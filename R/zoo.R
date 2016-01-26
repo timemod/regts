@@ -1,4 +1,5 @@
 #' @export
+#' @import zoo
 as.regts.zoo <- function(x, ...) {
     return (as.regts(as.ts(x)))
 }

@@ -1,5 +1,10 @@
 #' @export
 regts <- function(data, start, end = NULL, frequency = NA, ...) {
+
+    # make sure that data is a matrix
+    # if data is a vector, than the name argument is ignored.
+    data <- as.matrix(data)
+
     start <- as.regperiod(start, frequency)
     if (missing(end)) {
         retval <- ts(data, start = start$data, frequency = start$freq, ...)

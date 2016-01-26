@@ -4,5 +4,5 @@
 #' @export
 as.list.regts <- function(x, ...) {
     x <- NextMethod("as.list")
-    lapply(x, FUN = as.regts)
+    return (lapply(x, FUN = as.regts))
 }
