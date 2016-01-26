@@ -43,6 +43,16 @@ regperiod <- function(x, frequency = NA) {
     return (structure(period, class = "regperiod"))
 }
 
+#' Test if an object is a regperiod.
+#'
+#' @param x an object
+#' @return <code>TRUE</code> if the object a \code{regperiod}
+#' @export
+is.regperiod <- function(x) {
+    return (inherits(x, "regperiod"))
+}
+
+
 # normalise_regpriod makes sure that the subperiod (x$data[2]) lies between 1
 # and x$freq
 normalise_regperiod <- function(x) {
@@ -51,13 +61,17 @@ normalise_regperiod <- function(x) {
     return (x)
 }
 
-#' @export
-"+.regperiod" <- function(x, y) {
+# add an integer to a regperiod
+add_regperiod <- function(x, y) {
     if (!is.numeric(y) || y != as.integer(y)) {
         stop(paste("Error in", substitute(x), "+", substitute(y),
                    ": second operand is not an integer"))
     }
-    x$data[2] <- x$data[2] + y
+    if (length(y) > 1) {
+        stop("For arithmetic with a regperiod, the second argument should
+             be an integer of length 1")
+    }
+    x$data[2] <- x$data[2] + y[1]
     return (normalise_regperiod(x))
 }
 
@@ -66,24 +80,52 @@ get_subperiod_count <- function(x) {
     return (x$data[1] * x$freq + x$data[2])
 }
 
-#' @export
-"-.regperiod" <- function(x, y) {
+# subtract an integer of another regperiod from a regperiod
+subtract_regperiod <- function(x, y) {
     if (class(y) == "regperiod") {
         if (x$freq != y$freq) {
             stop("x and y have different frequencies")
         }
         retval <- get_subperiod_count(x) - get_subperiod_count(y)
-    } else if (is.numeric(y) && y == as.integer(y)) {
-        retval <- x
-        retval$data[2] <- retval$data[2] - y
-        retval <- normalise_regperiod(retval)
     } else {
-        stop(paste("Error in", substitute(x), "+", substitute(y),
-                   ": second operand is not a period or integer"))
+        retval <- add_regperiod(x, -y)
+        retval <- normalise_regperiod(retval)
     }
     return (retval)
 }
 
+#' @export
+Ops.regperiod <- function(x, y) {
+    if (.Generic == "+") {
+        retval <- add_regperiod(x, y)
+    } else if (.Generic == "-") {
+        retval <- subtract_regperiod(x, y)
+    } else if (is.regperiod(y)
+               && .Generic %in% c("==", "!=", "<", ">", "<=", "=>")) {
+        retval <- compare_regperiods(x, y, .Generic)
+    } else {
+        retval <- NextMethod(.Generic)
+    }
+    return (retval)
+}
+
+# compare two regperiods with relational operator operator
+compare_regperiods <- function(x, y, operator) {
+    if (x$freq != y$freq) {
+        if (operator %in% c("==", "!=")) {
+            retval <- operator == "=="
+        } else {
+            stop("Cannot compare two regperiods with different frequency")
+        }
+    } else {
+        subperiods <- lapply(list(x, y), get_subperiod_count)
+        retval <- do.call(operator, subperiods)
+    }
+}
+
+#' Convert an \code{regperiod} to a character representation
+#'
+#' param x the \code{regperiod} object to be converted
 #' @export
 as.character.regperiod <- function(x) {
     if (x$freq == 1) {

@@ -6,6 +6,7 @@
 #' Convert a regts to a dataframe.
 #' For the time being use zoo as intermediate class.
 #' @export
+#' @import zoo
 as.data.frame.regts <- function(x, ...) {
     return (as.data.frame(as.zooreg(x)))
 }
