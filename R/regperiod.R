@@ -101,7 +101,7 @@ Ops.regperiod <- function(x, y) {
     } else if (.Generic == "-") {
         retval <- subtract_regperiod(x, y)
     } else if (is.regperiod(y)
-               && .Generic %in% c("==", "!=", "<", ">", "<=", "=>")) {
+               && .Generic %in% c("==", "!=", "<", ">", "<=", ">=")) {
         retval <- compare_regperiods(x, y, .Generic)
     } else {
         retval <- NextMethod(.Generic)

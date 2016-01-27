@@ -1,3 +1,4 @@
+#' @import stringr
 #' @export
 regperiod_range <- function(x, frequency = NA) {
     if (!is.character(x)) {
@@ -10,6 +11,8 @@ regperiod_range <- function(x, frequency = NA) {
     } else {
         part1 <- substr(x, start = 1, stop = pos - 1)
         part2 <- substr(x, start = pos + 1, stop = nchar(x))
+        part1 <- str_trim(part1, side = "right")
+        part2 <- str_trim(part2, side = "left")
         if (nchar(part1) > 0) {
             p1 <- regperiod(part1, frequency)
             freq <- p1$freq
@@ -23,10 +26,14 @@ regperiod_range <- function(x, frequency = NA) {
         }
     }
 
-    if ((!(is.null(p1) || is.null(p2))) && p1$freq != p2$freq) {
-        stop("The two periods have different frequency")
+    if ((!(is.null(p1) || is.null(p2)))) {
+        if (p1$freq != p2$freq) {
+            stop("The two periods have different frequency")
+        }
+        if (p2 < p1) {
+            stop(paste("The start period", p1, "is after the end period", p2))
+        }
     }
-
     if (!is.null(p1)) {
         freq <- p1$freq
     } else {
@@ -61,7 +68,13 @@ get_start_period <- function(x) {
     if (!inherits(x, "regperiod_range")) {
         stop("x should be a regperiod_range object")
     }
-    return (list(data = x$start, freq = x$freq, class = "regperiod"))
+    if (!is.null(x$start)) {
+        retval <- (structure(list(data = x$start, freq = x$freq),
+                             class = "regperiod"))
+    } else {
+        retval <- NULL
+    }
+    return (retval)
 }
 
 #' @export
@@ -69,14 +82,21 @@ get_end_period <- function(x) {
     if (!inherits(x, "regperiod_range")) {
         stop("x should be a regperiod_range object")
     }
-    return (list(data = x$end, freq = x$freq, class = "regperiod"))
+    if (!is.null(x$end)) {
+        retval <- (structure(list(data = x$end, freq = x$freq),
+                             class = "regperiod"))
+    } else {
+        retval <- NULL
+    }
+    return (retval)
 }
-
 
 #' @export
 as.character.regperiod_range <- function(x) {
     if (!is.null(x$start)) {
         retval <- as.character.regperiod(get_start_period(x))
+    } else {
+        retval <- ""
     }
     retval <- paste0(retval, "/")
     if (!is.null(x$end)) {
@@ -113,3 +133,5 @@ modify_frequency <- function(x, new_freq) {
     x$freq <- new_freq
     return (x)
 }
+
+
