@@ -44,3 +44,22 @@ test_that("modify_frequency", {
     expect_identical(r, regperiod_range("/2010Q4"))
 })
 
+test_that("regrange_intersect", {
+    r1 <- regperiod_range("2010Q4/2011Q3")
+    r2 <- regperiod_range("2011Q1/2012Q4")
+    expect_identical(as.character(regrange_intersect(r1, r2)), "2011Q1/2011Q3")
+    expect_identical(as.character(regrange_intersect(r2, r1)), "2011Q1/2011Q3")
+    r2 <- regperiod_range("2008Q1/2011Q2")
+    expect_identical(as.character(regrange_intersect(r1, r2)), "2010Q4/2011Q2")
+    expect_identical(as.character(regrange_intersect(r2, r1)), "2010Q4/2011Q2")
+    r2 <- regperiod_range("/2011Q2")
+    expect_identical(as.character(regrange_intersect(r1, r2)), "2010Q4/2011Q2")
+    expect_identical(as.character(regrange_intersect(r2, r1)), "2010Q4/2011Q2")
+    r2 <- regperiod_range("2011Q2/")
+    expect_identical(as.character(regrange_intersect(r1, r2)), "2011Q2/2011Q3")
+    expect_identical(as.character(regrange_intersect(r2, r1)), "2011Q2/2011Q3")
+    r2 <- regperiod_range("2019Q2/")
+    expect_null(regrange_intersect(r1, r2))
+    expect_null(regrange_intersect(r2, r1))
+})
+

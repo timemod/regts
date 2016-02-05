@@ -135,3 +135,59 @@ modify_frequency <- function(x, new_freq) {
 }
 
 
+# Function minp calculates the smallest of two regperiods.
+# If both regperiods are NULL, then it returns NULL.
+# If only one regperiod is NULL, then it returns the regperiod
+# that is not NULL
+minp <- function(p1, p2) {
+    if (is.null(p1)) {
+        retval <- p2
+    } else if (is.null(p2) || p1 <= p2) {
+        retval <- p1
+    } else {
+        retval <- p2
+    }
+    return (retval)
+}
+
+
+
+# Function maxp calculates the largest of two regperiods.
+# If both regperiods are NULL, then it returns NULL.
+# If only one regperiod is NULL, then it returns the regperiod
+# that is not NULL
+maxp <- function(p1, p2) {
+    if (is.null(p1)) {
+        retval <- p2
+    } else if (is.null(p2) || p1 >= p2) {
+        retval <- p1
+    } else {
+        retval <- p2
+    }
+    return (retval)
+}
+
+#' Calculates the intersection of two \code{regperiod_range} objects.
+#  TODO: handle multiple regperiod_range objects?
+#'
+#' @param range1 a \code{regperiod_range} object
+#' @param range2 another \code{regperiod_range} object
+#' @return the intersection of \code{range1} and \code{range2}. Returns
+#' \code{NULL} if there is no intersection
+#' @export
+regrange_intersect <- function(range1, range2) {
+    if (range1$freq != range2$freq) {
+        stop("The two regperiod_ranges have different frequencies")
+    }
+    p1 <- maxp(get_start_period(range1), get_start_period(range2))
+    p2 <- minp(get_end_period(range1)  , get_end_period(range2))
+
+    if (p2 >= p1) {
+        return (structure(list(start = p1$data, end = p2$data, freq = range1$freq),
+                      class="regperiod_range"))
+    } else {
+        return (NULL)
+    }
+}
+
+
