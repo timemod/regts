@@ -56,6 +56,60 @@ add_columns <- function(x, new_colnames) {
     return (as.regts(x))
 }
 
+# This function makes sure that regperiod_range object range has
+# the same frequency as timeseries x, and also replaces
+# NULL values for range$start or range$end by the appropriate
+# values from timeseries x.
+# param range a regperiod_range object used as selector of a timeseries
+# param x  a timeseries object (regts or ts)
+convert_range_selector <- function(range, x) {
+
+    range <- modify_frequency(range, frequency(x))
+
+    # replace NULl periods by periods in x
+    if (is.null(range$start)) {
+        range$start <- start(x)
+    }
+    if (is.null(range$end)) {
+        range$end <- end(x)
+    }
+
+    # Check if range is a valid selector of timeseries x.
+    # An error will occur for example if timeseries x has period
+    # 2010Q1/2011Q2 while range is 2012Q2/.
+    p_start <- get_start_period(range)
+    p_end   <- get_end_period(range)
+    if (p_start > p_end) {
+        # This
+        stop(paste("Start period", p_start, "before end period", p_end))
+    }
+    return (range)
+}
+
+#' Adjust the period of the timeseries
+#'
+#' @param x a timeseries object (\code{ts} or \code{regts})
+#' @param range the new period range of the timeseries
+#' @return a \code{regts} with the adjusted period
+#' @export
+adjust_period <- function(x, range) {
+    range <- convert_range_selector(as.regperiod_range(range), x)
+    # TODO: if range within x, then use the window function,
+    # this might be faster (or not? check this)
+    return (.adjust_period(x, range))
+}
+
+.adjust_period <- function(x, range) {
+    per_len <- get_end_period(range) - get_start_period(range) + 1
+    retval <- regts(matrix(NA, nrow = per_len, ncol = ncol(x)),
+                    start = get_start_period(range), names = colnames(x))
+    p <- .regrange_intersect(get_regperiod_range(x), range)
+    if (!is.null(p)) {
+        retval[p, ] <- window(x, start = p$start, end = p$start)
+    }
+    return (retval)
+}
+
 # This function computes the row numbers of the selected rows in a
 # regts object. If the period selector lies partially outside
 # the defintion period of the input timeseries, then the function
@@ -68,27 +122,15 @@ add_columns <- function(x, new_colnames) {
 #          or NULL if y lies partially outside the
 #          definition period of x.
 get_row_selection <- function(x, y) {
-    ts_per <- get_regperiod_range(x)
+    ts_per       <- get_regperiod_range(x)
     ts_per_start <- get_start_period(ts_per)
-    ts_per_end  <- get_end_period(ts_per)
-    ts_per_len <- ts_per_end - ts_per_start + 1  # TODO: create special function
-    if (is.null(y$start)) {
-        p_start <- ts_per_start
-    } else {
-        p_start <- get_start_period(y)
-    }
-    if (is.null(y$end)) {
-        p_end <- ts_per_end
-    } else {
-        p_end <- get_end_period(y)
-    }
-
-    index1 <- p_start - ts_per_start + 1
-    index2 <- p_end - ts_per_start + 1
-    if (index1 > index2) {
-        stop(paste("Start period", p_start, "before end period", p_end))
-    }
-    extend <- index1 < 1 || index2 > ts_per_len
+    ts_per_end   <- get_end_period(ts_per)
+    ts_per_len   <- ts_per_end - ts_per_start + 1  # TODO: create function
+    p_start      <- get_start_period(y)
+    p_end        <- get_end_period(y)
+    index1       <- p_start - ts_per_start + 1
+    index2       <- p_end   - ts_per_start + 1
+    extend       <- index1 < 1 || index2 > ts_per_len
     if (!extend) {
         return (index1 : index2)
     } else {
@@ -117,46 +159,34 @@ check_extend <- function(x, y) {
 
     if (!missing(i) && (is.character(i) || inherits(i, "regperiod") ||
                         inherits(i, "regperiod_range"))) {
-        i <- as.regperiod_range(i)
-        i <- modify_frequency(i, frequency(x))
-        row_numbers <- get_row_selection(x, i)
-        extend <- is.null(row_numbers)
-        if (extend) {
-            # The window function of ts is quite slow when applied to the
-            # lhs of a statement, especially if extend = TRUE.
-            # Therefore only use window if extend = TRUE, use the
-            # row number selection if extend = FALSE.
-            suppressWarnings({
-                # suppress warnings about extending  timeseries with NA values
-                if (missing(j)) {
-                    window(x, start = i$start, end = i$end, extend = TRUE) <- value
-                } else {
-                    window(x, start = i$start, end = i$end, extend = TRUE)[, j] <- value
-                }
-            })
-        } else {
-            i <- row_numbers
-            x <- NextMethod("[<-")
+        range <- convert_range_selector(as.regperiod_range(i), x)
+        row_numbers <- get_row_selection(x, range)
+        if (is.null(row_numbers)) {
+            # Do not use the window function of ts to extend the timeseries,
+            # it is very slow. Use our own function .adjust_period
+            x <- .adjust_period(x, .regrange_union(range,
+                                                   get_regperiod_range(x)))
+            row_numbers <- get_row_selection(x, range)
         }
-        return (x)
-    } else {
-        return (NextMethod("[<-"))
+        i <- row_numbers
     }
+    return (NextMethod("[<-"))
 }
 
 #' @export
 "[.regts" <- function(x, i, j, drop = FALSE) {
     if (!missing(i) && (is.character(i) || inherits(i, "regperiod") ||
                         inherits(i, "regperiod_range"))) {
-        i <- as.regperiod_range(i)
-        i <- modify_frequency(i, frequency(x))
-        extend <- check_extend(x, i)
+        range <- convert_range_selector(as.regperiod_range(i), x)
+        extend <- check_extend(x, range)
         # The window function of ts is quite slow if extend = TRUE.
         # Therefore only use extend if it is really necessary
         if (missing(j)) {
-            x <- window(x, start = i$start, end = i$end, extend = extend)
+            x <- window(x, start = range$start, end = range$end,
+                        extend = extend)
         } else {
-            x <- window(x, start = i$start, end = i$end, extend = extend)[, j]
+            x <- window(x, start = range$start, end = range$end,
+                        extend = extend)[, j]
         }
         return (x)
     } else {

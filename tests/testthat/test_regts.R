@@ -53,17 +53,6 @@ test_that("get_regperiod_range / check_extend", {
                      TRUE)
     expect_identical(check_extend(regts1, regperiod_range("2010Q2/2012Q1")),
                      TRUE)
-    expect_identical(check_extend(regts1, regperiod_range("/2010Q1")),
-                     FALSE)
-    expect_identical(check_extend(regts1, regperiod_range("/2012Q1")),
-                     TRUE)
-    expect_identical(check_extend(regts1, regperiod_range("2008Q1/")),
-                     TRUE)
-    expect_identical(check_extend(regts1, regperiod_range("2011Q1/")),
-                     FALSE)
-
-    expect_error(check_extend(regts1, regperiod_range("/2007Q1")),
-                 "Start period 2010Q1 before end period 2007Q1")
 })
 
 test_that("period selection in univariate timeseries", {
