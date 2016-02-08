@@ -41,17 +41,11 @@ as.regts.default <- function(x, ...) {
 
 # Add columns with names new_colnames to x, and fill with NA.
 add_columns <- function(x, new_colnames) {
-
     new_columns <- ts(matrix(NA, ncol = length(new_colnames)),
                       start = start(x), end = end(x),
-                      frequency = frequency(x), names = new_colnames,
-                      class = c("mts", "ts", "matrix"))
-
+                      frequency = frequency(x))
     old_colnames <- colnames(x)
-
-    # call ts.intersect with normal ts object, otherwise the
-    # problems may occur
-    x <- ts.intersect(x, new_columns)
+    x <- cbind(x, new_columns)
     colnames(x) <- c(old_colnames, new_colnames)
     return (as.regts(x))
 }

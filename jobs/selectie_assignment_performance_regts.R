@@ -29,10 +29,13 @@ tm
 tm <- microbenchmark(ts2['2009Q3/2009Q4', 'ts_3400'] <- 2, times = 1)
 tm
 
+
 # nieuwe reeks toevoegen
+ts2 <- ts1
 tm <- microbenchmark(ts2[, 'x'] <- 2, times = 1)
 tm
 
+ts2 <- ts1
 tm <- microbenchmark(ts2['2012Q3/2012Q4', 'z'] <- 2, times = 1)
 tm
 
