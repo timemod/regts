@@ -104,3 +104,59 @@ test_that("period / column selection in multivariate timeseries", {
     expect_identical(regts1['2011'], as.regts(
         window(ts1, start = c(2011,1), end = c(2011,4), extend = TRUE)))
 })
+
+
+test_that("period selection at the lhs of a univariate timeseries", {
+
+    ts1 <- ts(1:8, start = c(2010, 1), end = c(2011, 4), frequency = 4)
+    regts1 <- as.regts(ts1)
+
+    # without period extension
+    regts2 <- regts1
+    regts2['2010Q2'] <- 2
+    regts2['2011Q3/'] <- 2 * regts1['2011Q3/']
+    ts2 <- ts1
+    window(ts2, start = c(2010, 2), end = c(2010,2)) <- 2
+    window(ts2, start = c(2011, 3)) <- 2 * window(ts1, start = c(2011, 3))
+    expect_identical(regts2, as.regts(ts2))
+
+    # with period extension
+    regts2 <- regts1
+    regts2['/2013Q2'] <- 9
+    regts2['2008Q2/2009Q2'] <- regts1['2010Q2/2011Q2']
+    ts2 <- ts1
+    suppressWarnings({
+        window(ts2, end = c(2013,2), extend = TRUE) <- 9
+        window(ts2, start = c(2008, 2), end = c(2009, 2), extend = TRUE) <-
+            window(ts1, start = c(2010, 2), end = c(2011,2))
+    })
+    expect_equivalent(regts2, as.regts(ts2))
+})
+
+
+test_that("period and column selection at the lhs of an assignment", {
+
+    data <- matrix(1: 10, ncol = 2)
+    ts1 <- ts(data, start = c(2010,4), frequency = 4, names = c("a", "b"))
+    regts1 <- as.regts(ts1)
+
+    regts2 <- regts1
+    regts2['2011Q1/'] <- 2 * regts1['2011Q1/']
+    regts2['/2011Q1', 'a'] <- c(10, 20)
+
+    ts2 <- ts1
+    window(ts2, start = c(2011, 1)) <- 2 * window(ts1, start = c(2011,1))
+    window(ts2, end = c(2011, 1))[, 'a'] <- c(10, 20)
+
+    expect_identical(regts2, as.regts(ts2))
+
+    regts2 <- regts1
+    regts2[, 'x'] <- 1
+    regts2['2010Q1'] <- 2 * regts2['2011Q1']
+    regts2['2012Q3/2012Q4', 'xx'] <- 2 * regts2['2011Q2/2011Q3', 'x']
+    regts2['2012Q3/',  c('a_2', 'b_2')] <- regts1['2011Q2/2011Q3',
+                                                       c('a', 'b')]
+    regts2['2010Q3/',  c('a', 'a_3')] <- 2 * regts1['2011Q2/2011Q3',
+                                                  c('a', 'a')]
+    expect_equal_to_reference(regts2, "period_and_column.rds")
+})

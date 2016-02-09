@@ -80,26 +80,28 @@ convert_range_selector <- function(range, x) {
     return (range)
 }
 
-#' Adjust the period of the timeseries
-#'
-#' @param x a timeseries object (\code{ts} or \code{regts})
-#' @param range the new period range of the timeseries
-#' @return a \code{regts} with the adjusted period
-#' @export
-adjust_period <- function(x, range) {
-    range <- convert_range_selector(as.regperiod_range(range), x)
-    # TODO: if range within x, then use the window function,
-    # this might be faster (or not? check this)
-    return (.adjust_period(x, range))
-}
-
+# Adjust the period of the timeseries
+#
+# @param x a timeseries object (\code{ts} or \code{regts})
+# @param range the new period range of the timeseries. This should
+# be a regperiod_range object without NULL periods
+# @return a regts with the adjusted period
 .adjust_period <- function(x, range) {
-    per_len <- get_end_period(range) - get_start_period(range) + 1
-    retval <- regts(matrix(NA, nrow = per_len, ncol = ncol(x)),
-                    start = get_start_period(range), names = colnames(x))
+
+    p_start <- get_start_period(range)
+    p_end   <- get_end_period(range)
+    per_len <- p_end - p_start + 1
+
+    if (is.mts(x)) {
+        ncolumns <- ncol(x)
+    } else {
+        ncolumns <- 1
+    }
+    retval <- regts(matrix(NA, nrow = per_len, ncol = ncolumns),
+                    start = p_start, names = colnames(x))
     p <- .regrange_intersect(get_regperiod_range(x), range)
     if (!is.null(p)) {
-        retval[p, ] <- window(x, start = p$start, end = p$start)
+        retval[p, ] <- window(x, start = p$start, end = p$end)
     }
     return (retval)
 }
@@ -163,6 +165,12 @@ check_extend <- function(x, y) {
             row_numbers <- get_row_selection(x, range)
         }
         i <- row_numbers
+        # if argument j is missing, then we have to add an empty
+        # column selection. x[i] does not return the same as x[i, ].
+        if (missing(j) && is.mts(x)) {
+            x[i, ] <- value
+            return (x)
+        }
     }
     return (NextMethod("[<-"))
 }
