@@ -20,7 +20,7 @@ regts.union <- function(...) {
 
 #' @export
 regts.intersect <- function(...) {
-    return (as.regts(ts.intersection(...)))
+    return (as.regts(ts.intersect(...)))
 }
 
 #' @export
