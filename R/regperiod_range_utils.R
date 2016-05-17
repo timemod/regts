@@ -26,7 +26,7 @@
         p_end <- p2_end
     }
     if (p_end >= p_start) {
-        return (combine_periods(p_start, p_end))
+        return (regperiod_range(p_start, p_end))
     } else {
         return (NULL)
     }
@@ -52,6 +52,6 @@
     if (p2_end > p_end) {
         p_end <- p2_end
     }
-    return (combine_periods(p_start, p_end))
+    return (regperiod_range(p_start, p_end))
 }
 
