@@ -79,15 +79,16 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
     missing_names2 <- setdiff(names1, names2)
 
     varCount <- length(common_names)
-    xx1 <- x1[, common_names]
-    xx2 <- x2[, common_names]
+
+    xx1 <- x1[, common_names, drop = FALSE]
+    xx2 <- x2[, common_names, drop = FALSE]
 
     # make sure that xx1 and xx2 have the same time axis
     # TODO: is there not a more efficient way to this?
     # calculate the intersection of period, then adjust each period
     tot <- regts.intersect(xx1, xx2)
-    xx1 <- tot[, 1: varCount]
-    xx2 <- tot[, (varCount + 1) : (2 * varCount)]
+    xx1 <- tot[, 1: varCount, drop = FALSE]
+    xx2 <- tot[, (varCount + 1) : (2 * varCount), drop = FALSE]
     rm(tot)
 
     # If xx1 and xx2 are both NA, then replace NA with 0.

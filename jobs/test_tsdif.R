@@ -28,7 +28,10 @@ print(dif4)
 dif5 <- tsdif(x1, x2[, 2:3])
 print(dif5)
 
-dif5 <- tsdif(x1[, 'a'], x2, fun = cvgdif, tol = 5e-4)
-print(dif5)
+dif6 <- tsdif(x1["2008Q4",], x2["2008Q4",])
+print(dif6)
+
+dif7 <- tsdif(x1[, 'a'], x2, fun = cvgdif, tol = 5e-4)
+print(dif7)
 
 
