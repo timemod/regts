@@ -110,15 +110,15 @@ calculate_difference <- function(common_names, x1, x2, tol, fun) {
         return (NULL)
     }
 
-    xx1 <- x1[, common_names, drop = FALSE]
-    xx2 <- x2[, common_names, drop = FALSE]
+    xx1 <- x1[, common_names]
+    xx2 <- x2[, common_names]
 
     # Make sure that xx1 and xx2 have the same time axis
     # TODO: is there not a more efficient way to this?
     # Calculate the union of period, then adjust each period.
     tot <- regts.union(xx1, xx2)
-    xx1 <- tot[, 1: var_count, drop = FALSE]
-    xx2 <- tot[, (var_count + 1) : (2 * var_count), drop = FALSE]
+    xx1 <- tot[, 1: var_count]
+    xx2 <- tot[, (var_count + 1) : (2 * var_count)]
     rm(tot)
 
     # If xx1 and xx2 are both NA, then replace NA with 0.
@@ -133,14 +133,14 @@ calculate_difference <- function(common_names, x1, x2, tol, fun) {
     sel <- apply(dif, FUN = max, MARGIN = 2) > tol
     sel[is.na(sel)] <- TRUE
     if (any(sel)) {
-        dif <- dif[, sel, drop = FALSE]
+        dif <- dif[, sel]
     } else {
         dif <- NULL
     }
 
     if (!is.null(dif)) {
         # sort columns of dif
-        dif <- dif[, sort(colnames(dif)), drop = FALSE]
+        dif <- dif[, sort(colnames(dif))]
     }
 }
 

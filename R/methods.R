@@ -10,6 +10,8 @@ diff.regts <- function(x, ...) {
 
 #' @export
 window.regts <- function(x, ...) {
+    # convert x to normal ts object
+    x <- remove_regts_class(x)
     return (as.regts(NextMethod(.Generic)))
 }
 

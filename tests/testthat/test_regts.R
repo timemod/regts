@@ -3,33 +3,33 @@ context("regts")
 test_that("constructor regts for univariate timeseries", {
 
     regts1 <- regts(1:10, start = "2010Q4")
-    ts1 <- ts(1:10, start = c(2010,4), frequency = 4)
+    ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010,4), frequency = 4, names = "Series 1")
     expect_identical(regts1, as.regts(ts1))
     expect_identical(class(regts1), c("regts", "ts"))
     expect_identical(is.regts(regts1), TRUE)
     expect_identical(is.regts(ts1), FALSE)
     expect_identical(is.ts(regts1), TRUE)
 
-    regts1 <- regts(matrix(1:10, ncol = 1), start = "2010Q4")
-    ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010,4), frequency = 4)
+    regts1 <- regts(matrix(1:10, ncol = 1), start = "2010Q4", names = "a")
+    ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010,4), frequency = 4, names = "a")
     expect_identical(regts1, as.regts(ts1))
 
-    regts1 <- regts(1:10, start = "2010", end = "2012", names = "a")
-    ts1 <- ts(1:10, start = 2010, end = 2012, frequency = 1, names = 'a')
-    expect_identical(regts1, as.regts(ts1))
+    regts1 <- regts(1:10, start = "2010", end = "2012")
+    expect_identical(regts1, as.regts(ts(1:10, start = 2010, end = 2012, frequency = 1)))
 
     expect_error(regts(1:10, start = "2010-1"),
                  "Frequency unknown. Specify argument frequency")
 
-    regts1 <- regts(1:10, start = "2010-1", frequency = 3)
-    ts1 <- ts(1:10, start = c(2010, 1), frequency = 3)
+    regts1 <- regts(1:10, start = "2010-1", frequency = 3, names = "a")
+    ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010, 1), frequency = 3, names = "a")
     expect_identical(as.regts(regts1), as.regts(ts1))
 })
 
 test_that("constructor regts for multivariate time series", {
     data <- matrix(1: 9, ncol = 3)
-    regts1 <- regts(data, start = "2010Q4", names = c("a", "b", "c"))
-    ts1 <- ts(data, start = c(2010,4), frequency = 4, names = c("a", "b", "c"))
+    colnames(data) <- c("a", "b", "c")
+    regts1 <- regts(data, start = "2010Q4")
+    ts1 <- ts(data, start = c(2010,4), frequency = 4)
     expect_identical(regts1, as.regts(ts1))
     expect_identical(class(regts1), c("regts", "mts", "ts", "matrix"))
     expect_identical(is.regts(regts1), TRUE)
@@ -91,7 +91,7 @@ test_that("period / column selection in multivariate timeseries", {
 
     regts2 <- regts1[, 'b']
     expect_is(regts2, "regts")
-    expect_identical(regts2, as.regts(ts1[, 'b']))
+    expect_identical(regts2, as.regts(ts1[, 'b', drop = FALSE]))
 
     expect_identical(regts1[, c("b", "a")], as.regts(ts1[, c("b", "a")]))
 
