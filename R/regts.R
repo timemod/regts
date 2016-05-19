@@ -111,8 +111,7 @@ as.regts.ts <- function(x) {
 
 ##' @export
 as.regts.default <- function(x) {
-    x <- as.ts(x, ...)
-    return (as.regts(x, ...))
+    return (as.regts(as.ts(x)))
 }
 
 # Add columns with names new_colnames to x, and fill with NA.
@@ -121,6 +120,7 @@ add_columns <- function(x, new_colnames) {
                       start = start(x), end = end(x),
                       frequency = frequency(x))
     old_colnames <- colnames(x)
+    x <- remove_regts_class(x)
     x <- cbind(x, new_columns)
     colnames(x) <- c(old_colnames, new_colnames)
     return (as.regts(x))

@@ -103,6 +103,9 @@ test_that("period / column selection in multivariate timeseries", {
 
     expect_identical(regts1['2011'], as.regts(
         window(ts1, start = c(2011,1), end = c(2011,4), extend = TRUE)))
+
+    expect_identical(regts1['2011Q1', c("a", "b")], as.regts(
+        window(ts1, start = c(2011,1), end = c(2011,1), extend = TRUE)[, c("a", "b"), drop = FALSE]))
 })
 
 
