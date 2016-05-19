@@ -29,8 +29,8 @@ a list with the following components
                        in \code{x2}}
  \item{common_names}{The names of the common columns of \code{x1} and
                     \code{x2}}
- \item{has_dif}{\code{TRUE} if any difference larger than \code{tol} was
-                found}
+ \item{equal}{\code{TRUE} if \code{x1} and \code{x2} have the same column names
+             and if all differences are smaller than or equal to \code{tol}}
  \item{difnames}{The names of the common columns with differences
                   larger than \code{tol}}
  \item{dif}{The computed differences for the common columns with

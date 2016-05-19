@@ -25,8 +25,8 @@
 #'                        in \code{x2}}
 #'  \item{common_names}{The names of the common columns of \code{x1} and
 #'                     \code{x2}}
-#'  \item{has_dif}{\code{TRUE} if any difference larger than \code{tol} was
-#'                 found}
+#'  \item{equal}{\code{TRUE} if \code{x1} and \code{x2} have the same column names
+#'              and if all differences are smaller than or equal to \code{tol}}
 #'  \item{difnames}{The names of the common columns with differences
 #'                   larger than \code{tol}}
 #'  \item{dif}{The computed differences for the common columns with
@@ -71,6 +71,9 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
                    "have different frequencies"))
     }
 
+    x1 <- as.regts(x1)
+    x2 <- as.regts(x2)
+
     names1 <- colnames(x1)
     names2 <- colnames(x2)
 
@@ -78,22 +81,49 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
     missing_names1 <- setdiff(names2, names1)
     missing_names2 <- setdiff(names1, names2)
 
-    varCount <- length(common_names)
+    dif <- calculate_difference(common_names, x1, x2, tol, fun)
+    if (!is.null(dif)) {
+        difnames <- colnames(dif)
+    } else {
+        difnames <- character(0)
+    }
+
+    retval <- list(tol           = tol,
+                   missing_names1 = missing_names1,
+                   missing_names2 = missing_names2,
+                   common_names   = common_names,
+                   equal          = length(missing_names1) == 0 & length(missing_names2) == 0
+                                    & length(difnames) == 0,
+                   difnames       = difnames,
+                   dif            = dif)
+
+    return (retval)
+}
+
+# Calculate the difference for the common columns in x1 and x2,
+# and return a regts with the difference. Return NULL if the differences
+# are smaller than tol, or if the two timeseries have no common columns
+calculate_difference <- function(common_names, x1, x2, tol, fun) {
+
+    var_count <- length(common_names)
+    if (var_count == 0) {
+        return (NULL)
+    }
 
     xx1 <- x1[, common_names, drop = FALSE]
     xx2 <- x2[, common_names, drop = FALSE]
 
-    # make sure that xx1 and xx2 have the same time axis
+    # Make sure that xx1 and xx2 have the same time axis
     # TODO: is there not a more efficient way to this?
-    # calculate the intersection of period, then adjust each period
-    tot <- regts.intersect(xx1, xx2)
-    xx1 <- tot[, 1: varCount, drop = FALSE]
-    xx2 <- tot[, (varCount + 1) : (2 * varCount), drop = FALSE]
+    # Calculate the union of period, then adjust each period.
+    tot <- regts.union(xx1, xx2)
+    xx1 <- tot[, 1: var_count, drop = FALSE]
+    xx2 <- tot[, (var_count + 1) : (2 * var_count), drop = FALSE]
     rm(tot)
 
     # If xx1 and xx2 are both NA, then replace NA with 0.
     # Two NA values are always considered equal.
-    both_na <- is.na(xx1) & is.na(xx1)
+    both_na <- is.na(xx1) & is.na(xx2)
     xx1[both_na] <- 0
     xx2[both_na] <- 0
 
@@ -110,21 +140,8 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
 
     if (!is.null(dif)) {
         # sort columns of dif
-        difnames <- colnames(dif)
-        dif <- dif[, sort(difnames), drop = FALSE]
-    } else {
-        difnames <- character(0)
+        dif <- dif[, sort(colnames(dif)), drop = FALSE]
     }
-
-    retval <- list(tol           = tol,
-                   missing_names1 = missing_names1,
-                   missing_names2 = missing_names2,
-                   common_names   = common_names,
-                   has_dif       = length(difnames) > 0,
-                   difnames      = difnames,
-                   dif           = dif)
-
-    return (retval)
 }
 
 #' Calculates the 'convergence difference'
