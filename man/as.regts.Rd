@@ -4,7 +4,7 @@
 \alias{as.regts}
 \title{Coerce an object to a \link{regts} timeseries object}
 \usage{
-as.regts(x)
+as.regts(x, ...)
 }
 \arguments{
 \item{x}{an arbitrary R object}

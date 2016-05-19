@@ -92,12 +92,12 @@ is.regts <- function(x) {
 #' @param x an arbitrary R object
 #' @return a \link{regts} object
 #' @export
-as.regts <- function(x) {
+as.regts <- function(x, ...) {
     UseMethod("as.regts")
 }
 
-##' @export
-as.regts.ts <- function(x) {
+#' @export
+as.regts.ts <- function(x, ...) {
     if (!is.regts(x)) {
         x <- insert_regts_class(x)
         if (is.null(attr(x, "dim"))) {
@@ -109,9 +109,9 @@ as.regts.ts <- function(x) {
     return (x)
 }
 
-##' @export
-as.regts.default <- function(x) {
-    return (as.regts(as.ts(x)))
+#' @export
+as.regts.default <- function(x, ...) {
+    return (as.regts(as.ts(x, ...)))
 }
 
 # Add columns with names new_colnames to x, and fill with NA.
