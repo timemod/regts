@@ -1,6 +1,9 @@
 #' Convert a regts to a list of univariate regts objects
 #' @param x a \code{regts} object
 #' @return a list of univariate \code{regts} objects
+#' @examples
+#' ts <- regts(matrix(1:6, ncol = 2), start = "2015Q3", names = c("a", "b"))
+#' print(as.list(ts))
 #' @export
 as.list.regts <- function(x, ...) {
     x <- NextMethod("as.list")

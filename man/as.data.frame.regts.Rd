@@ -2,14 +2,24 @@
 % Please edit documentation in R/data.frame.R
 \name{as.data.frame.regts}
 \alias{as.data.frame.regts}
-\title{Conversion between dataframes and regts.}
+\title{Converts a \link{regts} to a \link{data.frame}}
 \usage{
 \method{as.data.frame}{regts}(x, ...)
 }
+\arguments{
+\item{x}{a \code{regts}}
+
+\item{...}{arguments passed to \link{as.zooreg}}
+}
+\value{
+A \code{data.frame}
+}
 \description{
-Zoo has excellent facilities for this,
-therefore we employ zoo for the time being.
-Convert a regts to a dataframe.
-For the time being use zoo as intermediate class.
+The \code{regts} is first converted to a \link{zoo} object using
+\link{as.zooreg} and then converted to a data frame with \link{as.data.frame.zoo}
+}
+\examples{
+ts <- regts(1:3 , start = "2015Q3", names = "a")
+print(as.data.frame(ts))
 }
 

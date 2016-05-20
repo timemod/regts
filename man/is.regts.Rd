@@ -2,7 +2,7 @@
 % Please edit documentation in R/regts.R
 \name{is.regts}
 \alias{is.regts}
-\title{Test wether an object is a \link{regts} timeseries object}
+\title{Tests whether an object is a \link{regts} timeseries object}
 \usage{
 is.regts(x)
 }
@@ -10,9 +10,12 @@ is.regts(x)
 \item{x}{an arbitrary R object}
 }
 \value{
-\code{TRUE} if \code{x} isa  \link{regts} object
+\code{TRUE} if \code{x} is a \link{regts}
 }
 \description{
-Test wether an object is a \link{regts} timeseries object
+Tests whether an object is a \link{regts} timeseries object
+}
+\seealso{
+\link{regts} \link{as.regts}
 }
 

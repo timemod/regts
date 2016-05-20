@@ -29,7 +29,7 @@ function \link{as.regperiod}. The \code{regperiod_range} object is used to repre
 of \link{regperiods},  for example, a period from \code{2012Q2} to \code{2016Q4}.
 }
 \examples{
-create a regperiod_range from 2010Q2 to 2016Q3
+# create a regperiod_range from 2010Q2 to 2016Q3
 # regperiod_range("2010Q2", "2016Q3")
 
 # create a regperiod_range for the first 5 quaters after 2013Q2

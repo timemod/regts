@@ -1,19 +1,16 @@
-#' Conversion between dataframes and regts.
+#' Converts a \link{regts} to a \link{data.frame}
 #'
-#' Zoo has excellent facilities for this,
-#' therefore we employ zoo for the time being.
-
-#' Convert a regts to a dataframe.
-#' For the time being use zoo as intermediate class.
-#' @export
+#' The \code{regts} is first converted to a \link{zoo} object using
+#' \link{as.zooreg} and then converted to a data frame with \link{as.data.frame.zoo}
+#' @param x a \code{regts}
+#' @param ... arguments passed to \link{as.zooreg}
+#' @return A \code{data.frame}
 #' @import zoo
+#' @examples
+#' ts <- regts(1:3 , start = "2015Q3", names = "a")
+#' print(as.data.frame(ts))
 as.data.frame.regts <- function(x, ...) {
-    return (as.data.frame(as.zooreg(x)))
+    return (as.data.frame(as.zooreg(x, ...)))
 }
 
-#' @export
-# For the time being use zoo as intermediate class
-as.regts.data.frame <- function(x, ...) {
-    x <- read.zoo(x, ...)
-    return (as.regts(x))
-}
+

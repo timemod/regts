@@ -31,6 +31,15 @@
 #'
 #' # create a half-yearly timeseries
 #' ts3 <- regts(1:10, start = "2010-1", end = '2011-2', frequency = 2)
+#' @seealso
+#' The function \link{is.regts} can be used to test if an object is a \code{regts}.
+#'
+#' The S3 generic \link{as.regts} can be used to coerce an R object to a \code{regts}. There are currently
+#' methods for \link{ts} and \link{data.frame}.
+#'
+#' \link{as.data.frame.regts} and \link{as.list.regts} can be used
+#' to convert \code{regts} to a \link{data.frame} or a \link{list}.
+#' @import evaluate
 #' @export
 regts <- function(data, start, end = NULL, frequency = NA, names = NULL) {
     start <- as.regperiod(start, frequency)
@@ -79,23 +88,53 @@ insert_dim_attr <- function(x, names) {
     return(x)
 }
 
-#' Test wether an object is a \link{regts} timeseries object
+#' Tests whether an object is a \link{regts} timeseries object
 #' @param x an arbitrary R object
-#' @return \code{TRUE} if \code{x} isa  \link{regts} object
-#'
+#' @return \code{TRUE} if \code{x} is a \link{regts}
+#' @seealso
+#' \link{regts} \link{as.regts}
 #' @export
 is.regts <- function(x) {
     return (inherits(x, "regts"))
 }
 
 #' Coerce an object to a \link{regts} timeseries object
+#'
 #' @param x an arbitrary R object
+#' @param FUN a function for computing the index from the index column(s) of the data. See details
+#' of function \link{read.zoo}
+#' @param format date format argument passed to FUN
+#' @param index.column numeric vector or list. The column names or numbers of the data
+#'          frame in which the index/time is stored. See the description of this argument
+#'          in the documentation of function \link{read.zoo}.
 #' @return a \link{regts} object
+#' @seealso
+#' \link{regts}, \link{is.regts}, \link{as.data.frame.regts}, \link{as.list.regts}
+#' @examples
+#' # convert a ts to regts
+#' x <- ts(1:3, start = c(2015,3), frequency = 4)
+#' x <- as.regts(x)
+#'
+#' # Now two examples for converting a data.frame
+#'
+#' # load library zoo (needed because we will use the function as.yearqtr)
+#' library(zoo)
+#'
+#' # convert a data.frame with the time index in the first column
+#' df <- data.frame(period = c("2015Q3", "2015Q4", "2016Q1"), a = 1:3)
+#' ts <- as.regts(df, FUN = as.yearqtr)
+#'
+#' # create a data.frame with time index in the rownames and special
+#' # time format "2015 3" instead of "2015Q3".
+#' df <- data.frame(a = 1:3)
+#' rownames(df) <- c("2015 3", "2015 4", "2016 1")
+#' ts <- as.regts(df, FUN = as.yearqtr, format = "%Y %q", index.column = "row.names")
 #' @export
 as.regts <- function(x, ...) {
     UseMethod("as.regts")
 }
 
+#' @describeIn as.regts Coerce a \link{ts} to a \link{regts}
 #' @export
 as.regts.ts <- function(x, ...) {
     if (!is.regts(x)) {
@@ -109,6 +148,18 @@ as.regts.ts <- function(x, ...) {
     return (x)
 }
 
+#' @describeIn as.regts Convert a \link{data.frame} to a \link{regts}, employing the
+#' function \link{read.zoo} of the \link{zoo} package. The arguments \code{...} are passed to \link{read.zoo}
+#' @export
+#' @import zoo
+as.regts.data.frame <- function(x, FUN = NULL, format = "", index.column = 1) {
+    x <- read.zoo(x, FUN = FUN, format = format, index.column = index.column, regular = TRUE,
+                  drop = FALSE)
+    return (as.regts(x))
+}
+
+#' @describeIn as.regts Default method to convert an R object to a \link{regts}. This method
+#' first employs \link{at.ts} and then \link{as.regts.ts}
 #' @export
 as.regts.default <- function(x, ...) {
     return (as.regts(as.ts(x, ...)))

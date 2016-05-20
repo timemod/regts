@@ -46,4 +46,13 @@ ts2 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"))
 # create a half-yearly timeseries
 ts3 <- regts(1:10, start = "2010-1", end = '2011-2', frequency = 2)
 }
+\seealso{
+The function \link{is.regts} can be used to test if an object is a \code{regts}.
+
+The S3 generic \link{as.regts} can be used to coerce an R object to a \code{regts}. There are currently
+methods for \link{ts} and \link{data.frame}.
+
+\link{as.data.frame.regts} and \link{as.list.regts} can be used
+to convert \code{regts} to a \link{data.frame} or a \link{list}.
+}
 
