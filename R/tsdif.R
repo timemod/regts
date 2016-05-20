@@ -1,15 +1,15 @@
-#' Calculates the difference between two multivariate ts objects
+#' Calculates the difference between two timeseries objects
 #'
-#'This function calculates the difference between two multivariate timeseries
+#'This function calculates the difference between two timeseries
 #'objects \code{x1} and \code{x2} for the common columns.
 #'The two timeseries must have the same frequency, but may have a different
-#'period ranges. The difference is computed for the intersection of the two
+#'period range. The difference is computed for the intersection of the two
 #'period ranges (for the non-overlapping periods the result will be
 #'\code{NA}). Two \code{NA} values are considered to be equal.
 #'
 #' @export
-#' @param x1 the first timeseries (a \link{regts} or \link{mts} object).
-#' @param x2 the second timeseries (a \link{regts} or \link{mts} object).
+#' @param x1 the first timeseries (a \link{regts} or \link{ts} object).
+#' @param x2 the second timeseries (a \link{regts} or \link{ts} object).
 #' @param tol difference tolerance (by default zero). Differences smaller
 #' than tol are ignored.
 #' @param fun function to compute differences. This function should accept
@@ -29,8 +29,8 @@
 #'              and if all differences are smaller than or equal to \code{tol}}
 #'  \item{difnames}{The names of the common columns with differences
 #'                   larger than \code{tol}}
-#'  \item{dif}{The computed differences for the common columns with
-#'             differences are larger than \code{tol}, or \code{NULL} is there
+#'  \item{dif}{A \link{regts} with the computed differences for the common columns with
+#'             differences larger than \code{tol}, or \code{NULL} if there
 #'             are no differences}
 #' @examples
 #' library(regts)
@@ -41,38 +41,33 @@
 #'x2 <- x1 + 0.001
 #'colnames(x2) <- c("a", "b", "d")
 #'
+#'# calculate and print the differences
 #'dif1 <- tsdif(x1, x2)
 #'print(dif1)
 #'
-#'# use the function regts::cvgdif (convergence difference)
+#'# use the function cvgdif (convergence difference)
 #'dif2 <- tsdif(x1, x2, fun = cvgdif)
-#'print(dif2)
 #'
-#'# ignore differences smaller than 1e-4
+#'# calculate differences with tol = 1e-4, and print the
+#'# names of the timeseries with differences larger than tol
 #'dif3 <- tsdif(x1, x2, tol = 1e-4, fun = cvgdif)
-#'print(dif3)
+#'print(dif3$difnames)
 #'
+#'@seealso
+#'\link{regts}
 #'
 tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
 
     seriesName1 <- deparse(substitute(x1))
     seriesName2 <- deparse(substitute(x2))
 
-    # tsdif currently only works if both x1 and x2 are multivariate timeseries
-    if (!inherits(x1, "mts")) {
-        stop(paste("Argument x1 (", seriesName1, "is not a multivariate ts"))
-    }
-    if (!inherits(x2, "mts")) {
-        stop(paste("Argument x2 (", seriesName2, "is not a multivariate ts"))
-    }
+    x1 <- as.regts(x1)
+    x2 <- as.regts(x2)
 
     if (frequency(x1) != frequency(x2)) {
         stop(paste("Timeseries x1 and x2 (", seriesName1, "and", seriesName2,
                    "have different frequencies"))
     }
-
-    x1 <- as.regts(x1)
-    x2 <- as.regts(x2)
 
     names1 <- colnames(x1)
     names2 <- colnames(x2)

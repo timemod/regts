@@ -89,6 +89,16 @@ test_that("single common column", {
     expect_equal(res, res_correct2)
 })
 
+test_that("two univariate timeseries", {
+    res <- tsdif(ts1[, "a"], ts2[, c("a")])
+    res_correct2 <- list(tol = 0, missing_names1 = character(0),  missing_names2 = character(0),
+                         common_names = c("a"), equal = FALSE, difnames = c("a"),
+                         dif = regts(matrix(data = c(NA, rep(0.01, 3), NA), nc = 1),
+                                     start = "2008Q3", names = c("a")))
+    expect_equal(res, res_correct2)
+})
+
+
 
 
 
