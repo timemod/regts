@@ -117,12 +117,22 @@ is.regts <- function(x) {
 #' Coerce an object to a \link{regts} timeseries object
 #'
 #' @param x an arbitrary R object
-#' @param FUN a function for computing the index from the index column(s) of the data. See details
+#' @param columnwise a logical value. If \code{TRUE}, then the timeseries
+#' are stored columnwise in the data frame
+#' @param index_column column number of the index, only used if \code{columnwise} is
+#'  \code{TRUE}. Specify \code{"rownames"} if the index is in the row names of the
+#'  data frame.
+#' @param name_column the number of the column with the names of the timeseries,
+#' only used if \code{columnwise} is \code{FALSE}. Specify \code{"rownames"} if the
+#'  timeseries names are the row names of the data frame.
+#' @param label_column column number with the labels of the timeseries, only used
+#'  if \code{columnwise} is \code{FALSE}. Specify \code{"rownames"} if the
+#'  labels are in the row names of the data frame or \code{NULL} if the
+#'  data frame does not contain labels
+#' @param FUN a function for computing the index from the index column of the data. See details
 #' of function \link{read.zoo}
 #' @param format date format argument passed to FUN
-#' @param index.column numeric vector or list. The column names or numbers of the data
-#'          frame in which the index/time is stored. See the description of this argument
-#'          in the documentation of function \link{read.zoo}.
+#' @param ... arguments passed to other methods (currently not used)
 #' @return a \link{regts} object
 #' @seealso
 #' \link{regts}, \link{is.regts}, \link{as.data.frame.regts}, \link{as.list.regts}
@@ -136,15 +146,27 @@ is.regts <- function(x) {
 #' # load library zoo (needed because we will use the function as.yearqtr)
 #' library(zoo)
 #'
-#' # convert a data.frame with the time index in the first column
-#' df <- data.frame(period = c("2015Q3", "2015Q4", "2016Q1"), a = 1:3)
+#' # create a data frame with columnwise timeseries and with the
+#' # time index in the rownames, and convert to a regts
+#' df <- data.frame(a = 1:3)
+#' rownames(df) <- c("2015Q3", "2015Q4", "2016Q1")
 #' ts <- as.regts(df, FUN = as.yearqtr)
 #'
-#' # create a data.frame with time index in the rownames and special
-#' # time format "2015 3" instead of "2015Q3".
-#' df <- data.frame(a = 1:3)
-#' rownames(df) <- c("2015 3", "2015 4", "2016 1")
-#' ts <- as.regts(df, FUN = as.yearqtr, format = "%Y %q", index.column = "row.names")
+#' # create a data frame with columnwise timeseries and with
+#' # time index in the first column and special time format "2015 3"
+#' # instead of "2015Q3", and convert to regts
+#' df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
+#' ts <- as.regts(df, index_column = 1, FUN = as.yearqtr, format = "%Y %q")
+#'
+#' # create a data frame with rowwise timeseries, names in the first column
+#' # and  labels in the second column, and convert to regts
+#' df <- data.frame(names = c("a", "b"),
+#'                  labels = c("Timeseries a", "Timeseries b"),
+#'                  matrix(1:4, ncol = 2))
+#' colnames(df) <- c("names", "labels", "2016Q1", "2016Q2")
+#' ts <- as.regts(df, columnwise = FALSE, name_column = 1, label_column = 2,
+#'                FUN = as.yearqtr)
+#'
 #' @export
 as.regts <- function(x, ...) {
     UseMethod("as.regts")
@@ -168,10 +190,39 @@ as.regts.ts <- function(x, ...) {
 #' function \link{read.zoo} of the \link{zoo} package. The arguments \code{...} are passed to \link{read.zoo}
 #' @export
 #' @import zoo
-as.regts.data.frame <- function(x, FUN = NULL, format = "", index.column = 1) {
-    x <- read.zoo(x, FUN = FUN, format = format, index.column = index.column, regular = TRUE,
-                  drop = FALSE)
-    return (as.regts(x))
+as.regts.data.frame <- function(x, columnwise = TRUE, index_column = "rownames",
+                                name_column = "rownames", label_column = NULL,
+                                FUN = NULL, format = "") {
+
+    labels <- NULL
+    if (!columnwise) {
+        if (!is.null(label_column)) {
+            if (label_column != "rownames") {
+                labels <- as.character(x[[label_column]])
+                x <- x[-label_column]
+            } else {
+                labels <- rownames(x)
+            }
+        }
+        if (name_column  != "rownames") {
+            rownames(x) <- as.character(x[[name_column]])
+            x <- x[ , -name_column]
+        }
+
+        x <- as.data.frame(t(x), stringsAsFactors = FALSE)
+        index_column <- "row.names"
+    } else {
+        if (index_column == "rownames") {
+            index_column = "row.names"
+        }
+    }
+    x <- read.zoo(x, FUN = FUN, format = format, index.column = index_column,
+                  regular = TRUE, drop = FALSE)
+    x <- as.regts(x)
+    if (!is.null(labels)) {
+        ts_labels(x) <- labels
+    }
+    return (x)
 }
 
 #' @describeIn as.regts Default method to convert an R object to a \link{regts}. This method
@@ -320,14 +371,9 @@ check_extend <- function(x, y) {
 
 #' @export
 "[.regts" <- function(x, i, j) {
-
     lbls <- ts_labels(x)
     if (!is.null(lbls) && !missing(j)) {
-        sel <- j
-        if (is.character(j)) {
-            sel <- which(colnames(x) %in% sel)
-        }
-        lbls <- lbls[sel]
+        lbls <- lbls[j]
     }
     if (!missing(i) && (is.character(i) || inherits(i, "regperiod") ||
                         inherits(i, "regperiod_range"))) {
@@ -391,8 +437,13 @@ remove_regts_class <- function(x) {
 #'@examples
 #'ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"))
 #'ts_labels(ts) <- c("Timeseries a", "Timeseries b")
-#'print(ts_labels(ts)
-#'@describeIn ts_labels Retrieve timeseries labels
+#'print(ts_labels(ts))
+#'
+#' # print the column names and labels as a nice data.frame
+#' print(as.data.frame(ts_labels(ts)))
+#' @describeIn ts_labels Retrieve timeseries labels
+#' @seealso
+#' \link{regts}, \link{update_labels}
 #' @export
 ts_labels <- function(x) {
     return (attr(x, "ts_labels"))
@@ -420,12 +471,14 @@ ts_labels <- function(x) {
 #'
 #' @param x a \link{regts} object
 #' @param labels a named list. The names are the column names
-#' and the values are the labels). Specify \code{NULL} to remove all labels.
+#' and the values are the labels. Specify \code{NULL} to remove all labels.
 #' @examples
 #' ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"),
 #'              labels <- c("Timeseries a", "???"))
 #' ts <-update_labels(ts, list(b = "Timeseries b"))
-#' print(ts_labels(ts)
+#' print(ts_labels(ts))
+#'
+#' @seealso \link{ts_labels}
 #' @export
 update_labels <- function(x, labels) {
 

@@ -11,22 +11,37 @@ as.regts(x, ...)
 
 \method{as.regts}{ts}(x, ...)
 
-\method{as.regts}{data.frame}(x, FUN = NULL, format = "",
-  index.column = 1)
+\method{as.regts}{data.frame}(x, columnwise = TRUE,
+  index_column = "rownames", name_column = "rownames",
+  label_column = NULL, FUN = NULL, format = "")
 
 \method{as.regts}{default}(x, ...)
 }
 \arguments{
 \item{x}{an arbitrary R object}
 
-\item{FUN}{a function for computing the index from the index column(s) of the data. See details
+\item{...}{arguments passed to other methods (currently not used)}
+
+\item{columnwise}{a logical value. If \code{TRUE}, then the timeseries
+are stored columnwise in the data frame}
+
+\item{index_column}{column number of the index, only used if \code{columnwise} is
+\code{TRUE}. Specify \code{"rownames"} if the index is in the row names of the
+data frame.}
+
+\item{name_column}{the number of the column with the names of the timeseries,
+only used if \code{columnwise} is \code{FALSE}. Specify \code{"rownames"} if the
+ timeseries names are the row names of the data frame.}
+
+\item{label_column}{column number with the labels of the timeseries, only used
+if \code{columnwise} is \code{FALSE}. Specify \code{"rownames"} if the
+labels are in the row names of the data frame or \code{NULL} if the
+data frame does not contain labels}
+
+\item{FUN}{a function for computing the index from the index column of the data. See details
 of function \link{read.zoo}}
 
 \item{format}{date format argument passed to FUN}
-
-\item{index.column}{numeric vector or list. The column names or numbers of the data
-frame in which the index/time is stored. See the description of this argument
-in the documentation of function \link{read.zoo}.}
 }
 \value{
 a \link{regts} object
@@ -54,15 +69,27 @@ x <- as.regts(x)
 # load library zoo (needed because we will use the function as.yearqtr)
 library(zoo)
 
-# convert a data.frame with the time index in the first column
-df <- data.frame(period = c("2015Q3", "2015Q4", "2016Q1"), a = 1:3)
+# create a data frame with columnwise timeseries and with the
+# time index in the rownames, and convert to a regts
+df <- data.frame(a = 1:3)
+rownames(df) <- c("2015Q3", "2015Q4", "2016Q1")
 ts <- as.regts(df, FUN = as.yearqtr)
 
-# create a data.frame with time index in the rownames and special
-# time format "2015 3" instead of "2015Q3".
-df <- data.frame(a = 1:3)
-rownames(df) <- c("2015 3", "2015 4", "2016 1")
-ts <- as.regts(df, FUN = as.yearqtr, format = "\%Y \%q", index.column = "row.names")
+# create a data frame with columnwise timeseries and with
+# time index in the first column and special time format "2015 3"
+# instead of "2015Q3", and convert to regts
+df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
+ts <- as.regts(df, index_column = 1, FUN = as.yearqtr, format = "\%Y \%q")
+
+# create a data frame with rowwise timeseries, names in the first column
+# and  labels in the second column, and convert to regts
+df <- data.frame(names = c("a", "b"),
+                 labels = c("Timeseries a", "Timeseries b"),
+                 matrix(1:4, ncol = 2))
+colnames(df) <- c("names", "labels", "2016Q1", "2016Q2")
+ts <- as.regts(df, columnwise = FALSE, name_column = 1, label_column = 2,
+               FUN = as.yearqtr)
+
 }
 \seealso{
 \link{regts}, \link{is.regts}, \link{as.data.frame.regts}, \link{as.list.regts}

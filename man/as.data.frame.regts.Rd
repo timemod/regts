@@ -4,10 +4,15 @@
 \alias{as.data.frame.regts}
 \title{Converts a \link{regts} to a \link{data.frame}}
 \usage{
-\method{as.data.frame}{regts}(x, ...)
+\method{as.data.frame}{regts}(x, columnwise = TRUE, ...)
 }
 \arguments{
 \item{x}{a \code{regts}}
+
+\item{columnwise}{a logical value. Specify \code{TRUE} if the timeseries
+should become the  columns of the data frame, and \code{FALSE} is the timeseries
+should become the rows of the data frame. In that case, the first column
+of the result data frame will contain the labels.}
 
 \item{...}{arguments passed to \link{as.data.frame.zoo}}
 }
@@ -15,11 +20,20 @@
 A \code{data.frame}
 }
 \description{
+The timeseries can be put either as columns or as rows in the data frame. The
+advantage of a rowwise storage is that an additional column with
+timeseries labels can be inserted in the data frame.
+}
+\details{
 The \code{regts} is first converted to a \link{zoo} object using
 \link{as.zooreg} and then converted to a data frame with \link{as.data.frame.zoo}
 }
 \examples{
-ts <- regts(1:3 , start = "2015Q3", names = "a")
+ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),
+           labels = c("Timeseries a", "Timeseries b"))
 print(as.data.frame(ts))
+
+# store timeseries rowwise. The first column contains the labels.
+print(as.data.frame(ts, columnwise = FALSE))
 }
 
