@@ -21,6 +21,7 @@
 #' @param names a character vector of names for the series: defaults to the colnames of data, or Series 1,
 #' Series 2, .... if the data does not have colnames. In contrast to the function\link{ts}, this function
 #' also uses the supplied name if the result is a single timeseries.
+#' @param labels a character vector of labels (descriptions of the timeseries)
 #' @return a \code{regts} object
 #' @examples
 #' # univariate timeseries
@@ -29,8 +30,12 @@
 #' # multivariate timeseries
 #' ts2 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"))
 #'
+#'# multivariate timeseries with labels
+#' ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"),
+#'              labels = paste("Timeseries", c("a", "b", "c")))
+#'
 #' # create a half-yearly timeseries
-#' ts3 <- regts(1:10, start = "2010-1", end = '2011-2', frequency = 2)
+#' ts4 <- regts(1:10, start = "2010-1", end = '2011-2', frequency = 2)
 #' @seealso
 #' The function \link{is.regts} can be used to test if an object is a \code{regts}.
 #'
@@ -39,9 +44,14 @@
 #'
 #' \link{as.data.frame.regts} and \link{as.list.regts} can be used
 #' to convert \code{regts} to a \link{data.frame} or a \link{list}.
+#'
+#' See also the description of the functions for handling labels
+#' (\link{ts.labels} and \link{update_labels}).
+#'
 #' @import evaluate
 #' @export
-regts <- function(data, start, end = NULL, frequency = NA, names = NULL) {
+regts <- function(data, start, end = NULL, frequency = NA, names = NULL,
+                  labels = NULL) {
     start <- as.regperiod(start, frequency)
     if (missing(end)) {
         retval <- ts(data, start = start$data, frequency = start$freq)
@@ -69,7 +79,13 @@ regts <- function(data, start, end = NULL, frequency = NA, names = NULL) {
     } else if (!is.null(colnames(data))) {
         colnames(retval) <- colnames(data)
     }
-    return (insert_regts_class(retval))
+
+    retval <- insert_regts_class(retval)
+
+    if (!is.null(labels)) {
+        ts_labels(retval) <- labels
+    }
+    return (retval)
 }
 
 # insert "regts" at the beginning of the classes vector
@@ -304,6 +320,15 @@ check_extend <- function(x, y) {
 
 #' @export
 "[.regts" <- function(x, i, j) {
+
+    lbls <- ts_labels(x)
+    if (!is.null(lbls) && !missing(j)) {
+        sel <- j
+        if (is.character(j)) {
+            sel <- which(colnames(x) %in% sel)
+        }
+        lbls <- lbls[sel]
+    }
     if (!missing(i) && (is.character(i) || inherits(i, "regperiod") ||
                         inherits(i, "regperiod_range"))) {
         range <- convert_range_selector(as.regperiod_range(i), x)
@@ -315,12 +340,19 @@ check_extend <- function(x, y) {
         } else {
             x <- window(x, start = range$start, end = range$end, extend = extend)[, j]
         }
+        if (!is.null(lbls)) {
+            ts_labels(x) <- lbls
+        }
         return (x)
     } else {
         x <- NextMethod("[", drop = FALSE)
         # x can be something else than a timeseries, for example an integer
         if (is.ts(x)) {
-            return (as.regts(x))
+            x <- as.regts(x)
+            if (!is.null(lbls)) {
+                ts_labels(x) <- lbls
+            }
+            return (x)
         } else {
             return (x)
         }
@@ -345,4 +377,75 @@ remove_regts_class <- function(x) {
     old_classes <- class(x)
     class(x) <- old_classes[old_classes != "regts"]
     return (x)
+}
+
+#' Timeseries labels
+#'
+#'Retrieve or set labels for the timeseries. Timerseries labels
+#'can be used to give a description of the contents of the timeseries.
+#'The labels are stored in a named list: the names are the timeseries names
+#'(column names), and the values the correpsonding label.
+#'@param x a \link{regts}
+#'@param value a character vector with the labels or \code{NULL}. The length
+#'should be equal to the number of columns. Specify \code{NULL} to remove all labels.
+#'@examples
+#'ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"))
+#'ts_labels(ts) <- c("Timeseries a", "Timeseries b")
+#'print(ts_labels(ts)
+#'@describeIn ts_labels Retrieve timeseries labels
+#' @export
+ts_labels <- function(x) {
+    return (attr(x, "ts_labels"))
+}
+
+#' @describeIn ts_labels Sets the timeseries labels
+#' @export
+`ts_labels<-` <- function(x, value) {
+    if (!is.null(value)) {
+        if (!is.character(value)) {
+            stop("value should be a character vector")
+        }
+        if (length(value) != ncol(x)) {
+            stop(paste("The length of the labels argument should be equal",
+                       "to the number of columns"))
+        }
+    }
+    attr(x, "ts_labels") <- value
+    return (x)
+}
+
+#' Update one or more timeseries labels in a \code{regts} object
+#'
+#' @param x a \link{regts} object
+#' @param labels a named list. The names are the column names
+#' and the values are the labels). Specify \code{NULL} to remove all labels.
+#' @examples
+#' ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"),
+#'              labels <- c("Timeseries a", "???"))
+#' ts <-update_labels(ts, list(b = "Timeseries b"))
+#' print(ts_labels(ts)
+#' @export
+update_labels <- function(x, labels) {
+
+    if (is.null(labels)) {
+        ts_labels(x) <- NULL
+        return (x)
+    }
+
+    lbls <- ts_labels(x)
+    if (is.null(lbls)) {
+        lbls <- rep("", ncol(x))
+    }
+    sel <- which(colnames(x) %in% names(labels))
+    lbls[sel] <- as.character(labels[colnames(x)[sel]])
+    ts_labels(x) <- lbls
+    return (x)
+}
+
+
+#' @export
+# do not print ts_labels
+print.regts <- function(x, ...) {
+    ts_labels(x) <- NULL
+    NextMethod("print", .Generic)
 }

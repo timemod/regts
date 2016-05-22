@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{a \code{regts}}
 
-\item{...}{arguments passed to \link{as.zooreg}}
+\item{...}{arguments passed to \link{as.data.frame.zoo}}
 }
 \value{
 A \code{data.frame}

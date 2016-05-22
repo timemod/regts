@@ -4,7 +4,8 @@
 \alias{regts}
 \title{Create a \code{regts} timeseries object}
 \usage{
-regts(data, start, end = NULL, frequency = NA, names = NULL)
+regts(data, start, end = NULL, frequency = NA, names = NULL,
+  labels = NULL)
 }
 \arguments{
 \item{data}{a vector or matrix of the observed time-series values. A data frame will be
@@ -25,6 +26,8 @@ e.g. \code{"2011-3"}}
 \item{names}{a character vector of names for the series: defaults to the colnames of data, or Series 1,
 Series 2, .... if the data does not have colnames. In contrast to the function\link{ts}, this function
 also uses the supplied name if the result is a single timeseries.}
+
+\item{labels}{a character vector of labels (descriptions of the timeseries)}
 }
 \value{
 a \code{regts} object
@@ -43,8 +46,12 @@ ts1 <- regts(1:10, start = "2010Q4")
 # multivariate timeseries
 ts2 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"))
 
+# multivariate timeseries with labels
+ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"),
+             labels = paste("Timeseries", c("a", "b", "c")))
+
 # create a half-yearly timeseries
-ts3 <- regts(1:10, start = "2010-1", end = '2011-2', frequency = 2)
+ts4 <- regts(1:10, start = "2010-1", end = '2011-2', frequency = 2)
 }
 \seealso{
 The function \link{is.regts} can be used to test if an object is a \code{regts}.
@@ -54,5 +61,8 @@ methods for \link{ts} and \link{data.frame}.
 
 \link{as.data.frame.regts} and \link{as.list.regts} can be used
 to convert \code{regts} to a \link{data.frame} or a \link{list}.
+
+See also the description of the functions for handling labels
+(\link{ts.labels} and \link{update_labels}).
 }
 
