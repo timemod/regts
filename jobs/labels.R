@@ -14,6 +14,6 @@ x1 <- update_labels(x1, list(b = "Timeseries  b"))
 print(ts_labels(x1))
 
 x1 <- regts(matrix(data = rep(1:6, 3), nc = 2), start = "2008Q4",
-            names = c("a", "b"), labels = c("Variable a"))
+            names = c("a", "b"), labels = c("Variable a", "Variable b"))
 print(ts_labels(x1))
 

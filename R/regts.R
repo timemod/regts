@@ -409,7 +409,9 @@ ts_labels <- function(x) {
             stop(paste("The length of the labels argument should be equal",
                        "to the number of columns"))
         }
+        names(value) <- colnames(x)
     }
+
     attr(x, "ts_labels") <- value
     return (x)
 }
@@ -435,6 +437,7 @@ update_labels <- function(x, labels) {
     lbls <- ts_labels(x)
     if (is.null(lbls)) {
         lbls <- rep("", ncol(x))
+        names(lbls) <- colnames(x)
     }
     sel <- which(colnames(x) %in% names(labels))
     lbls[sel] <- as.character(labels[colnames(x)[sel]])
