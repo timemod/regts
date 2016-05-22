@@ -54,7 +54,10 @@ Coerce an object to a \link{regts} timeseries object
 \item \code{ts}: Coerce a \link{ts} to a \link{regts}
 
 \item \code{data.frame}: Convert a \link{data.frame} to a \link{regts}, employing the
-function \link{read.zoo} of the \link{zoo} package. The arguments \code{...} are passed to \link{read.zoo}
+function \link{read.zoo} of the \link{zoo} package. The timeseries can be stored
+columnwise or rowwise in the data frame. If they are stored columnwise, then the
+data frame may contain a column with labels: these labels can also be read. See the description
+of argument \code{columnwise}, \code{name_column} and \code{label_column}.
 
 \item \code{default}: Default method to convert an R object to a \link{regts}. This method
 first employs \link{at.ts} and then \link{as.regts.ts}

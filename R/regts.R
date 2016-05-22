@@ -187,9 +187,12 @@ as.regts.ts <- function(x, ...) {
 }
 
 #' @describeIn as.regts Convert a \link{data.frame} to a \link{regts}, employing the
-#' function \link{read.zoo} of the \link{zoo} package. The arguments \code{...} are passed to \link{read.zoo}
-#' @export
+#' function \link{read.zoo} of the \link{zoo} package. The timeseries can be stored
+#' columnwise or rowwise in the data frame. If they are stored columnwise, then the
+#' data frame may contain a column with labels: these labels can also be read. See the description
+#' of argument \code{columnwise}, \code{name_column} and \code{label_column}.
 #' @import zoo
+#' @export
 as.regts.data.frame <- function(x, columnwise = TRUE, index_column = "rownames",
                                 name_column = "rownames", label_column = NULL,
                                 FUN = NULL, format = "") {
