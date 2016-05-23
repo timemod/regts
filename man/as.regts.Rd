@@ -35,7 +35,7 @@ only used if \code{columnwise} is \code{FALSE}. Specify \code{"rownames"} if the
 
 \item{label_column}{column number with the labels of the timeseries, only used
 if \code{columnwise} is \code{FALSE}. Specify \code{"rownames"} if the
-labels are in the row names of the data frame or \code{NULL} if the
+labels are the row names of the data frame or \code{NULL} if the
 data frame does not contain labels}
 
 \item{format}{date format argument passed to FUN}
@@ -67,7 +67,7 @@ first employs \link{at.ts} and then \link{as.regts.ts}
 x <- ts(1:3, start = c(2015,3), frequency = 4)
 x <- as.regts(x)
 
-# Now two examples for converting a data.frame
+# Now three examples for converting a data.frame
 
 # load library zoo (needed because we will use the function as.yearqtr)
 library(zoo)

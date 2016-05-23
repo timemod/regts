@@ -16,7 +16,7 @@ ts_labels(x) <- value
 should be equal to the number of columns. Specify \code{NULL} to remove all labels.}
 }
 \description{
-Retrieve or set labels for the timeseries. Timerseries labels
+Retrieve or set labels for the timeseries. Timeseries labels
 can be used to give a description of the contents of the timeseries.
 The labels are stored in a named list: the names are the timeseries names
 (column names), and the values the correpsonding label.

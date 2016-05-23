@@ -23,9 +23,10 @@ from the dimension of \code{data}}
 the start or end period is specified with a general period format without period indicator,
 e.g. \code{"2011-3"}}
 
-\item{names}{a character vector of names for the series: defaults to the colnames of data, or Series 1,
-Series 2, .... if the data does not have colnames. In contrast to the function\link{ts}, this function
-also uses the supplied name if the result is a single timeseries.}
+\item{names}{a character vector of names for the series: defaults to the
+colnames of data, or \code{"Series 1"}, \code{"Series 2"} ..., if the data does
+not have colnames. In contrast to the function \link{ts},  \code{names}
+is also used if the result is a single timeseries.}
 
 \item{labels}{a character vector of labels (descriptions of the timeseries)}
 }
@@ -50,7 +51,8 @@ ts2 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"))
 ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"),
              labels = paste("Timeseries", c("a", "b", "c")))
 
-# create a half-yearly timeseries
+# create a half-yearly timeseries, because ‘end’ is specified the length
+# of the timeseries is smaller than the length of data (10).
 ts4 <- regts(1:10, start = "2010-1", end = '2011-2', frequency = 2)
 }
 \seealso{
@@ -63,6 +65,6 @@ methods for \link{ts} and \link{data.frame}.
 to convert \code{regts} to a \link{data.frame} or a \link{list}.
 
 See also the description of the functions for handling labels
-(\link{ts.labels} and \link{update_labels}).
+(\link{ts_labels} and \link{update_labels}).
 }
 

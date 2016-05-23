@@ -9,11 +9,11 @@ regperiod_range(p1, p2 = p1, frequency = NA)
 \arguments{
 \item{p1}{the first period (a \link{regperiod}, a character string
 that can be converted to a \link{regpediod}, or \code{NULL}). If \code{p1}
-is \code{NULL}. In that case, the lower bound of the period range is undetermined.}
+is \code{NULL}, the lower bound of the period range is undetermined.}
 
 \item{p2}{the last period (a \link{regperiod}, a character string
 that can be converted to a \link{regpediod}). If \code{p2} is
-\code{NULL}, the lower bound of the period range is undetermined.}
+\code{NULL}, the upper bound of the period range is undetermined.}
 
 \item{frequency}{frequency of the regperiod objects. This argument is mandatory
 if argument \code{p1} or \code{p2} is a character with general period format
@@ -24,22 +24,22 @@ a \code{regperiod_range} object
 }
 \description{
 Create a \code{regperiod_range} object from two \link{regperiod} objects
-or character strings that can be converted to a \link{regperiod} objects with
+or character strings that can be converted to \link{regperiod} objects with
 function \link{as.regperiod}. The \code{regperiod_range} object is used to represent an interval
 of \link{regperiods},  for example, a period from \code{2012Q2} to \code{2016Q4}.
 }
 \examples{
 # create a regperiod_range from 2010Q2 to 2016Q3
-# regperiod_range("2010Q2", "2016Q3")
+regperiod_range("2010Q2", "2016Q3")
 
-# create a regperiod_range for the first 5 quaters after 2013Q2
+# create a regperiod_range for the first 5 quarters after 2013Q2
 p1 <- regperiod("2013Q3")
 regperiod_range(p1, p1 + 5)
 
 # create a regperiod_range from 2010Q2 with no upper bound
 regperiod_range("2010Q2", NULL)
 
-#create a regperiod_range for a timeseries with frequency 3
-regperiod_range("2010-2", "2016-3", frequency = 3)
+#create a regperiod_range for a timeseries with frequency 2 (half year)
+regperiod_range("2010-2", "2016-2", frequency = 2)
 }
 

@@ -18,9 +18,10 @@
 #' @param frequency the frequency of the timeseries. This argument should only be specified if
 #' the start or end period is specified with a general period format without period indicator,
 #' e.g. \code{"2011-3"}
-#' @param names a character vector of names for the series: defaults to the colnames of data, or Series 1,
-#' Series 2, .... if the data does not have colnames. In contrast to the function\link{ts}, this function
-#' also uses the supplied name if the result is a single timeseries.
+#' @param names a character vector of names for the series: defaults to the
+#' colnames of data, or \code{"Series 1"}, \code{"Series 2"} ..., if the data does
+#' not have colnames. In contrast to the function \link{ts},  \code{names}
+#' is also used if the result is a single timeseries.
 #' @param labels a character vector of labels (descriptions of the timeseries)
 #' @return a \code{regts} object
 #' @examples
@@ -34,7 +35,8 @@
 #' ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"),
 #'              labels = paste("Timeseries", c("a", "b", "c")))
 #'
-#' # create a half-yearly timeseries
+#' # create a half-yearly timeseries, because ‘end’ is specified the length
+#' # of the timeseries is smaller than the length of data (10).
 #' ts4 <- regts(1:10, start = "2010-1", end = '2011-2', frequency = 2)
 #' @seealso
 #' The function \link{is.regts} can be used to test if an object is a \code{regts}.
@@ -46,7 +48,7 @@
 #' to convert \code{regts} to a \link{data.frame} or a \link{list}.
 #'
 #' See also the description of the functions for handling labels
-#' (\link{ts.labels} and \link{update_labels}).
+#' (\link{ts_labels} and \link{update_labels}).
 #'
 #' @import evaluate
 #' @export
@@ -127,7 +129,7 @@ is.regts <- function(x) {
 #'  timeseries names are the row names of the data frame.
 #' @param label_column column number with the labels of the timeseries, only used
 #'  if \code{columnwise} is \code{FALSE}. Specify \code{"rownames"} if the
-#'  labels are in the row names of the data frame or \code{NULL} if the
+#'  labels are the row names of the data frame or \code{NULL} if the
 #'  data frame does not contain labels
 #' @param FUN a function for computing the index from the index column of the data. See details
 #' of function \link{read.zoo}
@@ -141,7 +143,7 @@ is.regts <- function(x) {
 #' x <- ts(1:3, start = c(2015,3), frequency = 4)
 #' x <- as.regts(x)
 #'
-#' # Now two examples for converting a data.frame
+#' # Now three examples for converting a data.frame
 #'
 #' # load library zoo (needed because we will use the function as.yearqtr)
 #' library(zoo)
@@ -429,7 +431,7 @@ remove_regts_class <- function(x) {
 
 #' Timeseries labels
 #'
-#'Retrieve or set labels for the timeseries. Timerseries labels
+#'Retrieve or set labels for the timeseries. Timeseries labels
 #'can be used to give a description of the contents of the timeseries.
 #'The labels are stored in a named list: the names are the timeseries names
 #'(column names), and the values the correpsonding label.
