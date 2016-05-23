@@ -195,8 +195,7 @@ as.regts.ts <- function(x, ...) {
 #' @export
 as.regts.data.frame <- function(x, columnwise = TRUE, index_column = "rownames",
                                 name_column = "rownames", label_column = NULL,
-                                FUN = NULL, format = "") {
-
+                                fun = NULL, format = NULL) {
     labels <- NULL
     if (!columnwise) {
         if (!is.null(label_column)) {
@@ -219,7 +218,7 @@ as.regts.data.frame <- function(x, columnwise = TRUE, index_column = "rownames",
             index_column = "row.names"
         }
     }
-    x <- read.zoo(x, FUN = FUN, format = format, index.column = index_column,
+    x <- read.zoo(x, FUN = fun, format = format, index.column = index_column,
                   regular = TRUE, drop = FALSE)
     x <- as.regts(x)
     if (!is.null(labels)) {

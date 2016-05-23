@@ -13,7 +13,7 @@ as.regts(x, ...)
 
 \method{as.regts}{data.frame}(x, columnwise = TRUE,
   index_column = "rownames", name_column = "rownames",
-  label_column = NULL, FUN = NULL, format = "")
+  label_column = NULL, fun = NULL, format = NULL)
 
 \method{as.regts}{default}(x, ...)
 }
@@ -38,10 +38,10 @@ if \code{columnwise} is \code{FALSE}. Specify \code{"rownames"} if the
 labels are in the row names of the data frame or \code{NULL} if the
 data frame does not contain labels}
 
+\item{format}{date format argument passed to FUN}
+
 \item{FUN}{a function for computing the index from the index column of the data. See details
 of function \link{read.zoo}}
-
-\item{format}{date format argument passed to FUN}
 }
 \value{
 a \link{regts} object

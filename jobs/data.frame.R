@@ -31,3 +31,8 @@ ts_labels(ts) <- NULL
 print(as.data.frame(ts))
 print(as.data.frame(ts, columnwise = FALSE))
 
+df <- data.frame(period = c(2015,2016,2017), a = 1:3)
+df
+read.zoo(df, index.column = 1, regular = TRUE)
+as.regts(as.ts(read.zoo(df, index.column = 1, regular = TRUE)))
+as.regts(df, index_column = 1)
