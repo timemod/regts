@@ -1,0 +1,73 @@
+#' Transpose a \link{data.frame}
+#'
+#' The function transposes a data frame. If the data frame contains
+#' labels that has been set by the function \link{label} of the
+#' package \link{Hmisc}, then the first column of the returned data frame will
+#' contain the labels. Conversely, you can specify the column that will become
+#' the labels of the transposed data frame.
+#'
+#' @param x a data frame
+#' @param colname_column the name or the index of the column that will be used
+#' as the column names of the transposed data frame. By default the
+#' row names of the original data frame are used as column names of the new data
+#'  frame.
+#' @param label_column the name or the index of the column that will be used
+#' to create labels for the transposed data frame. By default no labels
+#' are created
+#' @return the transposed data frame
+#' @examples
+#' df <- data.frame(variables = c("a", "b"), labels = c("Variabele a",
+#'                  "Variable c"), x = 1:3, y = 10:12)
+#' df_t <- transpose_df(df, colname_column = 1, label_column = 2)
+#' print(df_t)
+#' print(transpose_df(df_t))
+#' @export
+#' @import Hmisc
+transpose_df  <- function(x, colname_column, label_column) {
+
+    #todo: check arguments. x should be a dataframe, colname_column
+    # and label_column a numeric  or character vector of length 1
+
+
+
+    if (!missing(colname_column)) {
+        if (is.character(colname_column)) {
+            colname_column <- which(colnames(x) %in% colname_column)
+        }
+        new_colnames <- as.character(x[[colname_column]])
+        columns_to_remove <- colname_column
+    } else {
+        columns_to_remove <- integer()
+    }
+
+    if (!missing(label_column)) {
+        if (is.character(label_column)) {
+            label_column <- which(colnames(x) %in% label_column)
+        }
+        labels <- as.character(x[[label_column]])
+        columns_to_remove <- c(columns_to_remove, label_column)
+        has_labels <- TRUE
+    } else {
+        has_labels <- FALSE
+    }
+
+    # remove columns
+    if (length(columns_to_remove) > 0) {
+        x <- x[-columns_to_remove]
+    }
+
+    old_labels <- as.character(Hmisc::label(x))
+    ret <- as.data.frame(t(x))
+
+    if (!missing(colname_column)) {
+        colnames(ret) <- new_colnames
+    }
+    if (has_labels) {
+        Hmisc::label(ret, self = FALSE) <- labels
+    }
+
+    if (any(nchar(old_labels) > 0)) {
+        ret <- cbind(labels = old_labels, ret)
+    }
+    return (ret)
+}

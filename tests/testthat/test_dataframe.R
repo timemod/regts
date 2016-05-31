@@ -43,9 +43,9 @@ test_that("as.regts.data.frame for multivariate yearly timeseries with labels", 
     ts2 <- regts(matrix(1:6, ncol =  2), start = "2015", names = c("a", "b"),
                  labels = ts_labels)
     expect_identical(ts1, ts2)
-    # df2 <- df
-    # rownames(df2) <- as.character(df[[1]])
-    # df2 <- df2[-1]
-    # expect_identical(df2, as.data.frame(ts2))
+    df2 <- df
+    rownames(df2) <- as.character(df[[1]])
+    df2 <- df2[-1]
+    expect_identical(df2, as.data.frame(ts2))
 })
 
