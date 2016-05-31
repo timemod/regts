@@ -11,9 +11,8 @@ as.regts(x, ...)
 
 \method{as.regts}{ts}(x, ...)
 
-\method{as.regts}{data.frame}(x, columnwise = TRUE,
-  index_column = "rownames", name_column = "rownames",
-  label_column = NULL, fun = NULL, format = NULL)
+\method{as.regts}{data.frame}(x, index_column = 0, fun = NULL,
+  format = NULL)
 
 \method{as.regts}{default}(x, ...)
 }
@@ -22,21 +21,9 @@ as.regts(x, ...)
 
 \item{...}{arguments passed to other methods (currently not used)}
 
-\item{columnwise}{a logical value. If \code{TRUE}, then the timeseries
-are stored columnwise in the data frame}
-
-\item{index_column}{column number of the index, only used if \code{columnwise} is
-\code{TRUE}. Specify \code{"rownames"} if the index is in the row names of the
-data frame.}
-
-\item{name_column}{the number of the column with the names of the timeseries,
-only used if \code{columnwise} is \code{FALSE}. Specify \code{"rownames"} if the
- timeseries names are the row names of the data frame.}
-
-\item{label_column}{column number with the labels of the timeseries, only used
-if \code{columnwise} is \code{FALSE}. Specify \code{"rownames"} if the
-labels are the row names of the data frame or \code{NULL} if the
-data frame does not contain labels}
+\item{index_column}{the column names or numbers of the data frame
+in which the index/time is stored. Specify \code{0} if the index is in the row names
+of the data frame}
 
 \item{format}{date format argument passed to FUN}
 
@@ -54,10 +41,7 @@ Coerce an object to a \link{regts} timeseries object
 \item \code{ts}: Coerce a \link{ts} to a \link{regts}
 
 \item \code{data.frame}: Convert a \link{data.frame} to a \link{regts}, employing the
-function \link{read.zoo} of the \link{zoo} package. The timeseries can be stored
-columnwise or rowwise in the data frame. If they are stored columnwise, then the
-data frame may contain a column with labels: these labels can also be read. See the description
-of argument \code{columnwise}, \code{name_column} and \code{label_column}.
+function \link{read.zoo} of the \link{zoo} package.
 
 \item \code{default}: Default method to convert an R object to a \link{regts}. This method
 first employs \link{at.ts} and then \link{as.regts.ts}
@@ -67,32 +51,21 @@ first employs \link{at.ts} and then \link{as.regts.ts}
 x <- ts(1:3, start = c(2015,3), frequency = 4)
 x <- as.regts(x)
 
-# Now three examples for converting a data.frame
+# Now two examples for converting a data.frame
 
 # load library zoo (needed because we will use the function as.yearqtr)
 library(zoo)
 
-# create a data frame with columnwise timeseries and with the
+# create a data frame with timeseries and with the
 # time index in the rownames, and convert to a regts
 df <- data.frame(a = 1:3)
 rownames(df) <- c("2015Q3", "2015Q4", "2016Q1")
 ts <- as.regts(df, FUN = as.yearqtr)
 
-# create a data frame with columnwise timeseries and with
-# time index in the first column and special time format "2015 3"
+# create a data frame with the time index in the first column and special time format "2015 3"
 # instead of "2015Q3", and convert to regts
 df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
 ts <- as.regts(df, index_column = 1, FUN = as.yearqtr, format = "\%Y \%q")
-
-# create a data frame with rowwise timeseries, names in the first column
-# and  labels in the second column, and convert to regts
-df <- data.frame(names = c("a", "b"),
-                 labels = c("Timeseries a", "Timeseries b"),
-                 matrix(1:4, ncol = 2))
-colnames(df) <- c("names", "labels", "2016Q1", "2016Q2")
-ts <- as.regts(df, columnwise = FALSE, name_column = 1, label_column = 2,
-               FUN = as.yearqtr)
-
 }
 \seealso{
 \link{regts}, \link{is.regts}, \link{as.data.frame.regts}, \link{as.list.regts}

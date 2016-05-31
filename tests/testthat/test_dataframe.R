@@ -35,34 +35,17 @@ test_that("as.regts.data.frame for multivariate yearly timeseries", {
     expect_identical(df2, as.data.frame(ts2))
 })
 
-test_that("as.regts.data.frame for rowwise data frame with label", {
-    basis_df <- data.frame(matrix(1:6, ncol = 3))
-    colnames(basis_df) <- c("2015Q3", "2015Q4", "2016Q1")
-
-    names <- c("a", "b")
-    labels <- c("Timeseries a", "Timeseries b")
-
-    df <- basis_df
-    rownames(df) <- names
-    df <- cbind(labels, df)
-
-    ts1 <- as.regts(df, columnwise = FALSE, label_column = 1, fun = as.yearqtr)
-    ts2 <- regts(t(matrix(1:6, ncol =  3)), start = "2015Q3",
-                  names = names, labels = labels)
+test_that("as.regts.data.frame for multivariate yearly timeseries with labels", {
+    df <- data.frame(periods = c(2015, 2016, 2017), a = 1:3, b = 4:6)
+    ts_labels <- paste("Timeseries", c("a", "b"))
+    label(df, self = FALSE) <- c("", ts_labels)
+    ts1 <- as.regts(df, index_column = 1)
+    ts2 <- regts(matrix(1:6, ncol =  2), start = "2015", names = c("a", "b"),
+                 labels = ts_labels)
     expect_identical(ts1, ts2)
-
-    df2 <- df
-    colnames(df2) <- c("labels", "2015 Q3", "2015 Q4", "2016 Q1")
-    expect_identical(df2, as.data.frame(ts2, columnwise = FALSE))
-
-    df <- basis_df
-    rownames(df) <- labels
-    df <- cbind(names, df)
-    ts1 <- as.regts(df, columnwise = FALSE, name_column = 1,
-                    label_column = "rownames", fun = as.yearqtr)
-    ts2 <- regts(t(matrix(1:6, ncol =  3)), start = "2015Q3",
-                 names = names, labels = labels)
-    expect_identical(ts1, ts2)
-
+    # df2 <- df
+    # rownames(df2) <- as.character(df[[1]])
+    # df2 <- df2[-1]
+    # expect_identical(df2, as.data.frame(ts2))
 })
 
