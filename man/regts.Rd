@@ -65,6 +65,6 @@ methods for \link{ts} and \link{data.frame}.
 to convert \code{regts} to a \link{data.frame} or a \link{list}.
 
 See also the description of the functions for handling labels
-(\link{ts_labels} and \link{update_labels}).
+(\link{ts_labels} and \link{update_ts_labels}).
 }
 

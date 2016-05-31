@@ -8,7 +8,7 @@ test_that("constructor regts for univariate timeseries", {
     names(res) <- "a"
     expect_identical(ts_labels(regts1), res)
 
-    regts2 <- update_labels(regts1, list(a = "ts a", x = "???"))
+    regts2 <- update_ts_labels(regts1, list(a = "ts a", x = "???"))
     res2 <- res
     res2['a'] <- "ts a"
     expect_identical(ts_labels(regts1), res)
@@ -23,7 +23,7 @@ test_that("constructor regts for multivariate timeseries", {
     names(res) <- c("a", "b")
     expect_identical(ts_labels(regts1), res)
 
-    regts2 <- update_labels(regts1, list(a = "ts a", x = "???"))
+    regts2 <- update_ts_labels(regts1, list(a = "ts a", x = "???"))
     res2 <- res
     res2['a'] <- "ts a"
     expect_identical(ts_labels(regts1), res)

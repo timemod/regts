@@ -36,6 +36,6 @@ print(ts_labels(ts))
 print(as.data.frame(ts_labels(ts)))
 }
 \seealso{
-\link{regts}, \link{update_labels}
+\link{regts}, \link{update_ts_labels}
 }
 

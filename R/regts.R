@@ -48,7 +48,7 @@
 #' to convert \code{regts} to a \link{data.frame} or a \link{list}.
 #'
 #' See also the description of the functions for handling labels
-#' (\link{ts_labels} and \link{update_labels}).
+#' (\link{ts_labels} and \link{update_ts_labels}).
 #'
 #' @import evaluate
 #' @export
@@ -414,7 +414,7 @@ remove_regts_class <- function(x) {
 #' print(as.data.frame(ts_labels(ts)))
 #' @describeIn ts_labels Retrieve timeseries labels
 #' @seealso
-#' \link{regts}, \link{update_labels}
+#' \link{regts}, \link{update_ts_labels}
 #' @export
 ts_labels <- function(x) {
     return (attr(x, "ts_labels"))
@@ -446,18 +446,16 @@ ts_labels <- function(x) {
 #' @examples
 #' ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"),
 #'              labels <- c("Timeseries a", "???"))
-#' ts <-update_labels(ts, list(b = "Timeseries b"))
+#' ts <-update_ts_labels(ts, list(b = "Timeseries b"))
 #' print(ts_labels(ts))
 #'
 #' @seealso \link{ts_labels}
 #' @export
-update_labels <- function(x, labels) {
-
+update_ts_labels <- function(x, labels) {
     if (is.null(labels)) {
         ts_labels(x) <- NULL
         return (x)
     }
-
     lbls <- ts_labels(x)
     if (is.null(lbls)) {
         lbls <- rep("", ncol(x))
@@ -468,7 +466,6 @@ update_labels <- function(x, labels) {
     ts_labels(x) <- lbls
     return (x)
 }
-
 
 #' @export
 # do not print ts_labels
