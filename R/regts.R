@@ -175,7 +175,10 @@ as.regts.ts <- function(x, ...) {
 #' @export
 as.regts.data.frame <- function(x, index_column = 0, fun = NULL,
                                 format = NULL) {
-
+	#documentation of read.zoo not correct, index_column = 0 is not recognized
+	if (index_column == 0) {
+		index_column <- "row.names"
+	}
     ret <- read.zoo(x, FUN = fun, format = format, index.column = index_column,
                     regular = TRUE, drop = FALSE)
     ret <- as.regts(ret)
@@ -188,7 +191,7 @@ as.regts.data.frame <- function(x, index_column = 0, fun = NULL,
         if (is.character(sel)) {
             sel <- which(names(lbls) %in% sel)
         }
-        if (sel != 0) {
+        if (length(sel) > 0) {
             lbls <- lbls[-sel]
         }
         ts_labels(ret) <- lbls
