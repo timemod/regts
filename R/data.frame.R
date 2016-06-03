@@ -2,9 +2,9 @@
 #'
 #' @details
 #' The \code{regts} is first converted to a \link{zoo} object using
-#' \link{as.zooreg} and then converted to a data frame with \link{as.data.frame.zoo}.
-#' If the \code{regts} has labels, then the labels are added to the result dataframe using
-#' package \link{Hmisc}.
+#' \link{as.zooreg} and then converted to a data frame with
+#' \link{as.data.frame.zoo}. If the \code{regts} has labels, then the labels
+#' are added to the result dataframe using package \link{Hmisc}.
 #' @param x a \code{regts}
 #' @param ... arguments passed to \link{as.data.frame.zoo}
 #' @return A \code{data.frame}
