@@ -168,8 +168,8 @@ as.regts.ts <- function(x, ...) {
     return (x)
 }
 
-#' @describeIn as.regts Convert a \link{data.frame} to a \link{regts}, employing the
-#' function \link{read.zoo} of the \link{zoo} package.
+#' @describeIn as.regts Convert a \link{data.frame} to a \link{regts}, employing
+#' the function \link{read.zoo} of the \link{zoo} package.
 #' @import zoo
 #' @import Hmisc
 #' @export
@@ -199,8 +199,8 @@ as.regts.data.frame <- function(x, index_column = 0, fun = NULL,
     return (ret)
 }
 
-#' @describeIn as.regts Default method to convert an R object to a \link{regts}. This method
-#' first employs \link{at.ts} and then \link{as.regts.ts}
+#' @describeIn as.regts Default method to convert an R object to a \link{regts}.
+#' This method #' first employs \link{at.ts} and then \link{as.regts.ts}
 #' @export
 as.regts.default <- function(x, ...) {
     return (as.regts(as.ts(x, ...)))
