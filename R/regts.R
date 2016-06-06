@@ -170,7 +170,8 @@ as.regts.ts <- function(x, ...) {
 as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
                                 ...) {
 
-    # extract time column(s) and data from the input dataframe
+    # extract time column(s) and data from the input data frame,
+    # and convert to a matrix
     if (time_column == 0) {
         times <- rownames(x)
         data <- x
@@ -181,13 +182,19 @@ as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
         times <- x[[time_column]]
         data <- x[-time_column]
     }
-
     data <- as.matrix(data)
 
-    times <- as.character(times)
-    times <- lapply(times, FUN = fun, ...)
+    # convert the contents of the time column to a list of regperiods
+    times <- lapply(as.character(times), FUN = fun, ...)
 
-    freq <- times[[1]]$freq # todo: check if all periods have the same freq
+    # check that all frequencies are equal
+    frequencies <- unlist(lapply(times, FUN = function(x) x$freq))
+    frequencies <- unique(frequencies)
+    if (length(frequencies) > 1) {
+        stop("The time column(s) contain different frequencies")
+    } else {
+        freq <- frequencies[1]
+    }
 
     subperiods <- as.integer(lapply(times, FUN = get_subperiod_count))
     if (identical(subperiods, subperiods[1]:subperiods[nrow(data)])) {

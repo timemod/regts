@@ -12,3 +12,7 @@ print(as.regts(dfy))
 dfq2 <- data.frame(period = c("2016Q1", "2015Q2", "2015Q3"), a = 1:3, b = 12:14)
 dfq2
 print(as.regts(dfq2, time_column = 1))
+
+dfq3 <- data.frame(period = c("2016Q1", "2012M2", "2015Q3"), a = 1:3, b = 12:14)
+dfq3
+print(as.regts(dfq3, time_column = 1))
