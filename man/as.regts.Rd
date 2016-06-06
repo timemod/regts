@@ -11,24 +11,21 @@ as.regts(x, ...)
 
 \method{as.regts}{ts}(x, ...)
 
-\method{as.regts}{data.frame}(x, time_column = 0, fun = regperiod,
-  frequency = NA)
+\method{as.regts}{data.frame}(x, time_column = 0, fun = regperiod, ...)
 
 \method{as.regts}{default}(x, ...)
 }
 \arguments{
 \item{x}{an arbitrary R object}
 
-\item{...}{arguments passed to other methods (currently not used)}
+\item{...}{arguments passed to \code{fun}}
 
-\item{index_column}{the column names or numbers of the data frame
-in which the index/time is stored. Specify \code{0} if the index is in the row names
+\item{time_column}{the column names or numbers of the data frame
+in which the time is stored. Specify \code{0} if the index is in the row names
 of the data frame}
 
-\item{FUN}{a function for computing the index from the index column of the data. See details
-of function \link{read.zoo}}
-
-\item{format}{date format argument passed to FUN}
+\item{fun}{a function for converting values in the time column to
+\link{regperiod} objects}
 }
 \value{
 a \link{regts} object
@@ -52,19 +49,16 @@ x <- as.regts(x)
 
 # Now two examples for converting a data.frame
 
-# load library zoo (needed because we will use the function as.yearqtr)
-library(zoo)
-
 # create a data frame with timeseries and with the
 # time index in the rownames, and convert to a regts
 df <- data.frame(a = 1:3)
 rownames(df) <- c("2015Q3", "2015Q4", "2016Q1")
-ts <- as.regts(df, FUN = as.yearqtr)
+ts <- as.regts(df)
 
-# create a data frame with the time index in the first column and special time format "2015 3"
-# instead of "2015Q3", and convert to regts
+# create a data frame with the time index in the first column and special
+time format "2015 3" instead of "2015Q3", and convert to regts
 df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
-ts <- as.regts(df, index_column = 1, FUN = as.yearqtr, format = "\%Y \%q")
+ts <- as.regts(df, time_column = 1, frequency = 4)
 }
 \seealso{
 \link{regts}, \link{is.regts}, \link{as.data.frame.regts}, \link{as.list.regts}

@@ -13,7 +13,7 @@ test_that("as.regts.data.frame for univariate quarterly timeseries", {
 
 test_that("as.regts.data.frame for multivariate quarterly timeseries", {
     df <- data.frame(a = 1:3, b = 4:6)
-    rownames(df) <- c("2015-3", "2015-4", "2016-1")
+    rownames(df) <- c("2015 3", "2015 4", "2016 1")
     ts1 <- as.regts(df, frequency = 4)
     ts2 <- regts(matrix(1:6, ncol =  2), start = "2015Q3", names = c("a", "b"))
     expect_identical(ts1, ts2)
@@ -48,3 +48,13 @@ test_that("as.regts.data.frame for multivariate yearly timeseries with labels", 
     expect_identical(df2, as.data.frame(ts2))
 })
 
+test_that("as.regts.data.frame for multivariate quarterly irregular timeseries", {
+    df <- data.frame(a = 1:3, b = 4:6)
+    rownames(df) <- c("2016Q2", "2015Q3", "2015Q4")
+    ts1 <- as.regts(df)
+    # convert ts1 from integer to double
+    ts1[, ] <- as.numeric(ts1)
+    ts2 <- regts(matrix(c(2,3,NA,1,5,6,NA,4), ncol =  2), start = "2015Q3",
+                 names = c("a", "b"))
+    expect_identical(ts1, ts2)
+})

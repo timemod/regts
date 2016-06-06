@@ -16,29 +16,33 @@ regperiod <- function(x, frequency = NA) {
     if (!is.character(x)) {
         stop("Argument x is not a character")
     }
-    pattern <- "(^[0-9]+)\\s*(([MQ-])\\s*([0-9]+))?$"
+    pattern <- "(^[0-9]+)\\s*(([MQ-])?\\s*([0-9]+))?$"
     m <- regexec(pattern, x, ignore.case = TRUE)
     if (length(m[[1]]) == 1 && m[[1]] == -1) {
         stop(paste("Illegal period", x))
     }
     parts <- regmatches(x, m)[[1]]
     data <- as.numeric(c(parts[2], parts[5]))
+
+    freq_char <- tolower(parts[[4]])
+    if (nchar(freq_char) > 0) {
+        freq <- switch(freq_char, m = 12, q = 4, "-" = frequency)
+    } else if (is.na(frequency) && is.na(data[2])) {
+        # no frequency specified and no subperiod -> assume year
+        freq <- 1
+    } else {
+        freq <- frequency
+    }
     if (is.na(data[2])) {
         data[2] <- 1
     }
-    period <- list(data = data)
-    freq_char <- tolower(parts[[4]])
-    if (nchar(freq_char) > 0) {
-        period$freq <- switch(freq_char, m = 12, q = 4, "-" = frequency)
-    } else {
-        period$freq <- 1
-    }
-    if (is.na(period$freq)) {
+    if (is.na(freq)) {
         stop("Frequency unknown. Specify argument frequency")
     }
-    if (!is.na(frequency) && frequency != period$freq) {
+    if (!is.na(frequency) && frequency != freq) {
         stop("Supplied frequency does not agree with actual frequency in regperiod")
     }
+    period <- list(data = data, freq = freq)
     period <- normalise_regperiod(period)
     return (structure(period, class = "regperiod"))
 }
@@ -159,10 +163,10 @@ get_subperiod_count <- function(x) {
     return (x$data[1] * x$freq + x$data[2])
 }
 
-# Converts the number of subperiods to a regperiod object
+# Converts the number of subperiods since Christ to a regperiod object
 subperiod_count_to_regperiod <- function(x, frequency) {
-    year <- trunc(x / frequency)
-    subperiod <- x %/% frequency
+    year <- x %/% frequency
+    subperiod <- x %% frequency
     period <- list(data = c(year, subperiod), freq = frequency)
     return (structure(period, class = "regperiod"))
 }

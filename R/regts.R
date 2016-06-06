@@ -119,13 +119,12 @@ is.regts <- function(x) {
 #' Coerce an object to a \link{regts} timeseries object
 #'
 #' @param x an arbitrary R object
-#' @param index_column the column names or numbers of the data frame
-#' in which the index/time is stored. Specify \code{0} if the index is in the row names
+#' @param time_column the column names or numbers of the data frame
+#' in which the time is stored. Specify \code{0} if the index is in the row names
 #' of the data frame
-#' @param FUN a function for computing the index from the index column of the data. See details
-#' of function \link{read.zoo}
-#' @param format date format argument passed to FUN
-#' @param ... arguments passed to other methods (currently not used)
+#' @param fun a function for converting values in the time column to
+#' \link{regperiod} objects
+#' @param ... arguments passed to \code{fun}
 #' @return a \link{regts} object
 #' @seealso
 #' \link{regts}, \link{is.regts}, \link{as.data.frame.regts}, \link{as.list.regts}
@@ -136,19 +135,16 @@ is.regts <- function(x) {
 #'
 #' # Now two examples for converting a data.frame
 #'
-#' # load library zoo (needed because we will use the function as.yearqtr)
-#' library(zoo)
-#'
 #' # create a data frame with timeseries and with the
 #' # time index in the rownames, and convert to a regts
 #' df <- data.frame(a = 1:3)
 #' rownames(df) <- c("2015Q3", "2015Q4", "2016Q1")
-#' ts <- as.regts(df, FUN = as.yearqtr)
+#' ts <- as.regts(df)
 #'
-#' # create a data frame with the time index in the first column and special time format "2015 3"
-#' # instead of "2015Q3", and convert to regts
+#' # create a data frame with the time index in the first column and special
+#' time format "2015 3" instead of "2015Q3", and convert to regts
 #' df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
-#' ts <- as.regts(df, index_column = 1, FUN = as.yearqtr, format = "%Y %q")
+#' ts <- as.regts(df, time_column = 1, frequency = 4)
 #' @export
 as.regts <- function(x, ...) {
     UseMethod("as.regts")
@@ -172,49 +168,55 @@ as.regts.ts <- function(x, ...) {
 #' @import Hmisc
 #' @export
 as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
-                                frequency = NA) {
+                                ...) {
+
+    # extract time column(s) and data from the input dataframe
     if (time_column == 0) {
         times <- rownames(x)
+        data <- x
     } else {
         if (is.character(time_column)) {
             time_column <- which(colnames(x) %in% time_column)
         }
         times <- x[[time_column]]
+        data <- x[-time_column]
     }
 
-    if (time_column != 0) {
-        data <- x[-time_column]
-    } else {
-        data <- x
-    }
+    data <- as.matrix(data)
 
     times <- as.character(times)
-    times <- lapply(times, FUN = fun, frequency = frequency)
+    times <- lapply(times, FUN = fun, ...)
 
     freq <- times[[1]]$freq # todo: check if all periods have the same freq
 
     subperiods <- as.integer(lapply(times, FUN = get_subperiod_count))
     if (identical(subperiods, subperiods[1]:subperiods[nrow(data)])) {
-        # normal timeseries, no missing periods
-        ret <- regts(as.matrix(data), start = times[[1]])
+        # normal regular timeseries, no missing periods and periods
+        # are ordered synchronically
+        ret <- regts(data, start = times[[1]])
     } else {
-        # weird period indicators
-        tmin <- subperiod_count_to_regperiod(min(subperiods), frequency = freq)
-        tmax <- subperiod_count_to_regperiod(max(subperiods), frequency = freq)
-        ret <- regts(matrix(NA, ncol = ncol(data)), start = tmin, end = tmax,
-                     names = colnames(data))
-        # todo: fill in new values
+        # irregular timeseries in dataframe (missing periods or
+        # unorderered time index)
+        subp_min <- min(subperiods)
+        subp_max <- max(subperiods)
+        per_count <- subp_max - subp_min + 1
+        pmin <- subperiod_count_to_regperiod(subp_min, frequency = freq)
+        ret <- regts(matrix(NA, nrow = per_count, ncol = ncol(data)),
+                     start = pmin, names = colnames(data))
+        rows <- subperiods - subp_min +1
+        ret[rows, ] <- data
     }
 
     # handle labels
     lbls <- label(x)
     if (!all(nchar(lbls) == 0)) {
-        # remove the index column(s) from the labels
+        # remove the time column(s) from the labels
         if (time_column != 0) {
             lbls <- lbls[-time_column]
         }
         ts_labels(ret) <- lbls
     }
+
     return (ret)
 }
 

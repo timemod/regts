@@ -7,6 +7,7 @@ test_that("constructor regperiod", {
     expect_identical(as.character(regperiod("2012")), "2012")
     expect_identical(as.character(regperiod("2012M3")), "2012M3")
     expect_identical(as.character(regperiod("2001-4", frequency = 4)), "2001Q4")
+    expect_identical(as.character(regperiod("2001 4", frequency = 12)), "2001M4")
     expect_error(regperiod("2001-4"),
                  "Frequency unknown. Specify argument frequency")
     expect_error(regperiod("2001Q4", frequency = 12),
