@@ -168,31 +168,50 @@ as.regts.ts <- function(x, ...) {
     return (x)
 }
 
-#' @describeIn as.regts Convert a \link{data.frame} to a \link{regts}, employing
-#' the function \link{read.zoo} of the \link{zoo} package.
-#' @import zoo
+#' @describeIn as.regts Convert a \link{data.frame} to a \link{regts}
 #' @import Hmisc
 #' @export
-as.regts.data.frame <- function(x, index_column = 0, fun = NULL,
-                                format = NULL) {
-	#documentation of read.zoo not correct, index_column = 0 is not recognized
-	if (index_column == 0) {
-		index_column <- "row.names"
-	}
-    ret <- read.zoo(x, FUN = fun, format = format, index.column = index_column,
-                    regular = TRUE, drop = FALSE)
-    ret <- as.regts(ret)
+as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
+                                frequency = NA) {
+    if (time_column == 0) {
+        times <- rownames(x)
+    } else {
+        if (is.character(time_column)) {
+            time_column <- which(colnames(x) %in% time_column)
+        }
+        times <- x[[time_column]]
+    }
+
+    if (time_column != 0) {
+        data <- x[-time_column]
+    } else {
+        data <- x
+    }
+
+    times <- as.character(times)
+    times <- lapply(times, FUN = fun, frequency = frequency)
+
+    freq <- times[[1]]$freq # todo: check if all periods have the same freq
+
+    subperiods <- as.integer(lapply(times, FUN = get_subperiod_count))
+    if (identical(subperiods, subperiods[1]:subperiods[nrow(data)])) {
+        # normal timeseries, no missing periods
+        ret <- regts(as.matrix(data), start = times[[1]])
+    } else {
+        # weird period indicators
+        tmin <- subperiod_count_to_regperiod(min(subperiods), frequency = freq)
+        tmax <- subperiod_count_to_regperiod(max(subperiods), frequency = freq)
+        ret <- regts(matrix(NA, ncol = ncol(data)), start = tmin, end = tmax,
+                     names = colnames(data))
+        # todo: fill in new values
+    }
 
     # handle labels
     lbls <- label(x)
     if (!all(nchar(lbls) == 0)) {
         # remove the index column(s) from the labels
-        sel <- index_column
-        if (is.character(sel)) {
-            sel <- which(names(lbls) %in% sel)
-        }
-        if (length(sel) > 0) {
-            lbls <- lbls[-sel]
+        if (time_column != 0) {
+            lbls <- lbls[-time_column]
         }
         ts_labels(ret) <- lbls
     }

@@ -52,7 +52,6 @@ is.regperiod <- function(x) {
     return (inherits(x, "regperiod"))
 }
 
-
 # normalise_regpriod makes sure that the subperiod (x$data[2]) lies between 1
 # and x$freq
 normalise_regperiod <- function(x) {
@@ -73,11 +72,6 @@ add_regperiod <- function(x, y) {
     }
     x$data[2] <- x$data[2] + y[1]
     return (normalise_regperiod(x))
-}
-
-#' @export
-get_subperiod_count <- function(x) {
-    return (x$data[1] * x$freq + x$data[2])
 }
 
 # subtract an integer of another regperiod from a regperiod
@@ -158,4 +152,17 @@ as.regperiod.regperiod <- function(x, ...) {
 #' @export
 as.regperiod.character <- function(x, ...) {
     return (regperiod(x, ...))
+}
+
+# Converts a regperiod object to the number of subperiods since Christ
+get_subperiod_count <- function(x) {
+    return (x$data[1] * x$freq + x$data[2])
+}
+
+# Converts the number of subperiods to a regperiod object
+subperiod_count_to_regperiod <- function(x, frequency) {
+    year <- trunc(x / frequency)
+    subperiod <- x %/% frequency
+    period <- list(data = c(year, subperiod), freq = frequency)
+    return (structure(period, class = "regperiod"))
 }

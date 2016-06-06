@@ -19,9 +19,9 @@ Converts a \link{regts} to a \link{data.frame}
 }
 \details{
 The \code{regts} is first converted to a \link{zoo} object using
-\link{as.zooreg} and then converted to a data frame with \link{as.data.frame.zoo}.
-If the \code{regts} has labels, then the labels are added to the result dataframe using
-package \link{Hmisc}.
+\link{as.zooreg} and then converted to a data frame with
+\link{as.data.frame.zoo}. If the \code{regts} has labels, then the labels
+are added to the result dataframe using package \link{Hmisc}.
 }
 \examples{
 ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),

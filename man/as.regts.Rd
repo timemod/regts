@@ -11,8 +11,8 @@ as.regts(x, ...)
 
 \method{as.regts}{ts}(x, ...)
 
-\method{as.regts}{data.frame}(x, index_column = 0, fun = NULL,
-  format = NULL)
+\method{as.regts}{data.frame}(x, time_column = 0, fun = regperiod,
+  frequency = NA)
 
 \method{as.regts}{default}(x, ...)
 }
@@ -25,10 +25,10 @@ as.regts(x, ...)
 in which the index/time is stored. Specify \code{0} if the index is in the row names
 of the data frame}
 
-\item{format}{date format argument passed to FUN}
-
 \item{FUN}{a function for computing the index from the index column of the data. See details
 of function \link{read.zoo}}
+
+\item{format}{date format argument passed to FUN}
 }
 \value{
 a \link{regts} object
@@ -40,11 +40,10 @@ Coerce an object to a \link{regts} timeseries object
 \itemize{
 \item \code{ts}: Coerce a \link{ts} to a \link{regts}
 
-\item \code{data.frame}: Convert a \link{data.frame} to a \link{regts}, employing the
-function \link{read.zoo} of the \link{zoo} package.
+\item \code{data.frame}: Convert a \link{data.frame} to a \link{regts}
 
-\item \code{default}: Default method to convert an R object to a \link{regts}. This method
-first employs \link{at.ts} and then \link{as.regts.ts}
+\item \code{default}: Default method to convert an R object to a \link{regts}.
+This method #' first employs \link{at.ts} and then \link{as.regts.ts}
 }}
 \examples{
 # convert a ts to regts
