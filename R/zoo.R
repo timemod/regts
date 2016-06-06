@@ -9,14 +9,14 @@ as.zooreg.regts <- function(x, ...) {
     f <- frequency(x)
     x <- NextMethod("as.zooreg")
     if (f == 4) {
-        index(x) <- as.yearqtr(index(x))
+        index(x) <- zoo::as.yearqtr(index(x))
     } else if (f == 12) {
-        index(x) <- as.yearmon(index(x))
+        index(x) <- zoo::as.yearmon(index(x))
     }
     return (x)
 }
 
 #' @export
 as.zoo.regts <- function(x, ...) {
-    return (as.zooreg.regts(x))
+    return (as.zooreg(x, ...))
 }
