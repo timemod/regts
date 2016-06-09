@@ -56,9 +56,9 @@ regts <- function(data, start, end = NULL, frequency = NA, names = NULL,
                   labels = NULL) {
     start <- as.regperiod(start, frequency)
     start_freq <- frequency(start)
+
     if (missing(end)) {
-        retval <- ts(data, start = c(get_year(start), get_subperiod(start)),
-                     frequency = start_freq)
+        retval <- ts(data, start = get_time_vector(start), frequency = start_freq)
     } else {
         end <- as.regperiod(end, frequency)
         end_freq <- frequency(end)
@@ -66,9 +66,8 @@ regts <- function(data, start, end = NULL, frequency = NA, names = NULL,
             stop(paste("Frequency start", start_freq, "and end",
                        end_freq, "do not agree"))
         }
-        retval <- ts(data, start = c(get_year(start), get_subperiod(start)),
-                     end = c(get_year(end), get_subperiod(end)),
-                     frequency = start_freq)
+        retval <- ts(data, start = get_time_vector(start),
+                     end = get_time_vector(end), frequency = start_freq)
     }
 
     if (is.null(attr(retval, "dim"))) {
@@ -307,9 +306,8 @@ convert_range_selector <- function(range, x) {
     if (!is.null(p)) {
         pstart <- get_start_period(p)
         pend   <- get_end_period(p)
-        start  <- c(get_year(pstart), get_subperiod(pstart))
-        end    <- c(get_year(pend), get_subperiod(pend))
-        retval[p, ] <- window(x, start = start, end = end)
+        retval[p, ] <- window(x, start = get_time_vector(pstart),
+                              end = get_time_vector(pend))
     }
     return (retval)
 }
@@ -397,8 +395,8 @@ check_extend <- function(x, y) {
         # Therefore only use extend if it is really necessary
         pstart <- get_start_period(range)
         pend   <- get_end_period(range)
-        start <- c(get_year(pstart), get_subperiod(pstart))
-        end   <- c(get_year(pend), get_subperiod(pend))
+        start  <- get_time_vector(pstart)
+        end    <- get_time_vector(pend)
         if (missing(j)) {
             x <- window(x, start = start, end = end, extend = extend)
         } else {

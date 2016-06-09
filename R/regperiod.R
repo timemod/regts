@@ -148,9 +148,20 @@ get_subperiod_count <- function(year, subperiod, frequency) {
     return (year * frequency + subperiod - 1)
 }
 
-# only used internally to create a regperiod object based on the number of
-# subperiods after Christ
+# Create a regperiod object based on the number of subperiods after Christ.
+# Internal function.
 create_regperiod <- function(subperiod_count, frequency) {
     return (structure(subperiod_count, class = "regperiod",
                       frequency = frequency))
+}
+
+# Returns a time vector according to the convention of the standard ts package.
+# For years, this is a single number. For higher frequencies a vector
+# of two integers (the year and the subperiod). Internal function.
+get_time_vector <- function(x) {
+    if (frequency(x) == 1) {
+        return (as.numeric(x))
+    } else {
+        return (c(get_year(x), get_subperiod(x)))
+    }
 }
