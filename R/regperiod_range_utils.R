@@ -12,7 +12,7 @@
 # @param range2 another \code{regperiod_range} object
 # @return the intersection of \code{range1} and \code{range2}. Returns
 # NULL if there is no intersection
-.regrange_intersect <- function(range1, range2) {
+regrange_intersect <- function(range1, range2) {
 
     p_start <- get_start_period(range1)
     p_end   <- get_end_period(range1)
@@ -39,7 +39,7 @@
 # @param range2 another \code{regperiod_range} object
 # @return the union of \code{range1} and \code{range2}. Returns
 # NULL if there is no intersection
-.regrange_union <- function(range1, range2) {
+regrange_union <- function(range1, range2) {
 
     p_start <- get_start_period(range1)
     p_end   <- get_end_period(range1)
@@ -54,4 +54,3 @@
     }
     return (regperiod_range(p_start, p_end))
 }
-

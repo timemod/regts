@@ -289,7 +289,7 @@ convert_range_selector <- function(range, x) {
 # @param range the new period range of the timeseries. This should
 # be a regperiod_range object without NULL periods
 # @return a regts with the adjusted period
-.adjust_period <- function(x, range) {
+adjust_period <- function(x, range) {
 
     p_start <- get_start_period(range)
     p_end   <- get_end_period(range)
@@ -302,7 +302,7 @@ convert_range_selector <- function(range, x) {
     }
     retval <- regts(matrix(NA, nrow = per_len, ncol = ncolumns),
                     start = p_start, names = colnames(x))
-    p <- .regrange_intersect(get_regperiod_range(x), range)
+    p <- regrange_intersect(get_regperiod_range(x), range)
     if (!is.null(p)) {
         pstart <- get_start_period(p)
         pend   <- get_end_period(p)
@@ -317,19 +317,19 @@ convert_range_selector <- function(range, x) {
 # the defintion period of the input timeseries, then the function
 # returns NULL.
 # PARAMETERS:
-# x  : a regts object
-# y  : a regperiod_range object. This object is used
-#      to select rows in argument x.
+# x   : a regts object
+# sel : a regperiod_range object. This object is used
+#       to select rows in argument x.
 # RETURNS: a vector with the numbers of the select rows in x,
-#          or NULL if y lies partially outside the
+#          or NULL if sel lies (partially) outside the
 #          definition period of x.
-get_row_selection <- function(x, y) {
+get_row_selection <- function(x, sel) {
     ts_per       <- get_regperiod_range(x)
     ts_per_start <- get_start_period(ts_per)
     ts_per_end   <- get_end_period(ts_per)
     ts_per_len   <- ts_per_end - ts_per_start + 1  # TODO: create function
-    p_start      <- get_start_period(y)
-    p_end        <- get_end_period(y)
+    p_start      <- get_start_period(sel)
+    p_end        <- get_end_period(sel)
     index1       <- p_start - ts_per_start + 1
     index2       <- p_end   - ts_per_start + 1
     extend       <- index1 < 1 || index2 > ts_per_len
@@ -365,9 +365,8 @@ check_extend <- function(x, y) {
         row_numbers <- get_row_selection(x, range)
         if (is.null(row_numbers)) {
             # Do not use the window function of ts to extend the timeseries,
-            # it is very slow. Use our own function .adjust_period
-            x <- .adjust_period(x, .regrange_union(range,
-                                                   get_regperiod_range(x)))
+            # it is very slow. Use our own function adjust_period
+            x <- adjust_period(x, regrange_union(range, get_regperiod_range(x)))
             row_numbers <- get_row_selection(x, range)
         }
         i <- row_numbers
