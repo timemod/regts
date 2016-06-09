@@ -28,6 +28,7 @@
 #'
 #' #create a regperiod_range for a timeseries with frequency 2 (half year)
 #' regperiod_range("2010-2", "2016-2", frequency = 2)
+#' @seealso \link{lensub}
 #' @export
 regperiod_range <- function(p1, p2 = p1, frequency = NA) {
     if (is.null(p1) & is.null(p2)) {
@@ -174,6 +175,23 @@ as.character.regperiod_range <- function(x) {
         retval <- paste0(retval, as.character.regperiod(get_end_period(x)))
     }
     return (retval)
+}
+
+#' Returns the number of subperiods in a \link{regperiod_range} object.
+#'
+#' @param  x a \code{regperiod_range}
+#' @return The number of subperiods in the range, or \code{Inf} is the
+#' range is not bounded
+#' @export
+lensub  <- function(x) {
+    if (!inherits(x, "regperiod_range")) {
+        stop("x should be a regperiod_range object")
+    }
+    if (is.null(x$start) | is.null(x$end)) {
+        return (Inf)
+    } else {
+        return (x$end - x$start + 1)
+    }
 }
 
 #' @export

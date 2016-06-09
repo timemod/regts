@@ -318,35 +318,31 @@ adjust_period <- function(x, range) {
 # returns NULL.
 # PARAMETERS:
 # x   : a regts object
-# sel : a regperiod_range object. This object is used
-#       to select rows in argument x.
+# sel : a regperiod_range object. This object is used to select rows in
+#       argument x.
 # RETURNS: a vector with the numbers of the select rows in x,
-#          or NULL if sel lies (partially) outside the
-#          definition period of x.
+#          or NULL if sel lies (partially) outside the definition period of x.
 get_row_selection <- function(x, sel) {
-    ts_per       <- get_regperiod_range(x)
-    ts_per_start <- get_start_period(ts_per)
-    ts_per_end   <- get_end_period(ts_per)
-    ts_per_len   <- ts_per_end - ts_per_start + 1  # TODO: create function
-    p_start      <- get_start_period(sel)
-    p_end        <- get_end_period(sel)
-    index1       <- p_start - ts_per_start + 1
-    index2       <- p_end   - ts_per_start + 1
-    extend       <- index1 < 1 || index2 > ts_per_len
-    if (!extend) {
-        return (index1 : index2)
+    start <- start(x)
+    subperiod_count <- get_subperiod_count(start[1], start[2], frequency(x))
+    start_row <- sel$start - subperiod_count + 1
+    end_row <- start_row + lensub(sel) - 1
+    if (start_row >= 1 & end_row <= nrow(x)) {
+        return (start_row : end_row)
     } else {
         return (NULL)
     }
 }
 
-# Returns TRUE if regperiod_range y lies partially outside the
+# Returns TRUE if regperiod_range sel lies partially outside the
 # definition period of timeseries x. This means that the timeseries
 # would be extended if the period selection is applied.
-check_extend <- function(x, y) {
-    return (is.null(get_row_selection(x, y)))
+check_extend <- function(x, sel) {
+    return (is.null(get_row_selection(x, sel)))
 }
 
+# Selection on the left-hand side: replace a part of a regts
+# (e.g. x["2010Q2", ] <- 2).
 #' @export
 "[<-.regts" <- function (x, i, j, value) {
 
@@ -380,6 +376,7 @@ check_extend <- function(x, y) {
     return (NextMethod("[<-"))
 }
 
+# Selection on the right-hand-side (e.g. x["2010Q2", ]).
 #' @export
 "[.regts" <- function(x, i, j) {
     lbls <- ts_labels(x)
@@ -388,6 +385,8 @@ check_extend <- function(x, y) {
     }
     if (!missing(i) && (is.character(i) || inherits(i, "regperiod") ||
                         inherits(i, "regperiod_range"))) {
+        # the row selector is a regperiod_range. Use the
+        # window function of ts.
         range <- convert_range_selector(as.regperiod_range(i), x)
         extend <- check_extend(x, range)
         # The window function of ts is quite slow if extend = TRUE.
@@ -420,7 +419,8 @@ check_extend <- function(x, y) {
     }
 }
 
-#' Returns the period range of the time series as a link{regperiod_range} object
+#' Returns the period range of the time series as a \link{regperiod_range}
+#' object.
 #'
 #' @param x a \code{regts} or \code{ts}
 #' @return a \code{regperiod_range}

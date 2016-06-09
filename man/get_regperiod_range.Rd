@@ -2,7 +2,8 @@
 % Please edit documentation in R/regts.R
 \name{get_regperiod_range}
 \alias{get_regperiod_range}
-\title{Returns the period range of the time series as a link{regperiod_range} object}
+\title{Returns the period range of the time series as a \link{regperiod_range}
+object.}
 \usage{
 get_regperiod_range(x)
 }
@@ -13,6 +14,7 @@ get_regperiod_range(x)
 a \code{regperiod_range}
 }
 \description{
-Returns the period range of the time series as a link{regperiod_range} object
+Returns the period range of the time series as a \link{regperiod_range}
+object.
 }
 

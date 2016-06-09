@@ -42,4 +42,7 @@ regperiod_range("2010Q2", NULL)
 #create a regperiod_range for a timeseries with frequency 2 (half year)
 regperiod_range("2010-2", "2016-2", frequency = 2)
 }
+\seealso{
+\link{lensub}
+}
 

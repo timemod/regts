@@ -158,6 +158,9 @@ create_regperiod <- function(subperiod_count, frequency) {
 # Returns a time vector according to the convention of the standard ts package.
 # For years, this is a single number. For higher frequencies a vector
 # of two integers (the year and the subperiod). Internal function.
+# PARAMETERS
+# x      : a regperiod
+# OUTPUT :the time vector
 get_time_vector <- function(x) {
     if (frequency(x) == 1) {
         return (as.numeric(x))
