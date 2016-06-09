@@ -35,12 +35,14 @@ regperiod_range <- function(p1, p2 = p1, frequency = NA) {
     }
     if (!is.null(p1)) {
         p1 <- as.regperiod(p1, frequency)
+        freq1 <- attr(p1, 'frequency')
     }
     if (!is.null(p2)) {
         p2 <- as.regperiod(p2, frequency)
+        freq2 <- attr(p2, 'frequency')
     }
     if ((!(is.null(p1) || is.null(p2)))) {
-        if (p1$freq != p2$freq) {
+        if (freq1 != freq2) {
             stop("The two periods have different frequency")
         }
         if (p2 < p1) {
@@ -48,11 +50,20 @@ regperiod_range <- function(p1, p2 = p1, frequency = NA) {
         }
     }
     if (!is.null(p1)) {
-        freq <- p1$freq
+        freq <- freq1
     } else {
-        freq <- p2$freq
+        freq <- freq2
     }
-    return (structure(list(start = p1$data, end = p2$data, freq = freq),
+
+    # convert regperiods to normal integer
+    if (!is.null(p1)) {
+        p1 <- as.integer(p1)
+    }
+    if (!is.null(p2)) {
+        p2 <- as.integer(p2)
+    }
+
+    return (structure(list(start = p1, end = p2, frequency = freq),
                       class="regperiod_range"))
 }
 
@@ -66,8 +77,9 @@ as.regperiod_range.regperiod_range <- function(x, ...) {
 
 #' @export
 as.regperiod_range.regperiod <- function(x, ...) {
-    return (structure(list(start = x$data, end = x$data, freq = x$freq),
-                   class = "regperiod_range"))
+    return (structure(list(start = as.integer(x), end = as.integer(x),
+                      frequency = attr(x, 'frequency')),
+                      class = "regperiod_range"))
 }
 
 #' Convert a character string to a regperiod_range object
@@ -101,7 +113,6 @@ as.regperiod_range.character <- function(x, frequency = NA) {
         part2 <- str_trim(part2, side = "left")
         if (nchar(part1) > 0) {
             p1 <- regperiod(part1, frequency)
-            freq <- p1$freq
         } else {
             p1 <- NULL
         }
@@ -110,7 +121,6 @@ as.regperiod_range.character <- function(x, frequency = NA) {
         } else {
             p2 <- NULL
         }
-
     }
     return (regperiod_range(p1, p2))
 }
@@ -126,14 +136,11 @@ get_start_period <- function(x) {
         stop("x should be a regperiod_range object")
     }
     if (!is.null(x$start)) {
-        retval <- (structure(list(data = x$start, freq = x$freq),
-                             class = "regperiod"))
+        return (create_regperiod(x$start, x$frequency))
     } else {
-        retval <- NULL
+        return (NULL)
     }
-    return (retval)
 }
-
 
 #' Get the end period of the \link{regperiod_range}
 #'
@@ -146,12 +153,10 @@ get_end_period <- function(x) {
         stop("x should be a regperiod_range object")
     }
     if (!is.null(x$end)) {
-        retval <- (structure(list(data = x$end, freq = x$freq),
-                             class = "regperiod"))
+        return (create_regperiod(x$end, x$frequency))
     } else {
-        retval <- NULL
+        return (NULL)
     }
-    return (retval)
 }
 
 #' @export
@@ -173,28 +178,19 @@ print.regperiod_range <- function(x) {
     print(as.character(x))
 }
 
-# Modify the frequency of a regperiod_range object.
-# Only used internally.
+# Converts the frequency of a regperiod_range object, from lower to higher
+# frequency.
 modify_frequency <- function(x, new_freq) {
-    if (!inherits(x, "regperiod_range")) {
-        stop("x should be a regperiod_range object")
-    }
-    if (!is.numeric(new_freq) || new_freq != as.integer(new_freq)) {
-        stop("new_freq is not an integer")
-    }
-
-    if (new_freq %% x$freq != 0) {
+    if (new_freq %% x$frequency != 0) {
         stop("Frequency of regperiod_range is no divisor of the required frequency")
     }
-
-    factor <- new_freq %/% x$freq
+    factor <- new_freq %/% x$frequency
     if (!is.null(x$start)) {
-        x$start <- c(x$start[1], factor * (x$start[2] - 1) + 1)
+        x$start <- as.integer(x$start * factor)
     }
     if (!is.null(x$end)) {
-        x$end <- c(x$end[1], factor * x$end[2])
+        x$end <- as.integer((x$end + 1) * factor - 1)
     }
-    x$freq <- new_freq
+    x$frequency <- new_freq
     return (x)
 }
-

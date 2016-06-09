@@ -22,29 +22,31 @@ regperiod <- function(x, frequency = NA) {
         stop(paste("Illegal period", x))
     }
     parts <- regmatches(x, m)[[1]]
-    data <- as.numeric(c(parts[2], parts[5]))
-
+    year <- as.integer(parts[2])
+    subperiod <- as.integer(parts[5])
     freq_char <- tolower(parts[[4]])
     if (nchar(freq_char) > 0) {
         freq <- switch(freq_char, m = 12, q = 4, "-" = frequency)
-    } else if (is.na(frequency) && is.na(data[2])) {
+    } else if (is.na(frequency) & is.na(subperiod)) {
         # no frequency specified and no subperiod -> assume year
         freq <- 1
     } else {
         freq <- frequency
     }
-    if (is.na(data[2])) {
-        data[2] <- 1
-    }
     if (is.na(freq)) {
         stop("Frequency unknown. Specify argument frequency")
     }
+    if (freq == 1 & is.na(subperiod)) {
+        subperiod <- 1
+    }
+    if (subperiod == 0) {
+        stop(paste("Illegal period", x))
+    }
+
     if (!is.na(frequency) && frequency != freq) {
         stop("Supplied frequency does not agree with actual frequency in regperiod")
     }
-    period <- list(data = data, freq = freq)
-    period <- normalise_regperiod(period)
-    return (structure(period, class = "regperiod"))
+    return (create_regperiod(get_subperiod_count(year, subperiod, freq), freq))
 }
 
 #' Test if an object is a regperiod.
@@ -56,68 +58,30 @@ is.regperiod <- function(x) {
     return (inherits(x, "regperiod"))
 }
 
-# normalise_regpriod makes sure that the subperiod (x$data[2]) lies between 1
-# and x$freq
-normalise_regperiod <- function(x) {
-    x$data[1] <- x$data[1] + (x$data[2] - 1) %/% x$freq
-    x$data[2] <- (x$data[2] - 1) %% x$freq + 1
-    return (x)
-}
-
-# add an integer to a regperiod
-add_regperiod <- function(x, y) {
-    if (!is.numeric(y) || y != as.integer(y)) {
-        stop(paste("Error in", substitute(x), "+", substitute(y),
-                   ": second operand is not an integer"))
-    }
-    if (length(y) > 1) {
-        stop("For arithmetic with a regperiod, the second argument should
-             be an integer of length 1")
-    }
-    x$data[2] <- x$data[2] + y[1]
-    return (normalise_regperiod(x))
-}
-
-# subtract an integer of another regperiod from a regperiod
-subtract_regperiod <- function(x, y) {
-    if (class(y) == "regperiod") {
-        if (x$freq != y$freq) {
-            stop("x and y have different frequencies")
-        }
-        retval <- get_subperiod_count(x) - get_subperiod_count(y)
-    } else {
-        retval <- add_regperiod(x, -y)
-        retval <- normalise_regperiod(retval)
-    }
-    return (retval)
-}
-
+# binary operators (arithmetic and logical)
 #' @export
 Ops.regperiod <- function(x, y) {
-    if (.Generic == "+") {
-        retval <- add_regperiod(x, y)
-    } else if (.Generic == "-") {
-        retval <- subtract_regperiod(x, y)
-    } else if (is.regperiod(y)
-               && .Generic %in% c("==", "!=", "<", ">", "<=", ">=")) {
-        retval <- compare_regperiods(x, y, .Generic)
-    } else {
-        retval <- NextMethod(.Generic)
-    }
-    return (retval)
-}
-
-# compare two regperiods with relational operator operator
-compare_regperiods <- function(x, y, operator) {
-    if (x$freq != y$freq) {
-        if (operator %in% c("==", "!=")) {
-            retval <- operator == "=="
-        } else {
-            stop("Cannot compare two regperiods with different frequency")
+    if (.Generic %in% c("==", "!=", "<", ">", "<=", ">=")) {
+        if (!(is.regperiod(x) & is.regperiod(y))) {
+            stop("Illegal logical operation")
         }
+        if (attr(x, 'frequency') != attr(y, 'frequency')) {
+            if (operator %in% c("==", "!=")) {
+                return (operator == "==")
+            } else {
+                stop("Illegal operation")
+            }
+        }
+        return (NextMethod(.Generic))
     } else {
-        subperiods <- lapply(list(x, y), get_subperiod_count)
-        retval <- do.call(operator, subperiods)
+        # TODO: error handling. Prevent strange results
+        # (adding to regperiods, subtracting two regperiods with
+        # different frequencies etc.)
+        retval <- NextMethod(.Generic)
+        if (.Generic == "-" & is.regperiod(y)) {
+            retval <- as.integer(retval)
+        }
+        return(retval)
     }
 }
 
@@ -126,18 +90,38 @@ compare_regperiods <- function(x, y, operator) {
 #' param x the \code{regperiod} object to be converted
 #' @export
 as.character.regperiod <- function(x) {
-    if (x$freq == 1) {
-        return (as.character(x$data[1]))
+    freq <- frequency(x)
+    if (freq == 1) {
+        return (NextMethod(.Generic))
     } else {
-        if (x$freq == 4) {
+        if (freq == 4) {
             freq_char <- "Q"
-        } else if (x$freq == 12) {
+        } else if (freq == 12) {
             freq_char <- "M"
         } else {
             freq_char <- "-"
         }
-        return (paste0(x$data[1], freq_char, x$data[2]))
+        return (paste0(get_year(x), freq_char, get_subperiod(x)))
     }
+}
+
+#' Returns the frequency of a \link{regperiod} object
+#'
+#' @param x a \code{regperiod}
+#' @return the frequency of the period
+#' @export
+frequency.regperiod <- function(x) {
+    return (attr(x, "frequency"))
+}
+
+# internal function
+get_year <- function(x) {
+    return (as.integer(x) %/% frequency(x))
+}
+
+# internal function
+get_subperiod <- function(x) {
+    return (as.integer(x) %% frequency(x) + 1)
 }
 
 #' @export
@@ -158,15 +142,15 @@ as.regperiod.character <- function(x, ...) {
     return (regperiod(x, ...))
 }
 
-# Converts a regperiod object to the number of subperiods since Christ
-get_subperiod_count <- function(x) {
-    return (x$data[1] * x$freq + x$data[2])
+# Returns the number of subperiods after Christ from a year, subperiod
+# and frequency. Internal function.
+get_subperiod_count <- function(year, subperiod, frequency) {
+    return (year * frequency + subperiod - 1)
 }
 
-# Converts the number of subperiods since Christ to a regperiod object
-subperiod_count_to_regperiod <- function(x, frequency) {
-    year <- x %/% frequency
-    subperiod <- x %% frequency
-    period <- list(data = c(year, subperiod), freq = frequency)
-    return (structure(period, class = "regperiod"))
+# only used internally to create a regperiod object based on the number of
+# subperiods after Christ
+create_regperiod <- function(subperiod_count, frequency) {
+    return (structure(as.integer(subperiod_count), class = "regperiod",
+                      frequency = frequency))
 }

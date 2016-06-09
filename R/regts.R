@@ -55,16 +55,20 @@
 regts <- function(data, start, end = NULL, frequency = NA, names = NULL,
                   labels = NULL) {
     start <- as.regperiod(start, frequency)
+    start_freq <- frequency(start)
     if (missing(end)) {
-        retval <- ts(data, start = start$data, frequency = start$freq)
+        retval <- ts(data, start = c(get_year(start), get_subperiod(start)),
+                     frequency = start_freq)
     } else {
         end <- as.regperiod(end, frequency)
-        if (end$freq != start$freq) {
-            stop(paste("Frequency start", start$freq, "and end",
-                       end$freq, "do not agree"))
+        end_freq <- frequency(end)
+        if (start_freq != end_freq) {
+            stop(paste("Frequency start", start_freq, "and end",
+                       end_freq, "do not agree"))
         }
-        retval <- ts(data, start = start$data, end = end$data,
-                     frequency = start$freq)
+        retval <- ts(data, start = c(get_year(start), get_subperiod(start)),
+                     end = c(get_year(end), get_subperiod(end)),
+                     frequency = start_freq)
     }
 
     if (is.null(attr(retval, "dim"))) {
@@ -188,7 +192,7 @@ as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
     times <- lapply(as.character(times), FUN = fun, ...)
 
     # check that all frequencies are equal
-    frequencies <- unlist(lapply(times, FUN = function(x) x$freq))
+    frequencies <- unlist(lapply(times, FUN = frequency))
     frequencies <- unique(frequencies)
     if (length(frequencies) > 1) {
         stop("The time column(s) contain different frequencies")
@@ -196,21 +200,21 @@ as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
         freq <- frequencies[1]
     }
 
-    subperiods <- as.integer(lapply(times, FUN = get_subperiod_count))
-    if (identical(subperiods, subperiods[1]:subperiods[nrow(data)])) {
+    times <- unlist(times)
+    if (identical(times, times[1]:times[nrow(data)])) {
         # normal regular timeseries, no missing periods and periods
         # are ordered synchronically
-        ret <- regts(data, start = times[[1]])
+        ret <- regts(data, start = create_regperiod(times[1], freq))
     } else {
         # irregular timeseries in dataframe (missing periods or
         # unorderered time index)
-        subp_min <- min(subperiods)
-        subp_max <- max(subperiods)
+        subp_min <- min(times)
+        subp_max <- max(times)
         per_count <- subp_max - subp_min + 1
-        pmin <- subperiod_count_to_regperiod(subp_min, frequency = freq)
+        pmin <- create_regperiod(subp_min, frequency = freq)
         ret <- regts(matrix(NA, nrow = per_count, ncol = ncol(data)),
                      start = pmin, names = colnames(data))
-        rows <- subperiods - subp_min +1
+        rows <- times - subp_min +1
         ret[rows, ] <- data
     }
 
@@ -254,14 +258,19 @@ add_columns <- function(x, new_colnames) {
 # param x  a timeseries object (regts or ts)
 convert_range_selector <- function(range, x) {
 
-    range <- modify_frequency(range, frequency(x))
+    freq <- frequency(x)
+
+    # convert the frequency of the range if necessary
+    range <- modify_frequency(range, freq)
 
     # replace NULl periods by periods in x
     if (is.null(range$start)) {
-        range$start <- start(x)
+        start <- start(x)
+        range$start <- as.integer(get_subperiod_count(start[1], start[2], freq))
     }
     if (is.null(range$end)) {
-        range$end <- end(x)
+        end <- end(x)
+        range$end <- as.integer(get_subperiod_count(end[1], end[2], freq))
     }
 
     # Check if range is a valid selector of timeseries x.
@@ -270,7 +279,6 @@ convert_range_selector <- function(range, x) {
     p_start <- get_start_period(range)
     p_end   <- get_end_period(range)
     if (p_start > p_end) {
-        # This
         stop(paste("Start period", p_start, "before end period", p_end))
     }
     return (range)
@@ -297,7 +305,11 @@ convert_range_selector <- function(range, x) {
                     start = p_start, names = colnames(x))
     p <- .regrange_intersect(get_regperiod_range(x), range)
     if (!is.null(p)) {
-        retval[p, ] <- window(x, start = p$start, end = p$end)
+        pstart <- get_start_period(p)
+        pend   <- get_end_period(p)
+        start  <- c(get_year(pstart), get_subperiod(pstart))
+        end    <- c(get_year(pend), get_subperiod(pend))
+        retval[p, ] <- window(x, start = start, end = end)
     }
     return (retval)
 }
@@ -383,10 +395,14 @@ check_extend <- function(x, y) {
         extend <- check_extend(x, range)
         # The window function of ts is quite slow if extend = TRUE.
         # Therefore only use extend if it is really necessary
+        pstart <- get_start_period(range)
+        pend   <- get_end_period(range)
+        start <- c(get_year(pstart), get_subperiod(pstart))
+        end   <- c(get_year(pend), get_subperiod(pend))
         if (missing(j)) {
-            x <- window(x, start = range$start, end = range$end, extend = extend)
+            x <- window(x, start = start, end = end, extend = extend)
         } else {
-            x <- window(x, start = range$start, end = range$end, extend = extend)[, j]
+            x <- window(x, start = start, end = end, extend = extend)[, j]
         }
         if (!is.null(lbls)) {
             ts_labels(x) <- lbls
@@ -407,16 +423,21 @@ check_extend <- function(x, y) {
     }
 }
 
-#' Returns the period range of the time series as a \code{regperiod_range} object
+#' Returns the period range of the time series as a link{regperiod_range} object
 #'
-#' @param x a \code{regts}
+#' @param x a \code{regts} or \code{ts}
 #' @return a \code{regperiod_range}
 #' @export
 get_regperiod_range <- function(x) {
-    if (!is.regts(x)) {
-        stop("Argument x is not a regts")
+    if (!is.ts(x)) {
+        stop("Argument x is not a regts or ts")
     }
-    return (structure(list(start = start(x), end = end(x), freq = frequency(x)),
+    freq <- frequency(x)
+    start <- start(x)
+    p1 <- as.integer(get_subperiod_count(start[1], start[2], freq))
+    end <- end(x)
+    p2 <- as.integer(get_subperiod_count(end[1], end[2], freq))
+    return (structure(list(start = p1, end = p2, frequency = freq),
                       class="regperiod_range"))
 }
 
