@@ -434,11 +434,10 @@ get_regperiod_range <- function(x) {
     }
     freq <- frequency(x)
     start <- start(x)
-    p1 <- as.integer(get_subperiod_count(start[1], start[2], freq))
     end <- end(x)
-    p2 <- as.integer(get_subperiod_count(end[1], end[2], freq))
-    return (structure(list(start = p1, end = p2, frequency = freq),
-                      class="regperiod_range"))
+    p1 <- get_subperiod_count(start[1], start[2], freq)
+    p2 <- get_subperiod_count(end[1], end[2], freq)
+    return (create_regperiod_range(p1, p2, freq))
 }
 
 # remove the regts class

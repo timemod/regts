@@ -55,16 +55,21 @@ regperiod_range <- function(p1, p2 = p1, frequency = NA) {
         freq <- freq2
     }
 
-    # convert regperiods to normal integer
+    # convert regperiods to normal numbers
     if (!is.null(p1)) {
-        p1 <- as.integer(p1)
+        p1 <- as.numeric(p1)
     }
     if (!is.null(p2)) {
-        p2 <- as.integer(p2)
+        p2 <- as.numeric(p2)
     }
+    return (create_regperiod_range(p1, p2, freq))
+}
 
-    return (structure(list(start = p1, end = p2, frequency = freq),
-                      class="regperiod_range"))
+# internal function to create a regperiod_range from start, end
+# and frequency
+create_regperiod_range <- function(start, end, frequency) {
+    return (structure(list(start = start, end = end,
+                           frequency = frequency), class = "regperiod_range"))
 }
 
 #' @export
@@ -77,9 +82,7 @@ as.regperiod_range.regperiod_range <- function(x, ...) {
 
 #' @export
 as.regperiod_range.regperiod <- function(x, ...) {
-    return (structure(list(start = as.integer(x), end = as.integer(x),
-                      frequency = attr(x, 'frequency')),
-                      class = "regperiod_range"))
+    return (create_regperiod_range(as.numeric(x), as.numeric(x), frequency(x)))
 }
 
 #' Convert a character string to a regperiod_range object
@@ -186,10 +189,10 @@ modify_frequency <- function(x, new_freq) {
     }
     factor <- new_freq %/% x$frequency
     if (!is.null(x$start)) {
-        x$start <- as.integer(x$start * factor)
+        x$start <- x$start * factor
     }
     if (!is.null(x$end)) {
-        x$end <- as.integer((x$end + 1) * factor - 1)
+        x$end <- (x$end + 1) * factor - 1
     }
     x$frequency <- new_freq
     return (x)

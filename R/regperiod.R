@@ -79,7 +79,7 @@ Ops.regperiod <- function(x, y) {
         # different frequencies etc.)
         retval <- NextMethod(.Generic)
         if (.Generic == "-" & is.regperiod(y)) {
-            retval <- as.integer(retval)
+            retval <- as.numeric(retval)
         }
         return(retval)
     }
@@ -116,12 +116,12 @@ frequency.regperiod <- function(x) {
 
 # internal function
 get_year <- function(x) {
-    return (as.integer(x) %/% frequency(x))
+    return (as.numeric(x) %/% frequency(x))
 }
 
 # internal function
 get_subperiod <- function(x) {
-    return (as.integer(x) %% frequency(x) + 1)
+    return (as.numeric(x) %% frequency(x) + 1)
 }
 
 #' @export
@@ -151,6 +151,6 @@ get_subperiod_count <- function(year, subperiod, frequency) {
 # only used internally to create a regperiod object based on the number of
 # subperiods after Christ
 create_regperiod <- function(subperiod_count, frequency) {
-    return (structure(as.integer(subperiod_count), class = "regperiod",
+    return (structure(subperiod_count, class = "regperiod",
                       frequency = frequency))
 }
