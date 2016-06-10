@@ -6,7 +6,8 @@ aantal_variabelen <- 50000
 aantal_perioden <- 200
 
 namen <- paste('ts', seq(aantal_variabelen), sep = "_")
-data <- matrix(rnorm(n  = aantal_variabelen * aantal_perioden), ncol = aantal_variabelen)
+data <- matrix(rnorm(n  = aantal_variabelen * aantal_perioden),
+               ncol = aantal_variabelen)
 regts1  <- regts(data, start = "2010Q2", names = namen)
 
 
@@ -15,8 +16,9 @@ tm <- microbenchmark(regts1[, 'ts_3400'], times = 1000)
 tm
 
 # selectie van kolom en rij met labels
-tm <- microbenchmark(regts1["2012Q1/2012Q2", 'ts_3400'], times = 1000)
+tm <- microbenchmark(regts1["2012Q1/2012Q2", 'ts_3400'], times = 100)
 tm
+
 
 # selectie met vooral gedefinieerde periode
 p <- as.regperiod_range("2012Q1/2012Q2")

@@ -378,7 +378,7 @@ check_extend <- function(x, sel) {
 
 # Selection on the right-hand-side (e.g. x["2010Q2", ]).
 #' @export
-"[.regts" <- function(x, i, j) {
+"[.regts" <- function(x, i, j, ...) {
     lbls <- ts_labels(x)
     if (!is.null(lbls) && !missing(j)) {
         lbls <- lbls[j]

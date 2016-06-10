@@ -1,19 +1,12 @@
-#' @export
-lag.regts <- function(x, ...) {
-    x <- remove_regts_class(x)
-    return (as.regts(NextMethod(.Generic)))
-}
-
-#' @export
-diff.regts <- function(x, ...) {
-    x <- remove_regts_class(x)
-    return (as.regts(NextMethod(.Generic)))
-}
-
+# The S3 method window.ts removes the regts class, therefore use as.regts.
 #' @export
 window.regts <- function(x, ...) {
-    # convert x to normal ts object
-    x <- remove_regts_class(x)
+    return (as.regts(NextMethod(.Generic)))
+}
+
+# The S3 method aggregate.ts removes the regts class, therefore as as.regts.
+#' @export
+aggregate.regts <- function(x, ...) {
     return (as.regts(NextMethod(.Generic)))
 }
 
