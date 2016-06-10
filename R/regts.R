@@ -244,7 +244,7 @@ add_columns <- function(x, new_colnames) {
                          start = get_start_period(get_regperiod_range(x)),
                          frequency = frequency(x))
     old_colnames <- colnames(x)
-    x <- cbind(x, new_columns)
+    x <- regts.intersect(x, new_columns)
     colnames(x) <- c(old_colnames, new_colnames)
     return (x)
 }
