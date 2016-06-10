@@ -58,6 +58,7 @@ regts.intersect <- function(...) {
 
 #' @export
 cbind.regts <- function(...) {
+
     # we cannot simply use .Generic, because the method dispatching is not
     # done via UserMethod(), but by C-internal patching. Therefore use the
     # following tric:
@@ -75,6 +76,7 @@ cbind.regts <- function(...) {
      arguments <- lapply(arguments, FUN = f)
      ret <- as.regts(do.call(cbind, arguments))
      ret <- handle_labels(ret, ...)
+     return (ret)
 }
 
 #' @export

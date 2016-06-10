@@ -239,14 +239,14 @@ as.regts.default <- function(x, ...) {
 
 # Add columns with names new_colnames to x, and fill with NA.
 add_columns <- function(x, new_colnames) {
-    new_columns <- ts(matrix(NA, ncol = length(new_colnames)),
-                      start = start(x), end = end(x),
-                      frequency = frequency(x))
+    # TODO: function get_start_period also for regts
+    new_columns <- regts(matrix(NA, nrow = nrow(x), ncol = length(new_colnames)),
+                         start = get_start_period(get_regperiod_range(x)),
+                         frequency = frequency(x))
     old_colnames <- colnames(x)
-    x <- remove_regts_class(x)
     x <- cbind(x, new_columns)
     colnames(x) <- c(old_colnames, new_colnames)
-    return (as.regts(x))
+    return (x)
 }
 
 # This function makes sure that regperiod_range object range has
