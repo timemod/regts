@@ -47,6 +47,10 @@
 #' \link{as.data.frame.regts} and \link{as.list.regts} can be used
 #' to convert \code{regts} to a \link{data.frame} or a \link{list}.
 #'
+#' Information about the time period of the timeseries can be obtained
+#' with the functions \link{get_regperiod_range}, \link{start_period}
+#' and \link{end_period}.
+#'
 #' See also the description of the functions for handling labels
 #' (\link{ts_labels} and \link{update_ts_labels}).
 #'
@@ -130,7 +134,8 @@ is.regts <- function(x) {
 #' @param ... arguments passed to \code{fun}
 #' @return a \link{regts} object
 #' @seealso
-#' \link{regts}, \link{is.regts}, \link{as.data.frame.regts}, \link{as.list.regts}
+#' \link{regts}, \link{is.regts}, \link{as.data.frame.regts},
+#' \link{as.list.regts}, \link{start_period}, \link{end_period}
 #' @examples
 #' # convert a ts to regts
 #' x <- ts(1:3, start = c(2015,3), frequency = 4)
@@ -239,10 +244,8 @@ as.regts.default <- function(x, ...) {
 
 # Add columns with names new_colnames to x, and fill with NA.
 add_columns <- function(x, new_colnames) {
-    # TODO: function get_start_period also for regts
     new_columns <- regts(matrix(NA, nrow = nrow(x), ncol = length(new_colnames)),
-                         start = get_start_period(get_regperiod_range(x)),
-                         frequency = frequency(x))
+                         start = start_period.ts(x), frequency = frequency(x))
     old_colnames <- colnames(x)
     x <- regts.intersect(x, new_columns)
     colnames(x) <- c(old_colnames, new_colnames)
@@ -275,8 +278,8 @@ convert_range_selector <- function(range, x) {
     # Check if range is a valid selector of timeseries x.
     # An error will occur for example if timeseries x has period
     # 2010Q1/2011Q2 while range is 2012Q2/.
-    p_start <- get_start_period(range)
-    p_end   <- get_end_period(range)
+    p_start <- start_period.regperiod_range(range)
+    p_end   <- end_period.regperiod_range(range)
     if (p_start > p_end) {
         stop(paste("Start period", p_start, "before end period", p_end))
     }
@@ -291,8 +294,8 @@ convert_range_selector <- function(range, x) {
 # @return a regts with the adjusted period
 adjust_period <- function(x, range) {
 
-    p_start <- get_start_period(range)
-    p_end   <- get_end_period(range)
+    p_start <- start_period.regperiod_range(range)
+    p_end   <- end_period.regperiod_range(range)
     per_len <- p_end - p_start + 1
 
     if (is.mts(x)) {
@@ -304,8 +307,8 @@ adjust_period <- function(x, range) {
                     start = p_start, names = colnames(x))
     p <- regrange_intersect(get_regperiod_range(x), range)
     if (!is.null(p)) {
-        pstart <- get_start_period(p)
-        pend   <- get_end_period(p)
+        pstart <- start_period.regperiod_range(p)
+        pend   <- end_period.regperiod_range(p)
         retval[p, ] <- window(x, start = get_time_vector(pstart),
                               end = get_time_vector(pend))
     }
@@ -391,8 +394,8 @@ check_extend <- function(x, sel) {
         extend <- check_extend(x, range)
         # The window function of ts is quite slow if extend = TRUE.
         # Therefore only use extend if it is really necessary
-        pstart <- get_start_period(range)
-        pend   <- get_end_period(range)
+        pstart <- start_period.regperiod_range(range)
+        pend   <- end_period.regperiod_range(range)
         start  <- get_time_vector(pstart)
         end    <- get_time_vector(pend)
         if (missing(j)) {

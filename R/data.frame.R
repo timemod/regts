@@ -14,7 +14,7 @@
 as.data.frame.regts <- function(x) {
 
     # convert the time index to a character vector with period texts
-    first_period <- get_start_period(get_regperiod_range(x))
+    first_period <- start_period.ts(x)
     times <- unlist(lapply(0 : (nrow(x) - 1),
                            FUN = function(x) as.character(first_period + x)))
 

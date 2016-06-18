@@ -61,6 +61,7 @@ df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
 ts <- as.regts(df, time_column = 1, frequency = 4)
 }
 \seealso{
-\link{regts}, \link{is.regts}, \link{as.data.frame.regts}, \link{as.list.regts}
+\link{regts}, \link{is.regts}, \link{as.data.frame.regts},
+\link{as.list.regts}, \link{start_period}, \link{end_period}
 }
 

@@ -64,6 +64,10 @@ methods for \link{ts} and \link{data.frame}.
 \link{as.data.frame.regts} and \link{as.list.regts} can be used
 to convert \code{regts} to a \link{data.frame} or a \link{list}.
 
+Information about the time period of the timeseries can be obtained
+with the functions \link{get_regperiod_range}, \link{start_period}
+and \link{end_period}.
+
 See also the description of the functions for handling labels
 (\link{ts_labels} and \link{update_ts_labels}).
 }

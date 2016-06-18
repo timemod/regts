@@ -28,7 +28,7 @@
 #'
 #' #create a regperiod_range for a timeseries with frequency 2 (half year)
 #' regperiod_range("2010-2", "2016-2", frequency = 2)
-#' @seealso \link{lensub}
+#' @seealso \link{lensub}, \link{start_period}, \link{end_period}
 #' @export
 regperiod_range <- function(p1, p2 = p1, frequency = NA) {
     if (is.null(p1) & is.null(p2)) {
@@ -129,50 +129,16 @@ as.regperiod_range.character <- function(x, frequency = NA) {
     return (regperiod_range(p1, p2))
 }
 
-#' Get the start period of the \link{regperiod_range}
-#'
-#' @param x  a \link{regperiod_range{ object}}
-#' @return a \link{regperiod} object representing the first period of the
-#' range, or \code{NULL} if the range has no lower boundary.
-#' @export
-get_start_period <- function(x) {
-    if (!inherits(x, "regperiod_range")) {
-        stop("x should be a regperiod_range object")
-    }
-    if (!is.null(x$start)) {
-        return (create_regperiod(x$start, x$frequency))
-    } else {
-        return (NULL)
-    }
-}
-
-#' Get the end period of the \link{regperiod_range}
-#'
-#' @param x  a \link{regperiod_range{ object}}
-#' @return a \link{regperiod} object representing the last period of the
-#' range, or \code{NULL} if the range has no upper boundary.
-#' @export
-get_end_period <- function(x) {
-    if (!inherits(x, "regperiod_range")) {
-        stop("x should be a regperiod_range object")
-    }
-    if (!is.null(x$end)) {
-        return (create_regperiod(x$end, x$frequency))
-    } else {
-        return (NULL)
-    }
-}
-
 #' @export
 as.character.regperiod_range <- function(x) {
     if (!is.null(x$start)) {
-        retval <- as.character.regperiod(get_start_period(x))
+        retval <- as.character.regperiod(start_period(x))
     } else {
         retval <- ""
     }
     retval <- paste0(retval, "/")
     if (!is.null(x$end)) {
-        retval <- paste0(retval, as.character.regperiod(get_end_period(x)))
+        retval <- paste0(retval, as.character.regperiod(end_period(x)))
     }
     return (retval)
 }

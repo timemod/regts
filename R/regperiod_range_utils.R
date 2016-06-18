@@ -14,11 +14,11 @@
 # NULL if there is no intersection
 regrange_intersect <- function(range1, range2) {
 
-    p_start <- get_start_period(range1)
-    p_end   <- get_end_period(range1)
+    p_start <- start_period(range1)
+    p_end   <- end_period(range1)
 
-    p2_start <- get_start_period(range2)
-    p2_end   <- get_end_period(range2)
+    p2_start <- start_period(range2)
+    p2_end   <- end_period(range2)
     if (p2_start > p_start) {
         p_start <- p2_start
     }
@@ -41,11 +41,11 @@ regrange_intersect <- function(range1, range2) {
 # NULL if there is no intersection
 regrange_union <- function(range1, range2) {
 
-    p_start <- get_start_period(range1)
-    p_end   <- get_end_period(range1)
+    p_start <- start_period(range1)
+    p_end   <- end_period(range1)
 
-    p2_start <- get_start_period(range2)
-    p2_end   <- get_end_period(range2)
+    p2_start <- start_period(range2)
+    p2_end   <- end_period(range2)
     if (p2_start < p_start) {
         p_start <- p2_start
     }

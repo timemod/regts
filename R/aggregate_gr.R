@@ -5,9 +5,7 @@ aggregate_gr <- function(x, frequency) {
 
     rep <- as.integer(frequency(x) / frequency)
 
-    # TODO: create a generic function get_start_period,
-    # for regperiod_range and (reg)ts
-    first_old <- get_start_period(get_regperiod_range(x))
+    first_old <- start_period.ts(x)
     first_new <- as.integer((first_old + 2 *(rep - 1)) / rep)
     data <- agg_gr(x, rep, first_old, first_new)
 

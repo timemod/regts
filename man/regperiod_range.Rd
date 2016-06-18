@@ -43,6 +43,6 @@ regperiod_range("2010Q2", NULL)
 regperiod_range("2010-2", "2016-2", frequency = 2)
 }
 \seealso{
-\link{lensub}
+\link{lensub}, \link{start_period}, \link{end_period}
 }
 
