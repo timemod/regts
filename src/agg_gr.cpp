@@ -9,14 +9,14 @@ public:
     int len() {return last - first + 1;}
 };
 
-PeriodRange get_period_range(NumericMatrix &ts);
-NumericMatrix create_regts(NumericMatrix x, PeriodRange per,
-                           CharacterVector names);
+PeriodRange get_period_range(const NumericMatrix &ts);
+NumericMatrix create_regts(const NumericMatrix &x, const PeriodRange &per,
+                           const CharacterVector &names);
 
 
 // [[Rcpp::export]]
-NumericMatrix agg_gr(NumericMatrix &ts_old, int freq_new) {
-
+NumericMatrix agg_gr(const NumericMatrix &ts_old, const int freq_new) {
+    //ts_old = ts_old * 2;
     // save the dimension names
     List dimnames = ts_old.attr("dimnames");
     CharacterVector names = dimnames[1];
@@ -66,13 +66,12 @@ NumericMatrix agg_gr(NumericMatrix &ts_old, int freq_new) {
     return ts_new;
 }
 
-// TODO: create a class for period, return this class
 
 // Returns the PeriodRange of a timeseries.
 // TODO: this function is almost a duplicate of the R code of
 // package regts. Create a general C++ function for this,
 // also to be used in the R code of this package.
-PeriodRange get_period_range(NumericMatrix &ts) {
+PeriodRange get_period_range(const NumericMatrix &ts) {
     PeriodRange per;
     NumericVector tsp = ts.attr("tsp");
     per.freq = tsp[2];
@@ -83,8 +82,8 @@ PeriodRange get_period_range(NumericMatrix &ts) {
     return per;
 }
 
-NumericMatrix create_regts(NumericMatrix x, PeriodRange per,
-                           CharacterVector names) {
+NumericMatrix create_regts(const NumericMatrix &x, const PeriodRange &per,
+                           const CharacterVector &names) {
 
     // get start and end vectors
 
