@@ -6,6 +6,7 @@ public:
     // the first and last subperiod after Christ, starting at 0 in the year 0:
     int first, last;
     int freq;
+    int len() {return last - first + 1;}
 };
 
 PeriodRange get_period_range(NumericMatrix &ts);
@@ -25,7 +26,7 @@ NumericMatrix agg_gr(NumericMatrix ts_old, int freq_new) {
     int rep = per_old.freq / freq_new;
     per_new.first = (per_old.first + 2 * (rep - 1)) / rep;
     per_new.last = (per_old.last - (rep - 1)) / rep;
-    int nper_new = per_new.last - per_new.first + 1;
+    int nper_new = per_new.len();
 
     if (per_old.freq % freq_new != 0) {
         Rf_error("The new frequency %d is not a divisor of the old frequency "
