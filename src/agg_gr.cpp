@@ -15,7 +15,7 @@ NumericMatrix create_regts(NumericMatrix x, PeriodRange per,
 
 
 // [[Rcpp::export]]
-NumericMatrix agg_gr(NumericMatrix ts_old, int freq_new) {
+NumericMatrix agg_gr(NumericMatrix &ts_old, int freq_new) {
 
     // save the dimension names
     List dimnames = ts_old.attr("dimnames");
