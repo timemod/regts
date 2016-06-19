@@ -3,38 +3,56 @@ using namespace Rcpp;
 
 int get_frequency(NumericMatrix ts);
 int get_first_period(NumericMatrix ts);
-NumericMatrix create_ts(NumericMatrix x, int first, int last, int freq);
+NumericMatrix create_ts(NumericMatrix x, int first, int last, int freq,
+                       CharacterVector names);
 
 // [[Rcpp::export]]
-NumericMatrix agg_gr(NumericMatrix ts, int freq_new) {
+NumericMatrix agg_gr(NumericMatrix ts_old, int freq_new) {
 
-    int freq_old = get_frequency(ts);
+
+    // save the dimension names
+    List dimnames = ts_old.attr("dimnames");
+    CharacterVector names = dimnames[1];
+
+    int freq_old = get_frequency(ts_old);
     int rep = freq_old / freq_new;
-    int first_old = get_first_period(ts);
+    int first_old = get_first_period(ts_old);
     int first_new = (first_old + 2 * (rep - 1)) / rep;
-    int last_old = first_old + ts.nrow() - 1;
+    int last_old = first_old + ts_old.nrow() - 1;
     int last_new = (last_old - (rep - 1)) / rep;
     int nper_new = last_new - first_new + 1;
 
-    NumericMatrix result(nper_new, ts.ncol());
+    NumericMatrix data(nper_new, ts_old.ncol());
 
     int shift = first_new * rep - (rep - 1) - first_old;
     
-    for (int col = 0; col < ts.ncol(); col++) {    
+    for (int col = 0; col < ts_old.ncol(); col++) {    
         for (int row = 0; row < nper_new; row++) {
             for (int i = 0; i < rep; i++) {
                 for (int j = 0; j < rep; j++) {
-                    result(row, col) = result(row, col) + 
-                         ts(i + j + rep * row + shift, col);
+                    data(row, col) = data(row, col) + 
+                         ts_old(i + j + rep * row + shift, col);
                 }
             }
         }
     }
     
-    result = result / 4;
-    result = create_ts(result, first_new, last_new, freq_new);
-    return result;
+    data = data / rep; // cgr method
+
+    NumericMatrix ts_new = create_ts(data, first_new, last_new, freq_new,
+                       names);
+
+    // check if labels are present in ts, if so that add to result
+    SEXP label_att = ts_old.attr("ts_labels");
+    if (!Rf_isNull(label_att)) {
+        CharacterVector labels(label_att);
+        ts_new.attr("ts_labels") = labels;
+    }
+
+    return ts_new;
 }
+
+// TODO: create a class for period, return this class
 
 // Returns the first period of timeseries ts as the number
 // of subperiods after Christ.
@@ -57,7 +75,10 @@ int get_frequency(NumericMatrix ts) {
     return freq;
 }
 
-NumericMatrix create_ts(NumericMatrix x, int first, int last, int freq) {
+NumericMatrix create_ts(NumericMatrix x, int first, int last, int freq, 
+                        CharacterVector names) {
+        
+    // get start and end vectors
     Environment stats("package:stats");
     Function ts = stats["ts"];
     NumericVector start(2);
@@ -66,5 +87,13 @@ NumericMatrix create_ts(NumericMatrix x, int first, int last, int freq) {
     NumericVector end(2);
     end[0] = last / freq;
     end[1] = last % freq + 1;
-    return ts(x, start, end, freq);
+
+    // 
+    CharacterVector classes(4);
+    classes[0] = "regts";
+    classes[1] = "mts";
+    classes[2] = "ts";
+    classes[3] = "matrix";
+
+    return ts(x, start, end, freq, 1, 0, classes, names);
 }
