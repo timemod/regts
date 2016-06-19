@@ -8,7 +8,7 @@
 #' @export
 #' @useDynLib regts
 #' @importFrom Rcpp sourceCpp
-aggregate_gr <- function(x, frequency) {
+aggregate_gr <- function(x, frequency = 1) {
     if (!inherits(x, 'ts')) {
         stop("Argument x is not a timeseries")
     }
