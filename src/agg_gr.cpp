@@ -12,10 +12,11 @@ public:
 PeriodRange get_period_range(const NumericMatrix &ts);
 NumericMatrix create_regts(const NumericMatrix &x, const PeriodRange &per,
                            const CharacterVector &names);
-
+void agg_gr_abs(NumericMatrix::Column column_old,
+                NumericMatrix::Column column_new, int rep, int shift);
 
 // [[Rcpp::export]]
-NumericMatrix agg_gr(const NumericMatrix &ts_old, const int freq_new) {
+NumericMatrix agg_gr(NumericMatrix &ts_old, const int freq_new) {
     //ts_old = ts_old * 2;
     // save the dimension names
     List dimnames = ts_old.attr("dimnames");
@@ -42,14 +43,7 @@ NumericMatrix agg_gr(const NumericMatrix &ts_old, const int freq_new) {
     int shift = per_new.first * rep - (rep - 1) - per_old.first;
 
     for (int col = 0; col < ts_old.ncol(); col++) {
-        for (int row = 0; row < nper_new; row++) {
-            for (int i = 0; i < rep; i++) {
-                for (int j = 0; j < rep; j++) {
-                    data(row, col) = data(row, col) +
-                         ts_old(i + j + rep * row + shift, col);
-                }
-            }
-        }
+        agg_gr_abs(ts_old(_, col), data(_, col), rep, shift);
     }
 
     data = data / rep; // cgr method
@@ -64,6 +58,18 @@ NumericMatrix agg_gr(const NumericMatrix &ts_old, const int freq_new) {
     }
 
     return ts_new;
+}
+
+void agg_gr_abs(NumericMatrix::Column column_old,
+                NumericMatrix::Column column_new, int rep, int shift) {
+    for (int row = 0; row < column_new.size(); row++) {
+        for (int i = 0; i < rep; i++) {
+            for (int j = 0; j < rep; j++) {
+                column_new[row] = column_new[row] +
+                              column_old[i + j + rep * row + shift];
+            }
+        }
+    }
 }
 
 
