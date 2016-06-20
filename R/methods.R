@@ -4,9 +4,21 @@ window.regts <- function(x, ...) {
     return (as.regts(NextMethod(.Generic)))
 }
 
-# The S3 method aggregate.ts removes the regts class, therefore as as.regts.
+# The S3 method aggregate.ts removes the regts class, therefore call  as.regts.
+# Also takes care of weird result if the first period of x does not
+# start at a subperiod for the new frequency (e.g.  a quartly timeseries
+# that is aggregated to a yearly timeseries starts at 2010.2q)).
+# In that case the initial period must be shifted.
 #' @export
-aggregate.regts <- function(x, ...) {
+aggregate.regts <- function(x, nfrequency = 1, ...) {
+    rep <- frequency(x) / nfrequency
+    p1 <- start_period(x)
+    extra <- as.integer(p1) %% rep
+    if (extra != 0) {
+        # shift initial period
+        p1 <- p1 + rep - extra
+        x <- x[regperiod_range(p1, NULL), ]
+    }
     return (as.regts(NextMethod(.Generic)))
 }
 

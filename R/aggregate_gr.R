@@ -11,11 +11,11 @@
 #' @export
 #' @useDynLib regts
 #' @importFrom Rcpp sourceCpp
-aggregate_gr <- function(x,  method, frequency = 1) {
+aggregate_gr <- function(x,  method, nfrequency = 1) {
     if (!inherits(x, 'ts')) {
         stop("Argument x is not a timeseries")
     }
 
     # call C++ function agg_gr (see src/agg_gr.cpp)
-    return (agg_gr(x, frequency, method))
+    return (agg_gr(x, nfrequency, method))
 }

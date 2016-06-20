@@ -5,7 +5,7 @@
 \title{Converts timeseries with absolute or relative growth rates to a lower
 frequency}
 \usage{
-aggregate_gr(x, method, frequency = 1)
+aggregate_gr(x, method, nfrequency = 1)
 }
 \arguments{
 \item{x}{a \link{ts} of \link{regts} object}
