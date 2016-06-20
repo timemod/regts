@@ -6,14 +6,15 @@
 using namespace Rcpp;
 
 // agg_gr
-NumericMatrix agg_gr(NumericMatrix& ts_old, const int freq_new);
-RcppExport SEXP regts_agg_gr(SEXP ts_oldSEXP, SEXP freq_newSEXP) {
+NumericMatrix agg_gr(NumericMatrix& ts_old, const int freq_new, const std::string& method);
+RcppExport SEXP regts_agg_gr(SEXP ts_oldSEXP, SEXP freq_newSEXP, SEXP methodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< NumericMatrix& >::type ts_old(ts_oldSEXP);
     Rcpp::traits::input_parameter< const int >::type freq_new(freq_newSEXP);
-    __result = Rcpp::wrap(agg_gr(ts_old, freq_new));
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    __result = Rcpp::wrap(agg_gr(ts_old, freq_new, method));
     return __result;
 END_RCPP
 }

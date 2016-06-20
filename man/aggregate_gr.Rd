@@ -5,16 +5,20 @@
 \title{Converts timeseries with absolute or relative growth rates to a lower
 frequency}
 \usage{
-aggregate_gr(x, frequency = 1)
+aggregate_gr(x, method, frequency = 1)
 }
 \arguments{
 \item{x}{a \link{ts} of \link{regts} object}
+
+\item{method}{Aggregation method: \code{"cgr"}, \code{"cgrs"}, \code{"cgru"}
+or \code{"cgrc"}. Consult the Isis reference manual for an explanation of
+these methods}
 
 \item{frequency}{the frequency of the result, should be higher than
 the frequency of timeseries \code{x}}
 }
 \value{
-a \link{regts} with lower frequency
+a \link{regts} with frequency \code{frequency}
 }
 \description{
 Converts timeseries with absolute or relative growth rates to a lower
