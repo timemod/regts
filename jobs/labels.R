@@ -1,5 +1,6 @@
 library(regts)
 
+print("jan")
 x1 <- regts(matrix(data = rep(1:6, 3), nc = 2), start = "2008Q4",
             names = c("a", "b"))
 ts_labels(x1) <- c("Timeseries  a", "Timeseries b")
