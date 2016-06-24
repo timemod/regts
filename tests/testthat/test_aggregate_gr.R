@@ -7,33 +7,67 @@ set.seed(12345)
 
 # Convert timeseries x to a first difference timeseries with lower
 # frequency nfrequency. First aggregate, then calculate difference.
-agg_diff1 <- function(x, nfrequency = 1) {
+agg_diff_1 <- function(x, nfrequency = 1) {
     x_y <- aggregate(x, nfrequency)
     return (diff(x_y))
 }
 
 # Convert timeseries x to a first difference timeseries with lower
 # frequency nfrequency. First calculate difference, then calculate aggregate.
-agg_diff2 <- function(x, method, nfrequency = 1) {
-    x_diff <- (frequency(x) / nfrequency) * diff(x)
+agg_diff_2 <- function(x, method, nfrequency = 1) {
+    x_diff <- diff(x)
+    if (method == "cgr") {
+        x_diff <- x_diff * (frequency(x) / nfrequency)
+    }
     return (aggregate_gr(x_diff, method, nfrequency))
 }
 
-test_that("quarterly to year, single timeseries", {
-    p         <- regperiod_range("2008Q3", "2013Q3")
+# Convert timeseries x to a relative difference timeseries with lower
+# frequency nfrequency. First aggregate, then calculate difference.
+agg_reldiff_1 <- function(x, nfrequency = 1) {
+    x_nfreq  <- aggregate(x, nfrequency)
+    ret <- diff(x_nfreq) / lag(x_nfreq, -1)
+    colnames(ret) <- colnames(x)
+    return (ret)
+}
+
+# Convert timeseries x to a relative difference timeseries with lower
+# frequency nfrequency. First calculate difference, then calculate aggregate.
+agg_reldiff_2 <- function(x, method, nfrequency = 1) {
+    x_diff <- diff(x) / lag(x, - 1)
+    colnames(x_diff) <- colnames(x)
+    if (method == "cgrc") {
+        x_diff <- 100 * x_diff
+    }
+    return (aggregate_gr(x_diff, method, nfrequency))
+}
+
+test_that("cgr and cgru, quarterly to year, single timeseries", {
+    p         <- regperiod_range("2008Q2", "2013Q3")
     ts_q      <- regts(rnorm(lensub(p)), start = start_period(p))
-    ref <- agg_diff1(ts_q) # the correct result
-    x1 <- agg_diff2(ts_q, method = "cgr")
-    expect_equal(agg_diff2(ts_q, method = "cgr"), ref);
-    expect_equal(agg_diff2(ts_q["2009Q1/"], method = "cgr"), ref);
+    ref <- agg_diff_1(ts_q) # the correct result
+    expect_equal(agg_diff_2(ts_q, method = "cgr"), ref);
+    expect_equal(agg_diff_2(ts_q["2008Q3/"], method = "cgr"), ref);
+    expect_equal(agg_diff_2(ts_q["2008Q4/"], method = "cgrs"), ref);
+    expect_equal(agg_diff_2(ts_q["2009Q1/"], method = "cgr"), ref);
 })
 
-# test_that("monthly to quarterly, two timeseries", {
-#     p <- regperiod_range("2010M2", "2011M11")
-#     tsm <- regts(rnorm(lensub(p) * 2), start = start_period(p))
-#     ts_q1 <- aggregate(tsm, nfrequency = 4)
-#     ts_q2 <- aggregate(tsm["2010M3/"], nfrequency = 4)
-#     ts_q3 <- aggregate(tsm["2010M4/"], nfrequency = 4)
-#     expect_equal(ts_q1, ts_q2)
-#     expect_equal(ts_q1, ts_q3)
-# })
+test_that("cgru and cgrc, quarterly to year, single timeseries", {
+    p         <- regperiod_range("2008Q2", "2013Q3")
+    ts_q      <- regts(rnorm(lensub(p)), start = start_period(p))
+    ref <- agg_reldiff_1(ts_q) # the correct result
+    expect_equal(agg_reldiff_2(ts_q, method = "cgru"), ref);
+    expect_equal(agg_reldiff_2(ts_q["2009Q1/"], method = "cgrc"), ref * 100);
+})
+
+test_that("monthly to quarterly, two timeseries", {
+    p <- regperiod_range("2010M11", "2011M11")
+    ts_m <- regts(matrix(rnorm(lensub(p) * 2), ncol = 2),
+                 start = start_period(p), names = c("a", "b"),
+                 labels = c("ts a", "ts b"))
+    ref_abs <- agg_diff_1(ts_m, nfrequency = 4)
+    expect_equal(agg_diff_2(ts_m, method = "cgr", nfrequency = 4), ref_abs);
+    ref_rel <- agg_reldiff_1(ts_m, nfrequency = 4)
+    expect_equal(agg_reldiff_2(ts_m["2011M1/"], method = "cgru", nfrequency = 4),
+                 ref_rel);
+})
