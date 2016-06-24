@@ -106,7 +106,7 @@ void agg_gr_rel(NumericMatrix::Column column_old,
                 if (!R_FINITE(column_old[j + shift + rep * row])) {
                     column_new[row] = NA_REAL;
                     na_found = true;
-                    break;
+                    goto next_row;
                 }
                 work[j] = work[j - 1] *
                       (column_old[j + shift + rep * row] / perc + 1);
@@ -125,7 +125,7 @@ void agg_gr_rel(NumericMatrix::Column column_old,
             if (!R_FINITE(column_old[j + shift + rep * row])) {
                 column_new[row] = NA_REAL;
                 na_found = true;
-                break;
+                goto next_row;
             }
             work[j] = work[j - 1] *
                 (column_old[j + shift + row * rep] / perc + 1);
@@ -133,6 +133,8 @@ void agg_gr_rel(NumericMatrix::Column column_old,
         }
         help2 = work[2 * rep - 1] / help1;
         column_new[row] = perc * (xtot2 / xtot1 - 1);
+    next_row:
+        continue;
     }
 }
 

@@ -42,7 +42,7 @@ agg_reldiff_2 <- function(x, method, nfrequency = 1) {
     return (aggregate_gr(x_diff, method, nfrequency))
 }
 
-test_that("cgr and cgru, quarterly to year, single timeseries", {
+test_that("cgr and cgrs, quarterly to year, single timeseries", {
     p         <- regperiod_range("2008Q2", "2013Q3")
     ts_q      <- regts(rnorm(lensub(p)), start = start_period(p))
     ref <- agg_diff_1(ts_q) # the correct result
@@ -60,7 +60,7 @@ test_that("cgru and cgrc, quarterly to year, single timeseries", {
     expect_equal(agg_reldiff_2(ts_q["2009Q1/"], method = "cgrc"), ref * 100);
 })
 
-test_that("monthly to quarterly, two timeseries", {
+test_that("cgr and cgru, monthly to quarterly, two timeseries", {
     p <- regperiod_range("2010M11", "2011M11")
     ts_m <- regts(matrix(rnorm(lensub(p) * 2), ncol = 2),
                  start = start_period(p), names = c("a", "b"),
@@ -70,4 +70,17 @@ test_that("monthly to quarterly, two timeseries", {
     ref_rel <- agg_reldiff_1(ts_m, nfrequency = 4)
     expect_equal(agg_reldiff_2(ts_m["2011M1/"], method = "cgru", nfrequency = 4),
                  ref_rel);
+})
+
+
+test_that("cgr and cgrs, quarterly to year, single timeseries with NA values", {
+    p         <- regperiod_range("2009Q1", "2015Q4")
+    ts_q      <- regts(rnorm(lensub(p)), start = start_period(p))
+    ts_q["2009Q1", ] <- NA
+    ts_q["2012Q2", ] <- NA
+    ts_q["2015Q4"] <- NA
+    ref_abs <- agg_diff_1(ts_q) # the correct result
+    expect_equal(agg_diff_2(ts_q, method = "cgr"), ref_abs);
+    ref_rel <- agg_reldiff_1(ts_q) # the correct result
+    expect_equal(agg_reldiff_2(ts_q, method = "cgru"), ref_rel);
 })
