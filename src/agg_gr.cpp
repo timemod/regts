@@ -101,10 +101,12 @@ void agg_gr_rel(NumericMatrix::Column column_old,
             xtot1 = 1.0;
             xtot2 = 0.0;
             for (int j = 1; j < rep; j++) {
-                //TODO: use R_FINITE or ISNAN? How should we handle
-                //infinite values?
                 if (!R_FINITE(column_old[j + shift + rep * row])) {
-                    column_new[row] = NA_REAL;
+                    if (ISNA(column_old[j + shift + rep * row])) {
+                        column_new[row] = NA_REAL;
+                    } else {
+                        column_new[row] = NAN;
+                    }
                     na_found = true;
                     goto next_row;
                 }
@@ -123,7 +125,11 @@ void agg_gr_rel(NumericMatrix::Column column_old,
         }
         for (int j = rep; j < 2 * rep; j++) {
             if (!R_FINITE(column_old[j + shift + rep * row])) {
-                column_new[row] = NA_REAL;
+                if (ISNA(column_old[j + shift + rep * row])) {
+                    column_new[row] = NA_REAL;
+                } else {
+                    column_new[row] = NAN;
+                }
                 na_found = true;
                 goto next_row;
             }
