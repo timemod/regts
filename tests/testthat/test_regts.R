@@ -163,3 +163,20 @@ test_that("period and column selection at the lhs of an assignment", {
                                                   c('a', 'a')]
     expect_equal_to_reference(regts2, "period_and_column.rds")
 })
+
+test_that("colnames are preserved in miscellaneous timeseries functions", {
+    x <- regts(1:10, start = "2010Q4", names = "a")
+    x_sin <- sin(x)
+    x_lag <- lag(x)
+    x_diff <- diff(x)
+    x_agg <- aggregate(x)
+    x_agg_gr <- aggregate_gr(x, method = "cgr")
+    x_windows <- window(x, start = c(2011, 4))
+    expect_identical(colnames(x), colnames(x_lag))
+    expect_identical(colnames(x), colnames(x_sin))
+    expect_identical(colnames(x), colnames(x_diff))
+    expect_identical(colnames(x), colnames(x_agg))
+    expect_identical(colnames(x), colnames(x_agg_gr))
+    expect_identical(colnames(x), colnames(x_windows))
+    expect_identical(colnames(x), colnames(x_windows))
+})

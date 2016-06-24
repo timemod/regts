@@ -1,13 +1,23 @@
 # The S3 method window.ts removes the regts class, therefore use as.regts.
 #' @export
 window.regts <- function(x, ...) {
-    return (as.regts(NextMethod(.Generic)))
+    lbls <- ts_labels(x)
+    x <- as.regts(NextMethod(.Generic))
+    if (!is.null(lbls)) {
+        ts_labels(x) <- lbls
+    }
+    return (x)
 }
 
 # The S3 method diff.ts removes the regts class, therefore use as.regts.
 #' @export
 diff.regts <- function(x, ...) {
-    return (as.regts(NextMethod(.Generic)))
+    lbls <- ts_labels(x)
+    x <- as.regts(NextMethod(.Generic))
+    if (!is.null(lbls)) {
+        ts_labels(x) <- lbls
+    }
+    return (x)
 }
 
 # The S3 method aggregate.ts removes the regts class, therefore call  as.regts.
@@ -17,6 +27,7 @@ diff.regts <- function(x, ...) {
 # In that case the initial period must be shifted.
 #' @export
 aggregate.regts <- function(x, nfrequency = 1, ...) {
+    lbls <- ts_labels(x)
     rep <- frequency(x) / nfrequency
     p1 <- start_period(x)
     extra <- as.integer(p1) %% rep
@@ -25,7 +36,11 @@ aggregate.regts <- function(x, nfrequency = 1, ...) {
         p1 <- p1 + rep - extra
         x <- x[regperiod_range(p1, NULL), ]
     }
-    return (as.regts(NextMethod(.Generic)))
+    x <- as.regts(NextMethod(.Generic))
+    if (!is.null(lbls)) {
+        ts_labels(x) <- lbls
+    }
+    return (x)
 }
 
 # Returns the timeseries label from an arbitrary object.
