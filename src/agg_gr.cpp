@@ -164,14 +164,23 @@ NumericMatrix create_regts(const NumericMatrix &x, const PeriodRange &per,
     end[0] = per.last / per.freq;
     end[1] = per.last % per.freq + 1;
 
-    CharacterVector classes(4);
-    classes[0] = "regts";
-    classes[1] = "mts";
-    classes[2] = "ts";
-    classes[3] = "matrix";
-
     Environment stats("package:stats");
     Function ts = stats["ts"];
 
-    return ts(x, start, end, per.freq, 1, 0, classes, names);
+    // TODO: could this code not be simplified?
+    if (x.ncol() > 1) {
+        CharacterVector classes(4);
+        classes[0] = "regts";
+        classes[1] = "mts";
+        classes[2] = "ts";
+        classes[3] = "matrix";
+        return ts(x, start, end, per.freq, 1, 0, classes, names);
+    } else {
+        CharacterVector classes(2);
+        classes[0] = "regts";
+        classes[1] = "ts";
+        return ts(x, start, end, per.freq, 1, 0, classes, names);
+    }
+
+
 }

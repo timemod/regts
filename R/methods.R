@@ -4,6 +4,12 @@ window.regts <- function(x, ...) {
     return (as.regts(NextMethod(.Generic)))
 }
 
+# The S3 method diff.ts removes the regts class, therefore use as.regts.
+#' @export
+diff.regts <- function(x, ...) {
+    return (as.regts(NextMethod(.Generic)))
+}
+
 # The S3 method aggregate.ts removes the regts class, therefore call  as.regts.
 # Also takes care of weird result if the first period of x does not
 # start at a subperiod for the new frequency (e.g.  a quartly timeseries
