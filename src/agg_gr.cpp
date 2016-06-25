@@ -88,6 +88,10 @@ void agg_gr_abs(NumericMatrix::Column column_old,
     }
 }
 
+// The macro CONVERT_INVALID converts an invalid number
+// (Inf, -Inf, NaN or NA) to either NA_REAL or NAN
+#define CONVERT_INVALID(X) ISNA(X) ? NA_REAL : NAN
+
 void agg_gr_rel(NumericMatrix::Column column_old,
                 NumericMatrix::Column column_new, double work[], int rep,
                 int shift, int perc) {
@@ -101,17 +105,13 @@ void agg_gr_rel(NumericMatrix::Column column_old,
             xtot1 = 1.0;
             xtot2 = 0.0;
             for (int j = 1; j < rep; j++) {
-                if (!R_FINITE(column_old[j + shift + rep * row])) {
-                    if (ISNA(column_old[j + shift + rep * row])) {
-                        column_new[row] = NA_REAL;
-                    } else {
-                        column_new[row] = NAN;
-                    }
+                double x_old = column_old[j + shift + rep * row];
+                if (!R_FINITE(x_old)) {
+                    column_new[row] = CONVERT_INVALID(x_old);
                     na_found = true;
                     goto next_row;
                 }
-                work[j] = work[j - 1] *
-                      (column_old[j + shift + rep * row] / perc + 1);
+                work[j] = work[j - 1] * (x_old / perc + 1);
                 xtot1 = xtot1 + work[j];
             }
             help1 = work[rep - 1];
@@ -124,23 +124,20 @@ void agg_gr_rel(NumericMatrix::Column column_old,
             work[rep - 1] = help2;
         }
         for (int j = rep; j < 2 * rep; j++) {
-            if (!R_FINITE(column_old[j + shift + rep * row])) {
-                if (ISNA(column_old[j + shift + rep * row])) {
-                    column_new[row] = NA_REAL;
-                } else {
-                    column_new[row] = NAN;
-                }
+            double x_old = column_old[j + shift + rep * row];
+            if (!R_FINITE(x_old)) {
+                column_new[row] = CONVERT_INVALID(x_old);
                 na_found = true;
                 goto next_row;
             }
-            work[j] = work[j - 1] *
-                (column_old[j + shift + row * rep] / perc + 1);
+            work[j] = work[j - 1] * (x_old / perc + 1);
             xtot2 = xtot2 + work[j];
         }
         help2 = work[2 * rep - 1] / help1;
         column_new[row] = perc * (xtot2 / xtot1 - 1);
-    next_row:
-        continue;
+
+        next_row:
+            continue;
     }
 }
 
