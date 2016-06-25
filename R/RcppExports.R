@@ -5,3 +5,7 @@ agg_gr <- function(ts_old, freq_new, method) {
     .Call('regts_agg_gr', PACKAGE = 'regts', ts_old, freq_new, method)
 }
 
+parse_period <- function(period_text, frequency) {
+    .Call('regts_parse_period', PACKAGE = 'regts', period_text, frequency)
+}
+

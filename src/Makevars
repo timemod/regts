@@ -1,0 +1,18 @@
+# options for lex and yacc
+LEX = flex
+YACC = bison
+LYPREFIX = pr
+
+all: $(SHLIB) period_scanner.o period_parser.o
+
+# rules for lex and yacc
+period_scanner.cpp : period_scanner.l
+	$(LEX)  -P$(LYPREFIX) -o$@ -i $<
+
+period_parser.cpp : period_parser.yy
+	$(YACC) -v  -d -p $(LYPREFIX) -o $@ $<
+
+# dependencies C files
+period_parser.o : period_parser.cpp period.hpp
+period_scanner.o : period_scanner.cpp period_parser.hpp months.hpp
+months.o : months.hpp

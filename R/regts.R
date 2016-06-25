@@ -432,7 +432,7 @@ get_regperiod_range <- function(x) {
     if (!is.ts(x)) {
         stop("Argument x is not a regts or ts")
     }
-    freq <- frequency(x)
+    freq <- as.integer(frequency(x))
     start <- start(x)
     end <- end(x)
     p1 <- get_subperiod_count(start[1], start[2], freq)
