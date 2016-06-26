@@ -178,6 +178,6 @@ modify_frequency <- function(x, new_freq) {
     if (!is.null(x$end)) {
         x$end <- (x$end + 1) * factor - 1
     }
-    x$frequency <- as.integer(new_freq)
+    x$frequency <- new_freq
     return (x)
 }

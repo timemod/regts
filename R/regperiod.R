@@ -15,8 +15,6 @@
 #' @useDynLib regts
 #' @importFrom Rcpp sourceCpp
 regperiod <- function(x, frequency = NA) {
-    # TODO: 1) handle standard date objects
-    #       2) introduce a user supplied format (as in  as.yearqtr)
     if (!is.character(x)) {
         stop("Argument x is not a character")
     }
