@@ -14,5 +14,5 @@ period_parser.cpp : period_parser.yy
 
 # dependencies C files
 period_parser.o : period_parser.cpp period.hpp
-period_scanner.o : period_scanner.cpp period_parser.hpp months.hpp
+period_scanner.o : period_scanner.cpp period_parser.cpp months.hpp
 months.o : months.hpp

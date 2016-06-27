@@ -4,7 +4,7 @@
 #include "months.hpp"
 
 typedef struct Month { /* month table entry */
-   char   *name;
+   const char   *name;
    unsigned char number;
    struct Month *next;  /* pointer to next month in linked list */
 } Month;
@@ -14,8 +14,8 @@ static Month *month_tab[HASHSIZE];
 static int month_tab_size = 0;
 
 static struct monthlist {
-        char          *name;
-        unsigned char number;
+        const char *name;
+        const unsigned char number;
     } months[] = {
         {"jan"       , 1},
         {"feb"       , 2},
@@ -43,7 +43,7 @@ static struct monthlist {
 #define ONE_EIGHTH  (NUM_BITS / 8)
 #define HIGH_BITS   (~ ((unsigned) ~0 >> ONE_EIGHTH))
 
-static  unsigned hashf(char *s) {
+static  unsigned hashf(const char *s) {
     unsigned h, tmp; 
     
     for( h = 0; *s; s++ ) 

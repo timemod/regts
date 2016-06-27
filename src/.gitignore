@@ -2,6 +2,3 @@
 *.so
 *.dll
 period_parser.output
-period_parser.cpp
-period_parser.hpp
-period_scanner.cpp
