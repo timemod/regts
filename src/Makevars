@@ -1,3 +1,6 @@
+# compiler flags for C++
+PKG_CXXFLAGS = -std=c++11
+
 # options for lex and yacc
 LEX = flex
 YACC = bison

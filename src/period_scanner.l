@@ -8,13 +8,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <string>
+
 #include "period.hpp"
 #include "period_parser.hpp"
 #include "months.hpp"
 
-static int get_periodicity(char *per_text);
-
-static char *c;
+static int textbuf_size = 0;
+static char *textbuf, *c;
+static int get_frequency(char *per_text);
 
 /*
  * for MKS Lex
@@ -49,15 +51,15 @@ static char *c;
 
 DIGIT           [0-9]
 SEP             [./\-:_]
-PERIODICITY     [QMK]
+FREQUENCY       [QMK]
 YEAR_CHAR       [YJ]
-MONTH_NAME      [a-z]{3,}
+MONTH_NAME      [A-Z]{3,}
 
 %%
 
-{DIGIT}+      {prlval = atoi(yytext); return NUMBER;}
+{DIGIT}+     {prlval = atoi(yytext); return NUMBER;}
 
-{PERIODICITY} {prlval = get_periodicity(yytext); return PERIODICITY;}
+{FREQUENCY}  {prlval = get_frequency(yytext); return FREQ;}
 
 {YEAR_CHAR}   {return YEAR_CHARACTER;}
 
@@ -73,16 +75,16 @@ MONTH_NAME      [a-z]{3,}
 
 %%
 
-static int get_periodicity(char *per_text) {
+static int get_frequency(char *per_text) {
    char c = tolower(*per_text);
    switch (c) {
        case ('q') : 
        case ('k') : 
-          return PERIODICITY_Q; break;      
+          return 4; break;      
        case ('m') : 
-          return PERIODICITY_M; break;   
+          return 12; break;   
        default:
-	  return PERIODICITY_UNKNOWN;
+	  return FREQ_UNKNOWN;
   }
 }
 
@@ -90,9 +92,20 @@ int prwrap( void ) {
     return 1;
 }
 
-void set_period_text(const char *period_text) {
-    c = (char *) malloc(strlen(period_text) + 1);
-    strcpy(c, period_text);
-    while (isspace(*c)) c++;
-    if (tolower(*c) == 't') c++; /* skip leading T (datum variable) */
+#include <Rcpp.h>
+#include <iostream>
+
+void set_period_text(const std::string &period_text) {
+    // TODO: use an iterator over period_text in the macro YYINPUT
+
+    size_t min_size = period_text.size() + 1;
+    if (textbuf == NULL) {
+        textbuf_size = 2 * min_size;
+        textbuf = (char *) malloc(textbuf_size);
+    } else  if (textbuf_size < min_size) {
+        textbuf_size = 2 * min_size;
+        textbuf = (char *) realloc(textbuf, textbuf_size);
+    }
+    strcpy(textbuf, period_text.c_str());
+    c = textbuf;
 }

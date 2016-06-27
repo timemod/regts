@@ -1,1 +1,1 @@
-int get_month_number(char *month_name);
+int get_month_number(const char *name);

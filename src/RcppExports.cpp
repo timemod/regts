@@ -19,7 +19,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // parse_period
-Rcpp::NumericVector parse_period(const std::string& period_text, double frequency);
+SEXP parse_period(const std::string& period_text, double frequency);
 RcppExport SEXP regts_parse_period(SEXP period_textSEXP, SEXP frequencySEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
