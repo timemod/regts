@@ -106,6 +106,7 @@ static void check_year_subperiod(int freq, int *year, int *frac) {
     switch (freq) {
         case (PERIODICITY_Q) : max_frac =  4; break;
         case (PERIODICITY_M) : max_frac =  12; break;
+	default: return;
     }
   
     if (*frac > max_frac && *year <= max_frac && *year > 0) {
@@ -128,7 +129,10 @@ Rcpp::NumericVector parse_period(const std::string &period_text,
    	
     set_period_text(period_text.c_str());
 
-    int retval =  yyparse();  
+    int retval = yyparse();  
+    if (!retval) {
+        error = 1;
+    }
 
     prrestart(NULL);
 	

@@ -76,7 +76,7 @@ static int strlcmp(const char *s1, const char *s2)
 }
 
 
-#define NBR_KWENTRIES ( sizeof(months) / sizeof(months[0]) )
+#define NBR_KWENTRIES (int) ( sizeof(months) / sizeof(months[0]) )
 
 static void init_month_table(void) {
     int i;
