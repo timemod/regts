@@ -1,5 +1,4 @@
 #' @export
-#' @import zoo
 as.regts.zoo <- function(x, ...) {
     return (as.regts(as.ts(x)))
 }
@@ -18,5 +17,5 @@ as.zooreg.regts <- function(x, ...) {
 
 #' @export
 as.zoo.regts <- function(x, ...) {
-    return (as.zooreg(x, ...))
+    return (zoo::as.zooreg(x, ...))
 }

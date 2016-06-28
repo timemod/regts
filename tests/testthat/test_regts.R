@@ -5,6 +5,7 @@ test_that("constructor regts for univariate timeseries", {
     regts1 <- regts(1:10, start = "2010Q4")
     ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010,4), frequency = 4, names = "Series 1")
     expect_identical(regts1, as.regts(ts1))
+    expect_identical(as.ts(regts1), ts1)
     expect_identical(class(regts1), c("regts", "ts"))
     expect_identical(is.regts(regts1), TRUE)
     expect_identical(is.regts(ts1), FALSE)
@@ -13,6 +14,7 @@ test_that("constructor regts for univariate timeseries", {
     regts1 <- regts(matrix(1:10, ncol = 1), start = "2010Q4", names = "a")
     ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010,4), frequency = 4, names = "a")
     expect_identical(regts1, as.regts(ts1))
+    expect_identical(as.ts(regts1), ts1)
 
     regts1 <- regts(1:10, start = "2010", end = "2012")
     expect_identical(regts1, as.regts(ts(1:10, start = 2010, end = 2012, frequency = 1)))

@@ -54,7 +54,6 @@
 #' See also the description of the functions for handling labels
 #' (\link{ts_labels} and \link{update_ts_labels}).
 #'
-#' @import evaluate
 #' @export
 regts <- function(data, start, end = NULL, frequency = NA, names = NULL,
                   labels = NULL) {
@@ -173,7 +172,6 @@ as.regts.ts <- function(x, ...) {
 }
 
 #' @describeIn as.regts Convert a \link{data.frame} to a \link{regts}
-#' @import Hmisc
 #' @export
 as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
                                 ...) {
@@ -223,7 +221,7 @@ as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
     }
 
     # handle labels
-    lbls <- label(x)
+    lbls <- Hmisc::label(x)
     if (!all(nchar(lbls) == 0)) {
         # remove the time column(s) from the labels
         if (time_column != 0) {

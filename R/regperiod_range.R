@@ -104,7 +104,7 @@ as.regperiod_range.regperiod <- function(x, ...) {
 #' # a single period can also be converted to a regperiod_range
 #' as.regperiod_range("2016Q1")
 #' @export
-#' @import stringr
+#' @importFrom stringr str_trim
 as.regperiod_range.character <- function(x, frequency = NA) {
     pos <- regexpr("/", x)
     if (pos == -1) {

@@ -22,7 +22,6 @@
 #' print(df_t)
 #' print(transpose_df(df_t))
 #' @export
-#' @import Hmisc
 transpose_df  <- function(x, colname_column, label_column) {
 
     #todo: check arguments. x should be a dataframe, colname_column
