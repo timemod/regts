@@ -18,7 +18,7 @@ test_that("constructor regts for univariate timeseries", {
     expect_identical(regts1, as.regts(ts(1:10, start = 2010, end = 2012, frequency = 1)))
 
     expect_error(regts(1:10, start = "2010-1"),
-                 "Frequency unknown. Specify argument frequency")
+                 "Frequency of period 2010-1 unknown. Specify argument frequency.")
 
     regts1 <- regts(1:10, start = "2010-1", frequency = 3, names = "a")
     ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010, 1), frequency = 3, names = "a")

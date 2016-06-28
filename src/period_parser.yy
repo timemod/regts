@@ -20,6 +20,8 @@
     #include <stdio.h>
     #include <Rcpp.h>
     #include <string>
+    #include <cstring>
+    #include <algorithm>
     #include "period.hpp"
     using Rcpp::CharacterVector;
     using Rcpp::NumericVector;
@@ -111,35 +113,43 @@ static void check_year_subperiod(int freq, int *year, int *frac) {
 }
 
 // [[Rcpp::export]]
-SEXP parse_period(const std::string &period_text, double frequency) {
+NumericVector parse_period(std::string &period_text, double frequency) {
 
-    /* initialise */
+    static std::string period_text_lc;
+	
+    // convert to lowercase, keep original string for error messages
+    period_text_lc = period_text;
+    std::transform(period_text_lc.begin(), period_text_lc.end(), 
+                   period_text_lc.begin(), tolower);
+
+    // initialise
     error = true;
     year = -1; 
     freq = FREQ_UNKNOWN;
     subperiod = -1;
     given_freq = frequency;
 
-    set_period_text(period_text);
+    set_period_text(period_text_lc);
 
     int retval = yyparse();  
     if (retval) {
         error = true;
     }
-
     prrestart(NULL);
 
     if (error) {
-        return R_NilValue;
+        Rf_error("Illegal period %s.", period_text.c_str());
     } else {
         if (freq == FREQ_UNKNOWN) {
             if (ISNA(frequency)) {
-                Rf_error("Frequency unknown. Specify argument frequency");
+                Rf_error("Frequency of period %s unknown." 
+                         " Specify argument frequency.", period_text.c_str());
             }
 	    freq = frequency; 
 	} else if (frequency != freq && !ISNA(frequency)) {
-	    Rf_error("Supplied frequency does not agree with actual frequency "
-                     "in regperiod");
+	    Rf_error("Specified frequency %d does not agree with actual "
+                     "frequency in period %s.", (int) frequency, 
+                     period_text.c_str());
 	}
         NumericVector result(1);
         result[0] = year * freq + subperiod - 1;

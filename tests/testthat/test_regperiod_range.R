@@ -8,7 +8,7 @@ test_that("constructor regperiod_range", {
     expect_identical(as.character(regperiod_range("2010q2", NULL)),
                      "2010Q2/")
     expect_error(regperiod_range("2001-4", "2014Q"),
-                 "Frequency unknown. Specify argument frequency")
+           "Frequency of period 2001-4 unknown. Specify argument frequency.")
     expect_error(regperiod_range("2001", "2014Q4"),
                  "The two periods have different frequency")
     expect_error(as.character(regperiod_range("2010Q4", "2010Q2")),
@@ -23,7 +23,7 @@ test_that("as.regperiod_range.character", {
     expect_identical(as.character(as.regperiod_range("2010q2/")),
                      "2010Q2/")
     expect_error(as.regperiod_range("2001-4 / 2014Q"),
-                 "Frequency unknown. Specify argument frequency")
+         "Frequency of period 2001-4 unknown. Specify argument frequency.")
     expect_error(as.regperiod_range("2001/2014Q4"),
                  "The two periods have different frequency")
     expect_error(as.character(as.regperiod_range("2010Q4/2010Q2")),

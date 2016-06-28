@@ -1,3 +1,3 @@
-x <- structure(12, class="periode")
-attr(x, "frequency") <- 4
-x
+library(regts)
+perioden <- c("2010Q1", "b", "c")
+tryCatch(x <- lapply(perioden[1], FUN = regperiod), error = function(e) {})

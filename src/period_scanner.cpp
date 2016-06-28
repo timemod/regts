@@ -411,9 +411,9 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    2,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    4,    4,    4,    5,    5,    5,
         5,    5,    5,    5,    5,    5,    5,    4,    1,    1,
-        1,    1,    1,    1,    6,    6,    6,    6,    6,    6,
-        6,    6,    6,    7,    8,    6,    8,    6,    6,    6,
-        8,    6,    6,    6,    6,    6,    6,    6,    7,    6,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    4,    1,    6,    6,    6,    6,
 
         6,    6,    6,    6,    6,    7,    8,    6,    8,    6,
@@ -485,20 +485,15 @@ char *prtext;
  * lexical analyzer for period string
  */
 #line 6 "period_scanner.l"
-
-#include <ctype.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstring>
 #include <string>
 
 #include "period.hpp"
 #include "period_parser.hpp"
 #include "months.hpp"
 
-static int textbuf_size = 0;
-static char *textbuf, *c;
-static int get_frequency(char *per_text);
+static const char *c;
+static int get_frequency(const char *c);
 
 /*
  * for MKS Lex
@@ -529,7 +524,7 @@ static int get_frequency(char *per_text);
 }
 
 #endif
-#line 533 "period_scanner.cpp"
+#line 528 "period_scanner.cpp"
 
 #define INITIAL 0
 
@@ -716,10 +711,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 58 "period_scanner.l"
+#line 53 "period_scanner.l"
 
 
-#line 723 "period_scanner.cpp"
+#line 718 "period_scanner.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -804,47 +799,47 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 60 "period_scanner.l"
+#line 55 "period_scanner.l"
 {prlval = atoi(prtext); return NUMBER;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 62 "period_scanner.l"
+#line 57 "period_scanner.l"
 {prlval = get_frequency(prtext); return FREQ;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 64 "period_scanner.l"
+#line 59 "period_scanner.l"
 {return YEAR_CHARACTER;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 66 "period_scanner.l"
+#line 61 "period_scanner.l"
 {return SEP;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 68 "period_scanner.l"
+#line 63 "period_scanner.l"
 {prlval = get_month_number(prtext); 
                int type = prlval > 0 ? MONTH_NAME : INVALID;
                return type;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 72 "period_scanner.l"
+#line 67 "period_scanner.l"
 /* eat up white space */
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 74 "period_scanner.l"
+#line 69 "period_scanner.l"
 {return INVALID;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 76 "period_scanner.l"
+#line 71 "period_scanner.l"
 ECHO;
 	YY_BREAK
-#line 848 "period_scanner.cpp"
+#line 843 "period_scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1842,13 +1837,12 @@ void prfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 76 "period_scanner.l"
+#line 71 "period_scanner.l"
 
 
 
-static int get_frequency(char *per_text) {
-   char c = tolower(*per_text);
-   switch (c) {
+static int get_frequency(const char *c) {
+   switch (*c) {
        case ('q') : 
        case ('k') : 
           return 4; break;      
@@ -1863,21 +1857,8 @@ int prwrap( void ) {
     return 1;
 }
 
-#include <Rcpp.h>
-#include <iostream>
-
 void set_period_text(const std::string &period_text) {
     // TODO: use an iterator over period_text in the macro YYINPUT
-
-    size_t min_size = period_text.size() + 1;
-    if (textbuf == NULL) {
-        textbuf_size = 2 * min_size;
-        textbuf = (char *) malloc(textbuf_size);
-    } else  if (textbuf_size < min_size) {
-        textbuf_size = 2 * min_size;
-        textbuf = (char *) realloc(textbuf, textbuf_size);
-    }
-    strcpy(textbuf, period_text.c_str());
-    c = textbuf;
+    c = period_text.c_str();
 }
 

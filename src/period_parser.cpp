@@ -75,6 +75,8 @@
     #include <stdio.h>
     #include <Rcpp.h>
     #include <string>
+    #include <cstring>
+    #include <algorithm>
     #include "period.hpp"
     using Rcpp::CharacterVector;
     using Rcpp::NumericVector;
@@ -83,7 +85,7 @@
     double freq, given_freq;
     static void check_year_subperiod(int freq, int *year, int *frac);
 
-#line 87 "period_parser.cpp" /* yacc.c:339  */
+#line 89 "period_parser.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -150,7 +152,7 @@ int prparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 154 "period_parser.cpp" /* yacc.c:358  */
+#line 156 "period_parser.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -448,8 +450,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    46,    46,    47,    48,    49,    50,    51,    54,    57,
-      61,    62,    65,    67,    69,    71,    73,    78,    87
+       0,    48,    48,    49,    50,    51,    52,    53,    56,    59,
+      63,    64,    67,    69,    71,    73,    75,    80,    89
 };
 #endif
 
@@ -1228,71 +1230,71 @@ yyreduce:
   switch (yyn)
     {
         case 7:
-#line 51 "period_parser.yy" /* yacc.c:1646  */
+#line 53 "period_parser.yy" /* yacc.c:1646  */
     {YYABORT;}
-#line 1234 "period_parser.cpp" /* yacc.c:1646  */
+#line 1236 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 55 "period_parser.yy" /* yacc.c:1646  */
+#line 57 "period_parser.yy" /* yacc.c:1646  */
     {error = false; year = (yyvsp[0]); freq = 1; subperiod = 1;}
-#line 1240 "period_parser.cpp" /* yacc.c:1646  */
+#line 1242 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 58 "period_parser.yy" /* yacc.c:1646  */
+#line 60 "period_parser.yy" /* yacc.c:1646  */
     {error = false; year = (yyvsp[-1]); freq = 1; subperiod = 1;}
-#line 1246 "period_parser.cpp" /* yacc.c:1646  */
+#line 1248 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 66 "period_parser.yy" /* yacc.c:1646  */
+#line 68 "period_parser.yy" /* yacc.c:1646  */
     {error = false; year = (yyvsp[-3]); subperiod = (yyvsp[-1]); freq = (yyvsp[0]);}
-#line 1252 "period_parser.cpp" /* yacc.c:1646  */
+#line 1254 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 68 "period_parser.yy" /* yacc.c:1646  */
+#line 70 "period_parser.yy" /* yacc.c:1646  */
     {error = false; year = (yyvsp[0]); subperiod = (yyvsp[-2]); freq = (yyvsp[-3]);}
-#line 1258 "period_parser.cpp" /* yacc.c:1646  */
+#line 1260 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 70 "period_parser.yy" /* yacc.c:1646  */
+#line 72 "period_parser.yy" /* yacc.c:1646  */
     {error = false; year = (yyvsp[-3]); subperiod = (yyvsp[0]); freq = (yyvsp[-1]);}
-#line 1264 "period_parser.cpp" /* yacc.c:1646  */
+#line 1266 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 72 "period_parser.yy" /* yacc.c:1646  */
+#line 74 "period_parser.yy" /* yacc.c:1646  */
     {error = false; year = (yyvsp[0]); subperiod = (yyvsp[-3]); freq = (yyvsp[-2]);}
-#line 1270 "period_parser.cpp" /* yacc.c:1646  */
+#line 1272 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 74 "period_parser.yy" /* yacc.c:1646  */
+#line 76 "period_parser.yy" /* yacc.c:1646  */
     {error = false; year = (yyvsp[-2]); subperiod = (yyvsp[0]); freq = (yyvsp[-1]);
                 check_year_subperiod(freq, &year, &subperiod);}
-#line 1277 "period_parser.cpp" /* yacc.c:1646  */
+#line 1279 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 81 "period_parser.yy" /* yacc.c:1646  */
+#line 83 "period_parser.yy" /* yacc.c:1646  */
     {error = false; year = (yyvsp[-2]); subperiod = (yyvsp[0]);
              if (!ISNA(given_freq)) {
                  check_year_subperiod(given_freq, &year, &subperiod);
              };}
-#line 1286 "period_parser.cpp" /* yacc.c:1646  */
+#line 1288 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 88 "period_parser.yy" /* yacc.c:1646  */
+#line 90 "period_parser.yy" /* yacc.c:1646  */
     {error = false; year = (yyvsp[0]); subperiod = (yyvsp[-2]); freq = 12;}
-#line 1292 "period_parser.cpp" /* yacc.c:1646  */
+#line 1294 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1296 "period_parser.cpp" /* yacc.c:1646  */
+#line 1298 "period_parser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1520,7 +1522,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 91 "period_parser.yy" /* yacc.c:1906  */
+#line 93 "period_parser.yy" /* yacc.c:1906  */
  
 
 void prerror(const char *s) {
@@ -1544,35 +1546,43 @@ static void check_year_subperiod(int freq, int *year, int *frac) {
 }
 
 // [[Rcpp::export]]
-SEXP parse_period(const std::string &period_text, double frequency) {
+NumericVector parse_period(std::string &period_text, double frequency) {
 
-    /* initialise */
+    static std::string period_text_lc;
+	
+    // convert to lowercase, keep original string for error messages
+    period_text_lc = period_text;
+    std::transform(period_text_lc.begin(), period_text_lc.end(), 
+                   period_text_lc.begin(), tolower);
+
+    // initialise
     error = true;
     year = -1; 
     freq = FREQ_UNKNOWN;
     subperiod = -1;
     given_freq = frequency;
 
-    set_period_text(period_text);
+    set_period_text(period_text_lc);
 
     int retval = yyparse();  
     if (retval) {
         error = true;
     }
-
     prrestart(NULL);
 
     if (error) {
-        return R_NilValue;
+        Rf_error("Illegal period %s.", period_text.c_str());
     } else {
         if (freq == FREQ_UNKNOWN) {
             if (ISNA(frequency)) {
-                Rf_error("Frequency unknown. Specify argument frequency");
+                Rf_error("Frequency of period %s unknown." 
+                         " Specify argument frequency.", period_text.c_str());
             }
 	    freq = frequency; 
 	} else if (frequency != freq && !ISNA(frequency)) {
-	    Rf_error("Supplied frequency does not agree with actual frequency "
-                     "in regperiod");
+	    Rf_error("Specified frequency %d does not agree with actual "
+                     "frequency in period %s.", (int) frequency, 
+                     period_text.c_str());
 	}
         NumericVector result(1);
         result[0] = year * freq + subperiod - 1;

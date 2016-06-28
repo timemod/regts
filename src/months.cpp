@@ -1,6 +1,5 @@
 #include <string>
 #include <map>
-#include <algorithm>
 #include "months.hpp"
 using std::map;
 using std::string;
@@ -26,12 +25,7 @@ static const map<string, int> months {
 // Returns the number of a month name. The function returns -1 if the
 // month name is not recognized */
 int get_month_number(const char *name) {
-
-    // covert *name to string and to lowercase
-    string mname = string(name);
-    std::transform(mname.begin(), mname.end(), mname.begin(), ::tolower);
-
-    const auto iter = months.find(mname);
+    const auto iter = months.find(name);
     if (iter != months.end()) {
         return iter->second;
     } else {

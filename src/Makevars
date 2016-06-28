@@ -1,5 +1,7 @@
 # compiler flags for C++
-PKG_CXXFLAGS = -std=c++11
+#PKG_CXXFLAGS = -std=c++11
+# NOTE: -std=c++11 does not work on Ubuntu 12.04 LTS.
+PKG_CXXFLAGS = -std=c++0x
 
 # options for lex and yacc
 LEX = flex
@@ -10,7 +12,7 @@ all: $(SHLIB) period_scanner.o period_parser.o
 
 # rules for lex and yacc
 period_scanner.cpp : period_scanner.l
-	$(LEX)  -P$(LYPREFIX) -o$@ -i $<
+	$(LEX)  -P$(LYPREFIX) -o$@ $<
 
 period_parser.cpp : period_parser.yy
 	$(YACC) -v  -d -p $(LYPREFIX) -o $@ $<

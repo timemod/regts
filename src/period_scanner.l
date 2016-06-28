@@ -3,20 +3,15 @@
  */
 
 %{
-
-#include <ctype.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstring>
 #include <string>
 
 #include "period.hpp"
 #include "period_parser.hpp"
 #include "months.hpp"
 
-static int textbuf_size = 0;
-static char *textbuf, *c;
-static int get_frequency(char *per_text);
+static const char *c;
+static int get_frequency(const char *c);
 
 /*
  * for MKS Lex
@@ -51,9 +46,9 @@ static int get_frequency(char *per_text);
 
 DIGIT           [0-9]
 SEP             [./\-:_]
-FREQUENCY       [QMK]
-YEAR_CHAR       [YJ]
-MONTH_NAME      [A-Z]{3,}
+FREQUENCY       [qmk]
+YEAR_CHAR       [yj]
+MONTH_NAME      [a-z]{3,}
 
 %%
 
@@ -75,9 +70,8 @@ MONTH_NAME      [A-Z]{3,}
 
 %%
 
-static int get_frequency(char *per_text) {
-   char c = tolower(*per_text);
-   switch (c) {
+static int get_frequency(const char *c) {
+   switch (*c) {
        case ('q') : 
        case ('k') : 
           return 4; break;      
@@ -92,20 +86,7 @@ int prwrap( void ) {
     return 1;
 }
 
-#include <Rcpp.h>
-#include <iostream>
-
 void set_period_text(const std::string &period_text) {
     // TODO: use an iterator over period_text in the macro YYINPUT
-
-    size_t min_size = period_text.size() + 1;
-    if (textbuf == NULL) {
-        textbuf_size = 2 * min_size;
-        textbuf = (char *) malloc(textbuf_size);
-    } else  if (textbuf_size < min_size) {
-        textbuf_size = 2 * min_size;
-        textbuf = (char *) realloc(textbuf, textbuf_size);
-    }
-    strcpy(textbuf, period_text.c_str());
-    c = textbuf;
+    c = period_text.c_str();
 }
