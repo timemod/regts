@@ -29,9 +29,6 @@ static int get_frequency(const char *c);
 
 #define YY_NEVER_INTERACTIVE 1
 
-static int textbuf_size = 0;
-static char *textbuf;
-
 %}
 
 DIGIT           [0-9]
@@ -78,33 +75,22 @@ int prwrap( void ) {
 
 void init_period_scanner(const std::string &period_text) {
 
-    int len = period_text.size();
-    int size = len + 2;
-  
-    if (textbuf == NULL) {
-        textbuf_size = 2 * size;
-        textbuf = (char *) malloc(textbuf_size); 
-    } else if (textbuf_size < size) {
-        textbuf_size = 2 * size;
-	textbuf = (char *) realloc(textbuf, textbuf_size);
-    }
+    static std::string textbuf;
 
-    period_text.copy(textbuf, len);
+    // copy text to textbuf, and convert to lower case
+    textbuf = period_text;
+    std::transform(textbuf.begin(), textbuf.end(), textbuf.begin(),
+                   tolower);   
 
-    // textbuf should end with two terminal ASCII NULL characters
-    // (see the documentation of Flex).
-    textbuf[len]     = '\0';
-    textbuf[len + 1] = '\0';
+    // add two '\0' characters (see Flex documentation)
+    textbuf.append(2, '\0');
 
-    // convert to lower case
-    for (char *p =  textbuf; *p; ++p) {
-        *p = tolower(*p);
-    }
-
+    // update buffer
     static YY_BUFFER_STATE buffer = NULL;
     if (buffer != NULL) {
         yy_delete_buffer(buffer);
     }
-    buffer = pr_scan_buffer(textbuf, size);
+    buffer = pr_scan_buffer(const_cast<char *>(textbuf.c_str()),
+                            textbuf.size());
     pr_switch_to_buffer(buffer);
 }

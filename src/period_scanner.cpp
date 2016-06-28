@@ -511,10 +511,7 @@ static int get_frequency(const char *c);
 
 #define YY_NEVER_INTERACTIVE 1
 
-static int textbuf_size = 0;
-static char *textbuf;
-
-#line 518 "period_scanner.cpp"
+#line 515 "period_scanner.cpp"
 
 #define INITIAL 0
 
@@ -701,10 +698,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 43 "period_scanner.l"
+#line 40 "period_scanner.l"
 
 
-#line 708 "period_scanner.cpp"
+#line 705 "period_scanner.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -789,47 +786,47 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 45 "period_scanner.l"
+#line 42 "period_scanner.l"
 {prlval = atoi(prtext); return NUMBER;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 47 "period_scanner.l"
+#line 44 "period_scanner.l"
 {prlval = get_frequency(prtext); return FREQ;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 49 "period_scanner.l"
+#line 46 "period_scanner.l"
 {return YEAR_CHARACTER;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 51 "period_scanner.l"
+#line 48 "period_scanner.l"
 {return SEP;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 53 "period_scanner.l"
+#line 50 "period_scanner.l"
 {prlval = get_month_number(prtext); 
                int type = prlval > 0 ? MONTH_NAME : INVALID;
                return type;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 57 "period_scanner.l"
+#line 54 "period_scanner.l"
 /* eat up white space */
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 59 "period_scanner.l"
+#line 56 "period_scanner.l"
 {return INVALID;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 61 "period_scanner.l"
+#line 58 "period_scanner.l"
 ECHO;
 	YY_BREAK
-#line 833 "period_scanner.cpp"
+#line 830 "period_scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1827,7 +1824,7 @@ void prfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 61 "period_scanner.l"
+#line 58 "period_scanner.l"
 
 
 
@@ -1849,34 +1846,23 @@ int prwrap( void ) {
 
 void init_period_scanner(const std::string &period_text) {
 
-    int len = period_text.size();
-    int size = len + 2;
-  
-    if (textbuf == NULL) {
-        textbuf_size = 2 * size;
-        textbuf = (char *) malloc(textbuf_size); 
-    } else if (textbuf_size < size) {
-        textbuf_size = 2 * size;
-	textbuf = (char *) realloc(textbuf, textbuf_size);
-    }
+    static std::string textbuf;
 
-    period_text.copy(textbuf, len);
+    // copy text to textbuf, and convert to lower case
+    textbuf = period_text;
+    std::transform(textbuf.begin(), textbuf.end(), textbuf.begin(),
+                   tolower);   
 
-    // textbuf should end with two terminal ASCII NULL characters
-    // (see the documentation of Flex).
-    textbuf[len]     = '\0';
-    textbuf[len + 1] = '\0';
+    // add two '\0' characters (see Flex documentation)
+    textbuf.append(2, '\0');
 
-    // convert to lower case
-    for (char *p =  textbuf; *p; ++p) {
-        *p = tolower(*p);
-    }
-
+    // update buffer
     static YY_BUFFER_STATE buffer = NULL;
     if (buffer != NULL) {
         pr_delete_buffer(buffer);
     }
-    buffer = pr_scan_buffer(textbuf, size);
+    buffer = pr_scan_buffer(const_cast<char *>(textbuf.c_str()),
+                            textbuf.size());
     pr_switch_to_buffer(buffer);
 }
 
