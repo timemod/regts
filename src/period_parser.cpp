@@ -76,15 +76,14 @@
     #include <Rcpp.h>
     #include <string>
     #include <cstring>
-    #include "period.hpp"
-    using Rcpp::CharacterVector;
+    #include "period_scanner.hpp"
     using Rcpp::NumericVector;
-    static bool error;
     static int year, subperiod;
-    double freq, given_freq;
-    static void check_year_subperiod(int freq, int *year, int *frac);
+    static double freq, given_freq;
+    static void check_year_subperiod(int freq, int &year, int &frac);
+    void prerror(const char *s);
 
-#line 88 "period_parser.cpp" /* yacc.c:339  */
+#line 87 "period_parser.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -151,7 +150,7 @@ int prparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 155 "period_parser.cpp" /* yacc.c:358  */
+#line 154 "period_parser.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -391,18 +390,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  18
+#define YYFINAL  17
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   23
+#define YYLAST   21
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  9
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  8
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  18
+#define YYNRULES  17
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  29
+#define YYNSTATES  28
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -449,8 +448,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    47,    47,    48,    49,    50,    51,    52,    55,    58,
-      62,    63,    66,    68,    70,    72,    74,    79,    88
+       0,    46,    46,    47,    48,    49,    50,    53,    56,    60,
+      61,    64,    66,    68,    70,    72,    77,    86
 };
 #endif
 
@@ -479,7 +478,7 @@ static const yytype_uint16 yytoknum[] =
 #define yypact_value_is_default(Yystate) \
   (!!((Yystate) == (-4)))
 
-#define YYTABLE_NINF -12
+#define YYTABLE_NINF -11
 
 #define yytable_value_is_error(Yytable_value) \
   0
@@ -488,9 +487,9 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -2,     4,     0,     7,    -4,    15,    -4,    -4,    -4,    -4,
-      -4,     8,    -4,    12,     1,     7,    -4,    14,    -4,    -4,
-      16,    17,    18,    20,    -4,    -4,    -4,    -4,    -4
+      -2,     3,     0,     6,     4,    -4,    -4,    -4,    -4,    -4,
+       7,    -4,    10,    12,     6,    -4,    13,    -4,    -4,    14,
+      15,    16,    18,    -4,    -4,    -4,    -4,    -4
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -498,9 +497,9 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     8,     0,    11,     7,     0,     2,     3,     4,     5,
-       6,     0,     9,    10,     0,    11,    10,     0,     1,    16,
-       0,     0,    17,     0,    18,    15,    14,    12,    13
+       0,     7,     0,    10,     0,     2,     3,     4,     5,     6,
+       0,     8,     9,     0,    10,     9,     0,     1,    15,     0,
+       0,    16,     0,    17,    14,    13,    11,    12
 };
 
   /* YYPGOTO[NTERM-NUM].  */
@@ -512,7 +511,7 @@ static const yytype_int8 yypgoto[] =
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     5,     6,     7,    14,     8,     9,    10
+      -1,     4,     5,     6,    13,     7,     8,     9
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -520,39 +519,39 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      17,     1,     2,    15,    22,     3,     4,   -11,    11,    12,
-      13,    19,    23,    16,    20,    18,    21,    24,     0,    25,
-      26,     0,    27,    28
+      16,     1,     2,    14,    17,     3,   -10,    10,    11,    12,
+      18,    22,    15,    19,    20,    21,    23,    24,    25,     0,
+      26,    27
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     3,     4,     3,     3,     7,     8,     3,     4,     5,
-       6,     3,    15,     6,     6,     0,     4,     3,    -1,     3,
-       3,    -1,     4,     3
+       3,     3,     4,     3,     0,     7,     3,     4,     5,     6,
+       3,    14,     6,     6,     4,     3,     3,     3,     3,    -1,
+       4,     3
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,     4,     7,     8,    10,    11,    12,    14,    15,
-      16,     4,     5,     6,    13,     3,     6,    13,     0,     3,
-       6,     4,     3,    13,     3,     3,     3,     4,     3
+       0,     3,     4,     7,    10,    11,    12,    14,    15,    16,
+       4,     5,     6,    13,     3,     6,    13,     0,     3,     6,
+       4,     3,    13,     3,     3,     3,     4,     3
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,     9,    10,    10,    10,    10,    10,    10,    11,    12,
-      13,    13,    14,    14,    14,    14,    14,    15,    16
+       0,     9,    10,    10,    10,    10,    10,    11,    12,    13,
+      13,    14,    14,    14,    14,    14,    15,    16
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     1,     1,     1,     1,     1,     1,     2,
-       1,     0,     4,     4,     4,     4,     3,     3,     3
+       0,     2,     1,     1,     1,     1,     1,     1,     2,     1,
+       0,     4,     4,     4,     4,     3,     3,     3
 };
 
 
@@ -1229,71 +1228,65 @@ yyreduce:
   switch (yyn)
     {
         case 7:
-#line 52 "period_parser.yy" /* yacc.c:1646  */
-    {YYABORT;}
-#line 1235 "period_parser.cpp" /* yacc.c:1646  */
+#line 54 "period_parser.yy" /* yacc.c:1646  */
+    {year = (yyvsp[0]); freq = 1; subperiod = 1;}
+#line 1234 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 56 "period_parser.yy" /* yacc.c:1646  */
-    {error = false; year = (yyvsp[0]); freq = 1; subperiod = 1;}
-#line 1241 "period_parser.cpp" /* yacc.c:1646  */
+#line 57 "period_parser.yy" /* yacc.c:1646  */
+    {year = (yyvsp[-1]); freq = 1; subperiod = 1;}
+#line 1240 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
-  case 9:
-#line 59 "period_parser.yy" /* yacc.c:1646  */
-    {error = false; year = (yyvsp[-1]); freq = 1; subperiod = 1;}
-#line 1247 "period_parser.cpp" /* yacc.c:1646  */
+  case 11:
+#line 65 "period_parser.yy" /* yacc.c:1646  */
+    {year = (yyvsp[-3]); subperiod = (yyvsp[-1]); freq = (yyvsp[0]);}
+#line 1246 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
 #line 67 "period_parser.yy" /* yacc.c:1646  */
-    {error = false; year = (yyvsp[-3]); subperiod = (yyvsp[-1]); freq = (yyvsp[0]);}
-#line 1253 "period_parser.cpp" /* yacc.c:1646  */
+    {year = (yyvsp[0]); subperiod = (yyvsp[-2]); freq = (yyvsp[-3]);}
+#line 1252 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
 #line 69 "period_parser.yy" /* yacc.c:1646  */
-    {error = false; year = (yyvsp[0]); subperiod = (yyvsp[-2]); freq = (yyvsp[-3]);}
-#line 1259 "period_parser.cpp" /* yacc.c:1646  */
+    {year = (yyvsp[-3]); subperiod = (yyvsp[0]); freq = (yyvsp[-1]);}
+#line 1258 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
 #line 71 "period_parser.yy" /* yacc.c:1646  */
-    {error = false; year = (yyvsp[-3]); subperiod = (yyvsp[0]); freq = (yyvsp[-1]);}
-#line 1265 "period_parser.cpp" /* yacc.c:1646  */
+    {year = (yyvsp[0]); subperiod = (yyvsp[-3]); freq = (yyvsp[-2]);}
+#line 1264 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
 #line 73 "period_parser.yy" /* yacc.c:1646  */
-    {error = false; year = (yyvsp[0]); subperiod = (yyvsp[-3]); freq = (yyvsp[-2]);}
+    {year = (yyvsp[-2]); subperiod = (yyvsp[0]); freq = (yyvsp[-1]);
+                check_year_subperiod(freq, year, subperiod);}
 #line 1271 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 75 "period_parser.yy" /* yacc.c:1646  */
-    {error = false; year = (yyvsp[-2]); subperiod = (yyvsp[0]); freq = (yyvsp[-1]);
-                check_year_subperiod(freq, &year, &subperiod);}
-#line 1278 "period_parser.cpp" /* yacc.c:1646  */
+#line 80 "period_parser.yy" /* yacc.c:1646  */
+    {year = (yyvsp[-2]); subperiod = (yyvsp[0]);
+                if (!ISNA(given_freq)) {
+                    check_year_subperiod(given_freq, year, subperiod);
+                };}
+#line 1280 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 82 "period_parser.yy" /* yacc.c:1646  */
-    {error = false; year = (yyvsp[-2]); subperiod = (yyvsp[0]);
-             if (!ISNA(given_freq)) {
-                 check_year_subperiod(given_freq, &year, &subperiod);
-             };}
-#line 1287 "period_parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 18:
-#line 89 "period_parser.yy" /* yacc.c:1646  */
-    {error = false; year = (yyvsp[0]); subperiod = (yyvsp[-2]); freq = 12;}
-#line 1293 "period_parser.cpp" /* yacc.c:1646  */
+#line 87 "period_parser.yy" /* yacc.c:1646  */
+    {year = (yyvsp[0]); subperiod = (yyvsp[-2]); freq = 12;}
+#line 1286 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1297 "period_parser.cpp" /* yacc.c:1646  */
+#line 1290 "period_parser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1521,26 +1514,24 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 92 "period_parser.yy" /* yacc.c:1906  */
+#line 90 "period_parser.yy" /* yacc.c:1906  */
  
 
-void prerror(const char *s) {
-    error = true;
-    /*fprintf(stderr, "%s\n", s);*/
-}
+void prerror(const char *s) {}
 
-static void check_year_subperiod(int freq, int *year, int *frac) {
+static void check_year_subperiod(int freq, int &year, int &subp) {
 
-   /* For periods such as "3 q 20" (without separator), it is not
-    * clear whether the first number is a year or a subperiod. 
-    * If the subperiod is larger than the maximum subperiod and the
-    * year is smaller than or equal to the maximum subperiod then
-    * year and subperiod should be swapped. */
+   // Periods with the format X sep Y are ambigious: both X and Y
+   // could be the year. For example, for the period "3q2000", the first
+   // number (3) is probably the quarter and the second number (2000) is 
+   // probably the year. If the subperiod is larger than frequency and the
+   // year is smaller than or equal to the frequency, then
+   // year and subperiod should be swapped.
 
-    if (*frac > freq && *year <= freq && *year > 0) {
-       int y = *year;
-       *year = *frac;
-       *frac = y;
+    if (subp > freq && year <= freq) {
+        int y = year;
+        year = subp;
+        subp = y;
     }
 }
 
@@ -1548,24 +1539,18 @@ static void check_year_subperiod(int freq, int *year, int *frac) {
 NumericVector parse_period(const std::string &period_text, double frequency) {
 
     // initialise
-    error = true;
     year = -1; 
-    freq = FREQ_UNKNOWN;
+    freq = NA_REAL;
     subperiod = -1;
     given_freq = frequency;
 
     init_period_scanner(period_text);
 
-    int retval = yyparse();  
-    if (retval) {
-        error = true;
-    }
-    prrestart(NULL);
-
-    if (error) {
+    int error_flag = prparse();  
+    if (error_flag) {
         Rf_error("Illegal period %s.", period_text.c_str());
     } else {
-        if (freq == FREQ_UNKNOWN) {
+        if (ISNA(freq)) {
             if (ISNA(frequency)) {
                 Rf_error("Frequency of period %s unknown." 
                          " Specify argument frequency.", period_text.c_str());

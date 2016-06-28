@@ -7,7 +7,7 @@
 #include <string>
 #include <algorithm>
 
-#include "period.hpp"
+#include "period_scanner.hpp"
 #include "period_parser.hpp"
 #include "months.hpp"
 
@@ -64,8 +64,8 @@ static int get_frequency(const char *c) {
           return 4; break;      
        case ('m') : 
           return 12; break;   
-       default:
-	  return FREQ_UNKNOWN;
+        default:
+	  return -1;
   }
 }
 

@@ -18,6 +18,7 @@ period_parser.cpp : period_parser.yy
 	$(YACC) -v  -d -p $(LYPREFIX) -o $@ $<
 
 # dependencies C files
-period_parser.o : period_parser.cpp period.hpp
-period_scanner.o : period_scanner.cpp period_parser.cpp months.hpp
+period_parser.o : period_parser.cpp period_scanner.hpp
+period_scanner.o : period_scanner.cpp period_parser.cpp period_scanner.hpp \
+                   months.hpp
 months.o : months.hpp

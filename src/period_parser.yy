@@ -21,13 +21,12 @@
     #include <Rcpp.h>
     #include <string>
     #include <cstring>
-    #include "period.hpp"
-    using Rcpp::CharacterVector;
+    #include "period_scanner.hpp"
     using Rcpp::NumericVector;
-    static bool error;
     static int year, subperiod;
-    double freq, given_freq;
-    static void check_year_subperiod(int freq, int *year, int *frac);
+    static double freq, given_freq;
+    static void check_year_subperiod(int freq, int &year, int &frac);
+    void prerror(const char *s);
 %}
 
 %token  NUMBER
@@ -49,14 +48,13 @@ period:   posint
         | qm_period   
         | no_periodicity
         | month
-        | INVALID   {YYABORT;}
 ;
 
 posint   : NUMBER      /* e.g. 2010  */
-	        {error = false; year = $1; freq = 1; subperiod = 1;} 
+	       {year = $1; freq = 1; subperiod = 1;} 
 
 y_period : NUMBER YEAR_CHARACTER  /* e.g. 2010y */ 
-	        {error = false; year = $1; freq = 1; subperiod = 1;} 
+	       {year = $1; freq = 1; subperiod = 1;} 
 ;
 
 opt_sep  : SEP /* separator e.g. ., - */
@@ -64,50 +62,48 @@ opt_sep  : SEP /* separator e.g. ., - */
 ;
 
 qm_period : NUMBER opt_sep NUMBER FREQ   /* e.g. 2010.1q */
-               {error = false; year = $1; subperiod = $3; freq = $4;}
+               {year = $1; subperiod = $3; freq = $4;}
              | FREQ NUMBER opt_sep NUMBER /* e.g. q2 2010 */
-               {error = false; year = $4; subperiod = $2; freq = $1;}
+               {year = $4; subperiod = $2; freq = $1;}
              | NUMBER SEP FREQ NUMBER  /*e.g. 2010.q3 */
-               {error = false; year = $1; subperiod = $4; freq = $3;}
+               {year = $1; subperiod = $4; freq = $3;}
              | NUMBER FREQ SEP NUMBER  /*e.g. 2q/2000 */
-               {error = false; year = $4; subperiod = $1; freq = $2;}
+               {year = $4; subperiod = $1; freq = $2;}
              | NUMBER FREQ NUMBER  /*e.g. 1974m2 */
-               {error = false; year = $1; subperiod = $3; freq = $2;
-                check_year_subperiod(freq, &year, &subperiod);}
+               {year = $1; subperiod = $3; freq = $2;
+                check_year_subperiod(freq, year, subperiod);}
 ;
 
 no_periodicity : NUMBER opt_sep NUMBER   /* e.g. 2010/1 or 5/2010 */
-            /* for the moment, assume the first number is a year and the
-             * second number a subperiod with unknown periodicity */
-            {error = false; year = $1; subperiod = $3;
-             if (!ISNA(given_freq)) {
-                 check_year_subperiod(given_freq, &year, &subperiod);
-             };}
+            // For the moment, assume the first number is a year and the
+             // second number a subperiod with unknown periodicity */
+               {year = $1; subperiod = $3;
+                if (!ISNA(given_freq)) {
+                    check_year_subperiod(given_freq, year, subperiod);
+                };}
 ;
 
 month:     MONTH_NAME opt_sep NUMBER  /* e.g. may 2012 */
-            {error = false; year = $3; subperiod = $1; freq = 12;}
+            {year = $3; subperiod = $1; freq = 12;}
 ;
 
 %% 
 
-void prerror(const char *s) {
-    error = true;
-    /*fprintf(stderr, "%s\n", s);*/
-}
+void prerror(const char *s) {}
 
-static void check_year_subperiod(int freq, int *year, int *frac) {
+static void check_year_subperiod(int freq, int &year, int &subp) {
 
-   /* For periods such as "3 q 20" (without separator), it is not
-    * clear whether the first number is a year or a subperiod. 
-    * If the subperiod is larger than the maximum subperiod and the
-    * year is smaller than or equal to the maximum subperiod then
-    * year and subperiod should be swapped. */
+   // Periods with the format X sep Y are ambigious: both X and Y
+   // could be the year. For example, for the period "3q2000", the first
+   // number (3) is probably the quarter and the second number (2000) is 
+   // probably the year. If the subperiod is larger than frequency and the
+   // year is smaller than or equal to the frequency, then
+   // year and subperiod should be swapped.
 
-    if (*frac > freq && *year <= freq && *year > 0) {
-       int y = *year;
-       *year = *frac;
-       *frac = y;
+    if (subp > freq && year <= freq) {
+        int y = year;
+        year = subp;
+        subp = y;
     }
 }
 
@@ -115,24 +111,18 @@ static void check_year_subperiod(int freq, int *year, int *frac) {
 NumericVector parse_period(const std::string &period_text, double frequency) {
 
     // initialise
-    error = true;
     year = -1; 
-    freq = FREQ_UNKNOWN;
+    freq = NA_REAL;
     subperiod = -1;
     given_freq = frequency;
 
     init_period_scanner(period_text);
 
-    int retval = yyparse();  
-    if (retval) {
-        error = true;
-    }
-    prrestart(NULL);
-
-    if (error) {
+    int error_flag = prparse();  
+    if (error_flag) {
         Rf_error("Illegal period %s.", period_text.c_str());
     } else {
-        if (freq == FREQ_UNKNOWN) {
+        if (ISNA(freq)) {
             if (ISNA(frequency)) {
                 Rf_error("Frequency of period %s unknown." 
                          " Specify argument frequency.", period_text.c_str());
