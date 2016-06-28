@@ -21,7 +21,6 @@
     #include <Rcpp.h>
     #include <string>
     #include <cstring>
-    #include <algorithm>
     #include "period.hpp"
     using Rcpp::CharacterVector;
     using Rcpp::NumericVector;
@@ -113,14 +112,7 @@ static void check_year_subperiod(int freq, int *year, int *frac) {
 }
 
 // [[Rcpp::export]]
-NumericVector parse_period(std::string &period_text, double frequency) {
-
-    static std::string period_text_lc;
-	
-    // convert to lowercase, keep original string for error messages
-    period_text_lc = period_text;
-    std::transform(period_text_lc.begin(), period_text_lc.end(), 
-                   period_text_lc.begin(), tolower);
+NumericVector parse_period(const std::string &period_text, double frequency) {
 
     // initialise
     error = true;
@@ -129,7 +121,7 @@ NumericVector parse_period(std::string &period_text, double frequency) {
     subperiod = -1;
     given_freq = frequency;
 
-    set_period_text(period_text_lc);
+    init_period_scanner(period_text);
 
     int retval = yyparse();  
     if (retval) {

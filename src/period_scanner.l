@@ -5,6 +5,7 @@
 %{
 #include <cstring>
 #include <string>
+#include <algorithm>
 
 #include "period.hpp"
 #include "period_parser.hpp"
@@ -28,20 +29,9 @@ static int get_frequency(const char *c);
 
 #define YY_NEVER_INTERACTIVE 1
 
-/*
- * Flex needs this
- * MKS Lex doesn't and just ignores this
- * but do use the special Flex scanner macro
- */
+static int textbuf_size = 0;
+static char *textbuf;
 
-#ifdef FLEX_SCANNER
-
-#define YY_INPUT(buf,result,max_size) \
-{\
-    result = (*c == '\0') ? YY_NULL : (buf[0] = *c++, 1); \
-}
-
-#endif
 %}
 
 DIGIT           [0-9]
@@ -86,7 +76,35 @@ int prwrap( void ) {
     return 1;
 }
 
-void set_period_text(const std::string &period_text) {
-    // TODO: use an iterator over period_text in the macro YYINPUT
-    c = period_text.c_str();
+void init_period_scanner(const std::string &period_text) {
+
+    int len = period_text.size();
+    int size = len + 2;
+  
+    if (textbuf == NULL) {
+        textbuf_size = 2 * size;
+        textbuf = (char *) malloc(textbuf_size); 
+    } else if (textbuf_size < size) {
+        textbuf_size = 2 * size;
+	textbuf = (char *) realloc(textbuf, textbuf_size);
+    }
+
+    period_text.copy(textbuf, len);
+
+    // textbuf should end with two terminal ASCII NULL characters
+    // (see the documentation of Flex).
+    textbuf[len]     = '\0';
+    textbuf[len + 1] = '\0';
+
+    // convert to lower case
+    for (char *p =  textbuf; *p; ++p) {
+        *p = tolower(*p);
+    }
+
+    static YY_BUFFER_STATE buffer = NULL;
+    if (buffer != NULL) {
+        yy_delete_buffer(buffer);
+    }
+    buffer = pr_scan_buffer(textbuf, size);
+    pr_switch_to_buffer(buffer);
 }

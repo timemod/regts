@@ -487,6 +487,7 @@ char *prtext;
 #line 6 "period_scanner.l"
 #include <cstring>
 #include <string>
+#include <algorithm>
 
 #include "period.hpp"
 #include "period_parser.hpp"
@@ -510,21 +511,10 @@ static int get_frequency(const char *c);
 
 #define YY_NEVER_INTERACTIVE 1
 
-/*
- * Flex needs this
- * MKS Lex doesn't and just ignores this
- * but do use the special Flex scanner macro
- */
+static int textbuf_size = 0;
+static char *textbuf;
 
-#ifdef FLEX_SCANNER
-
-#define YY_INPUT(buf,result,max_size) \
-{\
-    result = (*c == '\0') ? YY_NULL : (buf[0] = *c++, 1); \
-}
-
-#endif
-#line 528 "period_scanner.cpp"
+#line 518 "period_scanner.cpp"
 
 #define INITIAL 0
 
@@ -711,10 +701,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 53 "period_scanner.l"
+#line 43 "period_scanner.l"
 
 
-#line 718 "period_scanner.cpp"
+#line 708 "period_scanner.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -799,47 +789,47 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 55 "period_scanner.l"
+#line 45 "period_scanner.l"
 {prlval = atoi(prtext); return NUMBER;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 57 "period_scanner.l"
+#line 47 "period_scanner.l"
 {prlval = get_frequency(prtext); return FREQ;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 59 "period_scanner.l"
+#line 49 "period_scanner.l"
 {return YEAR_CHARACTER;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 61 "period_scanner.l"
+#line 51 "period_scanner.l"
 {return SEP;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 63 "period_scanner.l"
+#line 53 "period_scanner.l"
 {prlval = get_month_number(prtext); 
                int type = prlval > 0 ? MONTH_NAME : INVALID;
                return type;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 67 "period_scanner.l"
+#line 57 "period_scanner.l"
 /* eat up white space */
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 69 "period_scanner.l"
+#line 59 "period_scanner.l"
 {return INVALID;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 71 "period_scanner.l"
+#line 61 "period_scanner.l"
 ECHO;
 	YY_BREAK
-#line 843 "period_scanner.cpp"
+#line 833 "period_scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1837,7 +1827,7 @@ void prfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 71 "period_scanner.l"
+#line 61 "period_scanner.l"
 
 
 
@@ -1857,8 +1847,36 @@ int prwrap( void ) {
     return 1;
 }
 
-void set_period_text(const std::string &period_text) {
-    // TODO: use an iterator over period_text in the macro YYINPUT
-    c = period_text.c_str();
+void init_period_scanner(const std::string &period_text) {
+
+    int len = period_text.size();
+    int size = len + 2;
+  
+    if (textbuf == NULL) {
+        textbuf_size = 2 * size;
+        textbuf = (char *) malloc(textbuf_size); 
+    } else if (textbuf_size < size) {
+        textbuf_size = 2 * size;
+	textbuf = (char *) realloc(textbuf, textbuf_size);
+    }
+
+    period_text.copy(textbuf, len);
+
+    // textbuf should end with two terminal ASCII NULL characters
+    // (see the documentation of Flex).
+    textbuf[len]     = '\0';
+    textbuf[len + 1] = '\0';
+
+    // convert to lower case
+    for (char *p =  textbuf; *p; ++p) {
+        *p = tolower(*p);
+    }
+
+    static YY_BUFFER_STATE buffer = NULL;
+    if (buffer != NULL) {
+        pr_delete_buffer(buffer);
+    }
+    buffer = pr_scan_buffer(textbuf, size);
+    pr_switch_to_buffer(buffer);
 }
 
