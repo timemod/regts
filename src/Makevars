@@ -22,3 +22,8 @@ period_parser.o : period_parser.cpp period_scanner.hpp
 period_scanner.o : period_scanner.cpp period_parser.cpp period_scanner.hpp \
                    months.hpp
 months.o : months.hpp
+
+period_range.o : period_range.h
+aggr_gr.o : period_range.h create_regts.h
+create_regts.o : create_regts.h
+

@@ -1,18 +1,9 @@
 #include <Rcpp.h>
 #include <string>
+#include "period_range.h"
+#include "create_regts.h"
 using namespace Rcpp;
 
-class PeriodRange {
-public:
-    // the first and last subperiod after Christ, starting at 0 in the year 0:
-    int first, last;
-    int freq;
-    int len() {return last - first + 1;}
-};
-
-PeriodRange get_period_range(const NumericMatrix &ts);
-NumericMatrix create_regts(const NumericMatrix &x, const PeriodRange &per,
-                           const CharacterVector &names);
 void agg_gr_abs(NumericMatrix::Column column_old,
                 NumericMatrix::Column column_new, int rep, int shift);
 void agg_gr_rel(NumericMatrix::Column column_old,
@@ -139,49 +130,4 @@ void agg_gr_rel(NumericMatrix::Column column_old,
         next_row:
             continue;
     }
-}
-
-
-// Returns the PeriodRange of a timeseries.
-// TODO: this function is almost a duplicate of the R code of
-// package regts. Create a general C++ function for this,
-// also to be used in the R code of this package.
-PeriodRange get_period_range(const NumericMatrix &ts) {
-    PeriodRange per;
-    NumericVector tsp = ts.attr("tsp");
-    per.freq = tsp[2];
-    int year = tsp[0] + 100;
-    int subp = (tsp[0] - year) * per.freq;
-    per.first = year * per.freq + subp;
-    per.last = per.first + ts.nrow() - 1;
-    return per;
-}
-
-NumericMatrix create_regts(const NumericMatrix &x, const PeriodRange &per,
-                           const CharacterVector &names) {
-
-    // get start and end vectors
-
-    IntegerVector start(2);
-    start[0] = per.first / per.freq;
-    start[1] = per.first % per.freq + 1;
-    IntegerVector end(2);
-    end[0] = per.last / per.freq;
-    end[1] = per.last % per.freq + 1;
-
-    // Return a CharacterVector with the class names of the return value.
-    CharacterVector classes;
-    classes.push_back("regts");
-    if (x.ncol() > 1) {
-        classes.push_back("mts");
-        classes.push_back("ts");
-        classes.push_back("matrix");
-    } else {
-        classes.push_back("ts");
-    }
-
-    // Call R function ts to create a regts.
-    Environment stats("package:stats");
-    Function ts = stats["ts"];
-    return ts(x, start, end, per.freq, 1, 0, classes, names);
 }
