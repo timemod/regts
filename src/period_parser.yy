@@ -1,17 +1,17 @@
 /*
- * This file contains the function parse_period for parsing a period 
- * text. 
+ * This file contains the function parse_period for parsing a period
+ * text.
  *
 
  * The following table presents the various period types, with examples and the
- * output arguments that are available for the different types. For each 
+ * output arguments that are available for the different types. For each
  * type, the arguments not listed in the table contain rubbish and should not
  * be used. The numerical values for the period types are defined
  * in header file period.h.
  *
 /*
  * Yacc syntax
- * for parsing period texts 
+ * for parsing period texts
  *
  * uses Bison
  */
@@ -44,17 +44,17 @@
 %%
 
 period:   posint
-        | y_period    
-        | qm_period   
+        | y_period
+        | qm_period
         | no_periodicity
         | month
 ;
 
 posint   : NUMBER      /* e.g. 2010  */
-	       {year = $1; freq = 1; subperiod = 1;} 
+	       {year = $1; freq = 1; subperiod = 1;}
 
-y_period : NUMBER YEAR_CHARACTER  /* e.g. 2010y */ 
-	       {year = $1; freq = 1; subperiod = 1;} 
+y_period : NUMBER YEAR_CHARACTER  /* e.g. 2010y */
+	       {year = $1; freq = 1; subperiod = 1;}
 ;
 
 opt_sep  : SEP /* separator e.g. ., - */
@@ -87,7 +87,7 @@ month:     MONTH_NAME opt_sep NUMBER  /* e.g. may 2012 */
             {year = $3; subperiod = $1; freq = 12;}
 ;
 
-%% 
+%%
 
 void prerror(const char *s) {}
 
@@ -95,7 +95,7 @@ static void check_year_subperiod(int freq, int &year, int &subp) {
 
    // Periods with the format X sep Y are ambigious: both X and Y
    // could be the year. For example, for the period "3q2000", the first
-   // number (3) is probably the quarter and the second number (2000) is 
+   // number (3) is probably the quarter and the second number (2000) is
    // probably the year. If the subperiod is larger than frequency and the
    // year is smaller than or equal to the frequency, then
    // year and subperiod should be swapped.
@@ -107,36 +107,53 @@ static void check_year_subperiod(int freq, int &year, int &subp) {
     }
 }
 
-// [[Rcpp::export]]
-NumericVector parse_period(const std::string &period_text, double frequency) {
+static void parse_period_(const std::string &period_text, double frequency, int &period, int &f) {
 
-    // initialise
-    year = -1; 
+    // initialise global variables
+    year = -1;
     freq = NA_REAL;
     subperiod = -1;
     given_freq = frequency;
 
     init_period_scanner(period_text);
 
-    int error_flag = prparse();  
+    int error_flag = prparse();
+
     if (error_flag) {
         Rf_error("Illegal period %s.", period_text.c_str());
     } else {
         if (ISNA(freq)) {
             if (ISNA(frequency)) {
-                Rf_error("Frequency of period %s unknown." 
+                Rf_error("Frequency of period %s unknown."
                          " Specify argument frequency.", period_text.c_str());
             }
-	    freq = frequency; 
-	} else if (frequency != freq && !ISNA(frequency)) {
-	    Rf_error("Specified frequency %d does not agree with actual "
-                     "frequency in period %s.", (int) frequency, 
+	        freq = frequency;
+	    } else if (frequency != freq && !ISNA(frequency)) {
+	        Rf_error("Specified frequency %d does not agree with actual "
+                     "frequency in period %s.", (int) frequency,
                      period_text.c_str());
-	}
-        NumericVector result(1);
-        result[0] = year * freq + subperiod - 1;
-        result.attr("class") = "regperiod";
-        result.attr("frequency") = freq;
-	return result;
+	    }
     }
+
+    // store results
+    period = year * freq + subperiod - 1;
+    f = freq;
+}
+
+// [[Rcpp::export]]
+NumericVector parse_period(const std::string &period_text, double frequency) {
+
+    Rcpp::Rcout << "testje" << std::endl;
+
+    int per, f;
+    parse_period(period_text, frequency, per, f)
+
+    int itest = NA_integer;
+    Rcpp::Rcout << itest << std::endl;
+
+    NumericVector result(1);
+    result[0] = per;
+    result.attr("class") = "regperiod";
+    result.attr("frequency") = f;
+	return result;
 }

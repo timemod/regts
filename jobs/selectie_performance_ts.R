@@ -17,7 +17,12 @@ ts1 <- as.ts(zoo1)
 tm <- microbenchmark(ts1[, 'ts_3400'], times = 1000)
 tm
 
-tm <- microbenchmark(window(ts1, start = c(2012, 1), end = c(2012))[, 'ts_3400'], 
+# periodeselectie
+tm <- microbenchmark(window(ts1, start = c(2012, 1), end = c(2012)))
+tm
+
+# periode + kolom selecteren
+tm <- microbenchmark(window(ts1, start = c(2012, 1), end = c(2012))[, 'ts_3400'],
                      times = 1000)
 tm
 
