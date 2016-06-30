@@ -284,35 +284,6 @@ convert_range_selector <- function(range, x) {
     return (range)
 }
 
-# Adjust the period of the timeseries
-#
-# @param x a timeseries object (\code{ts} or \code{regts})
-# @param range the new period range of the timeseries. This should
-# be a regperiod_range object without NULL periods
-# @return a regts with the adjusted period
-adjust_period <- function(x, range) {
-
-    p_start <- start_period.regperiod_range(range)
-    p_end   <- end_period.regperiod_range(range)
-    per_len <- p_end - p_start + 1
-
-    if (is.mts(x)) {
-        ncolumns <- ncol(x)
-    } else {
-        ncolumns <- 1
-    }
-    retval <- regts(matrix(NA, nrow = per_len, ncol = ncolumns),
-                    start = p_start, names = colnames(x))
-    p <- regrange_intersect(get_regperiod_range(x), range)
-    if (!is.null(p)) {
-        pstart <- start_period.regperiod_range(p)
-        pend   <- end_period.regperiod_range(p)
-        retval[p, ] <- window(x, start = get_time_vector(pstart),
-                              end = get_time_vector(pend))
-    }
-    return (retval)
-}
-
 # This function computes the row numbers of the selected rows in a
 # regts object. If the period selector lies partially outside
 # the defintion period of the input timeseries, then the function
@@ -333,13 +304,6 @@ get_row_selection <- function(x, sel) {
     } else {
         return (NULL)
     }
-}
-
-# Returns TRUE if regperiod_range sel lies partially outside the
-# definition period of timeseries x. This means that the timeseries
-# would be extended if the period selection is applied.
-check_extend <- function(x, sel) {
-    return (is.null(get_row_selection(x, sel)))
 }
 
 # Selection on the left-hand side: replace a part of a regts
@@ -363,7 +327,7 @@ check_extend <- function(x, sel) {
         if (is.null(row_numbers)) {
             # Do not use the window function of ts to extend the timeseries,
             # it is very slow. Use our own function adjust_period
-            x <- adjust_period(x, regrange_union(range, get_regperiod_range(x)))
+            x <- window_regts(x, regrange_union(range, get_regperiod_range(x)))
             row_numbers <- get_row_selection(x, range)
         }
         i <- row_numbers

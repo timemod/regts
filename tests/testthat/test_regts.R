@@ -45,16 +45,10 @@ test_that("constructor regts for multivariate time series", {
     expect_identical(regts1, as.regts(ts1))
 })
 
-test_that("get_regperiod_range / check_extend", {
+test_that("get_regperiod_range", {
     regts1 <- regts(1, start = "2010Q1", end = "2011Q4")
     expect_identical(get_regperiod_range(regts1),
                      regperiod_range("2010Q1", "2011Q4"))
-    expect_identical(check_extend(regts1, as.regperiod_range("2010Q1/2011Q3")),
-                     FALSE)
-    expect_identical(check_extend(regts1, as.regperiod_range("2008Q1/2011Q3")),
-                     TRUE)
-    expect_identical(check_extend(regts1, regperiod_range("2010Q2", "2012Q1")),
-                     TRUE)
 })
 
 test_that("period selection in univariate timeseries", {
