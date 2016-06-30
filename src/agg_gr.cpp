@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include <math.h>
 #include <string>
 #include "period_range.h"
 #include "create_regts.h"
@@ -21,12 +22,12 @@ NumericMatrix agg_gr(NumericMatrix &ts_old, const int freq_new,
     PeriodRange per_old = get_period_range(ts_old);
     PeriodRange per_new;
     per_new.freq = freq_new;
-    int rep = ((int) per_old.freq) / freq_new;
+    int rep = ((int) per_old.freq) / ((int) freq_new);
     per_new.first = (((int) per_old.first) + 2 * (rep - 1)) / rep;
-    per_new.last = (((int) per_old.last) - (rep - 1)) / rep;
+    per_new.last  = (((int) per_old.last) - (rep - 1)) / rep;
     int nper_new = per_new.len();
 
-    if (per_old.freq % freq_new != 0) {
+    if ((int) per_old.freq % (int) freq_new != 0) {
         Rf_error("The new frequency %d is not a divisor of the old frequency "
                  "%d\n", freq_new, per_old.freq);
     }
@@ -38,7 +39,7 @@ NumericMatrix agg_gr(NumericMatrix &ts_old, const int freq_new,
     NumericMatrix data(nper_new, ts_old.ncol());
 
     if (method == "cgr" || method == "cgrs") {
-        int shift = ((int) per_new.first) * rep - (rep - 1) - (int) per_old.first;
+        int shift = per_new.first * rep - (rep - 1) - per_old.first;
         for (int col = 0; col < ts_old.ncol(); col++) {
             agg_gr_abs(ts_old(_, col), data(_, col), rep, shift);
         }
@@ -46,7 +47,7 @@ NumericMatrix agg_gr(NumericMatrix &ts_old, const int freq_new,
             data = data / rep;
         }
     } else if (method == "cgru" || method == "cgrc") {
-        int shift = ((int) per_new.first) * rep - rep  - (int) per_old.first;
+        int shift = per_new.first * rep - rep  - per_old.first;
         double work[2*rep];
         int perc = method == "cgru" ? 1 : 100;
         for (int col = 0; col < ts_old.ncol(); col++) {

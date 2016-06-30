@@ -9,11 +9,11 @@ NumericMatrix create_regts(const NumericMatrix &x, const PeriodRange &per,
     // get start and end vectors
 
     IntegerVector start(2);
-    start[0] = ((int) per.first) / per.freq;
-    start[1] =( (int) per.first) % per.freq + 1;
+    start[0] = ((int) per.first) / ((int) per.freq);
+    start[1] = ((int) per.first) % ((int) per.freq) + 1;
     IntegerVector end(2);
-    end[0] = ((int) per.last) / per.freq;
-    end[1] = ((int) per.last) % per.freq + 1;
+    end[0] = ((int) per.last) / ((int) per.freq);
+    end[1] = ((int)per.last) % ((int) per.freq) + 1;
 
     // Return a CharacterVector with the class names of the return value.
     CharacterVector classes;

@@ -14,20 +14,20 @@ PeriodRange get_period_range(const NumericMatrix &ts) {
     per.freq  = tsp[2];
     int year  = floor(tsp[0]);
     int subp  = round((tsp[0] - year) * per.freq);
-    per.first = year * per.freq + subp;
+    per.first = round(year * per.freq + subp);
     per.last  = per.first + ts.nrow() - 1;
     return per;
 }
 
 PeriodRange modify_frequency(PeriodRange old_range, int new_freq) {
-    if (new_freq % old_range.freq != 0) {
+    if ((int) new_freq % (int) old_range.freq != 0) {
         Rf_error("Frequency of regperiod_range is no divisor of the "
                 "required frequency");
     }
     int factor = new_freq / old_range.freq;
     PeriodRange new_range;
-    new_range.first = old_range.first * factor;
-    new_range.last  = (old_range.last + 1) * factor - 1;
+    new_range.first = floor(old_range.first * factor);
+    new_range.last  = floor((old_range.last + 1) * factor - 1);
     new_range.freq = new_freq;
     return new_range;
 }

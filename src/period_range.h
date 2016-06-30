@@ -2,7 +2,7 @@ class PeriodRange {
 public:
     // the first and last subperiod after Christ, starting at 0 in the year 0:
     double first, last;
-    int freq;
+    double freq;
     int len() {return last - first + 1;}
 };
 
