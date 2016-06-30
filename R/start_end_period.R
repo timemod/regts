@@ -21,8 +21,8 @@ end_period <- function(x) UseMethod("end_period")
 #' @describeIn start_period Returns the first period
 #' @export
 start_period.regperiod_range <- function(x) {
-    if (!is.null(x$start)) {
-        return (create_regperiod(x$start, x$frequency))
+    if (!is.na(x[1])) {
+        return (create_regperiod(x[1], x[3]))
     } else {
         return (NULL)
     }
@@ -45,8 +45,8 @@ start_period.default <- function(x) {
 #' @describeIn start_period Returns the end period
 #' @export
 end_period.regperiod_range <- function(x) {
-    if (!is.null(x$end)) {
-        return (create_regperiod(x$end, x$frequency))
+    if (!is.na(x[2])) {
+        return (create_regperiod(x[2], x[3]))
     } else {
         return (NULL)
     }
@@ -65,4 +65,3 @@ end_period.ts <- function(x) {
 end_period.default <- function(x) {
     stop(paste("end_period not defined for objects of class", class(x)))
 }
-

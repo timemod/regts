@@ -58,6 +58,16 @@ my_window2 <- function(x, i, j) {
 regts1 <- regts(matrix(1:1000, ncol = 100), start = "2010Q2")
 regts1
 
+range <- as.regperiod_range("2010Q2/2011Q4")
+regts2 <- window_regts(regts1, range)
+print(regts2)
+
+t <- microbenchmark(ts1 <- window_regts(regts1, range))
+print(t)
+
+t <- microbenchmark(ts1 <- window_regts(regts1, as.regperiod_range("2010Q2/2011Q4")))
+print(t)
+
 t <- microbenchmark(ts1 <- as.ts(regts1))
 print(t1)
 t <- microbenchmark(xx <- as.regts(ts1))

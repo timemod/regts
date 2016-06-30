@@ -252,7 +252,7 @@ add_columns <- function(x, new_colnames) {
 
 # This function makes sure that regperiod_range object range has
 # the same frequency as timeseries x, and also replaces
-# NULL values for range$start or range$end by the appropriate
+# NULL values for range[1] or range[2] by the appropriate
 # values from timeseries x.
 # param range a regperiod_range object used as selector of a timeseries
 # param x  a timeseries object (regts or ts)
@@ -264,13 +264,13 @@ convert_range_selector <- function(range, x) {
     range <- modify_frequency(range, freq)
 
     # replace NULl periods by periods in x
-    if (is.null(range$start)) {
+    if (is.na(range[1])) {
         start <- start(x)
-        range$start <- as.integer(get_subperiod_count(start[1], start[2], freq))
+        range[1] <- as.integer(get_subperiod_count(start[1], start[2], freq))
     }
-    if (is.null(range$end)) {
+    if (is.na(range[2])) {
         end <- end(x)
-        range$end <- as.integer(get_subperiod_count(end[1], end[2], freq))
+        range[2] <- as.integer(get_subperiod_count(end[1], end[2], freq))
     }
 
     # Check if range is a valid selector of timeseries x.
@@ -326,7 +326,7 @@ adjust_period <- function(x, range) {
 get_row_selection <- function(x, sel) {
     start <- start(x)
     subperiod_count <- get_subperiod_count(start[1], start[2], frequency(x))
-    start_row <- sel$start - subperiod_count + 1
+    start_row <- sel[1] - subperiod_count + 1
     end_row <- start_row + lensub(sel) - 1
     if (start_row >= 1 & end_row <= nrow(x)) {
         return (start_row : end_row)
@@ -380,32 +380,20 @@ check_extend <- function(x, sel) {
 # Selection on the right-hand-side (e.g. x["2010Q2", ]).
 #' @export
 "[.regts" <- function(x, i, j, ...) {
-    lbls <- ts_labels(x)
-    if (!is.null(lbls) && !missing(j)) {
-        lbls <- lbls[j]
-    }
     if (!missing(i) && (is.character(i) || inherits(i, "regperiod") ||
                         inherits(i, "regperiod_range"))) {
-        # the row selector is a regperiod_range. Use the
-        # window function of ts.
-        range <- convert_range_selector(as.regperiod_range(i), x)
-        extend <- check_extend(x, range)
-        # The window function of ts is quite slow if extend = TRUE.
-        # Therefore only use extend if it is really necessary
-        pstart <- start_period.regperiod_range(range)
-        pend   <- end_period.regperiod_range(range)
-        start  <- get_time_vector(pstart)
-        end    <- get_time_vector(pend)
-        if (missing(j)) {
-            x <- window(x, start = start, end = end, extend = extend)
-        } else {
-            x <- window(x, start = start, end = end, extend = extend)[, j]
+        # the row selector is a regperiod_range. Use the C++ function
+        # windows_regts
+        if (!missing(j)) {
+            x <- x[, j]
         }
-        if (!is.null(lbls)) {
-            ts_labels(x) <- lbls
-        }
+        x <- window_regts(x, as.regperiod_range(i))
         return (x)
     } else {
+        lbls <- ts_labels(x)
+        if (!is.null(lbls) && !missing(j)) {
+            lbls <- lbls[j]
+        }
         x <- NextMethod("[", drop = FALSE)
         # x can be something else than a timeseries, for example an integer
         if (is.ts(x)) {

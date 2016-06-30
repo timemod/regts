@@ -13,16 +13,17 @@ void agg_gr_rel(NumericMatrix::Column column_old,
 // [[Rcpp::export]]
 NumericMatrix agg_gr(NumericMatrix &ts_old, const int freq_new,
                      const std::string &method) {
-    //ts_old = ts_old * 2;
+
     // save the dimension names
     List dimnames = ts_old.attr("dimnames");
     CharacterVector names = dimnames[1];
+
     PeriodRange per_old = get_period_range(ts_old);
     PeriodRange per_new;
     per_new.freq = freq_new;
-    int rep = per_old.freq / freq_new;
-    per_new.first = (per_old.first + 2 * (rep - 1)) / rep;
-    per_new.last = (per_old.last - (rep - 1)) / rep;
+    int rep = ((int) per_old.freq) / freq_new;
+    per_new.first = (((int) per_old.first) + 2 * (rep - 1)) / rep;
+    per_new.last = (((int) per_old.last) - (rep - 1)) / rep;
     int nper_new = per_new.len();
 
     if (per_old.freq % freq_new != 0) {
@@ -37,7 +38,7 @@ NumericMatrix agg_gr(NumericMatrix &ts_old, const int freq_new,
     NumericMatrix data(nper_new, ts_old.ncol());
 
     if (method == "cgr" || method == "cgrs") {
-        int shift = per_new.first * rep - (rep - 1) - per_old.first;
+        int shift = ((int) per_new.first) * rep - (rep - 1) - (int) per_old.first;
         for (int col = 0; col < ts_old.ncol(); col++) {
             agg_gr_abs(ts_old(_, col), data(_, col), rep, shift);
         }
@@ -45,7 +46,7 @@ NumericMatrix agg_gr(NumericMatrix &ts_old, const int freq_new,
             data = data / rep;
         }
     } else if (method == "cgru" || method == "cgrc") {
-        int shift = per_new.first * rep - rep  - per_old.first;
+        int shift = ((int) per_new.first) * rep - rep  - (int) per_old.first;
         double work[2*rep];
         int perc = method == "cgru" ? 1 : 100;
         for (int col = 0; col < ts_old.ncol(); col++) {

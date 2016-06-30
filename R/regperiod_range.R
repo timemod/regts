@@ -59,9 +59,13 @@ regperiod_range <- function(p1, p2 = p1, frequency = NA) {
     # convert regperiods to normal numbers
     if (!is.null(p1)) {
         p1 <- as.numeric(p1)
+    } else {
+        p1 <- NA_real_
     }
     if (!is.null(p2)) {
         p2 <- as.numeric(p2)
+    } else {
+        p2 <- NA_real_
     }
     return (create_regperiod_range(p1, p2, freq))
 }
@@ -69,8 +73,7 @@ regperiod_range <- function(p1, p2 = p1, frequency = NA) {
 # internal function to create a regperiod_range from start, end
 # and frequency
 create_regperiod_range <- function(start, end, frequency) {
-    return (structure(list(start = start, end = end,
-                           frequency = frequency), class = "regperiod_range"))
+    return (structure(c(start, end, frequency), class = "regperiod_range"))
 }
 
 #' @export
@@ -131,13 +134,13 @@ as.regperiod_range.character <- function(x, frequency = NA) {
 
 #' @export
 as.character.regperiod_range <- function(x) {
-    if (!is.null(x$start)) {
+    if (!is.na(x[1])) {
         retval <- as.character.regperiod(start_period(x))
     } else {
         retval <- ""
     }
     retval <- paste0(retval, "/")
-    if (!is.null(x$end)) {
+    if (!is.na(x[2])) {
         retval <- paste0(retval, as.character.regperiod(end_period(x)))
     }
     return (retval)
@@ -153,10 +156,10 @@ lensub  <- function(x) {
     if (!inherits(x, "regperiod_range")) {
         stop("x should be a regperiod_range object")
     }
-    if (is.null(x$start) | is.null(x$end)) {
+    if (is.na(x[1]) | is.na(x[2])) {
         return (Inf)
     } else {
-        return (x$end - x$start + 1)
+        return (x[2] - x[1] + 1)
     }
 }
 
@@ -168,16 +171,12 @@ print.regperiod_range <- function(x) {
 # Converts the frequency of a regperiod_range object, from lower to higher
 # frequency.
 modify_frequency <- function(x, new_freq) {
-    if (new_freq %% x$frequency != 0) {
+    if (new_freq %% x[3] != 0) {
         stop("Frequency of regperiod_range is no divisor of the required frequency")
     }
-    factor <- new_freq %/% x$frequency
-    if (!is.null(x$start)) {
-        x$start <- x$start * factor
-    }
-    if (!is.null(x$end)) {
-        x$end <- (x$end + 1) * factor - 1
-    }
-    x$frequency <- new_freq
+    factor <- new_freq %/% x[3]
+    x[1] <- x[1] * factor
+    x[2] <- (x[2] + 1) * factor - 1
+    x[3] <- new_freq
     return (x)
 }

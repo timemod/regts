@@ -34,7 +34,7 @@ aggregate.regts <- function(x, nfrequency = 1, ...) {
     if (extra != 0) {
         # shift initial period
         p1 <- p1 + rep - extra
-        x <- x[regperiod_range(p1, NULL), ]
+        x <- window_regts(x, regperiod_range(p1, NULL))
     }
     x <- as.regts(NextMethod(.Generic))
     if (!is.null(lbls)) {

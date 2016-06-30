@@ -9,3 +9,8 @@ parse_period <- function(period_text, frequency) {
     .Call('regts_parse_period', PACKAGE = 'regts', period_text, frequency)
 }
 
+#' @export
+window_regts <- function(ts_old, range) {
+    .Call('regts_window_regts', PACKAGE = 'regts', ts_old, range)
+}
+

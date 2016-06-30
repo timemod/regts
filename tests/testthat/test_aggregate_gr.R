@@ -47,7 +47,6 @@ test_that("cgr and cgrs, quarterly to year, single timeseries", {
     ts_q      <- regts(rnorm(lensub(p)), start = start_period(p))
     ref <- agg_diff_1(ts_q) # the correct result
     expect_equal(agg_diff_2(ts_q, method = "cgr"), ref);
-    expect_equal(agg_diff_2(ts_q["2008Q3/"], method = "cgr"), ref);
     expect_equal(agg_diff_2(ts_q["2008Q4/"], method = "cgrs"), ref);
     expect_equal(agg_diff_2(ts_q["2009Q1/"], method = "cgr"), ref);
 })
@@ -71,7 +70,6 @@ test_that("cgr and cgru, monthly to quarterly, two timeseries", {
     expect_equal(agg_reldiff_2(ts_m["2011M1/"], method = "cgru", nfrequency = 4),
                  ref_rel);
 })
-
 
 test_that("cgr and cgrs, quarterly to year, single timeseries with NA values", {
     p         <- regperiod_range("2009Q1", "2015Q4")

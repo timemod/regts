@@ -3,6 +3,7 @@ as.regts.zoo <- function(x, ...) {
     return (as.regts(as.ts(x)))
 }
 
+#' @importFrom zoo as.zooreg
 #' @export
 as.zooreg.regts <- function(x, ...) {
     f <- frequency(x)
@@ -15,6 +16,7 @@ as.zooreg.regts <- function(x, ...) {
     return (x)
 }
 
+#' @importFrom zoo as.zoo
 #' @export
 as.zoo.regts <- function(x, ...) {
     return (zoo::as.zooreg(x, ...))
