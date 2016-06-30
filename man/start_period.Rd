@@ -19,7 +19,7 @@ start_period(x)
 \method{end_period}{ts}(x)
 }
 \arguments{
-\item{x}{a \link{regts} or \link{regperiod_range{ object}}}
+\item{x}{a \link{regts} or \link{regperiod_range} object}
 }
 \value{
 a \link{regperiod} object representing the first period of the

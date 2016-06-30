@@ -11,11 +11,11 @@ LYPREFIX = pr
 all: $(SHLIB) period_scanner.o period_parser.o
 
 # rules for lex and yacc
-period_scanner.cpp : period_scanner.l
-	$(LEX)  -P$(LYPREFIX) -o$@ $<
+#period_scanner.cpp : period_scanner.l
+#	$(LEX)  -P$(LYPREFIX) -o$@ $<
 
-period_parser.cpp : period_parser.yy
-	$(YACC) -v  -d -p $(LYPREFIX) -o $@ $<
+#period_parser.cpp : period_parser.yy
+#	$(YACC) -v  -d -p $(LYPREFIX) -o $@ $<
 
 # dependencies C files
 period_parser.o : period_parser.cpp period_scanner.hpp
@@ -27,4 +27,3 @@ period_range.o : period_range.h
 aggr_gr.o : period_range.h create_regts.h
 window_regts.o : period_range.h create_regts.h
 create_regts.o : create_regts.h
-
