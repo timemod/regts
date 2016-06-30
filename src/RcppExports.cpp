@@ -30,6 +30,18 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
+// parse_period_range
+NumericVector parse_period_range(const std::string& period_text, double frequency);
+RcppExport SEXP regts_parse_period_range(SEXP period_textSEXP, SEXP frequencySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const std::string& >::type period_text(period_textSEXP);
+    Rcpp::traits::input_parameter< double >::type frequency(frequencySEXP);
+    __result = Rcpp::wrap(parse_period_range(period_text, frequency));
+    return __result;
+END_RCPP
+}
 // window_regts
 NumericMatrix window_regts(NumericMatrix& ts_old, NumericVector& range);
 RcppExport SEXP regts_window_regts(SEXP ts_oldSEXP, SEXP rangeSEXP) {

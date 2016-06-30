@@ -11,7 +11,6 @@
 #include "period_parser.hpp"
 #include "months.hpp"
 
-static const char *c;
 static int get_frequency(const char *c);
 
 /*
@@ -47,7 +46,7 @@ MONTH_NAME      [a-z]{3,}
 
 {SEP}         {return SEP;}
 
-{MONTH_NAME}  {prlval = get_month_number(yytext); 
+{MONTH_NAME}  {prlval = get_month_number(yytext);
                int type = prlval > 0 ? MONTH_NAME : INVALID;
                return type;}
 
@@ -59,11 +58,11 @@ MONTH_NAME      [a-z]{3,}
 
 static int get_frequency(const char *c) {
    switch (*c) {
-       case ('q') : 
-       case ('k') : 
-          return 4; break;      
-       case ('m') : 
-          return 12; break;   
+       case ('q') :
+       case ('k') :
+          return 4; break;
+       case ('m') :
+          return 12; break;
         default:
 	  return -1;
   }
@@ -80,7 +79,7 @@ void init_period_scanner(const std::string &period_text) {
     // copy text to textbuf, and convert to lower case
     textbuf = period_text;
     std::transform(textbuf.begin(), textbuf.end(), textbuf.begin(),
-                   tolower);   
+                   tolower);
 
     // add two '\0' characters (see Flex documentation)
     textbuf.append(2, '\0');

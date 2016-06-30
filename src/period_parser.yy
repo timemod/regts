@@ -21,8 +21,12 @@
     #include <Rcpp.h>
     #include <string>
     #include <cstring>
+    #include <regex>
+    #include <math.h>
     #include "period_scanner.hpp"
     using Rcpp::NumericVector;
+    using std::regex;
+    using std::sregex_token_iterator;
     static int year, subperiod;
     static double freq, given_freq;
     static void check_year_subperiod(int freq, int &year, int &frac);
@@ -107,7 +111,8 @@ static void check_year_subperiod(int freq, int &year, int &subp) {
     }
 }
 
-static void parse_period_(const std::string &period_text, double frequency, int &period, int &f) {
+static void parse_period_(const std::string &period_text, double frequency,
+                          double &period, double &f) {
 
     // initialise global variables
     year = -1;
@@ -118,7 +123,6 @@ static void parse_period_(const std::string &period_text, double frequency, int 
     init_period_scanner(period_text);
 
     int error_flag = prparse();
-
     if (error_flag) {
         Rf_error("Illegal period %s.", period_text.c_str());
     } else {
@@ -136,24 +140,74 @@ static void parse_period_(const std::string &period_text, double frequency, int 
     }
 
     // store results
-    period = year * freq + subperiod - 1;
+    period = round(year * freq + subperiod - 1);
     f = freq;
 }
 
 // [[Rcpp::export]]
 NumericVector parse_period(const std::string &period_text, double frequency) {
 
-    Rcpp::Rcout << "testje" << std::endl;
-
-    int per, f;
-    parse_period(period_text, frequency, per, f)
-
-    int itest = NA_integer;
-    Rcpp::Rcout << itest << std::endl;
+    double per, f;
+    parse_period_(period_text, frequency, per, f);
 
     NumericVector result(1);
     result[0] = per;
     result.attr("class") = "regperiod";
     result.attr("frequency") = f;
+	return result;
+}
+
+// [[Rcpp::export]]
+NumericVector parse_period_range(const std::string &period_text,
+                                 double frequency) {
+
+    static const regex re("\\s*(.*\\S)?\\s*/\\s*(.*\\S)?\\s*");
+    std::smatch match;
+    std::regex_search(period_text, match, re);
+
+    //for (int i = 0; i < match.size(); i++) {
+    //    Rcpp::Rcout << match[i] << ":" << std::endl;
+    //}
+
+    double p1, p2, f;
+    p1 = NA_REAL;
+    p2 = NA_REAL;
+    f  = NA_REAL;
+    if (match.size() == 0) {
+        parse_period_(period_text, frequency, p1, f);
+        p2 = p1;
+    } else if (match.size() == 3) {
+        std::string s1 = match[1];
+        std::string s2 = match[2];
+        bool both = s1.size() > 0 && s2.size() >> 0;
+        if (s1.size() == 0 && s2.size() == 0) {
+            Rf_error("Illegal period range %s.", period_text.c_str());
+        }
+        double f1, f2;
+        if (s1.size() > 0) {
+            parse_period_(s1, frequency, p1, f);
+            f1 = f; // for checking
+        }
+        if (s2.size() > 0) {
+            parse_period_(s2, frequency, p2, f);
+            f2 = f; // for checking
+        }
+        if (both) {
+            if (f1 != f2) {
+               Rf_error("The two periods have different frequency");
+            } else if (p1 > p2) {
+               Rf_error("The start period (%s) is after the end period (%s)",
+                s1.c_str(), s2.c_str());
+            }
+        }
+    } else {
+         Rf_error("Illegal period range %s.", period_text.c_str());
+    }
+
+    NumericVector result(3);
+    result[0] = p1;
+    result[1] = p2;
+    result[2] = f;
+    result.attr("class") = "regperiod_range";
 	return result;
 }
