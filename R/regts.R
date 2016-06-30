@@ -57,11 +57,13 @@
 #' @export
 regts <- function(data, start, end = NULL, frequency = NA, names = NULL,
                   labels = NULL) {
+
     start <- as.regperiod(start, frequency)
     start_freq <- frequency(start)
 
     if (missing(end)) {
-        retval <- ts(data, start = get_time_vector(start), frequency = start_freq)
+        retval <- ts(data, start = get_time_vector(start),
+                     frequency = start_freq)
     } else {
         end <- as.regperiod(end, frequency)
         end_freq <- frequency(end)
@@ -88,21 +90,11 @@ regts <- function(data, start, end = NULL, frequency = NA, names = NULL,
         colnames(retval) <- colnames(data)
     }
 
-    retval <- insert_regts_class(retval)
-
     if (!is.null(labels)) {
         ts_labels(retval) <- labels
     }
+    class(retval) <- c("regts", class(retval))
     return (retval)
-}
-
-# insert "regts" at the beginning of the classes vector
-insert_regts_class <- function(x) {
-    if (!is.regts(x)) {
-        old_classes <- class(x)
-        class(x) <- c("regts", old_classes)
-    }
-    return(x)
 }
 
 # add dimension attribute for univariate timeseriss
@@ -159,9 +151,9 @@ as.regts <- function(x, ...) {
 
 #' @describeIn as.regts Coerce a \link{ts} to a \link{regts}
 #' @export
-as.regts.ts <- function(x, ...) {
+as.regts.ts <- function(x) {
     if (!is.regts(x)) {
-        x <- insert_regts_class(x)
+        class(x) <- c("regts", class(x))
         if (is.null(attr(x, "dim"))) {
             # univariate timeseries wihout dimension attributes
             # add dimension attributes so that the timeseries has a column name.
@@ -390,13 +382,6 @@ get_regperiod_range <- function(x) {
     return (create_regperiod_range(p1, p2, freq))
 }
 
-# remove the regts class
-remove_regts_class <- function(x) {
-    old_classes <- class(x)
-    class(x) <- old_classes[old_classes != "regts"]
-    return (x)
-}
-
 #' Timeseries labels
 #'
 #'Retrieve or set labels for the timeseries. Timeseries labels
@@ -405,7 +390,8 @@ remove_regts_class <- function(x) {
 #'(column names), and the values the correpsonding label.
 #'@param x a \link{regts}
 #'@param value a character vector with the labels or \code{NULL}. The length
-#'should be equal to the number of columns. Specify \code{NULL} to remove all labels.
+#'should be equal to the number of columns. Specify \code{NULL} to remove all
+#'labels.
 #'@examples
 #'ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"))
 #'ts_labels(ts) <- c("Timeseries a", "Timeseries b")
