@@ -26,8 +26,8 @@ PeriodRange modify_frequency(PeriodRange old_range, int new_freq) {
     }
     int factor = new_freq / old_range.freq;
     PeriodRange new_range;
-    new_range.first = floor(old_range.first * factor);
-    new_range.last  = floor((old_range.last + 1) * factor - 1);
+    new_range.first = round(old_range.first * factor);
+    new_range.last  = round((old_range.last + 1) * factor - 1);
     new_range.freq = new_freq;
     return new_range;
 }
