@@ -21,12 +21,9 @@
     #include <Rcpp.h>
     #include <string>
     #include <cstring>
-    #include <regex>
     #include <math.h>
     #include "period_scanner.hpp"
     using Rcpp::NumericVector;
-    using std::regex;
-    using std::sregex_token_iterator;
     static int year, subperiod;
     static double freq, given_freq;
     static void check_year_subperiod(int freq, int &year, int &frac);
@@ -157,28 +154,37 @@ NumericVector parse_period(const std::string &period_text, double frequency) {
 	return result;
 }
 
+static std::string trim(const std::string& str) {
+    const std::string whitespace = " \t";
+    const auto strBegin = str.find_first_not_of(whitespace);
+    if (strBegin == std::string::npos) {
+        return ""; // no content
+    }
+    const auto strEnd = str.find_last_not_of(whitespace);
+    const auto strRange = strEnd - strBegin + 1;
+    return str.substr(strBegin, strRange);
+}
+
 // [[Rcpp::export]]
 NumericVector parse_period_range(const std::string &period_text,
                                  double frequency) {
-
-    static const regex re("\\s*(.*\\S)?\\s*/\\s*(.*\\S)?\\s*");
-    std::smatch match;
-    std::regex_search(period_text, match, re);
-
-    //for (int i = 0; i < match.size(); i++) {
-    //    Rcpp::Rcout << match[i] << ":" << std::endl;
-    //}
 
     double p1, p2, f;
     p1 = NA_REAL;
     p2 = NA_REAL;
     f  = NA_REAL;
-    if (match.size() == 0) {
+
+    const auto pos = period_text.find("/");
+    if (pos == std::string::npos) {
+        // no / separator
         parse_period_(period_text, frequency, p1, f);
         p2 = p1;
-    } else if (match.size() == 3) {
-        std::string s1 = match[1];
-        std::string s2 = match[2];
+    } else {
+         // a / seperator has been found
+        std::string s1 = period_text.substr(0, pos);
+        std::string s2 = period_text.substr(pos + 1);
+        s1 = trim(s1);
+        s2 = trim(s2);
         bool both = s1.size() > 0 && s2.size() >> 0;
         if (s1.size() == 0 && s2.size() == 0) {
             Rf_error("Illegal period range %s.", period_text.c_str());
@@ -200,8 +206,6 @@ NumericVector parse_period_range(const std::string &period_text,
                 s1.c_str(), s2.c_str());
             }
         }
-    } else {
-         Rf_error("Illegal period range %s.", period_text.c_str());
     }
 
     NumericVector result(3);

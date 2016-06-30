@@ -22,6 +22,10 @@ test_that("as.regperiod_range.character", {
                      "2010M2/2010M2")
     expect_identical(as.character(as.regperiod_range("2010q2/")),
                      "2010Q2/")
+    expect_identical(as.character(as.regperiod_range("2010q2 /  ")),
+                     "2010Q2/")
+    expect_identical(as.character(as.regperiod_range("  /2010q2")),
+                     "/2010Q2")
     expect_error(as.regperiod_range("2001-4 / 2014Q"),
          "Frequency of period 2001-4 unknown. Specify argument frequency.")
     expect_error(as.regperiod_range("2001/2014Q4"),
