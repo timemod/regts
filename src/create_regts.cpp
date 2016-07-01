@@ -4,7 +4,7 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-SEXP create_regts(const NumericMatrix &x, const NumericVector &period_range,
+SEXP create_regts(const SEXP &x, const NumericVector &period_range,
                   const CharacterVector &names) {
     PeriodRange per;
     per.first = period_range[0];
@@ -13,11 +13,10 @@ SEXP create_regts(const NumericMatrix &x, const NumericVector &period_range,
     return create_regts(x, per, names);
 }
 
-SEXP create_regts(const NumericMatrix &x, const PeriodRange &per,
+SEXP create_regts(const SEXP &x, const PeriodRange &per,
                   const CharacterVector &names) {
 
     // get start and end vectors
-
     IntegerVector start(2);
     start[0] = ((int) per.first) / ((int) per.freq);
     start[1] = ((int) per.first) % ((int) per.freq) + 1;
@@ -25,10 +24,12 @@ SEXP create_regts(const NumericMatrix &x, const PeriodRange &per,
     end[0] = ((int) per.last) / ((int) per.freq);
     end[1] = ((int)per.last) % ((int) per.freq) + 1;
 
+    int ncols = names.length();
+
     // Return a CharacterVector with the class names of the return value.
     CharacterVector classes;
     classes.push_back("regts");
-    if (x.ncol() > 1) {
+    if (ncols > 1) {
         classes.push_back("mts");
         classes.push_back("ts");
         classes.push_back("matrix");

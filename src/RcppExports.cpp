@@ -19,12 +19,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // create_regts
-SEXP create_regts(const NumericMatrix& x, const NumericVector& period_range, const CharacterVector& names);
+SEXP create_regts(const SEXP& x, const NumericVector& period_range, const CharacterVector& names);
 RcppExport SEXP regts_create_regts(SEXP xSEXP, SEXP period_rangeSEXP, SEXP namesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< const NumericMatrix& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const SEXP& >::type x(xSEXP);
     Rcpp::traits::input_parameter< const NumericVector& >::type period_range(period_rangeSEXP);
     Rcpp::traits::input_parameter< const CharacterVector& >::type names(namesSEXP);
     __result = Rcpp::wrap(create_regts(x, period_range, names));
