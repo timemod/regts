@@ -5,12 +5,12 @@ agg_gr <- function(ts_old, freq_new, method) {
     .Call('regts_agg_gr', PACKAGE = 'regts', ts_old, freq_new, method)
 }
 
-parse_period <- function(period_text, frequency) {
-    .Call('regts_parse_period', PACKAGE = 'regts', period_text, frequency)
+parse_regperiod <- function(period_text, frequency) {
+    .Call('regts_parse_regperiod', PACKAGE = 'regts', period_text, frequency)
 }
 
-parse_period_range <- function(period_text, frequency) {
-    .Call('regts_parse_period_range', PACKAGE = 'regts', period_text, frequency)
+parse_regperiod_range <- function(period_text, frequency) {
+    .Call('regts_parse_regperiod_range', PACKAGE = 'regts', period_text, frequency)
 }
 
 #' @export

@@ -18,7 +18,7 @@ regperiod <- function(x, frequency = NA) {
     if (!is.character(x)) {
         stop("Argument x is not a character")
     }
-    return (parse_period(x, frequency))
+    return (parse_regperiod(x, frequency))
 }
 
 #' Test if an object is a regperiod.

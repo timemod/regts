@@ -23,6 +23,7 @@
     #include <cstring>
     #include <math.h>
     #include "period_scanner.hpp"
+    #include "parse_period.h"
     using Rcpp::NumericVector;
     static int year, subperiod;
     static double freq, given_freq;
@@ -108,110 +109,17 @@ static void check_year_subperiod(int freq, int &year, int &subp) {
     }
 }
 
-static void parse_period_(const std::string &period_text, double frequency,
-                          double &period, double &f) {
+ParsedPeriod parse_period(const std::string &period_text, int frequency) {
 
     // initialise global variables
-    year = -1;
-    freq = NA_REAL;
-    subperiod = -1;
+    year       = NA_INTEGER;
+    freq       = NA_INTEGER;
+    subperiod  = NA_INTEGER;
     given_freq = frequency;
 
     init_period_scanner(period_text);
 
     int error_flag = prparse();
-    if (error_flag) {
-        Rf_error("Illegal period %s.", period_text.c_str());
-    } else {
-        if (ISNA(freq)) {
-            if (ISNA(frequency)) {
-                Rf_error("Frequency of period %s unknown."
-                         " Specify argument frequency.", period_text.c_str());
-            }
-	        freq = frequency;
-	    } else if (frequency != freq && !ISNA(frequency)) {
-	        Rf_error("Specified frequency %d does not agree with actual "
-                     "frequency in period %s.", (int) frequency,
-                     period_text.c_str());
-	    }
-    }
 
-    // store results
-    period = round(year * freq + subperiod - 1);
-    f = freq;
-}
-
-// [[Rcpp::export]]
-NumericVector parse_period(const std::string &period_text, double frequency) {
-
-    double per, f;
-    parse_period_(period_text, frequency, per, f);
-
-    NumericVector result(1);
-    result[0] = per;
-    result.attr("class") = "regperiod";
-    result.attr("frequency") = f;
-	return result;
-}
-
-static std::string trim(const std::string& str) {
-    const std::string whitespace = " \t";
-    const auto strBegin = str.find_first_not_of(whitespace);
-    if (strBegin == std::string::npos) {
-        return ""; // no content
-    }
-    const auto strEnd = str.find_last_not_of(whitespace);
-    const auto strRange = strEnd - strBegin + 1;
-    return str.substr(strBegin, strRange);
-}
-
-// [[Rcpp::export]]
-NumericVector parse_period_range(const std::string &period_text,
-                                 double frequency) {
-
-    double p1, p2, f;
-    p1 = NA_REAL;
-    p2 = NA_REAL;
-    f  = NA_REAL;
-
-    const auto pos = period_text.find("/");
-    if (pos == std::string::npos) {
-        // no / separator
-        parse_period_(period_text, frequency, p1, f);
-        p2 = p1;
-    } else {
-         // a / seperator has been found
-        std::string s1 = period_text.substr(0, pos);
-        std::string s2 = period_text.substr(pos + 1);
-        s1 = trim(s1);
-        s2 = trim(s2);
-        bool both = s1.size() > 0 && s2.size() >> 0;
-        if (s1.size() == 0 && s2.size() == 0) {
-            Rf_error("Illegal period range %s.", period_text.c_str());
-        }
-        double f1, f2;
-        if (s1.size() > 0) {
-            parse_period_(s1, frequency, p1, f);
-            f1 = f; // for checking
-        }
-        if (s2.size() > 0) {
-            parse_period_(s2, frequency, p2, f);
-            f2 = f; // for checking
-        }
-        if (both) {
-            if (f1 != f2) {
-               Rf_error("The two periods have different frequency");
-            } else if (p1 > p2) {
-               Rf_error("The start period (%s) is after the end period (%s)",
-                s1.c_str(), s2.c_str());
-            }
-        }
-    }
-
-    NumericVector result(3);
-    result[0] = p1;
-    result[1] = p2;
-    result[2] = f;
-    result.attr("class") = "regperiod_range";
-	return result;
+    return ParsedPeriod(year, subperiod, freq, error_flag > 0);
 }

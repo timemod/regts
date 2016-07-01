@@ -109,7 +109,7 @@ as.regperiod_range.regperiod <- function(x, ...) {
 #' @export
 #' @importFrom stringr str_trim
 as.regperiod_range.character <- function(x, frequency = NA) {
-    return (parse_period_range(x, frequency));
+    return (parse_regperiod_range(x, frequency));
 }
 
 #' @export
