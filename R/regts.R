@@ -55,60 +55,48 @@
 #' (\link{ts_labels} and \link{update_ts_labels}).
 #'
 #' @export
-regts <- function(data, start, end = NULL, frequency = NA, names = NULL,
+regts <- function(data, start, end = NULL, frequency = NA, names,
                   labels = NULL) {
 
-    start <- as.regperiod(start, frequency)
-    start_freq <- frequency(start)
+    data <- as.matrix(data)
 
-    if (missing(end)) {
-        retval <- ts(data, start = get_time_vector(start),
-                     frequency = start_freq)
-    } else {
+    start <- as.regperiod(start, frequency)
+    if (!is.null(end)) {
         end <- as.regperiod(end, frequency)
-        end_freq <- frequency(end)
-        if (start_freq != end_freq) {
-            stop(paste("Frequency start", start_freq, "and end",
-                       end_freq, "do not agree"))
+    } else {
+        end = start + nrow(data) - 1
+    }
+    range <- regperiod_range(start, end)
+
+    if (missing(names)) {
+        if (!is.null(colnames(data))) {
+            names <- colnames(data)
+        } else {
+            names <- paste("Series", as.character(seq(to = ncol(data))))
         }
-        retval <- ts(data, start = get_time_vector(start),
-                     end = get_time_vector(end), frequency = start_freq)
+    } else if (length(names) != ncol(data)) {
+        stop("The length of the number of variables is not correct")
     }
 
+    retval <- create_regts(data, range, names)
+
+    # TODO: add this code to the code of create_regts.
     if (is.null(attr(retval, "dim"))) {
         # univariate timeseries wihout dimension attributes
-        # add dimension attributes so that the timeseries has a column name.
+        # add dimension attributes so that the timeseries has a column numn
         if (is.null(names)) {
             name <- "Series 1"
         } else {
             name <- names
         }
         retval <- insert_dim_attr(retval, name)
-    } else if (!is.null(names)) {
-        colnames(retval) <- names
-    } else if (!is.null(colnames(data))) {
-        colnames(retval) <- colnames(data)
     }
 
+    # TODO: labels argumnet of create_regts?
     if (!is.null(labels)) {
         ts_labels(retval) <- labels
     }
-    class(retval) <- c("regts", class(retval))
     return (retval)
-}
-
-# Returns a time vector according to the convention of the standard ts package.
-# For years, this is a single number. For higher frequencies a vector
-# of two integers (the year and the subperiod). Internal function.
-# PARAMETERS
-# x      : a regperiod
-# OUTPUT :the time vector
-get_time_vector <- function(x) {
-    if (frequency(x) == 1) {
-        return (as.numeric(x))
-    } else {
-        return (c(get_year(x), get_subperiod(x)))
-    }
 }
 
 # add dimension attribute for univariate timeseriss
