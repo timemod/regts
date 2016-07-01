@@ -31,10 +31,8 @@ start_period.regperiod_range <- function(x) {
 #' @describeIn start_period Returns the first period
 #' @export
 start_period.ts <- function(x) {
-    freq <- frequency(x)
-    start <- start(x)
-    p <- get_subperiod_count(start[1], start[2], freq)
-    return (create_regperiod(p, freq))
+    r <- get_regperiod_range(x)
+    return (create_regperiod(r[1], r[3]))
 }
 
 #' @export
@@ -55,10 +53,8 @@ end_period.regperiod_range <- function(x) {
 #' @describeIn start_period Returns the end period
 #' @export
 end_period.ts <- function(x) {
-    freq <- frequency(x)
-    end <- start(x)
-    p <- get_subperiod_count(end[1], end[2], freq)
-    return (create_regperiod(p, freq))
+    r <- get_regperiod_range(x)
+    return (create_regperiod(r[2], r[3]))
 }
 
 #' @export

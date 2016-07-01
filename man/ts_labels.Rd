@@ -13,7 +13,8 @@ ts_labels(x) <- value
 \item{x}{a \link{regts}}
 
 \item{value}{a character vector with the labels or \code{NULL}. The length
-should be equal to the number of columns. Specify \code{NULL} to remove all labels.}
+should be equal to the number of columns. Specify \code{NULL} to remove all
+labels.}
 }
 \description{
 Retrieve or set labels for the timeseries. Timeseries labels

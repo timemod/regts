@@ -32,3 +32,24 @@ PeriodRange modify_frequency(PeriodRange old_range, int new_freq) {
     return new_range;
 }
 
+//' Returns the period range of the time series as a \link{regperiod_range}
+//' object.
+//'
+//' @param x a \code{regts} or \code{ts}
+//' @return a \code{regperiod_range}
+//' @export
+// [[Rcpp::export]]
+NumericVector get_regperiod_range(const SEXP &tsSEXP) {
+    if (!Rf_inherits(tsSEXP, "ts")) {
+        Rf_error("Argument is not a regts or ts");
+    }
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type ts(tsSEXP);
+    PeriodRange range = get_period_range(ts);
+    NumericVector result(3);
+    result[0] = range.first;
+    result[1] = range.last;
+    result[2] = range.freq;
+    result.attr("class") = "regperiod_range";
+    return result;
+}
+

@@ -97,6 +97,20 @@ regts <- function(data, start, end = NULL, frequency = NA, names = NULL,
     return (retval)
 }
 
+# Returns a time vector according to the convention of the standard ts package.
+# For years, this is a single number. For higher frequencies a vector
+# of two integers (the year and the subperiod). Internal function.
+# PARAMETERS
+# x      : a regperiod
+# OUTPUT :the time vector
+get_time_vector <- function(x) {
+    if (frequency(x) == 1) {
+        return (as.numeric(x))
+    } else {
+        return (c(get_year(x), get_subperiod(x)))
+    }
+}
+
 # add dimension attribute for univariate timeseriss
 insert_dim_attr <- function(x, names) {
     dim_attr <- list(dim = c(length(x), 1), dimnames = list(NULL, names))
@@ -255,24 +269,25 @@ convert_range_selector <- function(range, x) {
     # convert the frequency of the range if necessary
     range <- modify_frequency(range, freq)
 
+    ts_range <- get_regperiod_range(x)
+
     # replace NULl periods by periods in x
     if (is.na(range[1])) {
-        start <- start(x)
-        range[1] <- as.integer(get_subperiod_count(start[1], start[2], freq))
+        range[1] <- ts_range[1]
     }
     if (is.na(range[2])) {
-        end <- end(x)
-        range[2] <- as.integer(get_subperiod_count(end[1], end[2], freq))
+        range[2] <- ts_range[2]
     }
 
     # Check if range is a valid selector of timeseries x.
     # An error will occur for example if timeseries x has period
     # 2010Q1/2011Q2 while range is 2012Q2/.
-    p_start <- start_period.regperiod_range(range)
-    p_end   <- end_period.regperiod_range(range)
-    if (p_start > p_end) {
+    if (range[1] > range[2]) {
+        p_start <- start_period.regperiod_range(range)
+        p_end   <- end_period.regperiod_range(range)
         stop(paste("Start period", p_start, "before end period", p_end))
     }
+
     return (range)
 }
 
@@ -287,9 +302,8 @@ convert_range_selector <- function(range, x) {
 # RETURNS: a vector with the numbers of the select rows in x,
 #          or NULL if sel lies (partially) outside the definition period of x.
 get_row_selection <- function(x, sel) {
-    start <- start(x)
-    subperiod_count <- get_subperiod_count(start[1], start[2], frequency(x))
-    start_row <- sel[1] - subperiod_count + 1
+    ts_range <- get_regperiod_range(x)
+    start_row <- sel[1] - ts_range[1] + 1
     end_row <- start_row + lensub(sel) - 1
     if (start_row >= 1 & end_row <= nrow(x)) {
         return (start_row : end_row)
@@ -362,24 +376,6 @@ get_row_selection <- function(x, sel) {
             return (x)
         }
     }
-}
-
-#' Returns the period range of the time series as a \link{regperiod_range}
-#' object.
-#'
-#' @param x a \code{regts} or \code{ts}
-#' @return a \code{regperiod_range}
-#' @export
-get_regperiod_range <- function(x) {
-    if (!is.ts(x)) {
-        stop("Argument x is not a regts or ts")
-    }
-    freq <- frequency(x)
-    start <- start(x)
-    end <- end(x)
-    p1 <- get_subperiod_count(start[1], start[2], freq)
-    p2 <- get_subperiod_count(end[1], end[2], freq)
-    return (create_regperiod_range(p1, p2, freq))
 }
 
 #' Timeseries labels

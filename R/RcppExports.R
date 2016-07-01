@@ -13,6 +13,16 @@ parse_regperiod_range <- function(period_text, frequency) {
     .Call('regts_parse_regperiod_range', PACKAGE = 'regts', period_text, frequency)
 }
 
+#' Returns the period range of the time series as a \link{regperiod_range}
+#' object.
+#'
+#' @param x a \code{regts} or \code{ts}
+#' @return a \code{regperiod_range}
+#' @export
+get_regperiod_range <- function(tsSEXP) {
+    .Call('regts_get_regperiod_range', PACKAGE = 'regts', tsSEXP)
+}
+
 #' @export
 window_regts <- function(ts_old, range) {
     .Call('regts_window_regts', PACKAGE = 'regts', ts_old, range)
