@@ -22,7 +22,7 @@ get_regperiod_range_from_tsp <- function(tsp, len) {
 }
 
 #' @export
-window_regts <- function(ts_old, range) {
-    .Call('regts_window_regts', PACKAGE = 'regts', ts_old, range)
+window_numregts <- function(ts_old, range) {
+    .Call('regts_window_numregts', PACKAGE = 'regts', ts_old, range)
 }
 

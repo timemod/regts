@@ -67,15 +67,15 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// window_regts
-NumericMatrix window_regts(NumericMatrix& ts_old, NumericVector& range);
-RcppExport SEXP regts_window_regts(SEXP ts_oldSEXP, SEXP rangeSEXP) {
+// window_numregts
+NumericMatrix window_numregts(NumericMatrix& ts_old, NumericVector& range);
+RcppExport SEXP regts_window_numregts(SEXP ts_oldSEXP, SEXP rangeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< NumericMatrix& >::type ts_old(ts_oldSEXP);
     Rcpp::traits::input_parameter< NumericVector& >::type range(rangeSEXP);
-    __result = Rcpp::wrap(window_regts(ts_old, range));
+    __result = Rcpp::wrap(window_numregts(ts_old, range));
     return __result;
 END_RCPP
 }

@@ -366,6 +366,23 @@ get_row_selection <- function(x, sel) {
     }
 }
 
+#' @export
+window_regts <- function(x, range) {
+    nr <- lensub(range)
+    data <- matrix(NA, nrow = nr, nc = ncol(x))
+    ts_range <- get_regperiod_range(x)
+    range <- convert_range_selector(range, x)
+    shift <- range[1] - ts_range[1]
+    rmax <- min(nr, nrow(x) - shift)
+    rmin <- max(1, 1 - shift)
+    if (rmax >= rmin) {
+        sel <- rmin:rmax
+        data[sel, ] <- x[sel + shift, ]
+    }
+    retval <- create_regts(data, range, colnames(x))
+    return(retval)
+}
+
 #' Timeseries labels
 #'
 #'Retrieve or set labels for the timeseries. Timeseries labels

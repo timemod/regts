@@ -6,7 +6,7 @@ using namespace Rcpp;
 
 //' @export
 // [[Rcpp::export]]
-NumericMatrix window_regts(NumericMatrix &ts_old, NumericVector &range) {
+NumericMatrix window_numregts(NumericMatrix &ts_old, NumericVector &range) {
 
     // save the dimension names
     List dimnames = ts_old.attr("dimnames");
