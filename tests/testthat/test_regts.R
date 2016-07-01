@@ -49,6 +49,9 @@ test_that("get_regperiod_range", {
     regts1 <- regts(1, start = "2010Q1", end = "2011Q4")
     expect_identical(get_regperiod_range(regts1),
                      regperiod_range("2010Q1", "2011Q4"))
+    regts2 <- regts(c("aap", "noot", "mies"), start = "2010M1", end = "2011M4")
+    expect_identical(get_regperiod_range(regts2),
+                     regperiod_range("2010M1", "2011M4"))
 })
 
 test_that("period selection in univariate timeseries", {

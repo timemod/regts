@@ -4,19 +4,21 @@
 using Rcpp::NumericMatrix;
 using Rcpp::NumericVector;
 
-// Returns the PeriodRange of a timeseries.
-// TODO: this function is almost a duplicate of the R code of
-// package regts. Create a general C++ function for this,
-// also to be used in the R code of this package.
-PeriodRange get_period_range(const NumericMatrix &ts) {
+// Returns the period range based on the tsp attribute of a timeseries
+PeriodRange get_period_range(const NumericVector &tsp, const int len) {
     PeriodRange per;
-    NumericVector tsp = ts.attr("tsp");
     per.freq  = tsp[2];
     int year  = floor(tsp[0]);
     int subp  = round((tsp[0] - year) * per.freq);
     per.first = round(year * per.freq + subp);
-    per.last  = per.first + ts.nrow() - 1;
+    per.last  = per.first + len - 1;
     return per;
+}
+
+// Returns the PeriodRange of a numerical timeseries.
+PeriodRange get_period_range(const NumericMatrix &ts) {
+    NumericVector tsp = ts.attr("tsp");
+    return get_period_range(tsp, ts.nrow());
 }
 
 PeriodRange modify_frequency(PeriodRange old_range, int new_freq) {
@@ -32,19 +34,12 @@ PeriodRange modify_frequency(PeriodRange old_range, int new_freq) {
     return new_range;
 }
 
-//' Returns the period range of the time series as a \link{regperiod_range}
-//' object.
-//'
-//' @param x a \code{regts} or \code{ts}
-//' @return a \code{regperiod_range}
-//' @export
+// Determine the regperiod_range based on the tsp attribute of a timeseries
+// object.
 // [[Rcpp::export]]
-NumericVector get_regperiod_range(const SEXP &tsSEXP) {
-    if (!Rf_inherits(tsSEXP, "ts")) {
-        Rf_error("Argument is not a regts or ts");
-    }
-    Rcpp::traits::input_parameter< const NumericMatrix& >::type ts(tsSEXP);
-    PeriodRange range = get_period_range(ts);
+NumericVector get_regperiod_range_from_tsp(const NumericVector &tsp,
+                                           int len) {
+    PeriodRange range = get_period_range(tsp, len);
     NumericVector result(3);
     result[0] = range.first;
     result[1] = range.last;
@@ -52,4 +47,3 @@ NumericVector get_regperiod_range(const SEXP &tsSEXP) {
     result.attr("class") = "regperiod_range";
     return result;
 }
-
