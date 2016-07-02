@@ -469,19 +469,3 @@ print.regts <- function(x, ...) {
     ts_labels(x) <- NULL
     NextMethod("print", .Generic)
 }
-
-#' Returns the period range of the time series as a \link{regperiod_range}
-#' object.
-#'
-#' @param x a \code{regts} or \code{ts}
-#' @return a \code{regperiod_range}
-#' @export
-#' @export
-#' @useDynLib regts
-#' @importFrom Rcpp sourceCpp
-get_regperiod_range <- function(x) {
-    if (!inherits(x, 'ts')) {
-        stop("Argument x is not a timeseries")
-    }
-    return (get_regperiod_range_from_tsp(attr(x, "tsp"), nrow(x)))
-}

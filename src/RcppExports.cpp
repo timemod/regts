@@ -55,15 +55,14 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// get_regperiod_range_from_tsp
-NumericVector get_regperiod_range_from_tsp(const NumericVector& tsp, int len);
-RcppExport SEXP regts_get_regperiod_range_from_tsp(SEXP tspSEXP, SEXP lenSEXP) {
+// get_regperiod_range
+NumericVector get_regperiod_range(const SEXP& ts);
+RcppExport SEXP regts_get_regperiod_range(SEXP tsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< const NumericVector& >::type tsp(tspSEXP);
-    Rcpp::traits::input_parameter< int >::type len(lenSEXP);
-    __result = Rcpp::wrap(get_regperiod_range_from_tsp(tsp, len));
+    Rcpp::traits::input_parameter< const SEXP& >::type ts(tsSEXP);
+    __result = Rcpp::wrap(get_regperiod_range(ts));
     return __result;
 END_RCPP
 }
