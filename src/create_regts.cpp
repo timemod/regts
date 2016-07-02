@@ -3,17 +3,7 @@
 #include "create_regts.h"
 using namespace Rcpp;
 
-// [[Rcpp::export]]
-SEXP create_regts(const SEXP &x, const NumericVector &period_range,
-                  const CharacterVector &names) {
-    PeriodRange per;
-    per.first = period_range[0];
-    per.last  = period_range[1];
-    per.freq  = period_range[2];
-    return create_regts(x, per, names);
-}
-
-SEXP create_regts(const SEXP &x, const PeriodRange &per,
+SEXP create_regts(const NumericMatrix &x, const PeriodRange &per,
                   const CharacterVector &names) {
 
     // get start and end vectors
