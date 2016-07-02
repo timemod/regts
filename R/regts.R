@@ -59,32 +59,32 @@ regts <- function(data, start, end = NULL, frequency = NA, names,
                   labels = NULL) {
 
     data <- as.matrix(data)
-
     start <- as.regperiod(start, frequency)
+    freq <- frequency(start)
+    start <- as.numeric(start)  # this turns out to be more efficient
     if (!is.null(end)) {
         end <- as.regperiod(end, frequency)
-    } else {
-        end = start + nrow(data) - 1
-    }
-    range <- regperiod_range(start, end)
-
-    if (missing(names)) {
-        if (!is.null(colnames(data))) {
-            names <- colnames(data)
-        } else {
-            names <- paste("Series", as.character(seq(to = ncol(data))))
+        if (frequency(end) != freq) {
+           stop("The frequency of the second period does not agree")
         }
-    } else if (length(names) != ncol(data)) {
-        stop("The length of the number of variables is not correct")
+        end <- as.numeric(end) # this turns out to be more efficient
     }
 
-    retval <- create_regts(data, range, names)
+    if (!missing(names)) {
+        if (length(names) != ncol(data)) {
+            stop("The length of the names vector is not euqal to the number of columns")
+        }
+        colnames(data) <- names
+    }
 
-    # TODO: add this code to the code of create_regts.
+    retval <- create_regts(data, start, end, freq, labels)
+
     if (is.null(attr(retval, "dim"))) {
         # univariate timeseries wihout dimension attributes
-        # add dimension attributes so that the timeseries has a column numn
-        if (is.null(names)) {
+        # add dimension attributes so that the timeseries has a column number
+        # this situation might occur in the following example:
+        # regts(1, start = "2010Q2", end = "2011Q3")
+        if (missing(names) || is.null(names)) {
             name <- "Series 1"
         } else {
             name <- names
@@ -92,7 +92,26 @@ regts <- function(data, start, end = NULL, frequency = NA, names,
         retval <- insert_dim_attr(retval, name)
     }
 
-    # TODO: labels argumnet of create_regts?
+    return (retval)
+}
+
+# TODO: export is only temporarily, for testing purposes
+#' @export
+create_regts <- function(data, startp, endp, freq, labels) {
+    if (ncol(data) > 1) {
+        classes <- c("regts", "mts", "ts", "matrix")
+    } else {
+        classes <- c("regts", "ts")
+    }
+    start_vector <- c(startp %/% freq, startp %% freq + 1)
+    if (is.null(endp)) {
+        retval <- ts(data, start = start_vector,  frequency = freq,
+                     class = classes)
+    } else {
+        end_vector <- c(endp   %/% freq, endp   %% freq + 1)
+        retval <- ts(data, start = start_vector,  end = end_vector,
+                     frequency = freq,  class = classes)
+    }
     if (!is.null(labels)) {
         ts_labels(retval) <- labels
     }
@@ -383,11 +402,8 @@ window_regts <- function(x, range) {
         sel <- rmin:rmax
         data[sel, ] <- x[sel + shift, ]
     }
-    retval <- create_regts(data, range, colnames(x))
-    lbls <- ts_labels(x)
-    if (!is.null(lbls)) {
-        ts_labels(retval) <- lbls
-    }
+    colnames(data) <- colnames(x)
+    retval <- create_regts(data, range[1], range[2], range[3], ts_labels(x))
     return(retval)
 }
 
