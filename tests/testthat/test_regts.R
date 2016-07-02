@@ -179,3 +179,19 @@ test_that("colnames are preserved in miscellaneous timeseries functions", {
     expect_identical(colnames(x), colnames(x_windows))
     expect_identical(colnames(x), colnames(x_windows))
 })
+
+test_that("several tests for character timeseries", {
+    data <- matrix(paste0("text", as.character(1: 10)), ncol = 2)
+    regts1 <- regts(data, start = "2010Q4", names = c("a", "b"))
+    ts1 <- ts(data, start = c(2010,4), frequency = 4, names = c("a", "b"))
+    expect_identical(regts1, as.regts(ts1))
+    expect_identical(as.ts(regts1), ts1)
+    expect_identical(regts1["2011Q2/2011Q3"],
+                as.regts(window(ts1, start = c(2011, 2), end = c(2011, 3))))
+
+    regts2 <- regts1
+    regts2["2010Q4"] <- "aap"
+    ts2 <- ts1;
+    window(ts2, start = c(2010, 4), end = c(2010, 4)) <- "aap";
+    expect_identical(regts2, as.regts(ts2))
+})

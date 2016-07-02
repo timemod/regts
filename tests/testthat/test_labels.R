@@ -11,7 +11,21 @@ test_that("constructor regts for univariate timeseries", {
     regts2 <- update_ts_labels(regts1, list(a = "ts a", x = "???"))
     res2 <- res
     res2['a'] <- "ts a"
+    expect_identical(ts_labels(regts2), res2)
+})
+
+test_that("constructor regts for univariate character timeseries", {
+
+    regts1 <- regts(paste0("text", as.character(1:10)), start = "2010Q4",
+                           names = "a", labels = "Timeseries a")
+    res <- "Timeseries a"
+    names(res) <- "a"
     expect_identical(ts_labels(regts1), res)
+
+    regts2 <- update_ts_labels(regts1, list(a = "ts a", x = "???"))
+    res2 <- res
+    res2['a'] <- "ts a"
+    expect_identical(ts_labels(regts2), res2)
 })
 
 test_that("constructor regts for multivariate timeseries", {

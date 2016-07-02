@@ -368,10 +368,14 @@ get_row_selection <- function(x, sel) {
 
 #' @export
 window_regts <- function(x, range) {
-    nr <- lensub(range)
-    data <- matrix(NA, nrow = nr, nc = ncol(x))
+    if (is.numeric(x)) {
+        # call C++ function window_numregts, this is faster
+        return (window_numregts(x, range))
+    }
     ts_range <- get_regperiod_range(x)
     range <- convert_range_selector(range, x)
+    nr <- lensub(range)
+    data <- matrix(NA, nrow = nr, nc = ncol(x))
     shift <- range[1] - ts_range[1]
     rmax <- min(nr, nrow(x) - shift)
     rmin <- max(1, 1 - shift)
@@ -380,6 +384,10 @@ window_regts <- function(x, range) {
         data[sel, ] <- x[sel + shift, ]
     }
     retval <- create_regts(data, range, colnames(x))
+    lbls <- ts_labels(x)
+    if (!is.null(lbls)) {
+        ts_labels(retval) <- lbls
+    }
     return(retval)
 }
 

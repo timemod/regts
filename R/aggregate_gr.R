@@ -15,7 +15,9 @@ aggregate_gr <- function(x,  method, nfrequency = 1) {
     if (!inherits(x, 'ts')) {
         stop("Argument x is not a timeseries")
     }
-
+    if (!is.numeric(x)) {
+        stop("aggregate_gr is not implemented for non-numeric timeseries")
+    }
     # call C++ function agg_gr (see src/agg_gr.cpp)
     return (agg_gr(x, nfrequency, method))
 }

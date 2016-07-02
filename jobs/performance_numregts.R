@@ -6,7 +6,8 @@ aantal_variabelen <- 50
 aantal_perioden <- 100
 
 namen <- paste('ts', seq(aantal_variabelen), sep = "_")
-data <- matrix(rnorm(n  = aantal_variabelen * aantal_perioden), ncol = aantal_variabelen)
+data <- matrix(as.character(rnorm(n  = aantal_variabelen * aantal_perioden)),
+               ncol = aantal_variabelen)
 regts1  <- regts(data, start ="2010Q2")
 ts1 <- as.ts(regts1)
 colnames(ts1) <- namen
@@ -20,3 +21,5 @@ tm
 
 tm <- microbenchmark(window_regts(regts1, p))
 tm
+
+
