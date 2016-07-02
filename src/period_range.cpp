@@ -44,7 +44,7 @@ PeriodRange modify_frequency(PeriodRange old_range, int new_freq) {
 // [[Rcpp::export]]
 NumericVector get_regperiod_range(const SEXP &ts) {
     if (!Rf_inherits(ts, "ts")) {
-        Rf_error("Argument is now a timeseries");
+        Rf_error("Argument is not a timeseries");
     }
     SEXP attr = Rf_getAttrib(ts, Rf_install("tsp"));
     if (Rf_isNull(attr)) {
