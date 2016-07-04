@@ -1,12 +1,13 @@
 #include <Rcpp.h>
 #include <string>
 #include "period_range.h"
-#include "create_regts.h"
 using namespace Rcpp;
 
+// TODO: @export only used in the testing phase of regts,
+// in the final version it should not be exported.
 //' @export
 // [[Rcpp::export]]
-NumericMatrix window_numregts(NumericMatrix &ts_old, NumericVector &range) {
+SEXP window_numregts(NumericMatrix &ts_old, NumericVector &range) {
 
     // save the dimension names
     List dimnames = ts_old.attr("dimnames");
@@ -45,14 +46,13 @@ NumericMatrix window_numregts(NumericMatrix &ts_old, NumericVector &range) {
         }
     }
 
-    NumericMatrix ts_new = create_regts(data, per_new, names);
+    Rcpp::NumericVector range_new(3);
+    range_new[0] = per_new.first;
+    range_new[1] = per_new.last;
+    range_new[2] = per_new.freq;
 
-    // check if labels are present in ts, if so that add to result
-    SEXP label_att = ts_old.attr("ts_labels");
-    if (!Rf_isNull(label_att)) {
-        CharacterVector labels(label_att);
-        ts_new.attr("ts_labels") = labels;
-    }
-
-    return ts_new;
+    Rcpp::List retval(2);
+    retval[0] = data;
+    retval[1] = range_new;
+    return retval;
 }

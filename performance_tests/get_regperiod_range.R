@@ -26,12 +26,14 @@ get_regperiod_range_alt2 <- function(x) {
     return (structure(c(first, last, frequency), class = "regperiod_range"))
 }
 
-# TODO: first create
-ts  <- regts(matrix(1:10, ncol = 2), start = "2010Q2")
-t1 <- microbenchmark(get_regperiod_range(ts))
-t2 <- microbenchmark(get_regperiod_range_alt1(ts))
-t3 <- microbenchmark(get_regperiod_range_alt2(ts))
-t4 <- microbenchmark(get_regperiod_range_alt2(ts))
+commands <- c("get_regperiod_range(ts)",
+              "get_regperiod_range_alt1(ts)",
+              "get_regperiod_range_alt2(ts)"
+)
 
-result <- rbind(t1, t2, t3, t4)
+parsed_commands <- lapply(commands, FUN = function(x) parse(text = x))
+result <- lapply(parsed_commands, FUN = function(x) summary(microbenchmark(eval(x)),
+                                                            unit = "us"))
+result <- do.call(rbind, result)
+result <- data.frame(commands, mean = result$mean)
 print(result)

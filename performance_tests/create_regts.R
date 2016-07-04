@@ -9,9 +9,14 @@ colnames(data) <- names
 p2 <- p1 + nrow(data) - 1
 range <- regperiod_range(p1, p2)
 
-t1 <- microbenchmark(ts(data, start = c(2010, 2), frequency = 4))
-t2 <- microbenchmark(regts(data, p1))
-t3 <- microbenchmark(create_regts(data, as.numeric(p1), NULL, range[3], NULL))
+commands <- c("ts(data, start = c(2010, 2), frequency = 4)",
+              "regts(data, p1)",
+              "create_regts(data, as.numeric(p1), NULL, range[3], NULL)"
 
-result <- rbind(t1, t2, t3)
+)
+parsed_commands <- lapply(commands, FUN = function(x) parse(text = x))
+result <- lapply(parsed_commands, FUN = function(x) summary(microbenchmark(eval(x)),
+                                                            unit = "us"))
+result <- do.call(rbind, result)
+result <- data.frame(commands, mean = result$mean)
 print(result)

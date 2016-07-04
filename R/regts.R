@@ -389,22 +389,26 @@ get_row_selection <- function(x, sel) {
 window_regts <- function(x, range) {
     if (is.numeric(x)) {
         # call C++ function window_numregts, this is faster
-        return (window_numregts(x, range))
-    }
-    ts_range <- get_regperiod_range(x)
-    range <- convert_range_selector(range, x)
-    nr <- lensub(range)
-    data <- matrix(NA, nrow = nr, nc = ncol(x))
-    shift <- range[1] - ts_range[1]
-    rmax <- min(nr, nrow(x) - shift)
-    rmin <- max(1, 1 - shift)
-    if (rmax >= rmin) {
-        sel <- rmin:rmax
-        data[sel, ] <- x[sel + shift, ]
+        ret <- window_numregts(x, range)
+        data <- ret[[1]]
+        range_new <- ret[[2]]
+    } else {
+        range_new <- convert_range_selector(range, x)
+        ts_range <- get_regperiod_range(x)
+        range <- convert_range_selector(range, x)
+        nr <- lensub(range)
+        data <- matrix(NA, nrow = nr, nc = ncol(x))
+        shift <- range[1] - ts_range[1]
+        rmax <- min(nr, nrow(x) - shift)
+        rmin <- max(1, 1 - shift)
+        if (rmax >= rmin) {
+            sel <- rmin:rmax
+            data[sel, ] <- x[sel + shift, ]
+        }
     }
     colnames(data) <- colnames(x)
-    retval <- create_regts(data, range[1], range[2], range[3], ts_labels(x))
-    return(retval)
+    return (create_regts(data, range_new[1], range_new[2], range_new[3],
+                         ts_labels(x)))
 }
 
 #' Timeseries labels

@@ -25,6 +25,6 @@ months.o : months.hpp
 parse_regperiod.o : parse_period.h
 
 period_range.o : period_range.h
-aggr_gr.o : period_range.h create_regts.h
-window_regts.o : period_range.h create_regts.h
-create_regts.o : create_regts.h
+aggr_gr.o : period_range.h
+window_regts.o : period_range.h
+

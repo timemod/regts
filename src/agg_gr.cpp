@@ -2,7 +2,6 @@
 #include <math.h>
 #include <string>
 #include "period_range.h"
-#include "create_regts.h"
 using namespace Rcpp;
 
 void agg_gr_abs(NumericMatrix::Column column_old,
@@ -12,7 +11,7 @@ void agg_gr_rel(NumericMatrix::Column column_old,
                 int shift, int perc);
 
 // [[Rcpp::export]]
-NumericMatrix agg_gr(NumericMatrix &ts_old, const int freq_new,
+List agg_gr(NumericMatrix &ts_old, const int freq_new,
                      const std::string &method) {
 
     // save the dimension names
@@ -57,16 +56,15 @@ NumericMatrix agg_gr(NumericMatrix &ts_old, const int freq_new,
         Rf_error((std::string("Illegal aggregation method ") + method).c_str());
     }
 
-    NumericMatrix ts_new = create_regts(data, per_new, names);
+    NumericVector range_new(3);
+    range_new[0] = per_new.first;
+    range_new[1] = per_new.last;
+    range_new[2] = per_new.freq;
 
-    // check if labels are present in ts, if so that add to result
-    SEXP label_att = ts_old.attr("ts_labels");
-    if (!Rf_isNull(label_att)) {
-        CharacterVector labels(label_att);
-        ts_new.attr("ts_labels") = labels;
-    }
-
-    return ts_new;
+    List result(2);
+    result[0] = data;
+    result[1] = range_new;
+    return (result);
 }
 
 void agg_gr_abs(NumericMatrix::Column column_old,

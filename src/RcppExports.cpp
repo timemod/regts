@@ -6,7 +6,7 @@
 using namespace Rcpp;
 
 // agg_gr
-NumericMatrix agg_gr(NumericMatrix& ts_old, const int freq_new, const std::string& method);
+List agg_gr(NumericMatrix& ts_old, const int freq_new, const std::string& method);
 RcppExport SEXP regts_agg_gr(SEXP ts_oldSEXP, SEXP freq_newSEXP, SEXP methodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
@@ -54,7 +54,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // window_numregts
-NumericMatrix window_numregts(NumericMatrix& ts_old, NumericVector& range);
+SEXP window_numregts(NumericMatrix& ts_old, NumericVector& range);
 RcppExport SEXP regts_window_numregts(SEXP ts_oldSEXP, SEXP rangeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
