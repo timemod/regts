@@ -25,6 +25,8 @@ test_that("constructor regts for univariate timeseries", {
     regts1 <- regts(1:10, start = "2010-1", frequency = 3, names = "a")
     ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010, 1), frequency = 3, names = "a")
     expect_identical(as.regts(regts1), as.regts(ts1))
+
+
 })
 
 test_that("constructor regts for multivariate time series", {

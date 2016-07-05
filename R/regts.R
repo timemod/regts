@@ -349,10 +349,11 @@ get_row_selection <- function(sel, ts_range) {
     }
 }
 
+
 window_regts <- function(x, range) {
     # call C++ function select_rows
     ret <- select_rows(x, range)
-    data <- ret[[1]]
+    data      <- ret[[1]]
     range_new <- ret[[2]]
     colnames(data) <- colnames(x)
     return (create_regts(data, range_new[1], range_new[2], range_new[3],
