@@ -54,6 +54,8 @@
 #' See also the description of the functions for handling labels
 #' (\link{ts_labels} and \link{update_ts_labels}).
 #'
+#' @importFrom stats ts
+#' @importFrom stats frequency
 #' @export
 regts <- function(data, start, end = NULL, frequency = NA, names,
                   labels = NULL) {
@@ -160,7 +162,7 @@ is.regts <- function(x) {
 #' ts <- as.regts(df)
 #'
 #' # create a data frame with the time index in the first column and special
-#' time format "2015 3" instead of "2015Q3", and convert to regts
+#' # time format "2015 3" instead of "2015Q3", and convert to regts
 #' df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
 #' ts <- as.regts(df, time_column = 1, frequency = 4)
 #' @export
@@ -245,7 +247,7 @@ as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
 }
 
 #' @describeIn as.regts Default method to convert an R object to a \link{regts}.
-#' This method #' first employs \link{at.ts} and then \link{as.regts.ts}
+#' This method first employs \link{as.ts} and then \link{as.regts.ts}
 #' @export
 as.regts.default <- function(x, ...) {
     return (as.regts(as.ts(x, ...)))

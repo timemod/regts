@@ -3,13 +3,13 @@
 #' Create a \code{regperiod_range} object from two \link{regperiod} objects
 #' or character strings that can be converted to \link{regperiod} objects with
 #' function \link{as.regperiod}. The \code{regperiod_range} object is used to represent an interval
-#' of \link{regperiods},  for example, a period from \code{2012Q2} to \code{2016Q4}.
+#' of \link{regperiod},  for example, a period from \code{2012Q2} to \code{2016Q4}.
 #'
 #' @param p1 the first period (a \link{regperiod}, a character string
-#' that can be converted to a \link{regpediod}, or \code{NULL}). If \code{p1}
+#' that can be converted to a \link{regperiod}, or \code{NULL}). If \code{p1}
 #' is \code{NULL}, the lower bound of the period range is undetermined.
 #' @param p2 the last period (a \link{regperiod}, a character string
-#' that can be converted to a \link{regpediod}). If \code{p2} is
+#' that can be converted to a \link{regperiod}). If \code{p2} is
 #' \code{NULL}, the upper bound of the period range is undetermined.
 #' @param frequency frequency of the regperiod objects. This argument is mandatory
 #' if argument \code{p1} or \code{p2} is a character with general period format
@@ -107,8 +107,7 @@ as.regperiod_range.regperiod <- function(x, ...) {
 #' # a single period can also be converted to a regperiod_range
 #' as.regperiod_range("2016Q1")
 #' @export
-#' @importFrom stringr str_trim
-as.regperiod_range.character <- function(x, frequency = NA) {
+as.regperiod_range.character <- function(x, frequency = NA, ...) {
     return (parse_regperiod_range(x, frequency));
 }
 

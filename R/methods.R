@@ -1,4 +1,5 @@
 # The S3 method window.ts removes the regts class, therefore use as.regts.
+#' @importFrom stats window
 #' @export
 window.regts <- function(x, ...) {
     lbls <- ts_labels(x)
@@ -24,7 +25,8 @@ diff.regts <- function(x, ...) {
 # Also takes care of weird result if the first period of x does not
 # start at a subperiod for the new frequency (e.g.  a quartly timeseries
 # that is aggregated to a yearly timeseries starts at 2010.2q)).
-# In that case the initial period must be shifted.
+# In that case the initial period must be shifted
+#' @importFrom stats aggregate
 #' @export
 aggregate.regts <- function(x, nfrequency = 1, ...) {
     lbls <- ts_labels(x)

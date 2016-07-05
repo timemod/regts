@@ -2,7 +2,7 @@
 #'
 #' @details
 #' If the \code{regts} has labels, then the labels are added to the result
-#' dataframe using package \link{Hmisc}.
+#' dataframe using the function \link{label}. of package \code{Hmisc}.
 #' @param x a \code{regts}
 #' @return A \code{data.frame}
 #' @export

@@ -101,6 +101,11 @@ print.regperiod <- function(x) {
     print(as.character(x))
 }
 
+#' Coerce an R object to a regperiod
+#'
+#' @param x an R object
+#' @param ... object passed to methods
+#' @return a \link{regperiod}
 #' @export
 as.regperiod <- function(x, ...) UseMethod("as.regperiod")
 

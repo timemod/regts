@@ -144,7 +144,7 @@ calculate_difference <- function(common_names, x1, x2, tol, fun) {
 #' \code{cvgdif} calculates the difference  between two numbers
 #' \code{x1} and \code{x2} according to \code{|x_1 - x_2| / max(|x_2|, 1)}.
 #' This difference is equivalent to the convergence test employed in the
-#' package \link{macromod}.
+#' package \code{macromod}.
 #' @param x1 first number
 #' @param x2 second number
 #' @return the 'convergence difference' as described above

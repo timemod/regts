@@ -1,14 +1,18 @@
 Package: regts
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Regular timeseries.
 Version: 0.1
 Date: 2016-01-26
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: More about what it does (maybe more than one line)
+Authors@R: c(
+ person("Rob", "van Harrevelt", email = "rvanharrevelt@gmail.com", role = c("aut", "cre")),
+ person("Anita", "van der Roest", email = "J.C.van.der.Roest@cpb.nl",role = "aut")
+ )
+Description: This package contains a number of tools to work efficiently with
+   regular timeseries, in particular monthy, quarterly and yearly timeseries.
 License: What license is it under?
 LazyData: TRUE
 RoxygenNote: 5.0.1
-Imports: Hmisc, Rcpp, stringr
+Imports: Rcpp
 Depends: Hmisc
-Suggests: zoo, testthat
+Suggests: zoo
 LinkingTo: Rcpp

@@ -40,7 +40,7 @@ Coerce an object to a \link{regts} timeseries object
 \item \code{data.frame}: Convert a \link{data.frame} to a \link{regts}
 
 \item \code{default}: Default method to convert an R object to a \link{regts}.
-This method #' first employs \link{at.ts} and then \link{as.regts.ts}
+This method first employs \link{as.ts} and then \link{as.regts.ts}
 }}
 \examples{
 # convert a ts to regts
@@ -56,7 +56,7 @@ rownames(df) <- c("2015Q3", "2015Q4", "2016Q1")
 ts <- as.regts(df)
 
 # create a data frame with the time index in the first column and special
-time format "2015 3" instead of "2015Q3", and convert to regts
+# time format "2015 3" instead of "2015Q3", and convert to regts
 df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
 ts <- as.regts(df, time_column = 1, frequency = 4)
 }

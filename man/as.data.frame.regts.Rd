@@ -17,7 +17,7 @@ Converts a \link{regts} to a \link{data.frame}
 }
 \details{
 If the \code{regts} has labels, then the labels are added to the result
-dataframe using package \link{Hmisc}.
+dataframe using the function \link{label}. of package \code{Hmisc}.
 }
 \examples{
 ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),

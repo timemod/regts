@@ -2,6 +2,7 @@
 #'
 #' @param x a \code{regts}
 #' @return a \code{ts}
+#' @importFrom stats as.ts
 #' @export
 as.ts.regts <- function(x) {
     class(x) <- class(x)[-1]

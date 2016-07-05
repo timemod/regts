@@ -4,7 +4,7 @@
 \alias{as.regperiod_range.character}
 \title{Convert a character string to a regperiod_range object}
 \usage{
-\method{as.regperiod_range}{character}(x, frequency = NA)
+\method{as.regperiod_range}{character}(x, frequency = NA, ...)
 }
 \arguments{
 \item{x}{a character string}

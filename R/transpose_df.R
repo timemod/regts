@@ -2,7 +2,7 @@
 #'
 #' The function transposes a data frame. If the data frame contains
 #' labels that has been set by the function \link{label} of the
-#' package \link{Hmisc}, then the first column of the returned data frame will
+#' package \code{Hmisc}, then the first column of the returned data frame will
 #' contain the labels. Conversely, you can specify the column that will become
 #' the labels of the transposed data frame.
 #'
