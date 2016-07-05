@@ -4,6 +4,10 @@ public:
     double first, last;
     double freq;
     int len() {return last - first + 1;}
+    PeriodRange(){}
+    PeriodRange(const Rcpp::NumericVector x);
+    void modify_frequency(int new_freq);
+    Rcpp::NumericVector get_regperiod_range();
 };
 
 PeriodRange get_period_range(const Rcpp::NumericMatrix &ts);

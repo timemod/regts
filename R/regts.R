@@ -95,8 +95,6 @@ regts <- function(data, start, end = NULL, frequency = NA, names,
     return (retval)
 }
 
-# TODO: export is only temporarily, for testing purposes
-#' @export
 create_regts <- function(data, startp, endp, freq, labels) {
     if (ncol(data) > 1) {
         classes <- c("regts", "mts", "ts", "matrix")
@@ -263,56 +261,20 @@ add_columns <- function(x, new_colnames) {
     return (x)
 }
 
-# This function makes sure that regperiod_range object range has
-# the same frequency as timeseries x, and also replaces
-# NULL values for range[1] or range[2] by the appropriate
-# values from timeseries x.
-# param range a regperiod_range object used as selector of a timeseries
-# param x  a timeseries object (regts or ts)
-convert_range_selector <- function(range, x) {
-
-    freq <- frequency(x)
-
-    # convert the frequency of the range if necessary
-    range <- modify_frequency(range, freq)
-
-    ts_range <- get_regperiod_range(x)
-
-    # replace NULl periods by periods in x
-    if (is.na(range[1])) {
-        range[1] <- ts_range[1]
-    }
-    if (is.na(range[2])) {
-        range[2] <- ts_range[2]
-    }
-
-    # Check if range is a valid selector of timeseries x.
-    # An error will occur for example if timeseries x has period
-    # 2010Q1/2011Q2 while range is 2012Q2/.
-    if (range[1] > range[2]) {
-        p_start <- start_period.regperiod_range(range)
-        p_end   <- end_period.regperiod_range(range)
-        stop(paste("Start period", p_start, "before end period", p_end))
-    }
-
-    return (range)
-}
-
 # This function computes the row numbers of the selected rows in a
 # regts object. If the period selector lies partially outside
 # the defintion period of the input timeseries, then the function
 # returns NULL.
 # PARAMETERS:
-# x   : a regts object
 # sel : a regperiod_range object. This object is used to select rows in
-#       argument x.
+#       a timeseries
+# ts_range : the range of the timeseries.
 # RETURNS: a vector with the numbers of the select rows in x,
 #          or NULL if sel lies (partially) outside the definition period of x.
-get_row_selection <- function(x, sel) {
-    ts_range <- get_regperiod_range(x)
+get_row_selection <- function(sel, ts_range) {
     start_row <- sel[1] - ts_range[1] + 1
     end_row <- start_row + lensub(sel) - 1
-    if (start_row >= 1 & end_row <= nrow(x)) {
+    if (start_row >= 1 & end_row <= lensub(ts_range)) {
         return (start_row : end_row)
     } else {
         return (NULL)
@@ -335,13 +297,15 @@ get_row_selection <- function(x, sel) {
 
     if (!missing(i) && (is.character(i) || inherits(i, "regperiod") ||
                         inherits(i, "regperiod_range"))) {
-        range <- convert_range_selector(as.regperiod_range(i), x)
-        row_numbers <- get_row_selection(x, range)
+        ts_range <- get_regperiod_range(x)
+        range <- convert_range_selector(as.regperiod_range(i), ts_range)
+        row_numbers <- get_row_selection(range, ts_range)
         if (is.null(row_numbers)) {
             # Do not use the window function of ts to extend the timeseries,
             # it is very slow. Use our own function adjust_period
-            x <- window_regts(x, regrange_union(range, get_regperiod_range(x)))
-            row_numbers <- get_row_selection(x, range)
+            ts_range_new <- regrange_union(range, ts_range)
+            x <- window_regts(x, ts_range_new)
+            row_numbers <- get_row_selection(range, ts_range_new)
         }
         i <- row_numbers
         # if argument j is missing, then we have to add an empty
@@ -385,20 +349,18 @@ get_row_selection <- function(x, sel) {
     }
 }
 
-#' @export
 window_regts <- function(x, range) {
-    if (is.numeric(x)) {
+    if (FALSE & is.numeric(x)) {
         # call C++ function window_numregts, this is faster
         ret <- window_numregts(x, range)
         data <- ret[[1]]
         range_new <- ret[[2]]
     } else {
-        range_new <- convert_range_selector(range, x)
         ts_range <- get_regperiod_range(x)
-        range <- convert_range_selector(range, x)
-        nr <- lensub(range)
+        range_new <- convert_range_selector(range, ts_range)
+        nr <- lensub(range_new)
         data <- matrix(NA, nrow = nr, nc = ncol(x))
-        shift <- range[1] - ts_range[1]
+        shift <- range_new[1] - ts_range[1]
         rmax <- min(nr, nrow(x) - shift)
         rmin <- max(1, 1 - shift)
         if (rmax >= rmin) {

@@ -11,8 +11,8 @@ void agg_gr_rel(NumericMatrix::Column column_old,
                 int shift, int perc);
 
 // [[Rcpp::export]]
-List agg_gr(NumericMatrix &ts_old, const int freq_new,
-                     const std::string &method) {
+List agg_gr(NumericMatrix ts_old, const int freq_new,
+            const std::string &method) {
 
     // save the dimension names
     List dimnames = ts_old.attr("dimnames");
@@ -56,14 +56,9 @@ List agg_gr(NumericMatrix &ts_old, const int freq_new,
         Rf_error((std::string("Illegal aggregation method ") + method).c_str());
     }
 
-    NumericVector range_new(3);
-    range_new[0] = per_new.first;
-    range_new[1] = per_new.last;
-    range_new[2] = per_new.freq;
-
     List result(2);
     result[0] = data;
-    result[1] = range_new;
+    result[1] = per_new.get_regperiod_range();
     return (result);
 }
 

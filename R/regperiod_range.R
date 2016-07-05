@@ -148,15 +148,4 @@ print.regperiod_range <- function(x) {
     print(as.character(x))
 }
 
-# Converts the frequency of a regperiod_range object, from lower to higher
-# frequency.
-modify_frequency <- function(x, new_freq) {
-    if (new_freq %% x[3] != 0) {
-        stop("Frequency of regperiod_range is no divisor of the required frequency")
-    }
-    factor <- new_freq %/% x[3]
-    x[1] <- x[1] * factor
-    x[2] <- (x[2] + 1) * factor - 1
-    x[3] <- new_freq
-    return (x)
-}
+

@@ -11,7 +11,7 @@ range <- regperiod_range(p1, p2)
 
 commands <- c("ts(data, start = c(2010, 2), frequency = 4)",
               "regts(data, p1)",
-              "create_regts(data, as.numeric(p1), NULL, range[3], NULL)"
+              "regts:::create_regts(data, as.numeric(p1), NULL, range[3], NULL)"
 
 )
 parsed_commands <- lapply(commands, FUN = function(x) parse(text = x))

@@ -64,7 +64,7 @@ Ops.regperiod <- function(x, y) {
 as.character.regperiod <- function(x) {
     freq <- frequency(x)
     if (freq == 1) {
-        return (as.character(x))
+        return (as.character(as.numeric(x)))
     } else {
         if (freq == 4) {
             freq_char <- "Q"

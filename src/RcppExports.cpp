@@ -6,12 +6,12 @@
 using namespace Rcpp;
 
 // agg_gr
-List agg_gr(NumericMatrix& ts_old, const int freq_new, const std::string& method);
+List agg_gr(NumericMatrix ts_old, const int freq_new, const std::string& method);
 RcppExport SEXP regts_agg_gr(SEXP ts_oldSEXP, SEXP freq_newSEXP, SEXP methodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< NumericMatrix& >::type ts_old(ts_oldSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type ts_old(ts_oldSEXP);
     Rcpp::traits::input_parameter< const int >::type freq_new(freq_newSEXP);
     Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
     __result = Rcpp::wrap(agg_gr(ts_old, freq_new, method));
@@ -54,14 +54,26 @@ BEGIN_RCPP
 END_RCPP
 }
 // window_numregts
-SEXP window_numregts(NumericMatrix& ts_old, NumericVector& range);
-RcppExport SEXP regts_window_numregts(SEXP ts_oldSEXP, SEXP rangeSEXP) {
+List window_numregts(const NumericMatrix ts_old, const NumericVector selector);
+RcppExport SEXP regts_window_numregts(SEXP ts_oldSEXP, SEXP selectorSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< NumericMatrix& >::type ts_old(ts_oldSEXP);
-    Rcpp::traits::input_parameter< NumericVector& >::type range(rangeSEXP);
-    __result = Rcpp::wrap(window_numregts(ts_old, range));
+    Rcpp::traits::input_parameter< const NumericMatrix >::type ts_old(ts_oldSEXP);
+    Rcpp::traits::input_parameter< const NumericVector >::type selector(selectorSEXP);
+    __result = Rcpp::wrap(window_numregts(ts_old, selector));
+    return __result;
+END_RCPP
+}
+// convert_range_selector
+NumericVector convert_range_selector(const NumericVector& selector, const NumericVector& ts_range);
+RcppExport SEXP regts_convert_range_selector(SEXP selectorSEXP, SEXP ts_rangeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const NumericVector& >::type selector(selectorSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type ts_range(ts_rangeSEXP);
+    __result = Rcpp::wrap(convert_range_selector(selector, ts_range));
     return __result;
 END_RCPP
 }

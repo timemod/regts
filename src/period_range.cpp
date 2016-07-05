@@ -4,6 +4,32 @@
 using Rcpp::NumericMatrix;
 using Rcpp::NumericVector;
 
+PeriodRange::PeriodRange(const NumericVector x) {
+    first = x[0];
+    last  = x[1];
+    freq  = x[2];
+}
+
+void PeriodRange::modify_frequency(int new_freq) {
+    if (new_freq % (int) freq != 0) {
+        Rf_error("Frequency of regperiod_range is no divisor of the "
+                     "required frequency");
+    }
+    int factor = new_freq / (int) freq;
+    first = round(first * factor);
+    last  = round((last + 1) * factor - 1);
+    freq = new_freq;
+}
+
+NumericVector PeriodRange::get_regperiod_range() {
+    NumericVector result(3);
+    result[0] = first;
+    result[1] = last;
+    result[2] = freq;
+    result.attr("class") = "regperiod_range";
+    return (result);
+}
+
 // Returns the period range based on the tsp attribute of a timeseries
 PeriodRange get_period_range(const NumericVector &tsp) {
     PeriodRange per;
@@ -23,19 +49,6 @@ PeriodRange get_period_range(const NumericMatrix &ts) {
     return get_period_range(tsp);
 }
 
-PeriodRange modify_frequency(PeriodRange old_range, int new_freq) {
-    if ((int) new_freq % (int) old_range.freq != 0) {
-        Rf_error("Frequency of regperiod_range is no divisor of the "
-                "required frequency");
-    }
-    int factor = new_freq / old_range.freq;
-    PeriodRange new_range;
-    new_range.first = round(old_range.first * factor);
-    new_range.last  = round((old_range.last + 1) * factor - 1);
-    new_range.freq = new_freq;
-    return new_range;
-}
-
 //' Returns the \link{regperiod_range} of a timeseries.
 //'
 //' @param x a timeseries (\link{ts} or \link{regts})
@@ -47,16 +60,7 @@ NumericVector get_regperiod_range(const SEXP &ts) {
         Rf_error("Argument is not a timeseries");
     }
     SEXP attr = Rf_getAttrib(ts, Rf_install("tsp"));
-    if (Rf_isNull(attr)) {
-        Rcpp::Rcout << "geen tsp-attribuut" << std::endl;
-    }
     NumericVector tsp(attr);
     PeriodRange range = get_period_range(tsp);
-
-    NumericVector result(3);
-    result[0] = range.first;
-    result[1] = range.last;
-    result[2] = range.freq;
-    result.attr("class") = "regperiod_range";
-    return (result);
+    return range.get_regperiod_range();
 }
