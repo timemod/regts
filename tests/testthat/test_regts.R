@@ -60,23 +60,23 @@ test_that("period selection in univariate timeseries", {
 
     regts2 <- regts1["2010Q2/2011Q3"]
     expect_is(regts2, "regts")
-    expect_equal(regts2,
+    expect_identical(regts2,
                      as.regts(window(ts1, start = c(2010,2), end = c(2011,3))))
 
     regts2 <- regts1["2008/2012"]
     expect_is(regts2, "regts")
-    expect_equal(regts2,
+    expect_identical(regts2,
                      as.regts(window(ts1, start = c(2008,1), end = c(2012,4),
                                      extend = TRUE)))
 
     regts2 <- regts1["2008/"]
     expect_is(regts2, "regts")
-    expect_equal(regts2,
+    expect_identical(regts2,
                      as.regts(window(ts1, start = c(2008,1), extend = TRUE)))
 
     regts2 <- regts1["/2011Q2"]
     expect_is(regts2, "regts")
-    expect_equal(regts2,
+    expect_identical(regts2,
                      as.regts(window(ts1, end = c(2011,2), extend = TRUE)))
 
     expect_identical(regts1[3], ts1[3])
@@ -94,16 +94,16 @@ test_that("period / column selection in multivariate timeseries", {
 
     expect_identical(regts1[, c("b", "a")], as.regts(ts1[, c("b", "a")]))
 
-    expect_equal(regts1['2011Q1', "c"], as.regts(
+    expect_identical(regts1['2011Q1', "c"], as.regts(
         window(ts1, start = c(2011,1), end = c(2011,1)))[, "c"])
 
-    expect_equal(regts1['2011Q1', c("b", "a")], as.regts(
+    expect_identical(regts1['2011Q1', c("b", "a")], as.regts(
         window(ts1, start = c(2011,1), end = c(2011,1)))[, c("b", "a")])
 
-    expect_equal(regts1['2011'], as.regts(
+    expect_identical(regts1['2011'], as.regts(
         window(ts1, start = c(2011,1), end = c(2011,4), extend = TRUE)))
 
-    expect_equal(regts1['2011Q1', c("a", "b")], as.regts(
+    expect_identical(regts1['2011Q1', c("a", "b")], as.regts(
         window(ts1, start = c(2011,1), end = c(2011,1), extend = TRUE)[, c("a", "b"), drop = FALSE]))
 })
 

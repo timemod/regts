@@ -53,15 +53,15 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// window_numregts
-List window_numregts(const NumericMatrix ts_old, const NumericVector selector);
-RcppExport SEXP regts_window_numregts(SEXP ts_oldSEXP, SEXP selectorSEXP) {
+// select_rows
+List select_rows(const SEXP ts_old, const NumericVector selector);
+RcppExport SEXP regts_select_rows(SEXP ts_oldSEXP, SEXP selectorSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< const NumericMatrix >::type ts_old(ts_oldSEXP);
+    Rcpp::traits::input_parameter< const SEXP >::type ts_old(ts_oldSEXP);
     Rcpp::traits::input_parameter< const NumericVector >::type selector(selectorSEXP);
-    __result = Rcpp::wrap(window_numregts(ts_old, selector));
+    __result = Rcpp::wrap(select_rows(ts_old, selector));
     return __result;
 END_RCPP
 }

@@ -7,10 +7,11 @@ ts1 <- as.ts(regts1)
 
 p1 <- as.regperiod_range("2010Q4/2011Q1")
 
-commands <- c("window(ts1, start = c(2010, 4), end = c(2011, 1))",
+commands <- c("window(ts1, start = c(2010, 4), end = c(2011, 1), extend = FALSE)",
+              "window(ts1, start = c(2010, 4), end = c(2011, 1), extend = TRUE)",
               "window(regts1, start = c(2010, 4), end = c(2011, 1))",
               "regts:::window_regts(regts1, p1)",
-              "regts:::window_numregts(regts1, p1)",
+              "regts:::select_rows(regts1, p1)",
               "regts1[p1, ]"
 )
 

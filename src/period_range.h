@@ -11,4 +11,5 @@ public:
 };
 
 PeriodRange get_period_range(const Rcpp::NumericMatrix &ts);
+PeriodRange get_period_range(const SEXP &ts);
 PeriodRange modify_frequency(PeriodRange period_range, int new_freq);

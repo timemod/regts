@@ -49,6 +49,14 @@ PeriodRange get_period_range(const NumericMatrix &ts) {
     return get_period_range(tsp);
 }
 
+// Returns the PeriodRange of a numerical timeseries.
+PeriodRange get_period_range(const SEXP &ts) {
+    SEXP attr = Rf_getAttrib(ts, Rf_install("tsp"));
+    NumericVector tsp(attr);
+    return get_period_range(tsp);
+}
+
+
 //' Returns the \link{regperiod_range} of a timeseries.
 //'
 //' @param x a timeseries (\link{ts} or \link{regts})

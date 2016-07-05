@@ -22,8 +22,8 @@ get_regperiod_range <- function(ts) {
     .Call('regts_get_regperiod_range', PACKAGE = 'regts', ts)
 }
 
-window_numregts <- function(ts_old, selector) {
-    .Call('regts_window_numregts', PACKAGE = 'regts', ts_old, selector)
+select_rows <- function(ts_old, selector) {
+    .Call('regts_select_rows', PACKAGE = 'regts', ts_old, selector)
 }
 
 convert_range_selector <- function(selector, ts_range) {
