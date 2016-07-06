@@ -5,12 +5,13 @@
 #' dataframe using the function \link{label}. of package \code{Hmisc}.
 #' @param x a \code{regts}
 #' @return A \code{data.frame}
+#' @importFrom Hmisc label<-
 #' @export
 #' @examples
 #' ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),
 #'            labels = c("Timeseries a", "Timeseries b"))
 #' print(as.data.frame(ts))
-as.data.frame.regts <- function(x) {
+as.data.frame.regts <- function(x, ...) {
 
     # convert the time index to a character vector with period texts
     first_period <- start_period.ts(x)
@@ -24,7 +25,7 @@ as.data.frame.regts <- function(x) {
     # handle labels
     lbls <- ts_labels(x)
     if (!is.null(lbls)) {
-        Hmisc::label(ret, self = FALSE) <- lbls
+        label(ret, self = FALSE) <- lbls
     }
     return(ret)
 }

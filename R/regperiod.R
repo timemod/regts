@@ -32,14 +32,14 @@ is.regperiod <- function(x) {
 
 # binary operators (arithmetic and logical)
 #' @export
-Ops.regperiod <- function(x, y) {
+Ops.regperiod <- function(e1, e2) {
     if (.Generic %in% c("==", "!=", "<", ">", "<=", ">=")) {
-        if (!(is.regperiod(x) & is.regperiod(y))) {
+        if (!(is.regperiod(e1) & is.regperiod(e2))) {
             stop("Illegal logical operation")
         }
-        if (attr(x, 'frequency') != attr(y, 'frequency')) {
-            if (operator %in% c("==", "!=")) {
-                return (operator == "==")
+        if (attr(e1, 'frequency') != attr(e2, 'frequency')) {
+            if (.Generic %in% c("==", "!=")) {
+                return (.Generic == "==")
             } else {
                 stop("Illegal operation")
             }
@@ -50,18 +50,15 @@ Ops.regperiod <- function(x, y) {
         # (adding to regperiods, subtracting two regperiods with
         # different frequencies etc.)
         retval <- NextMethod(.Generic)
-        if (.Generic == "-" & is.regperiod(y)) {
+        if (.Generic == "-" & is.regperiod(e2)) {
             retval <- as.numeric(retval)
         }
         return(retval)
     }
 }
 
-#' Convert an \code{regperiod} to a character representation
-#'
-#' param x the \code{regperiod} object to be converted
 #' @export
-as.character.regperiod <- function(x) {
+as.character.regperiod <- function(x, ...) {
     freq <- frequency(x)
     if (freq == 1) {
         return (as.character(as.numeric(x)))
@@ -80,9 +77,10 @@ as.character.regperiod <- function(x) {
 #' Returns the frequency of a \link{regperiod} object
 #'
 #' @param x a \code{regperiod}
-#' @return the frequency of the period
+#' @param ... additional arguments for future methods
+#' @return the frequency of the \code{regperiod}
 #' @export
-frequency.regperiod <- function(x) {
+frequency.regperiod <- function(x, ...) {
     return (attr(x, "frequency"))
 }
 
@@ -97,7 +95,7 @@ get_subperiod <- function(x) {
 }
 
 #' @export
-print.regperiod <- function(x) {
+print.regperiod <- function(x, ...) {
     print(as.character(x))
 }
 

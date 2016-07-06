@@ -4,13 +4,15 @@
 \alias{frequency.regperiod}
 \title{Returns the frequency of a \link{regperiod} object}
 \usage{
-\method{frequency}{regperiod}(x)
+\method{frequency}{regperiod}(x, ...)
 }
 \arguments{
 \item{x}{a \code{regperiod}}
+
+\item{...}{additional arguments for future methods}
 }
 \value{
-the frequency of the period
+the frequency of the \code{regperiod}
 }
 \description{
 Returns the frequency of a \link{regperiod} object

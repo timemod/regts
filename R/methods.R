@@ -74,8 +74,7 @@ handle_labels <- function(x, ...) {
     return(x)
 }
 
-#' regts.union
-#'
+#' @importFrom stats ts.union
 #' @export
 regts.union <- function(...) {
     ret <- as.regts(ts.union(...))
@@ -83,7 +82,7 @@ regts.union <- function(...) {
     return (ret)
 }
 
-#' regts.intersect
+#' @importFrom stats ts.intersect
 #' @export
 regts.intersect <- function(...) {
     ret <- as.regts(ts.intersect(...))
@@ -97,6 +96,6 @@ cbind.regts <- function(...) {
 }
 
 #' @export
-Ops.regts <- function(x, y) {
+Ops.regts <- function(e1, e2) {
     return (as.regts(NextMethod(.Generic)))
 }

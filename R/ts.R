@@ -4,7 +4,7 @@
 #' @return a \code{ts}
 #' @importFrom stats as.ts
 #' @export
-as.ts.regts <- function(x) {
+as.ts.regts <- function(x, ...) {
     class(x) <- class(x)[-1]
     return (x)
 }

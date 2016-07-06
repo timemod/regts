@@ -9,7 +9,7 @@
 \usage{
 as.regts(x, ...)
 
-\method{as.regts}{ts}(x)
+\method{as.regts}{ts}(x, ...)
 
 \method{as.regts}{data.frame}(x, time_column = 0, fun = regperiod, ...)
 

@@ -4,7 +4,7 @@
 \alias{as.data.frame.regts}
 \title{Converts a \link{regts} to a \link{data.frame}}
 \usage{
-\method{as.data.frame}{regts}(x)
+\method{as.data.frame}{regts}(x, ...)
 }
 \arguments{
 \item{x}{a \code{regts}}

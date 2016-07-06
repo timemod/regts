@@ -4,7 +4,7 @@
 \alias{as.ts.regts}
 \title{Convert a \link{regts} to a normal \link{ts}}
 \usage{
-\method{as.ts}{regts}(x)
+\method{as.ts}{regts}(x, ...)
 }
 \arguments{
 \item{x}{a \code{regts}}

@@ -112,7 +112,7 @@ as.regperiod_range.character <- function(x, frequency = NA, ...) {
 }
 
 #' @export
-as.character.regperiod_range <- function(x) {
+as.character.regperiod_range <- function(x, ...) {
     if (!is.na(x[1])) {
         retval <- as.character.regperiod(start_period(x))
     } else {
@@ -143,7 +143,7 @@ lensub  <- function(x) {
 }
 
 #' @export
-print.regperiod_range <- function(x) {
+print.regperiod_range <- function(x, ...) {
     print(as.character(x))
 }
 
