@@ -2,7 +2,7 @@
 #' \code{\link{regperiod_range}}
 #'
 #' This function returns the start or end period of a
-#' timeseries object (a \code{\link{regts}} or \code{\link[stats]{ts]}}))
+#' timeseries object (a \code{\link{regts}} or \code{\link[stats]{ts}}))
 #' or a \code{regperiod_range}.
 #' @param x  a \code{regts} or \code{regperiod_range} object
 #' @return A \code{regperiod} object representing the first or last period of the

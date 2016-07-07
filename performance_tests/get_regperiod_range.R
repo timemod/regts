@@ -1,6 +1,8 @@
 # test the performance of get_regperiod_range and a number of alternatives.
-library(microbenchmark)
 library(regts)
+source("performance_tests/time_commands.R")
+
+regts1 <- regts(as.numeric(1:30), start = "2010Q2")
 
 get_regperiod_range_alt1 <- function(x) {
     if (!inherits(x, 'ts')) {
@@ -26,14 +28,9 @@ get_regperiod_range_alt2 <- function(x) {
     return (structure(c(first, last, frequency), class = "regperiod_range"))
 }
 
-commands <- c("get_regperiod_range(ts)",
-              "get_regperiod_range_alt1(ts)",
-              "get_regperiod_range_alt2(ts)"
+commands <- c("get_regperiod_range(regts1)",
+              "get_regperiod_range_alt1(regts1)",
+              "get_regperiod_range_alt2(regts1)"
 )
 
-parsed_commands <- lapply(commands, FUN = function(x) parse(text = x))
-result <- lapply(parsed_commands, FUN = function(x) summary(microbenchmark(eval(x)),
-                                                            unit = "us"))
-result <- do.call(rbind, result)
-result <- data.frame(commands, mean = result$mean)
-print(result)
+print(time_commands(commands))

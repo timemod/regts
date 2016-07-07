@@ -1,6 +1,5 @@
-# test the performance of the function regts, create_regts and an alternative
-library(microbenchmark)
 library(regts)
+source("performance_tests/time_commands.R")
 
 convert_range_selector_alt <- function(range, ts_range) {
 
@@ -44,9 +43,4 @@ commands <- c("regts:::convert_range_selector(p1, ts_range)",
               "convert_range_selector_alt(p1, ts_range)"
 )
 
-parsed_commands <- lapply(commands, FUN = function(x) parse(text = x))
-result <- lapply(parsed_commands, FUN = function(x) summary(microbenchmark(eval(x)),
-                                                            unit = "us"))
-result <- do.call(rbind, result)
-result <- data.frame(commands, mean = result$mean)
-print(result)
+print(time_commands(commands))

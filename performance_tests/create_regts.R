@@ -1,6 +1,7 @@
 # test the performance of the function regts, create_regts and an alternative
 library(microbenchmark)
 library(regts)
+source("performance_tests/time_commands.R")
 
 p1 <- regperiod("2010Q2")
 data <- matrix(1:10, ncol = 2)
@@ -14,9 +15,5 @@ commands <- c("ts(data, start = c(2010, 2), frequency = 4)",
               "regts:::create_regts(data, as.numeric(p1), NULL, range[3], NULL)"
 
 )
-parsed_commands <- lapply(commands, FUN = function(x) parse(text = x))
-result <- lapply(parsed_commands, FUN = function(x) summary(microbenchmark(eval(x)),
-                                                            unit = "us"))
-result <- do.call(rbind, result)
-result <- data.frame(commands, mean = result$mean)
-print(result)
+
+print(time_commands(commands))
