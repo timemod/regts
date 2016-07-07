@@ -22,7 +22,7 @@
     #include <string>
     #include <cstring>
     #include <math.h>
-    #include "period_scanner.hpp"
+    #include "period_scanner.h"
     #include "parse_period.h"
     using Rcpp::NumericVector;
     static int year, subperiod;

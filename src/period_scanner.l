@@ -7,9 +7,9 @@
 #include <string>
 #include <algorithm>
 
-#include "period_scanner.hpp"
-#include "period_parser.hpp"
-#include "months.hpp"
+#include "period_scanner.h"
+#include "period_parser.h"
+#include "months.h"
 
 static int get_frequency(const char *c);
 

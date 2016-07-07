@@ -77,7 +77,7 @@
     #include <string>
     #include <cstring>
     #include <math.h>
-    #include "period_scanner.hpp"
+    #include "period_scanner.h"
     #include "parse_period.h"
     using Rcpp::NumericVector;
     static int year, subperiod;
@@ -104,9 +104,9 @@
 #endif
 
 /* In a future release of Bison, this section will be replaced
-   by #include "period_parser.hpp".  */
-#ifndef YY_PR_PERIOD_PARSER_HPP_INCLUDED
-# define YY_PR_PERIOD_PARSER_HPP_INCLUDED
+   by #include "period_parser.h".  */
+#ifndef YY_PR_PERIOD_PARSER_H_INCLUDED
+# define YY_PR_PERIOD_PARSER_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -148,7 +148,7 @@ extern YYSTYPE prlval;
 
 int prparse (void);
 
-#endif /* !YY_PR_PERIOD_PARSER_HPP_INCLUDED  */
+#endif /* !YY_PR_PERIOD_PARSER_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
