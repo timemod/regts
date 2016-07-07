@@ -34,26 +34,33 @@ is.regperiod <- function(x) {
 #' @export
 Ops.regperiod <- function(e1, e2) {
     if (.Generic %in% c("==", "!=", "<", ">", "<=", ">=")) {
-        if (!(is.regperiod(e1) & is.regperiod(e2))) {
-            stop("Illegal logical operation")
-        }
-        if (attr(e1, 'frequency') != attr(e2, 'frequency')) {
+        # logical operator
+        if (is.regperiod(e1) & is.regperiod(e2) &
+            (attr(e1, 'frequency') != attr(e2, 'frequency'))) {
+            # if e1 and e2 are both regperiods with a different frequency,
+            # the the operators == and != are meaningful, but comparison
+            # operators such as > do not make sense.
             if (.Generic %in% c("==", "!=")) {
                 return (.Generic == "==")
             } else {
-                stop("Illegal operation")
+                stop("Illegal binary logical operation")
             }
         }
         return (NextMethod(.Generic))
     } else {
-        # TODO: error handling. Prevent strange results
-        # (adding to regperiods, subtracting two regperiods with
-        # different frequencies etc.)
+        # arithmetic operator
         retval <- NextMethod(.Generic)
-        if (.Generic == "-" & is.regperiod(e2)) {
+        if (is.regperiod(e2)) {
+            if (attr(e1, 'frequency') != attr(e2, 'frequency')) {
+                stop(paste("Arithmetic operations on regperiods with different",
+                           "frequencies are not allowed"))
+            }
+            # if the second operand is also a regperiod, then the result an
+            # ordinary number.
             retval <- as.numeric(retval)
         }
-        return(retval)
+        # the return value should always be an integer
+        return (floor(retval))
     }
 }
 
