@@ -31,8 +31,9 @@ test_that("as.regperiod_range.character", {
     expect_error(as.regperiod_range("2001/2014Q4"),
                  "The two periods have different frequency")
     expect_error(as.character(as.regperiod_range("2010Q4/2010Q2")),
-                 "The start period (2010Q4) is after the end period (2010Q2)")
+        "The start period \\(2010Q4\\) is after the end period \\(2010Q2\\)")
 })
+
 
 test_that("start_period and end_period", {
     r <- regperiod_range("2010Q4", "2011Q3")
