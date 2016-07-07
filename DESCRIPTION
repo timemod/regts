@@ -1,6 +1,6 @@
 Package: regts
 Type: Package
-Title: Regular timeseries.
+Title: Regular timeseries
 Version: 0.1
 Date: 2016-01-26
 Authors@R: c(

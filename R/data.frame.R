@@ -1,9 +1,11 @@
-#' Converts a \link{regts} to a \link{data.frame}
+#' Converts a \code{\link{regts}} to a \code{\link{data.frame}}
 #'
 #' @details
 #' If the \code{regts} has labels, then the labels are added to the result
-#' dataframe using the function \link{label}. of package \code{Hmisc}.
+#' dataframe using the function \code{\link[Hmisc]{label}}
+#' of package \code{Hmisc}.
 #' @param x a \code{regts}
+#' @param ... additional arguments to be passed to methods.
 #' @return A \code{data.frame}
 #' @importFrom Hmisc label<-
 #' @export

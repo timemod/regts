@@ -10,7 +10,7 @@ ts_labels(x)
 ts_labels(x) <- value
 }
 \arguments{
-\item{x}{a \link{regts}}
+\item{x}{a \code{\link{regts}}}
 
 \item{value}{a character vector with the labels or \code{NULL}. The length
 should be equal to the number of columns. Specify \code{NULL} to remove all
@@ -37,6 +37,6 @@ print(ts_labels(ts))
 print(as.data.frame(ts_labels(ts)))
 }
 \seealso{
-\link{regts}, \link{update_ts_labels}
+\code{\link{regts}}, \code{\link{update_ts_labels}}
 }
 

@@ -5,7 +5,7 @@
 \alias{as.regts.data.frame}
 \alias{as.regts.default}
 \alias{as.regts.ts}
-\title{Coerce an object to a \link{regts} timeseries object}
+\title{Coerce an object to a \code{\link{regts}} timeseries object}
 \usage{
 as.regts(x, ...)
 
@@ -25,22 +25,25 @@ in which the time is stored. Specify \code{0} if the index is in the row names
 of the data frame}
 
 \item{fun}{a function for converting values in the time column to
-\link{regperiod} objects}
+\code{\link{regperiod}} objects}
 }
 \value{
-a \link{regts} object
+a \code{regts} object
 }
 \description{
-Coerce an object to a \link{regts} timeseries object
+Coerce an object to a \code{\link{regts}} timeseries object
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{ts}: Coerce a \link{ts} to a \link{regts}
+\item \code{ts}: Coerce a \code{\link[stats]{ts}} to a
+\code{\link{regts}}
 
-\item \code{data.frame}: Convert a \link{data.frame} to a \link{regts}
+\item \code{data.frame}: Convert a \code{\link{data.frame}} to a
+\code{\link{regts}}
 
-\item \code{default}: Default method to convert an R object to a \link{regts}.
-This method first employs \link{as.ts} and then \link{as.regts.ts}
+\item \code{default}: Default method to convert an R object to a
+\code{\link{regts}}. This method first employs \code{\link[stats]{as.ts}}
+and then \code{\link{as.regts.ts}}
 }}
 \examples{
 # convert a ts to regts
@@ -61,7 +64,8 @@ df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
 ts <- as.regts(df, time_column = 1, frequency = 4)
 }
 \seealso{
-\link{regts}, \link{is.regts}, \link{as.data.frame.regts},
-\link{as.list.regts}, \link{start_period}, \link{end_period}
+\code{\link{regts}}, \code{\link{is.regts}},
+\code{\link{as.data.frame.regts}},
+\code{\link{as.list.regts}}, \code{\link{start_period}}, \code{\link{end_period}}
 }
 

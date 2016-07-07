@@ -7,7 +7,7 @@
 update_ts_labels(x, labels)
 }
 \arguments{
-\item{x}{a \link{regts} object}
+\item{x}{a \code{\link{regts}} object}
 
 \item{labels}{a named list. The names are the column names
 and the values are the labels. Specify \code{NULL} to remove all labels.}
@@ -17,12 +17,12 @@ Update one or more timeseries labels in a \code{regts} object
 }
 \examples{
 ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"),
-             labels <- c("Timeseries a", "???"))
+             labels = c("Timeseries a", "???"))
 ts <-update_ts_labels(ts, list(b = "Timeseries b"))
 print(ts_labels(ts))
 
 }
 \seealso{
-\link{ts_labels}
+\code{\link{ts_labels}}
 }
 

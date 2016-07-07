@@ -43,13 +43,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // get_regperiod_range
-NumericVector get_regperiod_range(const SEXP& ts);
-RcppExport SEXP regts_get_regperiod_range(SEXP tsSEXP) {
+NumericVector get_regperiod_range(const SEXP& x);
+RcppExport SEXP regts_get_regperiod_range(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< const SEXP& >::type ts(tsSEXP);
-    __result = Rcpp::wrap(get_regperiod_range(ts));
+    Rcpp::traits::input_parameter< const SEXP& >::type x(xSEXP);
+    __result = Rcpp::wrap(get_regperiod_range(x));
     return __result;
 END_RCPP
 }

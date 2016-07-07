@@ -2,7 +2,7 @@
 % Please edit documentation in R/transpose_df.R
 \name{transpose_df}
 \alias{transpose_df}
-\title{Transpose a \link{data.frame}}
+\title{Transpose a \code{\link{data.frame}}}
 \usage{
 transpose_df(x, colname_column, label_column)
 }
@@ -23,14 +23,15 @@ the transposed data frame
 }
 \description{
 The function transposes a data frame. If the data frame contains
-labels that has been set by the function \link{label} of the
+labels that has been set by the function \code{\link[Hmisc]{label}} of the
 package \code{Hmisc}, then the first column of the returned data frame will
 contain the labels. Conversely, you can specify the column that will become
 the labels of the transposed data frame.
 }
 \examples{
-df <- data.frame(variables = c("a", "b"), labels = c("Variabele a",
-                 "Variable c"), x = 1:3, y = 10:12)
+df <- data.frame(variables = c("a", "b"),
+                 labels = c("Variabele a", "Variable b"),
+                 x = 1:2, y = 10:11)
 df_t <- transpose_df(df, colname_column = 1, label_column = 2)
 print(df_t)
 print(transpose_df(df_t))

@@ -1,4 +1,4 @@
-#' Create a regperiod object based on a string.
+#' Create a \code{regperiod} object based on a string.
 #'
 #' Possible string formats are for example \code{"2010Q2"},
 #' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.

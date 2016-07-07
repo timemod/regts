@@ -8,14 +8,15 @@
 #'\code{NA}). Two \code{NA} values are considered to be equal.
 #'
 #' @export
-#' @param x1 the first timeseries (a \link{regts} or \link{ts} object).
-#' @param x2 the second timeseries (a \link{regts} or \link{ts} object).
+#' @param x1 the first timeseries (a \code{\link{regts}} or
+#'            \code{\link[stats]{ts}} object).
+#' @param x2 the second timeseries (a \code{regts} or \code{ts} object).
 #' @param tol difference tolerance (by default zero). Differences smaller
 #' than tol are ignored.
 #' @param fun function to compute differences. This function should accept
 #' two arguments (two numbers) for which the difference is computed.
 #' By default the absolute difference is computed. A useful function for
-#' computing difference is \link{cvgdif}, which computes relative differences
+#' computing difference is \code{\link{cvgdif}}, which computes relative differences
 #' if the absolute value of \code{x2} is larger than 1.
 #' @return a list with the following components
 #'  \item{tol}{The tolerance parameter}
@@ -29,7 +30,7 @@
 #'              and if all differences are smaller than or equal to \code{tol}}
 #'  \item{difnames}{The names of the common columns with differences
 #'                   larger than \code{tol}}
-#'  \item{dif}{A \link{regts} with the computed differences for the common columns with
+#'  \item{dif}{A \code{\link{regts}} with the computed differences for the common columns with
 #'             differences larger than \code{tol}, or \code{NULL} if there
 #'             are no differences}
 #' @examples
@@ -54,7 +55,7 @@
 #'print(dif3$difnames)
 #'
 #'@seealso
-#'\link{regts}
+#'\code{\link{regts}}
 #'
 tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
 
@@ -142,7 +143,7 @@ calculate_difference <- function(common_names, x1, x2, tol, fun) {
 #' Calculates the 'convergence difference'
 #'
 #' \code{cvgdif} calculates the difference  between two numbers
-#' \code{x1} and \code{x2} according to \code{|x_1 - x_2| / max(|x_2|, 1)}.
+#' \eqn{x_1} and \eqn{x_2} according to \eqn{\frac{|x_1 - x_2|}{\max(|x_2|, 1)}}.
 #' This difference is equivalent to the convergence test employed in the
 #' package \code{macromod}.
 #' @param x1 first number

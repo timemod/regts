@@ -2,7 +2,7 @@
 % Please edit documentation in R/regperiod_range.R
 \name{lensub}
 \alias{lensub}
-\title{Returns the number of subperiods in a \link{regperiod_range} object.}
+\title{Returns the number of subperiods in a \code{\link{regperiod_range}} object.}
 \usage{
 lensub(x)
 }
@@ -14,6 +14,6 @@ The number of subperiods in the range, or \code{Inf} is the
 range is not bounded
 }
 \description{
-Returns the number of subperiods in a \link{regperiod_range} object.
+Returns the number of subperiods in a \code{\link{regperiod_range}} object.
 }
 

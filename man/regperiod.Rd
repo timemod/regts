@@ -2,7 +2,7 @@
 % Please edit documentation in R/regperiod.R
 \name{regperiod}
 \alias{regperiod}
-\title{Create a regperiod object based on a string.}
+\title{Create a \code{regperiod} object based on a string.}
 \usage{
 regperiod(x, frequency = NA)
 }

@@ -7,12 +7,12 @@
 regperiod_range(p1, p2 = p1, frequency = NA)
 }
 \arguments{
-\item{p1}{the first period (a \link{regperiod}, a character string
-that can be converted to a \link{regperiod}, or \code{NULL}). If \code{p1}
+\item{p1}{the first period (a \code{regperiod}, a character string
+that can be converted to a \code{regperiod}, or \code{NULL}). If \code{p1}
 is \code{NULL}, the lower bound of the period range is undetermined.}
 
-\item{p2}{the last period (a \link{regperiod}, a character string
-that can be converted to a \link{regperiod}). If \code{p2} is
+\item{p2}{the last period (a \code{regperiod}, a character string
+that can be converted to a \code{regperiod}). If \code{p2} is
 \code{NULL}, the upper bound of the period range is undetermined.}
 
 \item{frequency}{frequency of the regperiod objects. This argument is mandatory
@@ -23,10 +23,11 @@ without frequency indicator (e.g. \code{"2011-1"})}
 a \code{regperiod_range} object
 }
 \description{
-Create a \code{regperiod_range} object from two \link{regperiod} objects
-or character strings that can be converted to \link{regperiod} objects with
-function \link{as.regperiod}. The \code{regperiod_range} object is used to represent an interval
-of \link{regperiod},  for example, a period from \code{2012Q2} to \code{2016Q4}.
+Create a \code{regperiod_range} object from two \code{\link{regperiod}} objects
+or character strings that can be converted to \code{regperiod} objects with
+function \code{\link{as.regperiod}}. The \code{regperiod_range} object is used to
+represent an interval of \code{regperiod},  for example, a period from
+\code{"2012Q2"} to \code{"2016Q4"}.
 }
 \examples{
 # create a regperiod_range from 2010Q2 to 2016Q3
@@ -43,6 +44,7 @@ regperiod_range("2010Q2", NULL)
 regperiod_range("2010-2", "2016-2", frequency = 2)
 }
 \seealso{
-\link{lensub}, \link{start_period}, \link{end_period}
+\code{\link{lensub}}, \code{\link{start_period}},
+\code{\link{end_period}}
 }
 

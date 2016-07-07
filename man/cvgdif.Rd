@@ -16,7 +16,7 @@ the 'convergence difference' as described above
 }
 \description{
 \code{cvgdif} calculates the difference  between two numbers
-\code{x1} and \code{x2} according to \code{|x_1 - x_2| / max(|x_2|, 1)}.
+\eqn{x_1} and \eqn{x_2} according to \eqn{\frac{|x_1 - x_2|}{\max(|x_2|, 1)}}.
 This difference is equivalent to the convergence test employed in the
 package \code{macromod}.
 }

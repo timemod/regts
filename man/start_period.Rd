@@ -6,7 +6,8 @@
 \alias{start_period}
 \alias{start_period.regperiod_range}
 \alias{start_period.ts}
-\title{Returns the start period of a \link{regts} or a \link{regperiod_range}}
+\title{Returns the start period of a \code{\link{regts}} or a
+\code{\link{regperiod_range}}}
 \usage{
 start_period(x)
 
@@ -19,7 +20,7 @@ start_period(x)
 \method{end_period}{ts}(x)
 }
 \arguments{
-\item{x}{a \link{regts} or \link{regperiod_range} object}
+\item{x}{a \code{regts} or \code{regperiod_range} object}
 }
 \value{
 a \link{regperiod} object representing the first period of the
@@ -27,7 +28,8 @@ range. The return value can be \code{NULL} if argument \code{x} is a
 \code{regperiod_range} with no lower boundary.
 }
 \description{
-Returns the start period of a \link{regts} or a \link{regperiod_range}
+Returns the start period of a \code{\link{regts}} or a
+\code{\link{regperiod_range}}
 }
 \section{Methods (by class)}{
 \itemize{

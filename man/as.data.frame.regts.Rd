@@ -2,22 +2,25 @@
 % Please edit documentation in R/data.frame.R
 \name{as.data.frame.regts}
 \alias{as.data.frame.regts}
-\title{Converts a \link{regts} to a \link{data.frame}}
+\title{Converts a \code{\link{regts}} to a \code{\link{data.frame}}}
 \usage{
 \method{as.data.frame}{regts}(x, ...)
 }
 \arguments{
 \item{x}{a \code{regts}}
+
+\item{...}{additional arguments to be passed to methods.}
 }
 \value{
 A \code{data.frame}
 }
 \description{
-Converts a \link{regts} to a \link{data.frame}
+Converts a \code{\link{regts}} to a \code{\link{data.frame}}
 }
 \details{
 If the \code{regts} has labels, then the labels are added to the result
-dataframe using the function \link{label}. of package \code{Hmisc}.
+dataframe using the function \code{\link[Hmisc]{label}}
+of package \code{Hmisc}.
 }
 \examples{
 ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),

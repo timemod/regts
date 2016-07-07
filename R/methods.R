@@ -74,22 +74,43 @@ handle_labels <- function(x, ...) {
     return(x)
 }
 
-#' @importFrom stats ts.union
-#' @export
-regts.union <- function(...) {
-    ret <- as.regts(ts.union(...))
-    ret <- handle_labels(ret, ...)
-    return (ret)
-}
-
+#' Bind Two or More Timeseries
+#'
+#' Bind time series which have a common frequency using the methods
+#' \code{\link[stats]{ts.intersect}} and \code{\link[stats]{ts.union}} of the
+#' \code{stats} package. The implementation for \code{regts} converts the value
+#' returned by \code{ts.intersect} and \code{ts.union}
+#' to a \code{regts} and also takes care of the timeseries labels
+#' (if present). The \code{cbind} methods for \code{regts} objects works
+#' as \code{regts.intersect}, except that the argument \code{dframe} is
+#' not used.
 #' @importFrom stats ts.intersect
+#' @importFrom stats ts.union
+#' @param  ... two or more univariate or multivariate time series,
+#' or objects which can coerced to time series
+#' @param dframe logical if \code{TRUE} return the result as a data frame
+#' @return  A \code{regts} timeseries object is \code{dframe} is
+#' \code{FALSE}, otherwise a data frame.
 #' @export
-regts.intersect <- function(...) {
-    ret <- as.regts(ts.intersect(...))
-    ret <- handle_labels(ret, ...)
+regts.intersect <- function(..., dframe = FALSE) {
+    ret <- ts.intersect(..., dframe = dframe)
+    if (!dframe) {
+        ret <- handle_labels(as.regts(ret), ...)
+    }
     return (ret)
 }
 
+#' @rdname regts.intersect
+#' @export
+regts.union <- function(..., dframe = FALSE) {
+    ret <- ts.union(..., dframe = dframe)
+    if (!dframe) {
+        ret <- handle_labels(as.regts(ret), ...)
+    }
+    return (ret)
+}
+
+#' @rdname regts.intersect
 #' @export
 cbind.regts <- function(...) {
     return (regts.intersect(...))

@@ -7,9 +7,10 @@
 tsdif(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2))
 }
 \arguments{
-\item{x1}{the first timeseries (a \link{regts} or \link{ts} object).}
+\item{x1}{the first timeseries (a \code{\link{regts}} or
+\code{\link[stats]{ts}} object).}
 
-\item{x2}{the second timeseries (a \link{regts} or \link{ts} object).}
+\item{x2}{the second timeseries (a \code{regts} or \code{ts} object).}
 
 \item{tol}{difference tolerance (by default zero). Differences smaller
 than tol are ignored.}
@@ -17,7 +18,7 @@ than tol are ignored.}
 \item{fun}{function to compute differences. This function should accept
 two arguments (two numbers) for which the difference is computed.
 By default the absolute difference is computed. A useful function for
-computing difference is \link{cvgdif}, which computes relative differences
+computing difference is \code{\link{cvgdif}}, which computes relative differences
 if the absolute value of \code{x2} is larger than 1.}
 }
 \value{
@@ -33,7 +34,7 @@ a list with the following components
              and if all differences are smaller than or equal to \code{tol}}
  \item{difnames}{The names of the common columns with differences
                   larger than \code{tol}}
- \item{dif}{A \link{regts} with the computed differences for the common columns with
+ \item{dif}{A \code{\link{regts}} with the computed differences for the common columns with
             differences larger than \code{tol}, or \code{NULL} if there
             are no differences}
 }
@@ -68,6 +69,6 @@ print(dif3$difnames)
 
 }
 \seealso{
-\link{regts}
+\code{\link{regts}}
 }
 

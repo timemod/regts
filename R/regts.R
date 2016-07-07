@@ -1,16 +1,17 @@
 #' Create a \code{regts} timeseries object
 #'
-#' The \code{regts} class is an extension of the \link{ts} class of the \link{stats} package.
-#' Working with \code{regts} makes it easier to select periods. Another difference is
-#' related to the representation of univariate timeseries.  A \code{regts} object
-#' always has \link{colnames}, also for univariate timeseries. A univariate \code{ts} object
-#' only has column names when the input data was a one-dimensional matrix.
-#'
+#' The \code{regts} class is an extension of the \code{\link[stats]{ts}} class
+#' of the \link{stats} package. Working with \code{regts} makes it easier to
+#' select periods. Another difference is related to the representation of
+#' univariate timeseries.  A \code{regts} object always has
+#' \code{\link{colnames}}, also for univariate timeseries. A univariate
+#' \code{ts} object only has column names when the input data was a
+#' one-dimensional matrix.
 #'
 #' @param data a vector or matrix of the observed time-series values. A data frame will be
-#' coerced to a numeric matrix via \link{data.matrix}. (See also the description of the
-#' function \link{ts} of the \link{stats} package).
-#' @param start the starting period as a  \link{regperiod} object or a character string that can
+#' coerced to a numeric matrix via \code{\link{data.matrix}}. (See also the description of the
+#' function \code{\link[stats]{ts}} of the \code{\link{stats}} package).
+#' @param start the starting period as a  \code{\link{regperiod}} object or a character string that can
 #' be converted to a \code{regperiod} object
 #' @param end the end period as a  \link{regperiod} object or a character string that can
 #' be converted to a \code{regperiod} object. If not specified, then the end period is calculated
@@ -39,20 +40,22 @@
 #' # of the timeseries is smaller than the length of data (10).
 #' ts4 <- regts(1:10, start = "2010-1", end = '2011-2', frequency = 2)
 #' @seealso
-#' The function \link{is.regts} can be used to test if an object is a \code{regts}.
+#' The function \code{\link{is.regts}} can be used to test if an object is a
+#' \code{regts}.
 #'
-#' The S3 generic \link{as.regts} can be used to coerce an R object to a \code{regts}. There are currently
-#' methods for \link{ts} and \link{data.frame}.
+#' The S3 generic \code{\link{as.regts}} can be used to coerce an R object to a
+#'  \code{regts}. There are currently methods for \code{\link[stats]{ts}} and
+#'  \code{\link{data.frame}}.
 #'
-#' \link{as.data.frame.regts} and \link{as.list.regts} can be used
-#' to convert \code{regts} to a \link{data.frame} or a \link{list}.
+#' \code{\link{as.data.frame.regts}} and \code{\link{as.list.regts}} can be used
+#' to convert \code{regts} to a \code{\link{data.frame}} or a \code{\link{list}}.
 #'
 #' Information about the time period of the timeseries can be obtained
-#' with the functions \link{get_regperiod_range}, \link{start_period}
-#' and \link{end_period}.
+#' with the functions \code{\link{get_regperiod_range}},
+#' \code{\link{start_period}} and \code{\link{end_period}}.
 #'
 #' See also the description of the functions for handling labels
-#' (\link{ts_labels} and \link{update_ts_labels}).
+#' (\code{\link{ts_labels}} and \code{\link{update_ts_labels}}).
 #'
 #' @importFrom stats ts
 #' @importFrom stats frequency
@@ -125,29 +128,30 @@ insert_dim_attr <- function(x, names) {
     return(x)
 }
 
-#' Tests whether an object is a \link{regts} timeseries object
+#' Tests whether an object is a \code{\link{regts}} timeseries object
 #' @param x an arbitrary R object
-#' @return \code{TRUE} if \code{x} is a \link{regts}
+#' @return \code{TRUE} if \code{x} is a \code{regts}
 #' @seealso
-#' \link{regts} \link{as.regts}
+#' \code{\link{regts}} and  \code{\link{as.regts}}
 #' @export
 is.regts <- function(x) {
     return (inherits(x, "regts"))
 }
 
-#' Coerce an object to a \link{regts} timeseries object
+#' Coerce an object to a \code{\link{regts}} timeseries object
 #'
 #' @param x an arbitrary R object
 #' @param time_column the column names or numbers of the data frame
 #' in which the time is stored. Specify \code{0} if the index is in the row names
 #' of the data frame
 #' @param fun a function for converting values in the time column to
-#' \link{regperiod} objects
+#' \code{\link{regperiod}} objects
 #' @param ... arguments passed to \code{fun}
-#' @return a \link{regts} object
+#' @return a \code{regts} object
 #' @seealso
-#' \link{regts}, \link{is.regts}, \link{as.data.frame.regts},
-#' \link{as.list.regts}, \link{start_period}, \link{end_period}
+#' \code{\link{regts}}, \code{\link{is.regts}},
+#' \code{\link{as.data.frame.regts}},
+#' \code{\link{as.list.regts}}, \code{\link{start_period}}, \code{\link{end_period}}
 #' @examples
 #' # convert a ts to regts
 #' x <- ts(1:3, start = c(2015,3), frequency = 4)
@@ -171,7 +175,8 @@ as.regts <- function(x, ...) {
     UseMethod("as.regts")
 }
 
-#' @describeIn as.regts Coerce a \link{ts} to a \link{regts}
+#' @describeIn as.regts Coerce a \code{\link[stats]{ts}} to a
+#' \code{\link{regts}}
 #' @export
 as.regts.ts <- function(x, ...) {
     if (!is.regts(x)) {
@@ -185,7 +190,8 @@ as.regts.ts <- function(x, ...) {
     return (x)
 }
 
-#' @describeIn as.regts Convert a \link{data.frame} to a \link{regts}
+#' @describeIn as.regts Convert a \code{\link{data.frame}} to a
+#' \code{\link{regts}}
 #' @export
 as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
                                 ...) {
@@ -247,8 +253,9 @@ as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
     return (ret)
 }
 
-#' @describeIn as.regts Default method to convert an R object to a \link{regts}.
-#' This method first employs \link{as.ts} and then \link{as.regts.ts}
+#' @describeIn as.regts Default method to convert an R object to a
+#' \code{\link{regts}}. This method first employs \code{\link[stats]{as.ts}}
+#' and then \code{\link{as.regts.ts}}
 #' @export
 as.regts.default <- function(x, ...) {
     return (as.regts(as.ts(x, ...)))
@@ -256,8 +263,9 @@ as.regts.default <- function(x, ...) {
 
 # Add columns with names new_colnames to x, and fill with NA.
 add_columns <- function(x, new_colnames) {
-    new_columns <- regts(matrix(NA, nrow = nrow(x), ncol = length(new_colnames)),
-                         start = start_period.ts(x), frequency = frequency(x))
+    range <- get_regperiod_range(x)
+    data <- matrix(NA, nrow = nrow(x), ncol = length(new_colnames))
+    new_columns <- create_regts(data, range[1], range[2], range[3], NULL)
     old_colnames <- colnames(x)
     x <- regts.intersect(x, new_columns)
     colnames(x) <- c(old_colnames, new_colnames)
@@ -371,7 +379,7 @@ window_regts <- function(x, range) {
 #'can be used to give a description of the contents of the timeseries.
 #'The labels are stored in a named list: the names are the timeseries names
 #'(column names), and the values the correpsonding label.
-#'@param x a \link{regts}
+#'@param x a \code{\link{regts}}
 #'@param value a character vector with the labels or \code{NULL}. The length
 #'should be equal to the number of columns. Specify \code{NULL} to remove all
 #'labels.
@@ -384,7 +392,7 @@ window_regts <- function(x, range) {
 #' print(as.data.frame(ts_labels(ts)))
 #' @describeIn ts_labels Retrieve timeseries labels
 #' @seealso
-#' \link{regts}, \link{update_ts_labels}
+#' \code{\link{regts}}, \code{\link{update_ts_labels}}
 #' @export
 ts_labels <- function(x) {
     return (attr(x, "ts_labels"))
@@ -410,16 +418,16 @@ ts_labels <- function(x) {
 
 #' Update one or more timeseries labels in a \code{regts} object
 #'
-#' @param x a \link{regts} object
+#' @param x a \code{\link{regts}} object
 #' @param labels a named list. The names are the column names
 #' and the values are the labels. Specify \code{NULL} to remove all labels.
 #' @examples
 #' ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"),
-#'              labels <- c("Timeseries a", "???"))
+#'              labels = c("Timeseries a", "???"))
 #' ts <-update_ts_labels(ts, list(b = "Timeseries b"))
 #' print(ts_labels(ts))
 #'
-#' @seealso \link{ts_labels}
+#' @seealso \code{\link{ts_labels}}
 #' @export
 update_ts_labels <- function(x, labels) {
     if (is.null(labels)) {

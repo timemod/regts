@@ -63,11 +63,11 @@ PeriodRange get_period_range(const SEXP &ts) {
 //' @return a \code{regperiod_range}
 //' @export
 // [[Rcpp::export]]
-NumericVector get_regperiod_range(const SEXP &ts) {
-    if (!Rf_inherits(ts, "ts")) {
+NumericVector get_regperiod_range(const SEXP &x) {
+    if (!Rf_inherits(x, "ts")) {
         Rf_error("Argument is not a timeseries");
     }
-    SEXP attr = Rf_getAttrib(ts, Rf_install("tsp"));
+    SEXP attr = Rf_getAttrib(x, Rf_install("tsp"));
     NumericVector tsp(attr);
     PeriodRange range = get_period_range(tsp);
     return range.get_regperiod_range();

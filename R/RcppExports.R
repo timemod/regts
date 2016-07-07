@@ -18,8 +18,8 @@ parse_regperiod_range <- function(period_text, frequency) {
 #' @param x a timeseries (\link{ts} or \link{regts})
 #' @return a \code{regperiod_range}
 #' @export
-get_regperiod_range <- function(ts) {
-    .Call('regts_get_regperiod_range', PACKAGE = 'regts', ts)
+get_regperiod_range <- function(x) {
+    .Call('regts_get_regperiod_range', PACKAGE = 'regts', x)
 }
 
 select_rows <- function(ts_old, selector) {

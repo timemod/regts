@@ -4,7 +4,7 @@
 \alias{get_regperiod_range}
 \title{Returns the \link{regperiod_range} of a timeseries.}
 \usage{
-get_regperiod_range(ts)
+get_regperiod_range(x)
 }
 \arguments{
 \item{x}{a timeseries (\link{ts} or \link{regts})}

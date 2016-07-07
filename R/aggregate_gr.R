@@ -1,13 +1,13 @@
 #' Converts timeseries with absolute or relative growth rates to a lower
 #' frequency
 #'
-#' @param x  a \link{ts} of \link{regts} object
-#' @param frequency the frequency of the result, should be higher than
+#' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object
+#' @param nfrequency the frequency of the result, should be higher than
 #' the frequency of timeseries \code{x}
 #' @param method Aggregation method: \code{"cgr"}, \code{"cgrs"}, \code{"cgru"}
 #' or \code{"cgrc"}. Consult the Isis reference manual for an explanation of
 #' these methods
-#' @return a \link{regts} with frequency \code{frequency}
+#' @return a \code{regts} with frequency \code{frequency}
 #' @export
 #' @useDynLib regts
 #' @importFrom Rcpp sourceCpp

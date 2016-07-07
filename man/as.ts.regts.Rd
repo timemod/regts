@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{x}{a \code{regts}}
+
+\item{...}{arguments passed to methods (unused for the default method).}
 }
 \value{
 a \code{ts}
