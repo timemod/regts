@@ -1,7 +1,7 @@
 # test the performance of the function regts, create_regts and an alternative
 library(regts)
 library(zoo)
-source("performance_tests/time_commands.R")
+source("tests/performance_tests/time_commands.R")
 
 regts1 <- regts(as.numeric(1:30), start = "2010Q2")
 ts1 <- as.ts(regts1)
