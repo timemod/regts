@@ -36,8 +36,8 @@
 #' ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"),
 #'              labels = paste("Timeseries", c("a", "b", "c")))
 #'
-#' # create a half-yearly timeseries, because ‘end’ is specified the length
-#' # of the timeseries is smaller than the length of data (10).
+#' # create a half-yearly timeseries, because \code{end} is specified the
+#' # length of the timeseries is smaller than the length of data (10).
 #' ts4 <- regts(1:10, start = "2010-1", end = '2011-2', frequency = 2)
 #' @seealso
 #' The function \code{\link{is.regts}} can be used to test if an object is a
