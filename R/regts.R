@@ -284,8 +284,8 @@ add_columns <- function(x, new_colnames) {
 #          or NULL if sel lies (partially) outside the definition period of x.
 get_row_selection <- function(sel, ts_range) {
     start_row <- sel[1] - ts_range[1] + 1
-    end_row <- start_row + lensub(sel) - 1
-    if (start_row >= 1 & end_row <= lensub(ts_range)) {
+    end_row <- start_row + lensub__(sel) - 1
+    if (start_row >= 1 & end_row <= lensub__(ts_range)) {
         return (start_row : end_row)
     } else {
         return (NULL)
@@ -315,9 +315,10 @@ get_row_selection <- function(sel, ts_range) {
         if (is.null(row_numbers)) {
             # Do not use the window function of ts to extend the timeseries,
             # it is very slow. Use our own function adjust_period
-            ts_range_new <- regrange_union(range, ts_range)
-            x <- window_regts(x, ts_range_new)
-            row_numbers <- get_row_selection(range, ts_range_new)
+            ts_range <- c(min(range[1], ts_range[1]),
+                          max(range[2], ts_range[2]), ts_range[3])
+            x <- window_regts(x, ts_range)
+            row_numbers <- get_row_selection(range, ts_range)
         }
         i <- row_numbers
         # if argument j is missing, then we have to add an empty
