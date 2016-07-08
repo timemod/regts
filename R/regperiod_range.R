@@ -34,7 +34,7 @@
 #' @export
 regperiod_range <- function(p1, p2 = p1, frequency = NA) {
     if (is.null(p1) & is.null(p2)) {
-        stop("At least one of p1 and p2 should not be NULL")
+        stop("At least one of the periods should not be NULL")
     }
     if (!is.null(p1)) {
         p1 <- as.regperiod(p1, frequency)
@@ -49,7 +49,7 @@ regperiod_range <- function(p1, p2 = p1, frequency = NA) {
             stop("The two periods have different frequency")
         }
         if (p2 < p1) {
-            stop(paste("The start period", p1, "is after the end period", p2))
+            stop(paste0("The start period (", p1, ") is after the end period (", p2, ")"))
         }
     }
     if (!is.null(p1)) {
@@ -153,7 +153,7 @@ as.character.regperiod_range <- function(x, ...) {
 #' @export
 lensub  <- function(x) {
     if (!inherits(x, "regperiod_range")) {
-        stop("x should be a regperiod_range object")
+        stop("Variable should be a regperiod_range object")
     }
     if (is.na(x[1]) | is.na(x[2])) {
         return (Inf)
