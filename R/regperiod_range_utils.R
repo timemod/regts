@@ -1,9 +1,5 @@
 # This file contains a number of utilities for regperiod_range objects
-# that are used internally in the regts package. They should
-# not be exported to the package.
-# All function in this file assume that the regperiod_range objects
-# do not have start or end periods equal to NULL.
-
+# that could be usefull. For now they are not exported to the package.
 
 # Calculates the intersection of two regperiod_range objects.
 # The start and end periods of the regperiod_range objects should not be NULL.

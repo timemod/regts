@@ -47,5 +47,5 @@ test_that(".regrange_errors", {
     r1 <- regperiod_range("2010Q4", "2011Q3")
     r3 <- as.regperiod_range("2010M4/2011M3")
     expect_error(regrange_union(r1,r3),
-                 "The two periods have different frequency")
+                 "The two periods have difffffferent frequency")
 })
