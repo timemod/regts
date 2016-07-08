@@ -47,11 +47,12 @@ List agg_gr(NumericMatrix ts_old, const int freq_new,
         }
     } else if (method == "cgru" || method == "cgrc") {
         int shift = per_new.first * rep - rep  - per_old.first;
-        double work[2*rep];
+        double *work = new double[2*rep];
         int perc = method == "cgru" ? 1 : 100;
         for (int col = 0; col < ts_old.ncol(); col++) {
             agg_gr_rel(ts_old(_, col), data(_, col), work, rep, shift, perc);
         }
+        delete work;
     } else {
         Rf_error((std::string("Illegal aggregation method ") + method).c_str());
     }
