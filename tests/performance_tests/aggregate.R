@@ -1,5 +1,5 @@
 library(regts)
-source("performance_tests/time_commands.R")
+source("tests/performance_tests/time_commands.R")
 
 regts1 <- regts(as.numeric(1:30), start = "2010Q1")
 ts1 <- as.ts(regts1)

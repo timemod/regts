@@ -1,7 +1,7 @@
 # test the performance of the function regts, create_regts and an alternative
 library(microbenchmark)
 library(regts)
-source("performance_tests/time_commands.R")
+source("tests/performance_tests/time_commands.R")
 
 p1 <- regperiod("2010Q2")
 data <- matrix(1:10, ncol = 2)

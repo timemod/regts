@@ -1,6 +1,6 @@
 library(regts)
 library(zoo)
-source("performance_tests/time_commands.R")
+source("tests/performance_tests/time_commands.R")
 
 set.seed(12345)
 aantal_variabelen <- 5000
