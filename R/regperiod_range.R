@@ -155,6 +155,10 @@ lensub  <- function(x) {
     if (!inherits(x, "regperiod_range")) {
         stop("Variable should be a regperiod_range object")
     }
+    return(lensub__(x))
+}
+
+lensub__  <- function(x) {
     if (is.na(x[1]) | is.na(x[2])) {
         return (Inf)
     } else {
