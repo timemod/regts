@@ -32,7 +32,7 @@ range. The return value can be \code{NULL} if argument \code{x} is a
 }
 \description{
 This function returns the start or end period of a
-timeseries object (a \code{\link{regts}} or \code{\link[stats]{ts]}}))
+timeseries object (a \code{\link{regts}} or \code{\link[stats]{ts}}))
 or a \code{regperiod_range}.
 }
 \section{Methods (by class)}{
