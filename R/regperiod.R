@@ -41,7 +41,7 @@ Ops.regperiod <- function(e1, e2) {
             # the the operators == and != are meaningful, but comparison
             # operators such as > do not make sense.
             if (.Generic %in% c("==", "!=")) {
-                return (.Generic == "==")
+                return (.Generic != "==")
             } else {
                 stop("Illegal logical operation, only == and != allowed")
             }
