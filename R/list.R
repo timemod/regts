@@ -7,6 +7,7 @@
 #' print(as.list(ts))
 #' @export
 as.list.regts <- function(x, ...) {
-    x <- NextMethod(.Generic)
-    return (lapply(x, FUN = as.regts))
+    retval <- lapply(seq_len(ncol(x)), function(i) x[, i])
+    names(retval) <- colnames(x)
+    return (retval)
 }

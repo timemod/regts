@@ -6,6 +6,10 @@ set.seed(12345)
 aantal_variabelen <- 5000
 aantal_perioden <- 200
 
+#aantal_variabelen <- 5
+#aantal_perioden <- 20
+
+
 namen <- paste('ts', seq(aantal_variabelen), sep = "_")
 data <- matrix(rnorm(n  = aantal_variabelen * aantal_perioden),
                ncol = aantal_variabelen)
