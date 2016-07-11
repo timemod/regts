@@ -43,21 +43,25 @@ Ops.regperiod <- function(e1, e2) {
             if (.Generic %in% c("==", "!=")) {
                 return (.Generic == "==")
             } else {
-                stop("Illegal binary logical operation")
+                stop("Illegal logical operation, only == and != allowed")
             }
         }
         return (NextMethod(.Generic))
     } else {
-        # arithmetic operator
-        retval <- NextMethod(.Generic)
-        if (is.regperiod(e2)) {
-            if (attr(e1, 'frequency') != attr(e2, 'frequency')) {
-                stop(paste("Arithmetic operations on regperiods with different",
-                           "frequencies are not allowed"))
+        # arithmetic operator + or -
+        if (.Generic %in% c("+", "-")) {
+            retval <- NextMethod(.Generic)
+            if (is.regperiod(e2)) {
+                if (attr(e1, 'frequency') != attr(e2, 'frequency')) {
+                    stop(paste("Arithmetic operations on regperiods with different",
+                               "frequencies are not allowed"))
+                }
+                # if the second operand is also a regperiod, then the result an
+                # ordinary number.
+                retval <- as.numeric(retval)
             }
-            # if the second operand is also a regperiod, then the result an
-            # ordinary number.
-            retval <- as.numeric(retval)
+        } else {
+            stop("Illegal arithmetic operation, only + and - allowed")
         }
         # the return value should always be an integer
         return (floor(retval))
