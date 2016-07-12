@@ -16,6 +16,7 @@ data <- matrix(rnorm(n  = aantal_variabelen * aantal_perioden),
 colnames(data) <- namen
 
 regts1 <- regts(data, start = "2010Q2")
+#ts_labels(regts1) <- namen
 ts1 <- as.ts(regts1)
 zoo1 <- as.zoo(ts1)
 
@@ -27,7 +28,7 @@ commands <- c("lts  <- as.list(ts1)",
               "lregts <- as.list(regts1)",
               "lzoo <- as.list(zoo1)",
               "do.call(ts.intersect, lts)",
-              "do.call(regts.intersect, lts)",
+              "do.call(regts.intersect, lregts)",
               "do.call(merge, lzoo)"
 )
 
