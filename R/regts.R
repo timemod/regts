@@ -263,13 +263,10 @@ as.regts.default <- function(x, ...) {
 
 # Add columns with names new_colnames to x, and fill with NA.
 add_columns <- function(x, new_colnames) {
-    range <- get_regperiod_range(x)
-    data <- matrix(NA, nrow = nrow(x), ncol = length(new_colnames))
-    new_columns <- create_regts(data, range[1], range[2], range[3], NULL)
-    old_colnames <- colnames(x)
-    x <- regts.intersect(x, new_columns)
-    colnames(x) <- c(old_colnames, new_colnames)
-    return (x)
+    new_columns <- matrix(NA, nrow = nrow(x), ncol = length(new_colnames))
+    ret <- regts.intersect(x, new_columns)
+    colnames(ret) <- c(colnames(x), new_colnames)
+    return (ret)
 }
 
 # Selection on the left-hand side: replace a part of a regts
@@ -292,7 +289,7 @@ add_columns <- function(x, new_colnames) {
         # call C++ function get_regperiod_range
         ts_range <- get_regperiod_range(x)
         # call C++ function convert_range_selector, this function also
-        # checks the frequency of sel_range
+        # checks  the frequency of sel_range
         sel_range <- convert_range_selector(as.regperiod_range(i), ts_range)
         if (sel_range[1] < ts_range[1] || sel_range[2] > ts_range[2]) {
             ts_range <- c(min(sel_range[1], ts_range[1]),
@@ -427,8 +424,8 @@ update_ts_labels <- function(x, labels) {
 }
 
 #' @export
-# do not print ts_labels
 print.regts <- function(x, ...) {
+    # do not print ts_labels
     ts_labels(x) <- NULL
     NextMethod("print", .Generic)
 }
