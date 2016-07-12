@@ -48,3 +48,19 @@ test_that("Ops.regts for multivariate timeseries", {
     expect_identical(regts1 + regts1, 2 * regts1)
 })
 
+test_that("Ops.regts for unary operators (- and !)", {
+    regts1 <- regts(matrix(as.numeric(1:8), ncol = 2), start = "2010Q2",
+                    names = c("a", "b"), labels = c("Var a", "Var b"))
+    ts1 <- as.ts(regts1)
+    expect_identical(ts_labels(-regts1), ts_labels(regts1))
+    expect_identical(colnames(-regts1), colnames(regts1))
+    expect_identical(-regts1, as.regts(-ts1))
+
+    regts1 <- regts(matrix(rep(FALSE, 8), ncol = 2), start = "2010Q2",
+                    names = c("a", "b"), labels = c("Var a", "Var b"))
+    ts1 <- as.ts(regts1)
+    expect_identical(ts_labels(!regts1), ts_labels(regts1))
+    expect_identical(colnames(!regts1), colnames(regts1))
+    expect_identical(!regts1, as.regts(!ts1))
+})
+

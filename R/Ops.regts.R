@@ -4,6 +4,11 @@ Ops.regts <- function(e1, e2) {
     # call Ops.ts
     retval <- as.regts(NextMethod(.Generic))
 
+    if (missing(e2)) {
+        # unary operator
+        return (retval)
+    }
+
     # Handling of labels: sometimes the result of NextMethod(.Generic)
     # does not have ts_labels while e1 or e2 do have labels. For example, if ts1
     # is a numerical timeseries with labels, then the result of ts1 < 2 does
