@@ -2,12 +2,8 @@
 #'
 #' The \code{regts} class is an extension of the \code{\link[stats]{ts}} class
 #' of the \link{stats} package. Working with \code{regts} makes it easier to
-#' select periods. Another difference is related to the representation of
-#' univariate timeseries.  A \code{regts} object always has
-#' \code{\link{colnames}}, also for univariate timeseries. A univariate
-#' \code{ts} object only has column names when the input data was a
-#' one-dimensional matrix.
-#'
+#' select periods.
+#' #'
 #' @param data a vector or matrix of the observed time-series values. A data frame will be
 #' coerced to a numeric matrix via \code{\link{data.matrix}}. (See also the description of the
 #' function \code{\link[stats]{ts}} of the \code{\link{stats}} package).
@@ -20,9 +16,7 @@
 #' the start or end period is specified with a general period format without period indicator,
 #' e.g. \code{"2011-3"}
 #' @param names a character vector of names for the series: defaults to the
-#' colnames of data, or \code{"Series 1"}, \code{"Series 2"} ..., if the data does
-#' not have colnames. In contrast to the function \link{ts},  \code{names}
-#' is also used if the result is a single timeseries.
+#' colnames of data
 #' @param labels a character vector of labels (descriptions of the timeseries)
 #' @return a \code{regts} object
 #' @examples
@@ -60,7 +54,7 @@
 #' @importFrom stats ts
 #' @importFrom stats frequency
 #' @export
-regts <- function(data, start, end = NULL, frequency = NA, names,
+regts <- function(data, start, end = NULL, frequency = NA, names = colnames(data),
                   labels = NULL) {
 
     data <- as.matrix(data)
@@ -89,12 +83,7 @@ regts <- function(data, start, end = NULL, frequency = NA, names,
         # add dimension attributes so that the timeseries has a column number
         # this situation might occur in the following example:
         # regts(1, start = "2010Q2", end = "2011Q3")
-        if (missing(names) || is.null(names)) {
-            name <- "Series 1"
-        } else {
-            name <- names
-        }
-        retval <- insert_dim_attr(retval, name)
+        retval <- insert_dim_attr(retval)
     }
 
     return (retval)
@@ -107,23 +96,26 @@ create_regts <- function(data, startp, endp, freq, labels) {
         classes <- c("regts", "ts")
     }
     start_vector <- c(startp %/% freq, startp %% freq + 1)
+
     if (is.null(endp)) {
         retval <- ts(data, start = start_vector,  frequency = freq,
-                     class = classes)
+                     class = classes, names = colnames(data))
     } else {
         end_vector <- c(endp   %/% freq, endp   %% freq + 1)
         retval <- ts(data, start = start_vector,  end = end_vector,
-                     frequency = freq,  class = classes)
+                     frequency = freq,  class = classes, names = colnames(data))
     }
+
     if (!is.null(labels)) {
         ts_labels(retval) <- labels
     }
+
     return (retval)
 }
 
 # add dimension attribute for univariate timeseriss
-insert_dim_attr <- function(x, names) {
-    dim_attr <- list(dim = c(length(x), 1), dimnames = list(NULL, names))
+insert_dim_attr <- function(x) {
+    dim_attr <- list(dim = c(length(x), 1), dimnames = list(NULL, NULL))
     attributes(x) <- c(dim_attr, attributes(x))
     return(x)
 }
@@ -184,7 +176,7 @@ as.regts.ts <- function(x, ...) {
         if (is.null(attr(x, "dim"))) {
             # univariate timeseries wihout dimension attributes
             # add dimension attributes so that the timeseries has a column name.
-            x <- insert_dim_attr(x, "Series 1")
+            x <- insert_dim_attr(x)
         }
     }
     return (x)

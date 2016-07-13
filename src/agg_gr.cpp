@@ -14,10 +14,6 @@ void agg_gr_rel(NumericMatrix::Column column_old,
 List agg_gr(NumericMatrix ts_old, const int freq_new,
             const std::string &method) {
 
-    // save the dimension names
-    List dimnames = ts_old.attr("dimnames");
-    CharacterVector names = dimnames[1];
-
     PeriodRange per_old = get_period_range(ts_old);
     PeriodRange per_new;
     per_new.freq = freq_new;

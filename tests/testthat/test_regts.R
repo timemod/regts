@@ -3,7 +3,8 @@ context("regts")
 test_that("constructor regts for univariate timeseries", {
 
     regts1 <- regts(1:10, start = "2010Q4")
-    ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010,4), frequency = 4, names = "Series 1")
+    ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010,4), frequency = 4,
+              names = NULL)
     expect_identical(regts1, as.regts(ts1))
     expect_identical(as.ts(regts1), ts1)
     expect_identical(class(regts1), c("regts", "ts"))
@@ -57,7 +58,8 @@ test_that("get_regperiod_range", {
 })
 
 test_that("period selection in univariate timeseries", {
-    ts1 <- ts(1:8, start = c(2010, 1), end = c(2011, 4), frequency = 4)
+    ts1 <- ts(1:8, start = c(2010, 1), end = c(2011, 4), frequency = 4,
+              names = NULL)
     regts1 <- as.regts(ts1)
 
     regts2 <- regts1["2010Q2/2011Q3"]

@@ -38,11 +38,17 @@ aggregate.regts <- function(x, nfrequency = 1, ...) {
         p1 <- p1 + rep - extra
         x <- window_regts(x, regperiod_range(p1, NULL))
     }
-    x <- as.regts(NextMethod(.Generic))
-    if (!is.null(lbls)) {
-        ts_labels(x) <- lbls
+    ret <- as.regts(NextMethod(.Generic))
+
+    if (is.null(colnames(x))) {
+        # aggregate.ts create colnames Series 1, Series 2 etc. if x does not
+        # have colnames. We do not want that.
+        colnames(ret) <- NULL
     }
-    return (x)
+    if (!is.null(lbls)) {
+        ts_labels(ret) <- lbls
+    }
+    return (ret)
 }
 
 # Returns the timeseries label from an arbitrary object.

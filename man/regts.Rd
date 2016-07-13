@@ -4,7 +4,8 @@
 \alias{regts}
 \title{Create a \code{regts} timeseries object}
 \usage{
-regts(data, start, end = NULL, frequency = NA, names, labels = NULL)
+regts(data, start, end = NULL, frequency = NA, names = colnames(data),
+  labels = NULL)
 }
 \arguments{
 \item{data}{a vector or matrix of the observed time-series values. A data frame will be
@@ -23,9 +24,7 @@ the start or end period is specified with a general period format without period
 e.g. \code{"2011-3"}}
 
 \item{names}{a character vector of names for the series: defaults to the
-colnames of data, or \code{"Series 1"}, \code{"Series 2"} ..., if the data does
-not have colnames. In contrast to the function \link{ts},  \code{names}
-is also used if the result is a single timeseries.}
+colnames of data}
 
 \item{labels}{a character vector of labels (descriptions of the timeseries)}
 }
@@ -35,11 +34,8 @@ a \code{regts} object
 \description{
 The \code{regts} class is an extension of the \code{\link[stats]{ts}} class
 of the \link{stats} package. Working with \code{regts} makes it easier to
-select periods. Another difference is related to the representation of
-univariate timeseries.  A \code{regts} object always has
-\code{\link{colnames}}, also for univariate timeseries. A univariate
-\code{ts} object only has column names when the input data was a
-one-dimensional matrix.
+select periods.
+#'
 }
 \examples{
 # univariate timeseries
