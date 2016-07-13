@@ -33,12 +33,11 @@ test_that("errors", {
     expect_identical(as.character(regperiod("2010Q8")), "2011Q4")
 })
 
-test_that("frequency and frequency.regperiod", {
+test_that("frequency", {
     expect_identical(frequency(regperiod("2010q2")), 4)
     expect_identical(frequency(regperiod("2010-2", frequency = 2)), 2)
-    expect_identical(frequency.regperiod(regperiod("2010q2")), 4)
-    expect_identical(frequency.regperiod(regperiod("2010-2", frequency = 2)), 2)
 })
+
 test_that("logical operators", {
     expect_true(regperiod("2010Q2") > regperiod("2010Q1"))
     expect_true(regperiod("2010M2") <= regperiod("2010M12"))
@@ -67,8 +66,6 @@ test_that("arithmetic operators: only + and - allowed", {
                  "frequencies are not allowed"))
 })
 
-
-
 test_that("as.regperiod", {
     expect_identical(as.regperiod("2010.2q"), regperiod("2010Q2"))
     expect_identical(as.regperiod("2005q3"), regperiod("2005Q3"))
@@ -76,6 +73,6 @@ test_that("as.regperiod", {
 })
 
 test_that("print regperiod", {
-    expect_output(print.regperiod(regperiod("2010q2")),"2010Q2")
-    expect_output(print.regperiod(regperiod("2010-1", freq = 12) - 3),"2009M10")
+    expect_output(print(regperiod("2010q2")),"2010Q2")
+    expect_output(print(regperiod("2010-1", freq = 12) - 3),"2009M10")
 })

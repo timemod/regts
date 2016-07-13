@@ -35,7 +35,7 @@ is.regperiod <- function(x) {
 Ops.regperiod <- function(e1, e2) {
     if (.Generic %in% c("==", "!=", "<", ">", "<=", ">=")) {
         # logical operator
-        if (is.regperiod(e1) & is.regperiod(e2) &
+        if (is.regperiod(e1) && is.regperiod(e2) &&
             (attr(e1, 'frequency') != attr(e2, 'frequency'))) {
             # if e1 and e2 are both regperiods with a different frequency,
             # the operators == and != are meaningful, but comparison
@@ -47,30 +47,27 @@ Ops.regperiod <- function(e1, e2) {
             }
         }
         return (NextMethod(.Generic))
-    } else {
+    } else if (.Generic %in% c("+", "-")) {
         # arithmetic operator + or -
-        if (.Generic %in% c("+", "-")) {
-            retval <- NextMethod(.Generic)
-            if (is.regperiod(e1) & is.regperiod(e2)) {
-                if (attr(e1, 'frequency') != attr(e2, 'frequency')) {
-                    stop(paste("Arithmetic operations on regperiods with different",
-                               "frequencies are not allowed"))
-                }
-                if (.Generic %in% c("-")) {
-                    # if the second operand is also a regperiod, then the result
-                    # is an ordinary number.
-                    retval <- as.numeric(retval)
-                } else {
-                    stop("Arithmetic operation + on two regperiods is not allowed")
-                }
+        retval <- NextMethod(.Generic)
+        if (is.regperiod(e1) && is.regperiod(e2)) {
+            if (attr(e1, 'frequency') != attr(e2, 'frequency')) {
+                stop(paste("Arithmetic operations on regperiods with different",
+                           "frequencies are not allowed"))
             }
-        } else {
-            stop("Illegal arithmetic operation, only + and - allowed")
+            if (.Generic == "-") {
+                # if the second operand is also a regperiod, then the result
+                # is an ordinary number.
+                retval <- as.numeric(retval)
+            } else {
+                stop("Arithmetic operation + on two regperiods is not allowed")
+            }
+
         }
-
-
         # the return value should always be an integer
         return (floor(retval))
+    } else {
+         stop("Illegal arithmetic operation, only + and - allowed")
     }
 }
 
