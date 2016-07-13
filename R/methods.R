@@ -54,15 +54,18 @@ aggregate.regts <- function(x, nfrequency = 1, ...) {
 # Returns the timeseries label from an arbitrary object.
 # Only regts objects have labels
 get_labels <- function(x) {
-    if (is.regts(x)) {
-        return (ts_labels(x))
-    } else {
-        nc <- ncol(x)
-        if (!is.null(nc)) {
-            return (rep("", nc))
-        } else {
-            return ("")
+    if (is.ts(x)) {
+        lbls <- ts_labels(x)
+        if (!is.null(lbls)) {
+            return (lbls)
         }
+    }
+    # no ts_labels present, create empty labels
+    nc <- ncol(x)
+    if (!is.null(nc)) {
+        return (rep("", nc))
+    } else {
+        return ("")
     }
 }
 
@@ -88,7 +91,7 @@ handle_labels <- function(x, ...) {
 #' returned by \code{ts.intersect} and \code{ts.union}
 #' to a \code{regts} and also takes care of the timeseries labels
 #' (if present). The \code{cbind} methods for \code{regts} objects works
-#' as \code{regts.intersect}, except that the argument \code{dframe} is
+#' as \code{regts.union}, except that the argument \code{dframe} is
 #' not used.
 #' @importFrom stats ts.intersect
 #' @importFrom stats ts.union
@@ -119,5 +122,5 @@ regts.union <- function(..., dframe = FALSE) {
 #' @rdname regts.intersect
 #' @export
 cbind.regts <- function(...) {
-    return (regts.intersect(...))
+    return (regts.union(...))
 }

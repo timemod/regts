@@ -29,7 +29,7 @@ Bind time series which have a common frequency using the methods
 returned by \code{ts.intersect} and \code{ts.union}
 to a \code{regts} and also takes care of the timeseries labels
 (if present). The \code{cbind} methods for \code{regts} objects works
-as \code{regts.intersect}, except that the argument \code{dframe} is
+as \code{regts.union}, except that the argument \code{dframe} is
 not used.
 }
 
