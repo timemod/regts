@@ -56,25 +56,23 @@ test_that("arithmetic operators: only + and - allowed", {
     expect_identical(regperiod("2010q2") + 4, regperiod("2011q2"))
     expect_identical(regperiod("2010") - 4, regperiod("2006"))
     expect_identical(regperiod("2010m2") - 8, regperiod("2009m6"))
+    expect_identical(regperiod("2010m2") - regperiod("2009m6"), 8)
 
     expect_error(regperiod("2010Q1") * 2,
                  "Illegal arithmetic operation, only \\+ and \\- allowed")
-    expect_error(regperiod("2010Q1") + regperiod("2010M1"),
-                 "Arithmetic operations on regperiods with different",
-                 "frequencies are not allowed")
+    expect_error(regperiod("2010Q1") + regperiod("2010Q2"),
+                 "Arithmetic operation \\+ on two regperiods is not allowed")
+    expect_error(regperiod("2010Q1") - regperiod("2010M1"),
+                 paste("Arithmetic operations on regperiods with different",
+                 "frequencies are not allowed"))
 })
 
-test_that("as.character.period and arithmetic operator", {
-    expect_identical(as.character(regperiod("2010q2") + 1), "2010Q3")
-    expect_identical(as.character(regperiod("2010-1", freq = 12) - 3), "2009M10")
-    expect_identical(as.character(regperiod("2011") - 3), "2008")
-})
 
-test_that("as.regperiod and as.regperiod.character", {
+
+test_that("as.regperiod", {
     expect_identical(as.regperiod("2010.2q"), regperiod("2010Q2"))
     expect_identical(as.regperiod("2005q3"), regperiod("2005Q3"))
-    expect_identical(as.regperiod.character("2005q1"), regperiod("2005q1"))
-    expect_identical(as.regperiod.character("2016Y"), regperiod("2016"))
+
 })
 
 test_that("print regperiod", {
