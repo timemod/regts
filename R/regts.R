@@ -263,33 +263,10 @@ as.regts.default <- function(x, ...) {
 
 # Add columns with names new_colnames to x, and fill with NA.
 add_columns <- function(x, new_colnames) {
-    range <- get_regperiod_range(x)
-    data <- matrix(NA, nrow = nrow(x), ncol = length(new_colnames))
-    new_columns <- create_regts(data, range[1], range[2], range[3], NULL)
-    old_colnames <- colnames(x)
-    x <- regts.intersect(x, new_columns)
-    colnames(x) <- c(old_colnames, new_colnames)
-    return (x)
-}
-
-# This function computes the row numbers of the selected rows in a
-# regts object. If the period selector lies partially outside
-# the defintion period of the input timeseries, then the function
-# returns NULL.
-# PARAMETERS:
-# sel : a regperiod_range object. This object is used to select rows in
-#       a timeseries
-# ts_range : the range of the timeseries.
-# RETURNS: a vector with the numbers of the select rows in x,
-#          or NULL if sel lies (partially) outside the definition period of x.
-get_row_selection <- function(sel, ts_range) {
-    start_row <- sel[1] - ts_range[1] + 1
-    end_row <- start_row + lensub__(sel) - 1
-    if (start_row >= 1 & end_row <= lensub__(ts_range)) {
-        return (start_row : end_row)
-    } else {
-        return (NULL)
-    }
+    new_columns <- matrix(NA, nrow = nrow(x), ncol = length(new_colnames))
+    ret <- regts.intersect(x, new_columns)
+    colnames(ret) <- c(colnames(x), new_colnames)
+    return (ret)
 }
 
 # Selection on the left-hand side: replace a part of a regts
@@ -309,18 +286,18 @@ get_row_selection <- function(sel, ts_range) {
 
     if (!missing(i) && (is.character(i) || inherits(i, "regperiod") ||
                         inherits(i, "regperiod_range"))) {
+        # call C++ function get_regperiod_range
         ts_range <- get_regperiod_range(x)
-        range <- convert_range_selector(as.regperiod_range(i), ts_range)
-        row_numbers <- get_row_selection(range, ts_range)
-        if (is.null(row_numbers)) {
-            # Do not use the window function of ts to extend the timeseries,
-            # it is very slow. Use our own function adjust_period
-            ts_range <- c(min(range[1], ts_range[1]),
-                          max(range[2], ts_range[2]), ts_range[3])
+        # call C++ function convert_range_selector, this function also
+        # checks  the frequency of sel_range
+        sel_range <- convert_range_selector(as.regperiod_range(i), ts_range)
+        if (sel_range[1] < ts_range[1] || sel_range[2] > ts_range[2]) {
+            ts_range <- c(min(sel_range[1], ts_range[1]),
+                          max(sel_range[2], ts_range[2]), ts_range[3])
             x <- window_regts(x, ts_range)
-            row_numbers <- get_row_selection(range, ts_range)
         }
-        i <- row_numbers
+        i <- seq(sel_range[1] - ts_range[1] + 1,
+                 length.out = lensub__(sel_range))
         # if argument j is missing, then we have to add an empty
         # column selection. x[i] does not return the same as x[i, ].
         if (missing(j) && is.mts(x)) {
@@ -447,8 +424,8 @@ update_ts_labels <- function(x, labels) {
 }
 
 #' @export
-# do not print ts_labels
 print.regts <- function(x, ...) {
+    # do not print ts_labels
     ts_labels(x) <- NULL
     NextMethod("print", .Generic)
 }

@@ -115,8 +115,3 @@ regts.union <- function(..., dframe = FALSE) {
 cbind.regts <- function(...) {
     return (regts.intersect(...))
 }
-
-#' @export
-Ops.regts <- function(e1, e2) {
-    return (as.regts(NextMethod(.Generic)))
-}
