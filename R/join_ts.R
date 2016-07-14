@@ -12,6 +12,7 @@
 #' @param suffixes Suffixes appended to the column names for overlapping
 #' columns. This argument is obligatory if the timeseries have overlapping
 #' column names
+#' @seealso \code{\link{as.list.regts}}
 #' @importFrom stats ts.union ts.intersect
 #' @export
 join_ts <- function(..., union = TRUE, suffixes) {

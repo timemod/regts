@@ -23,4 +23,7 @@ column names}
 \description{
 Join time series objects with a common frequency.
 }
+\seealso{
+\code{\link{as.list.regts}}
+}
 
