@@ -24,8 +24,6 @@
 #'                        in \code{x1}}
 #'  \item{missing_names2}{The names of columns present in \code{x1} but missing
 #'                        in \code{x2}}
-#'  \item{common_names}{The names of the common columns of \code{x1} and
-#'                     \code{x2}}
 #'  \item{equal}{\code{TRUE} if \code{x1} and \code{x2} have the same column names
 #'              and if all differences are smaller than or equal to \code{tol}}
 #'  \item{difnames}{The names of the common columns with differences
@@ -87,9 +85,9 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
     retval <- list(tol           = tol,
                    missing_names1 = missing_names1,
                    missing_names2 = missing_names2,
-                   common_names   = common_names,
-                   equal          = length(missing_names1) == 0 & length(missing_names2) == 0
-                                    & length(difnames) == 0,
+                   equal          = length(missing_names1) == 0 &&
+                                    length(missing_names2) == 0 &&
+                                    length(difnames) == 0,
                    difnames       = difnames,
                    dif            = dif)
 
@@ -109,13 +107,12 @@ calculate_difference <- function(common_names, x1, x2, tol, fun) {
     xx1 <- x1[, common_names]
     xx2 <- x2[, common_names]
 
-    # Make sure that xx1 and xx2 have the same time axis
-    # TODO: is there not a more efficient way to this?
-    # Calculate the union of period, then adjust each period.
-    tot <- as.regts(ts.union(xx1, xx2))
-    xx1 <- tot[, 1: var_count]
-    xx2 <- tot[, (var_count + 1) : (2 * var_count)]
-    rm(tot)
+    # Align the two timeseries objects using the union of their times.
+    p1 <- get_regperiod_range(xx1)
+    p2 <- get_regperiod_range(xx2)
+    punion <- c(min(p1[1], p2[1]), max(p1[2], p2[2]), p1[3])
+    xx1 <- window_regts(xx1, punion)
+    xx2 <- window_regts(xx2, punion)
 
     # If xx1 and xx2 are both NA, then replace NA with 0.
     # Two NA values are always considered equal.
