@@ -3,7 +3,7 @@ library(regts)
 library(zoo)
 source("tests/performance_tests/time_commands.R")
 
-regts1 <- regts(as.numeric(1:30), start = "2010Q2")
+regts1 <- regts(matrix(as.numeric(1:30), ncol = 1), start = "2010Q2")
 ts1 <- as.ts(regts1)
 zoo1 <- as.zooreg(ts1)
 
@@ -17,7 +17,6 @@ commands <- c("window(ts1, start = c(2010, 4), end = c(2011, 1), extend = FALSE)
               "window(ts1, start = c(2010, 4), end = c(2011, 1), extend = TRUE)",
               "window(regts1, start = c(2010, 4), end = c(2011, 1))",
               "regts:::window_regts(regts1, p1)",
-              "regts:::select_rows(regts1, p1)",
               "regts1[p1, ]",
               "window(zoo1, start = startp, end = endp)"
 )

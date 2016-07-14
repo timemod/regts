@@ -4,23 +4,6 @@
 using Rcpp::NumericMatrix;
 using Rcpp::NumericVector;
 
-PeriodRange::PeriodRange(const NumericVector x) {
-    first = x[0];
-    last  = x[1];
-    freq  = x[2];
-}
-
-void PeriodRange::modify_frequency(int new_freq) {
-    if (new_freq % (int) freq != 0) {
-        Rf_error("Frequency of regperiod_range is no divisor of the "
-                     "required frequency");
-    }
-    int factor = new_freq / (int) freq;
-    first = round(first * factor);
-    last  = round((last + 1) * factor - 1);
-    freq = new_freq;
-}
-
 NumericVector PeriodRange::get_regperiod_range() {
     NumericVector result(3);
     result[0] = first;
@@ -48,14 +31,6 @@ PeriodRange get_period_range(const NumericMatrix &ts) {
     NumericVector tsp = ts.attr("tsp");
     return get_period_range(tsp);
 }
-
-// Returns the PeriodRange of a numerical timeseries.
-PeriodRange get_period_range(const SEXP &ts) {
-    SEXP attr = Rf_getAttrib(ts, Rf_install("tsp"));
-    NumericVector tsp(attr);
-    return get_period_range(tsp);
-}
-
 
 //' Returns the \link{regperiod_range} of a timeseries.
 //'

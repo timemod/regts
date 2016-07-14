@@ -341,15 +341,32 @@ add_columns <- function(x, new_colnames) {
     }
 }
 
+convert_range_selector <- function(range, ts_range) {
+    if (ts_range[3] %% range[3] != 0) {
+        stop(paste("frequency of timeseries not divisible by the frequency of",
+                   "the selectort"))
+    }
+    fac <- ts_range[3] %/% range[3]
+    range_new <- numeric(3)
+    range_new[1] <- floor(range[1] * fac)
+    range_new[2] <- floor((range[2] + 1) * fac - 1)
+    range_new[3] <- ts_range[3]
+    range_new <- ifelse(is.na(range_new), ts_range, range_new)
+    return (range_new)
+}
 
 window_regts <- function(x, range) {
-    # call C++ function select_rows
-    ret <- select_rows(x, range)
-    data      <- ret[[1]]
-    range_new <- ret[[2]]
+    ts_range <- get_regperiod_range(x)
+    range_new <- convert_range_selector(range, ts_range)
+    nper_new <- lensub__(range_new)
+    shift <- range_new[1] - ts_range[1]
+    rmin <- max(1, 1 - shift)
+    rmax <- min(nper_new, lensub__(ts_range) - shift)
+    data <- matrix(NA, nrow = nper_new, ncol = ncol(x))
+    data[rmin:rmax, ] <- x[(rmin+shift):(rmax+shift), ]
     colnames(data) <- colnames(x)
     return (create_regts(data, range_new[1], range_new[2], range_new[3],
-                         ts_labels(x)))
+                                 ts_labels(x)))
 }
 
 #' Timeseries labels
