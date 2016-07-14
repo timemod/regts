@@ -27,10 +27,8 @@ commands <- c("lts  <- as.list(ts1)",
               "lregts <- as.list(regts1)",
               "lzoo <- as.list(zoo1)",
               "do.call(ts.union, lts)",
-              "do.call(regts.union, lregts)",
-              "do.call(cbind.regts, lregts)",
+              "do.call(ts.intersect, lts)",
               "do.call(join_ts, lregts)",
-              "do.call(join_ts2, lregts)",
               "do.call(merge, lzoo)"
 )
 

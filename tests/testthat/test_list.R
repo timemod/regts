@@ -12,10 +12,10 @@ test_that("as.list for univariate timeseries", {
     label_a <- labels[1]
     names(label_a) <- "a"
     expect_identical(lapply(l1, FUN = ts_labels), list(a = label_a))
-    expect_identical(do.call(regts.intersect, l1), regts1)
+    expect_identical(do.call(join_ts, l1), regts1)
 
     # for a list with one element, ts.intersect gives the same result as
-    # regts.intersect
+    # join_ts
     expect_identical(do.call(ts.intersect, l1), regts1)
 })
 
@@ -32,5 +32,5 @@ test_that("as.list for multivariate timeseries", {
     label_b <- labels[2]
     names(label_b) <- "b"
     expect_identical(lapply(l1, FUN = ts_labels), list(a = label_a, b = label_b))
-    expect_identical(do.call(regts.intersect, l1), regts1)
+    expect_identical(do.call(join_ts, c(l1, union = FALSE)), regts1)
 })

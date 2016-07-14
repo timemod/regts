@@ -4,22 +4,23 @@
 \alias{join_ts}
 \title{Join two or more timeseries}
 \usage{
-join_ts(..., method = "union", suffixes)
+join_ts(..., union = TRUE, suffixes)
 }
 \arguments{
 \item{...}{two or more univariate or multivariate time series,
 or objects which can coerced to time series}
 
-\item{method}{method used to determine the time axis of the result.
-Specify \code{"union"} for a total time coverage
-(missing values are filled with \code{NA}) and \code{"intersect"}
-to restrict the time axis to the time covered by all timeseries.}
+\item{union}{if \code{TRUE}, then the period range of the result
+is the union of the period ranges of the joined objects
+(missing values are filled with \code{NA}). If \code{FALSE},
+then the period range of the result is the intersection of the period ranges
+of the joined objects.}
 
 \item{suffixes}{Suffixes appended to the column names for overlapping
-columns. This argument is mandatory if the timeseries have overlapping
-columns.}
+columns. This argument is obligatory if the timeseries have overlapping
+column names}
 }
 \description{
-Bind time series which have a common frequency.
+Join time series objects with a common frequency.
 }
 

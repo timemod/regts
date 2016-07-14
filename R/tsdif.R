@@ -112,7 +112,7 @@ calculate_difference <- function(common_names, x1, x2, tol, fun) {
     # Make sure that xx1 and xx2 have the same time axis
     # TODO: is there not a more efficient way to this?
     # Calculate the union of period, then adjust each period.
-    tot <- regts.union(xx1, xx2)
+    tot <- as.regts(ts.union(xx1, xx2))
     xx1 <- tot[, 1: var_count]
     xx2 <- tot[, (var_count + 1) : (2 * var_count)]
     rm(tot)

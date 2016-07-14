@@ -253,11 +253,17 @@ as.regts.default <- function(x, ...) {
     return (as.regts(as.ts(x, ...)))
 }
 
-# Add columns with names new_colnames to x, and fill with NA.
+# Add columns with names new_colnames to x, and fill with NA
+#' @importFrom stats ts.union
 add_columns <- function(x, new_colnames) {
-    new_columns <- matrix(NA, nrow = nrow(x), ncol = length(new_colnames))
-    ret <- regts.intersect(x, new_columns)
+    ncols <- length(new_colnames)
+    new_columns <- matrix(NA, nrow = nrow(x), ncol = ncols)
+    ret <- as.regts(ts.union(x, new_columns))
     colnames(ret) <- c(colnames(x), new_colnames)
+    lbls <- ts_labels(x)
+    if (!is.null(lbls)) {
+        ts_labels(ret) <- c(lbls, rep("", ncols))
+    }
     return (ret)
 }
 
