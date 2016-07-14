@@ -49,6 +49,23 @@ test_that("constructor regts for multivariate timeseries", {
 })
 
 
+test_that("adding a column to a regts", {
+    regts1 <- regts(matrix(rep(1:10), ncol = 2), start = "2010Q4",
+                    names = c("a", "b"),
+                    labels = c("Timeseries a", "Timeseries b"))
+    regts1['2012Q2', 'x'] <- 2
+
+    ref <- c("Timeseries a", "Timeseries b", "")
+    names(ref) <- colnames(regts1)
+
+    expect_identical(ts_labels(regts1), ref)
+
+    regts2 <- update_ts_labels(regts1, list(x = "Timeseries x"))
+    ref2 <- c("Timeseries a", "Timeseries b", "Timeseries x")
+    names(ref2) <- colnames(regts2)
+    expect_identical(ts_labels(regts2), ref2)
+})
+
 test_that("labels are preserved in miscellaneous timeseries functions", {
     x <- regts(1:10, start = "2010Q4", names = "a", labels = "Timeseries a")
     x_sin <- sin(x)
