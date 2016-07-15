@@ -18,11 +18,23 @@ aggregate_gr <- function(x,  method, nfrequency = 1) {
     if (!is.numeric(x)) {
         stop("aggregate_gr is not implemented for non-numeric timeseries")
     }
+    if (!is.matrix(x)) {
+        is_mat <- FALSE
+        dim(x) <- c(length(x), 1)
+    } else {
+        is_mat <- TRUE
+    }
     # call C++ function agg_gr (see src/agg_gr.cpp)
     res <- agg_gr(x, nfrequency, method)
     data  <- res[[1]]
     range_new <- res[[2]]
-    colnames(data) <- colnames(x)
+
+    if (is_mat) {
+        colnames(data) <- colnames(x)
+    } else {
+        dim(data) <- NULL
+    }
+
     return (create_regts(data, range_new[1], range_new[2], range_new[3],
                          ts_labels(x)))
 }

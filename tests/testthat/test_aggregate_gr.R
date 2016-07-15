@@ -74,8 +74,8 @@ test_that("cgr and cgru, monthly to quarterly, two timeseries", {
 test_that("cgr and cgrs, quarterly to year, single timeseries with NA values", {
     p         <- regperiod_range("2009Q1", "2015Q4")
     ts_q      <- regts(rnorm(lensub(p)), start = start_period(p))
-    ts_q["2009Q1", ] <- NA
-    ts_q["2012Q2", ] <- NA
+    ts_q["2009Q1"] <- NA
+    ts_q["2012Q2"] <- NA
     ts_q["2015Q4"] <- NA
     ref_abs <- agg_diff_1(ts_q) # the correct result
     expect_equal(agg_diff_2(ts_q, method = "cgr"), ref_abs);
@@ -87,13 +87,13 @@ test_that("cgr and cgrs, quarterly to year, single timeseries with Inf, -Inf or
           NaN values", {
     p         <- regperiod_range("2009Q1", "2015Q4")
     ts_q      <- regts(rnorm(lensub(p)), start = start_period(p))
-    ts_q["2009Q1", ] <- 1/0
-    ts_q["2012Q2", ] <- 0/0
+    ts_q["2009Q1"] <- 1/0
+    ts_q["2012Q2"] <- 0/0
     ts_q["2015Q4"] <- -1/0
     ref_abs <- agg_diff_1(ts_q) # the correct result
     expect_equal(agg_diff_2(ts_q, method = "cgr"), ref_abs);
     ref_rel <- agg_reldiff_1(ts_q) # the correct result
-    ref_rel['2015', ] <- NaN  # the cgru and cgrs methods  cannot distinguish
+    ref_rel['2015'] <- NaN  # the cgru and cgrs methods  cannot distinguish
                               #Inf, Inf and NaN
     expect_equal(agg_reldiff_2(ts_q, method = "cgru"), ref_rel);
 })

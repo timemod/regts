@@ -104,8 +104,8 @@ calculate_difference <- function(common_names, x1, x2, tol, fun) {
         return (NULL)
     }
 
-    xx1 <- x1[, common_names]
-    xx2 <- x2[, common_names]
+    xx1 <- x1[, common_names, drop = FALSE]
+    xx2 <- x2[, common_names, drop = FALSE]
 
     # Align the two timeseries objects using the union of their times.
     p1 <- get_regperiod_range(xx1)
@@ -126,7 +126,7 @@ calculate_difference <- function(common_names, x1, x2, tol, fun) {
     sel <- apply(dif, FUN = max, MARGIN = 2) > tol
     sel[is.na(sel)] <- TRUE
     if (any(sel)) {
-        dif <- dif[, sel]
+        dif <- dif[, sel, drop = FALSE]
     } else {
         dif <- NULL
     }

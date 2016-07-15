@@ -3,7 +3,7 @@ context("cbind")
 test_that("univariate timeseries", {
 
     a <- regts(1:5, start = "2010Q2")
-    b <- regts(11:15, start = "2011Q1")
+    b <- regts(matrix(11:15, nc = 1), start = "2011Q1")
 
     expect_identical(colnames(cbind(a, b)), c("a", "b"))
     expect_identical(colnames(cbind(x = a, y = b)), c("x", "y"))

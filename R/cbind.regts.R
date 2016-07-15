@@ -27,6 +27,11 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
         ret <- ts.intersect(..., dframe = FALSE)
     }
 
+    if (!is.matrix(ret)) {
+        # single ts
+        return (ret)
+    }
+
     # The following code is to create column names for the result.
     # We do not like the column names created by ts.union and ts.intersect,
     # therefore determine our own column names

@@ -8,12 +8,10 @@ test_that("as.list for univariate timeseries without colnames", {
     a <- regts(1:10, start = "2010Q2", labels = labels)
     l1 <- as.list(a)
     expect_identical(l1[[1]], a)
-    expect_identical(l1[[1]], a[, 1])
     expect_identical(names(l1), "a")
     expect_identical(lapply(l1, FUN = ts_labels), list(a = labels[1]))
 
     ref <- a
-    colnames(ref) <- "a"
     ts_labels(ref) <- ts_labels(ref)  # add names
     expect_identical(do.call(cbind, l1), ref)
 
@@ -35,7 +33,11 @@ test_that("as.list for univariate timeseries with colnames", {
 
     label_a <- labels[1]
     expect_identical(lapply(l1, FUN = ts_labels), list(a = label_a))
-    expect_identical(do.call(cbind, l1), regts1)
+    ref <- regts1
+    dim(ref) <- NULL
+    names(ts_labels(ref)) <- NULL
+
+    expect_identical(do.call(cbind, l1), ref)
 
     # for a list with one element, ts.intersect gives the same result as
     # cbind

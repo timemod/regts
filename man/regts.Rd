@@ -4,8 +4,7 @@
 \alias{regts}
 \title{Create a \code{regts} timeseries object}
 \usage{
-regts(data, start, end = NULL, frequency = NA, names = colnames(data),
-  labels = NULL)
+regts(data, start, end = NULL, frequency = NA, names, labels = NULL)
 }
 \arguments{
 \item{data}{a vector or matrix of the observed time-series values. A data frame will be

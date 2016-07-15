@@ -3,8 +3,7 @@ context("regts")
 test_that("constructor regts for univariate timeseries", {
 
     regts1 <- regts(1:10, start = "2010Q4")
-    ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010,4), frequency = 4,
-              names = NULL)
+    ts1 <- ts(1:10, start = c(2010,4), frequency = 4)
     expect_identical(regts1, as.regts(ts1))
     expect_identical(as.ts(regts1), ts1)
     expect_identical(class(regts1), c("regts", "ts"))
@@ -94,21 +93,26 @@ test_that("period / column selection in multivariate timeseries", {
 
     regts2 <- regts1[, 'b']
     expect_is(regts2, "regts")
-    expect_identical(regts2, as.regts(ts1[, 'b', drop = FALSE]))
+    expect_identical(regts2, as.regts(ts1[, 'b']))
+
+    regts3 <- regts1[, 'b', drop = FALSE]
+    expect_identical(regts3, as.regts(ts1[, 'b', drop = FALSE]))
 
     expect_identical(regts1[, c("b", "a")], as.regts(ts1[, c("b", "a")]))
 
     expect_identical(regts1['2011Q1', "c"], as.regts(
-        window(ts1, start = c(2011,1), end = c(2011,1)))[, "c"])
+        window(ts1[, "c"], start = c(2011,1), end = c(2011,1))))
 
     expect_identical(regts1['2011Q1', c("b", "a")], as.regts(
-        window(ts1, start = c(2011,1), end = c(2011,1)))[, c("b", "a")])
+        window(ts1, start = c(2011,1), end = c(2011,1)))[, c("b", "a"),
+                                                         drop = FALSE])
 
     expect_identical(regts1['2011'], as.regts(
         window(ts1, start = c(2011,1), end = c(2011,4), extend = TRUE)))
 
     expect_identical(regts1['2011Q1', c("a", "b")], as.regts(
-        window(ts1, start = c(2011,1), end = c(2011,1), extend = TRUE)[, c("a", "b"), drop = FALSE]))
+        window(ts1, start = c(2011,1), end = c(2011,1), extend = TRUE)
+                                            [, c("a", "b"), drop = FALSE]))
 })
 
 

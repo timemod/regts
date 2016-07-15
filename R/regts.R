@@ -57,12 +57,11 @@
 #' @importFrom stats ts
 #' @importFrom stats frequency
 #' @export
-regts <- function(data, start, end = NULL, frequency = NA, names = colnames(data),
+regts <- function(data, start, end = NULL, frequency = NA, names,
                   labels = NULL) {
 
-    data <- as.matrix(data)
     start <- as.regperiod(start, frequency)
-    freq <- frequency(start)
+    freq  <- frequency(start)
     start <- as.numeric(start)  # this turns out to be more efficient
     if (!is.null(end)) {
         end <- as.regperiod(end, frequency)
@@ -73,27 +72,29 @@ regts <- function(data, start, end = NULL, frequency = NA, names = colnames(data
     }
 
     if (!missing(names)) {
+        data <- as.matrix(data)
         if (length(names) != ncol(data)) {
-            stop("The length of the names vector is not euqal to the number of columns")
+            stop("The length of the names vector is not equal to the number of columns")
         }
         colnames(data) <- names
     }
 
     retval <- create_regts(data, start, end, freq, labels)
 
-    if (is.null(attr(retval, "dim"))) {
-        # univariate timeseries wihout dimension attributes
-        # add dimension attributes so that the timeseries has a column number
-        # this situation might occur in the following example:
-        # regts(1, start = "2010Q2", end = "2011Q3")
-        retval <- insert_dim_attr(retval)
+    if (!missing(names) && is.null(attr(retval, "dim"))) {
+        # Univariate timeseries wihout dimension attribute.
+        # This situation will occur for the following example:
+        # regts(1, start = "2010Q2", end = "2011Q3").
+        # Therefore, add a dimension attribute so that the timeseries can carry
+        # a column name.
+        dim_attr <- list(dim = c(length(x), 1), dimnames = list(NULL, names))
+        attributes(x) <- c(dim_attr, attributes(x))
     }
-
     return (retval)
 }
 
 create_regts <- function(data, startp, endp, freq, labels) {
-    if (ncol(data) > 1) {
+    if (is.matrix(data) && ncol(data) > 1) {
         classes <- c("regts", "mts", "ts", "matrix")
     } else {
         classes <- c("regts", "ts")
@@ -114,13 +115,6 @@ create_regts <- function(data, startp, endp, freq, labels) {
     }
 
     return (retval)
-}
-
-# add dimension attribute for univariate timeseriss
-insert_dim_attr <- function(x) {
-    dim_attr <- list(dim = c(length(x), 1), dimnames = list(NULL, NULL))
-    attributes(x) <- c(dim_attr, attributes(x))
-    return(x)
 }
 
 #' Tests whether an object is a \code{\link{regts}} timeseries object
@@ -176,11 +170,6 @@ as.regts <- function(x, ...) {
 as.regts.ts <- function(x, ...) {
     if (!is.regts(x)) {
         class(x) <- c("regts", class(x))
-        if (is.null(attr(x, "dim"))) {
-            # univariate timeseries wihout dimension attributes
-            # add dimension attributes so that the timeseries has a column name.
-            x <- insert_dim_attr(x)
-        }
     }
     return (x)
 }
@@ -312,14 +301,14 @@ add_columns <- function(x, new_colnames) {
 # Selection on the right-hand-side (e.g. x["2010Q2", ]).
 #' @importFrom stats is.ts
 #' @export
-"[.regts" <- function(x, i, j, ...) {
+"[.regts" <- function(x, i, j, drop = TRUE) {
     if (!missing(i) && (is.character(i) || inherits(i, "regperiod") ||
                         inherits(i, "regperiod_range"))) {
-        # the row selector is a regperiod_range. Use the C++ function
-        # windows_regts
+        # first select columns
         if (!missing(j)) {
-            x <- x[, j]
+            x <- x[, j, drop = drop]
         }
+        # the row selector is a regperiod_range. Use window_regts
         x <- window_regts(x, as.regperiod_range(i))
         return (x)
     } else {
@@ -327,7 +316,7 @@ add_columns <- function(x, new_colnames) {
         if (!is.null(lbls) && !missing(j)) {
             lbls <- lbls[j]
         }
-        x <- NextMethod("[", drop = FALSE)
+        x <- NextMethod("[")
         # x can be something else than a timeseries, for example an integer
         if (is.ts(x)) {
             x <- as.regts(x)
@@ -362,9 +351,16 @@ window_regts <- function(x, range) {
     shift <- range_new[1] - ts_range[1]
     rmin <- max(1, 1 - shift)
     rmax <- min(nper_new, lensub__(ts_range) - shift)
-    data <- matrix(NA, nrow = nper_new, ncol = ncol(x))
-    data[rmin:rmax, ] <- x[(rmin+shift):(rmax+shift), ]
-    colnames(data) <- colnames(x)
+    if (is.matrix(x)) {
+        data <- matrix(NA, nrow = nper_new, ncol = ncol(x))
+        data[rmin:rmax, ] <- x[(rmin+shift):(rmax+shift), ]
+        colnames(data) <- colnames(x)
+    } else {
+        data <- numeric(nper_new)
+        data <- NA
+        data[rmin:rmax] <- x[(rmin+shift):(rmax+shift)]
+    }
+
     return (create_regts(data, range_new[1], range_new[2], range_new[3],
                                  ts_labels(x)))
 }
@@ -401,7 +397,11 @@ ts_labels <- function(x) {
         if (!is.character(value)) {
             stop("value should be a character vector")
         }
-        if (length(value) != ncol(x)) {
+        nc <- ncol(x)
+        if (is.null(nc)) {
+            nc <- 1
+        }
+        if (length(value) != nc) {
             stop(paste("The length of the labels argument should be equal",
                        "to the number of columns"))
         }
@@ -431,8 +431,12 @@ update_ts_labels <- function(x, labels) {
         return (x)
     }
     lbls <- ts_labels(x)
+    nc <- ncol(x)
+    if (is.null(nc)) {
+        nc <- 1
+    }
     if (is.null(lbls)) {
-        lbls <- rep("", ncol(x))
+        lbls <- rep("", nc)
         names(lbls) <- colnames(x)
     }
     sel <- which(colnames(x) %in% names(labels))

@@ -42,8 +42,8 @@ test_that("constructor regts for multivariate timeseries", {
     res2['a'] <- "ts a"
     expect_identical(ts_labels(regts1), res)
 
-    expect_identical(ts_labels(regts1[, 1]), res['a'])
-    expect_identical(ts_labels(regts1[, 'b']), res['b'])
+    expect_identical(ts_labels(regts1[, 1, drop = FALSE]), res['a'])
+    expect_identical(ts_labels(regts1[, 'b']), unname(res['b']))
     expect_identical(ts_labels(regts1[, c('a', 'b')]), res)
     expect_identical(ts_labels(regts1[, c('b', 'a')]), res[c("b", "a")])
 })

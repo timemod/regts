@@ -4,13 +4,15 @@
 \alias{filter_columns}
 \title{Select columns using  a filter}
 \usage{
-filter_columns(x, regex)
+filter_columns(x, regex, drop = TRUE)
 }
 \arguments{
 \item{x}{any R object that supports column selection (\code{data.frame},
 \code{matrix}, \code{ts}, \code{regts})}
 
 \item{regex}{a regular expression used to select column}
+
+\item{drop}{simplify the result}
 }
 \value{
 the selection of object \code{x}

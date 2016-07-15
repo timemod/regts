@@ -30,6 +30,12 @@
 #' @export
 as.list.regts <- function(x, ...) {
 
+    if (!is.matrix(x)) {
+        retval <- list(x)
+        names(retval) <- deparse(substitute(x))
+        return (retval)
+    }
+
     # create list of univariate timeseries without colnames
     f <- function(i) {
         ret <- x[, i]
