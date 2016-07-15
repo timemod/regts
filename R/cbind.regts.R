@@ -1,12 +1,16 @@
-#' Join two or more timeseries
+#' Bind two or more timeseries
 #'
-#' Join time series objects with a common frequency.
+#' Bind two or more time series objects with a common frequency.
+#' By default, the period range of the result is the union of the period ranges
+#' of the individual timeseries. The result is padded with \code{NA}s if
+#' neccesary. If argument \code{union} is false, then the period range
+#' of the result is the intersection of the period ranges.
 #'
 #' @param  ... two or more univariate or multivariate time series,
 #' or objects which can coerced to time series
 #' @param union if \code{TRUE}, then the period range of the result
 #' is the union of the period ranges of the joined objects
-#' (missing values are filled with \code{NA}). If \code{FALSE},
+#' (the result is padded with \code{NA}s if necessary). If \code{FALSE},
 #' then the period range of the result is the intersection of the period ranges
 #' of the joined objects.
 #' @param suffixes Suffixes appended to the column names for overlapping
@@ -15,7 +19,7 @@
 #' @seealso \code{\link{as.list.regts}}
 #' @importFrom stats ts.union ts.intersect
 #' @export
-join_ts <- function(..., union = TRUE, suffixes) {
+cbind.regts <- function(..., union = TRUE, suffixes) {
 
     if (union) {
         ret <- ts.union(..., dframe = FALSE)
@@ -58,7 +62,7 @@ join_ts <- function(..., union = TRUE, suffixes) {
     if (any(dupl)) {
         if (missing(suffixes)) {
             stop (paste0("Duplicate column names (", all_names[dupl],
-                       "). Specify argument suffixes"))
+                       "). Specify argument suffixes."))
         } else if (length(suffixes) < length(args)) {
             stop (paste0("Length of argument suffixes is smaller than the",
                         " number of objects to be joined (", length(args),

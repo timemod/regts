@@ -28,4 +28,4 @@ l2 <- within(l, {
     d <- c
     e <- d
 })
-ts3 <- do.call(join_ts, l2)
+ts3 <- do.call(cbind, l2)

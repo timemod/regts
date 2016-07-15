@@ -21,9 +21,9 @@
 #'  })
 #'
 #'  # convert ts_list2 to a multivariate regts
-#'  regts2 <- do.call(join_ts, ts_list2)
+#'  regts2 <- do.call(cbind, ts_list2)
 #'
-#' @seealso The functions \code{\link{do.call}} and \code{\link{join_ts}}
+#' @seealso The functions \code{\link{do.call}} and \code{\link{cbind}}
 #' can be used to convert the list of timeseries objects to a multivariate
 #' \code{regts} (see the example).
 #'
@@ -46,7 +46,7 @@ as.list.regts <- function(x, ...) {
     } else {
         # The return value should always have names. Otherwise, a problem
         # could occur when the list is converted to a regts again
-        # by using do.call(join_ts, l)
+        # by using do.call(cbind, l)
         xname <- deparse(substitute(x))
         nc <- ncol(x)
         if (is.null(nc) || nc == 1) {

@@ -15,10 +15,10 @@ test_that("as.list for univariate timeseries without colnames", {
     ref <- a
     colnames(ref) <- "a"
     ts_labels(ref) <- ts_labels(ref)  # add names
-    expect_identical(do.call(join_ts, l1), ref)
+    expect_identical(do.call(cbind, l1), ref)
 
     # for a list with one element, ts.intersect gives the same result as
-    # join_ts
+    # cbind
     expect_identical(do.call(ts.intersect, l1), a)
 })
 
@@ -35,10 +35,10 @@ test_that("as.list for univariate timeseries with colnames", {
 
     label_a <- labels[1]
     expect_identical(lapply(l1, FUN = ts_labels), list(a = label_a))
-    expect_identical(do.call(join_ts, l1), regts1)
+    expect_identical(do.call(cbind, l1), regts1)
 
     # for a list with one element, ts.intersect gives the same result as
-    # join_ts
+    # cbind
     expect_identical(do.call(ts.intersect, l1), ref)
 })
 
@@ -56,7 +56,7 @@ test_that("as.list for multivariate timeseries", {
     label_a <- labels[1]
     label_b <- labels[2]
     expect_identical(lapply(l1, FUN = ts_labels), list(a = label_a, b = label_b))
-    expect_identical(do.call(join_ts, c(l1, union = FALSE)), regts1)
+    expect_identical(do.call(cbind, c(l1, union = FALSE)), regts1)
 })
 
 test_that("as.list for multivariate timeseries without colnames and labels", {
@@ -68,7 +68,7 @@ test_that("as.list for multivariate timeseries without colnames and labels", {
     expect_identical(names(l1), ts_names)
     ref <- regts1
     colnames(ref) <- ts_names
-    expect_identical(do.call(join_ts, l1), ref)
+    expect_identical(do.call(cbind, l1), ref)
 })
 
 test_that("usage of within", {
@@ -80,7 +80,7 @@ test_that("usage of within", {
         c <- a * b
         d <- lag(c)
     })
-    regts2 <- do.call(join_ts, l)
+    regts2 <- do.call(cbind, l)
     regts2 <- regts2[, c("a", "b", "c", "d")]
 
     ref <- regts1
@@ -99,7 +99,7 @@ test_that("usage of within with labels", {
         c <- a * b
         d <- lag(c)
     })
-    regts2 <- do.call(join_ts, l)
+    regts2 <- do.call(cbind, l)
     regts2 <- regts2[, c("a", "b", "c", "d")]
 
     ref <- regts1

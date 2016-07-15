@@ -44,7 +44,7 @@
 #' \code{\link{as.data.frame.regts}} and \code{\link{as.list.regts}} can be used
 #' to convert \code{regts} to a \code{\link{data.frame}} or a \code{\link{list}}.
 #'
-# Function \code{\link{join_ts}} can be used to join two or more
+#' Function \code{\link{cbind}} can be used to bind two or more
 #' timeseries objects and create a multivariate \code{regts}.
 #'
 #' Information about the time period of the timeseries can be obtained
