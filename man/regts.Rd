@@ -63,6 +63,8 @@ The S3 generic \code{\link{as.regts}} can be used to coerce an R object to a
 \code{\link{as.data.frame.regts}} and \code{\link{as.list.regts}} can be used
 to convert \code{regts} to a \code{\link{data.frame}} or a \code{\link{list}}.
 
+timeseries objects and create a multivariate \code{regts}.
+
 Information about the time period of the timeseries can be obtained
 with the functions \code{\link{get_regperiod_range}},
 \code{\link{start_period}} and \code{\link{end_period}}.

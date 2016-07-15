@@ -22,11 +22,3 @@ get_regperiod_range <- function(x) {
     .Call('regts_get_regperiod_range', PACKAGE = 'regts', x)
 }
 
-select_rows <- function(ts_old, selector) {
-    .Call('regts_select_rows', PACKAGE = 'regts', ts_old, selector)
-}
-
-convert_range_selector <- function(selector, ts_range) {
-    .Call('regts_convert_range_selector', PACKAGE = 'regts', selector, ts_range)
-}
-

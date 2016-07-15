@@ -2,7 +2,7 @@
 % Please edit documentation in R/list.R
 \name{as.list.regts}
 \alias{as.list.regts}
-\title{Convert a regts to a list of univariate regts objects}
+\title{Convert a \code{\link{regts}} to a list of univariate regts objects}
 \usage{
 \method{as.list}{regts}(x, ...)
 }
@@ -15,10 +15,30 @@
 a list of univariate \code{regts} objects
 }
 \description{
-Convert a regts to a list of univariate regts objects
+This function converts a \code{\link{regts}} to a list of univariate
+\code{regts} objects.
 }
 \examples{
-ts <- regts(matrix(1:6, ncol = 2), start = "2015Q3", names = c("a", "b"))
-print(as.list(ts))
+
+regts1 <- regts(matrix(1:6, ncol = 2), start = "2015Q3", names = c("a", "b"))
+
+# convert regts1 to a list
+ts_list1 <- as.list(regts1)
+
+# use the within function to modify timeseries and create new timeseries
+ts_list2 <- within (ts_list1, {
+   b["2015q2"] <- 2
+   c <- a * b
+   d <- lag(c)
+ })
+
+ # convert ts_list2 to a multivariate regts
+ regts2 <- do.call(join_ts, ts_list2)
+
+}
+\seealso{
+The functions \code{\link{do.call}} and \code{\link{join_ts}}
+can be used to convert the list of timeseries objects to a multivariate
+\code{regts} (see the example).
 }
 

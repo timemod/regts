@@ -44,6 +44,9 @@
 #' \code{\link{as.data.frame.regts}} and \code{\link{as.list.regts}} can be used
 #' to convert \code{regts} to a \code{\link{data.frame}} or a \code{\link{list}}.
 #'
+# Function \code{\link{join_ts}} can be used to join two or more
+#' timeseries objects and create a multivariate \code{regts}.
+#'
 #' Information about the time period of the timeseries can be obtained
 #' with the functions \code{\link{get_regperiod_range}},
 #' \code{\link{start_period}} and \code{\link{end_period}}.
@@ -253,11 +256,17 @@ as.regts.default <- function(x, ...) {
     return (as.regts(as.ts(x, ...)))
 }
 
-# Add columns with names new_colnames to x, and fill with NA.
+# Add columns with names new_colnames to x, and fill with NA
+#' @importFrom stats ts.union
 add_columns <- function(x, new_colnames) {
-    new_columns <- matrix(NA, nrow = nrow(x), ncol = length(new_colnames))
-    ret <- regts.intersect(x, new_columns)
+    ncols <- length(new_colnames)
+    new_columns <- matrix(NA, nrow = nrow(x), ncol = ncols)
+    ret <- as.regts(ts.union(x, new_columns))
     colnames(ret) <- c(colnames(x), new_colnames)
+    lbls <- ts_labels(x)
+    if (!is.null(lbls)) {
+        ts_labels(ret) <- c(lbls, rep("", ncols))
+    }
     return (ret)
 }
 
@@ -332,15 +341,32 @@ add_columns <- function(x, new_colnames) {
     }
 }
 
+convert_range_selector <- function(range, ts_range) {
+    if (ts_range[3] %% range[3] != 0) {
+        stop(paste("frequency of timeseries not divisible by the frequency of",
+                   "the selectort"))
+    }
+    fac <- ts_range[3] %/% range[3]
+    range_new <- numeric(3)
+    range_new[1] <- floor(range[1] * fac)
+    range_new[2] <- floor((range[2] + 1) * fac - 1)
+    range_new[3] <- ts_range[3]
+    range_new <- ifelse(is.na(range_new), ts_range, range_new)
+    return (range_new)
+}
 
 window_regts <- function(x, range) {
-    # call C++ function select_rows
-    ret <- select_rows(x, range)
-    data      <- ret[[1]]
-    range_new <- ret[[2]]
+    ts_range <- get_regperiod_range(x)
+    range_new <- convert_range_selector(range, ts_range)
+    nper_new <- lensub__(range_new)
+    shift <- range_new[1] - ts_range[1]
+    rmin <- max(1, 1 - shift)
+    rmax <- min(nper_new, lensub__(ts_range) - shift)
+    data <- matrix(NA, nrow = nper_new, ncol = ncol(x))
+    data[rmin:rmax, ] <- x[(rmin+shift):(rmax+shift), ]
     colnames(data) <- colnames(x)
     return (create_regts(data, range_new[1], range_new[2], range_new[3],
-                         ts_labels(x)))
+                                 ts_labels(x)))
 }
 
 #' Timeseries labels

@@ -15,7 +15,7 @@ difference["2008Q3", ] <- NA
 difference["2009Q3", ] <- NA
 
 res_correct <- list(tol = 0, missing_names1 = "d",  missing_names2 = "c",
-                    common_names = c("a", "b"), equal = FALSE, difnames = c("a", "b"),
+                    equal = FALSE, difnames = c("a", "b"),
                     dif = difference)
 
 test_that("simple example", {
@@ -27,7 +27,7 @@ test_that("no difference", {
     res <- tsdif(ts1, ts1)
     res_no_dif <- list(tol = 0, missing_names1 = character(0),
                          missing_names2 = character(0),
-                         common_names = colnames(ts1), equal = TRUE, difnames = character(0),
+                         equal = TRUE, difnames = character(0),
                          dif = NULL)
     expect_equal(res, res_no_dif)
 })
@@ -61,7 +61,7 @@ test_that("no common columns", {
     res <- tsdif(ts1, x2)
     res_correct2 <- list(tol = 0, missing_names1 = c("A", "B", "D"),
                          missing_names2 = c("a", "b", "c"),
-                         common_names = character(0), equal = FALSE, difnames = character(0),
+                         equal = FALSE, difnames = character(0),
                           dif = NULL)
     expect_equal(res, res_correct2)
 })
@@ -83,7 +83,7 @@ test_that("single ts as result", {
 test_that("single common column", {
     res <- tsdif(ts1[, c("a", "c")], ts2[, c("d", "a")])
     res_correct2 <- list(tol = 0, missing_names1 = "d",  missing_names2 = "c",
-                         common_names = c("a"), equal = FALSE, difnames = c("a"),
+                         equal = FALSE, difnames = c("a"),
                          dif = regts(matrix(data = c(NA, rep(0.01, 3), NA), nc = 1),
                                      start = "2008Q3", names = c("a")))
     expect_equal(res, res_correct2)
@@ -92,7 +92,7 @@ test_that("single common column", {
 test_that("two univariate timeseries", {
     res <- tsdif(ts1[, "a"], ts2[, c("a")])
     res_correct2 <- list(tol = 0, missing_names1 = character(0),  missing_names2 = character(0),
-                         common_names = c("a"), equal = FALSE, difnames = c("a"),
+                         equal = FALSE, difnames = c("a"),
                          dif = regts(matrix(data = c(NA, rep(0.01, 3), NA), nc = 1),
                                      start = "2008Q3", names = c("a")))
     expect_equal(res, res_correct2)

@@ -6,9 +6,8 @@ set.seed(12345)
 aantal_variabelen <- 5000
 aantal_perioden <- 200
 
-#aantal_variabelen <- 5
+#aantal_variabelen <- 50
 #aantal_perioden <- 20
-
 
 namen <- paste('ts', seq(aantal_variabelen), sep = "_")
 data <- matrix(rnorm(n  = aantal_variabelen * aantal_perioden),
@@ -27,8 +26,9 @@ lzoo <- as.list(zoo1)
 commands <- c("lts  <- as.list(ts1)",
               "lregts <- as.list(regts1)",
               "lzoo <- as.list(zoo1)",
+              "do.call(ts.union, lts)",
               "do.call(ts.intersect, lts)",
-              "do.call(regts.intersect, lregts)",
+              "do.call(join_ts, lregts)",
               "do.call(merge, lzoo)"
 )
 

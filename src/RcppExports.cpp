@@ -53,27 +53,3 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// select_rows
-List select_rows(const SEXP ts_old, const NumericVector selector);
-RcppExport SEXP regts_select_rows(SEXP ts_oldSEXP, SEXP selectorSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< const SEXP >::type ts_old(ts_oldSEXP);
-    Rcpp::traits::input_parameter< const NumericVector >::type selector(selectorSEXP);
-    __result = Rcpp::wrap(select_rows(ts_old, selector));
-    return __result;
-END_RCPP
-}
-// convert_range_selector
-NumericVector convert_range_selector(const NumericVector& selector, const NumericVector& ts_range);
-RcppExport SEXP regts_convert_range_selector(SEXP selectorSEXP, SEXP ts_rangeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< const NumericVector& >::type selector(selectorSEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type ts_range(ts_rangeSEXP);
-    __result = Rcpp::wrap(convert_range_selector(selector, ts_range));
-    return __result;
-END_RCPP
-}
