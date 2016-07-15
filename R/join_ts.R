@@ -56,7 +56,6 @@ join_ts <- function(..., union = TRUE, suffixes) {
     dupl <- duplicated(all_names)
 
     if (any(dupl)) {
-        #TODO: improve error messages
         if (missing(suffixes)) {
             stop (paste0("Duplicate column names (", all_names[dupl],
                        "). Specify argument suffixes"))
