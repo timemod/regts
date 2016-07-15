@@ -29,9 +29,9 @@ join_ts <- function(..., union = TRUE, suffixes) {
     args <- list(...)
     cnames <- lapply(args, FUN = colnames)
 
-    # handle missing columns
     missing_colnames <- lapply(cnames, FUN = is.null)
     if (any(unlist(missing_colnames))) {
+        # handle missing colnames
         ts_names <- get_ts_names(...)
         get_colnames <- function(i) {
             if (missing_colnames[[i]]) {
@@ -58,9 +58,12 @@ join_ts <- function(..., union = TRUE, suffixes) {
     if (any(dupl)) {
         #TODO: improve error messages
         if (missing(suffixes)) {
-            stop("Duplicate column names. Specify argument suffixes ")
+            stop (paste0("Duplicate column names (", all_names[dupl],
+                       "). Specify argument suffixes"))
         } else if (length(suffixes) < length(args)) {
-            stop("Length of argument suffixes is incorrect")
+            stop (paste0("Length of argument suffixes is smaller than the",
+                        " number of objects to be joined (", length(args),
+                        ")."))
         }
         add_suffix <- lapply(cnames, function(x) x %in% all_names[dupl])
         fix_dupl <- function(i) {
@@ -73,13 +76,12 @@ join_ts <- function(..., union = TRUE, suffixes) {
     cnames <- unlist(cnames)
     colnames(ret) <- cnames
 
-    ret <- handle_labels(as.regts(ret), ...)
-
+    ret <- handle_labels(as.regts(ret), args)
     return (ret)
 }
 
 get_ts_names <- function(...) {
-    # copied from stats:::.makeNamesTs
+    # returns the names of the ... arguments
     l <- as.list(substitute(list(...)))[-1L]
     nm <- names(l)
     fixup <- if (is.null(nm)) {
@@ -98,7 +100,6 @@ get_ts_names <- function(...) {
 }
 
 # Returns the timeseries label from an arbitrary object.
-# Only regts objects have labels
 get_labels <- function(x) {
     if (is.ts(x)) {
         lbls <- ts_labels(x)
@@ -117,13 +118,11 @@ get_labels <- function(x) {
 
 # Check if the arguments in ... contain any label, and if so than add
 # all labels to x
-handle_labels <- function(x, ...) {
-    arguments <- list(...)
-    # Check if there are any labels
-    has_labels <- any(unlist(lapply(arguments,
+handle_labels <- function(x, args) {
+    has_labels <- any(unlist(lapply(args,
                                     FUN = function(x) !is.null(ts_labels(x)))))
     if (has_labels) {
-        labels <- unname(unlist(lapply(arguments, FUN = get_labels)))
+        labels <- unname(unlist(lapply(args, FUN = get_labels)))
         ts_labels(x) <- labels
     }
     return(x)
