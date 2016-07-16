@@ -316,7 +316,7 @@ add_columns <- function(x, new_colnames) {
         if (!is.null(lbls) && !missing(j)) {
             lbls <- lbls[j]
         }
-        if (is.matrix(x) && nrow(x) == 1 && length(j) > 1) {
+        if (is.matrix(x) && nrow(x) == 1 && (missing(j) || length(j) > 1)) {
             # the result is very weird is the timeseries has a single row
             # and if drop = TRUE is used
             x <- NextMethod(.Generic, drop = FALSE)

@@ -1,16 +1,23 @@
-#' Calculates the difference between two timeseries objects
+#' Calculates the differences between two multivariate timeseries
+#' objects
 #'
-#'This function calculates the difference between two timeseries
-#'objects \code{x1} and \code{x2} for the common columns.
-#'The two timeseries must have the same frequency, but may have a different
-#'period range. The difference is computed for the intersection of the two
-#'period ranges (for the non-overlapping periods the result will be
-#'\code{NA}). Two \code{NA} values are considered to be equal.
+#' This function can be used to compare two multivariate timeseries objects.
+#' The function reports the names of columns with differences larger than a
+#' specified tolerance, and the names of the columns present in one object
+#' but missing in the other object.
+#'
+#' @details
+#' This function calculates the difference between common columns
+#' of two multivariate timeseries objects \code{x1} and \code{x2}.
+#' The two timeseries must have the same frequency, but may have a different
+#' period range. The difference is computed for the union of the two
+#' period ranges (for the non-overlapping periods the result will be
+#' \code{NA}). Two \code{NA} values are considered to be equal.
 #'
 #' @export
-#' @param x1 the first timeseries (a \code{\link{regts}} or
+#' @param x1 the first timeseries (a multivariate \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
-#' @param x2 the second timeseries (a \code{regts} or \code{ts} object).
+#' @param x2 the second timeseries (a multivariate \code{regts} or \code{ts} object).
 #' @param tol difference tolerance (by default zero). Differences smaller
 #' than tol are ignored.
 #' @param fun function to compute differences. This function should accept
@@ -57,19 +64,37 @@
 #'
 tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
 
-    seriesName1 <- deparse(substitute(x1))
-    seriesName2 <- deparse(substitute(x2))
+    if (!is.mts(x1)) {
+        stop(paste0("Argument x1 (", deparse(substitute(x1))),
+                   ") is not a multivariate timeseries")
+    }
+    if (!is.mts(x2)) {
+        stop(paste0("Argument x2 (", deparse(substitute(x2))),
+             ") is not a multivariate timeseries")
+    }
 
     x1 <- as.regts(x1)
     x2 <- as.regts(x2)
 
     if (frequency(x1) != frequency(x2)) {
-        stop(paste("Timeseries x1 and x2 (", seriesName1, "and", seriesName2,
+        series_name1 <- deparse(substitute(x1))
+        series_name2 <- deparse(substitute(x2))
+        stop(paste("Timeseries x1 and x2 (", series_name1, "and", series_name2,
                    "have different frequencies"))
     }
 
     names1 <- colnames(x1)
     names2 <- colnames(x2)
+
+    # create colnames of x1 or x2 does not have colnames
+    if (is.null(names1)) {
+        names1 <- paste("column", 1 : ncol(x1))
+        colnames(x1) <- names1
+    }
+    if (is.null(names2)) {
+        names2 <- paste("column", 1 : ncol(x2))
+        colnames(x2) <- names2
+    }
 
     common_names   <- intersect(names1, names2)
     missing_names1 <- setdiff(names2, names1)
@@ -133,7 +158,7 @@ calculate_difference <- function(common_names, x1, x2, tol, fun) {
 
     if (!is.null(dif)) {
         # sort columns of dif
-        dif <- dif[, sort(colnames(dif))]
+        dif <- dif[, sort(colnames(dif)), drop = FALSE]
     }
 }
 

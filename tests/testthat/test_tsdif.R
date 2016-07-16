@@ -90,14 +90,27 @@ test_that("single common column", {
 })
 
 test_that("two univariate timeseries", {
-    res <- tsdif(ts1[, "a"], ts2[, c("a")])
-    res_correct2 <- list(tol = 0, missing_names1 = character(0),  missing_names2 = character(0),
-                         equal = FALSE, difnames = c("a"),
-                         dif = regts(matrix(data = c(NA, rep(0.01, 3), NA), nc = 1),
-                                     start = "2008Q3", names = c("a")))
-    expect_equal(res, res_correct2)
+    expect_error(tsdif(ts1[, "a"], ts2[, "a"]),
+       "Argument x1 \\(ts1\\[, \"a\"\\]\\) is not a multivariate timeseries")
+    expect_error(tsdif(ts1, ts2[, "a", drop = FALSE]),
+        "Argument x2 \\(ts2\\[, \"a\", drop = FALSE\\]\\) is not a multivariate timeseries")
 })
 
+test_that("no column namessimple", {
+    x <- ts1
+    y <- ts2[, 1:2]
+    colnames(x) <- NULL
+    colnames(y) <- NULL
+    res <- tsdif(x, y)
+
+    difference3 <- difference[, 1:2]
+    colnames(difference3) <- c("column 1", "column 2")
+    res_correct3 <- list(tol = 0, missing_names1 = character(0),
+                         missing_names2 = "column 3",
+                        equal = FALSE, difnames = c("column 1", "column 2"),
+                        dif = difference3)
+    expect_equal(res, res_correct3)
+})
 
 
 

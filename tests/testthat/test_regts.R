@@ -223,5 +223,9 @@ test_that("column selection in a timeseries with 1 row", {
     names(ref) <- "c"
     expect_equal(regts1[, "c"], ref)
     expect_identical(regts1[, "c"], as.regts(ts1[, "c"]))
+
+    # select all columns
+    expect_identical(regts1[, ], regts1)
+    expect_identical(regts1[, ], as.regts(ts1[, , drop = FALSE]))
 })
 
