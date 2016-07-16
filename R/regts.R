@@ -164,13 +164,16 @@ as.regts <- function(x, ...) {
     UseMethod("as.regts")
 }
 
+#' @export
+as.regts.regts <- function(x, ...) {
+    return (x)
+}
+
 #' @describeIn as.regts Coerce a \code{\link[stats]{ts}} to a
 #' \code{\link{regts}}
 #' @export
 as.regts.ts <- function(x, ...) {
-    if (!is.regts(x)) {
-        class(x) <- c("regts", class(x))
-    }
+    class(x) <- c("regts", class(x))
     return (x)
 }
 
