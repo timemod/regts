@@ -36,19 +36,12 @@ as.list.regts <- function(x, ...) {
         return (retval)
     }
 
-    # create list of univariate timeseries without colnames
-    f <- function(i) {
-        ret <- x[, i]
-        colnames(ret) <- NULL
-        ts_labels(ret) <- ts_labels(ret)
-        return (ret)
-    }
-    retval <- lapply(seq_len(ncol(x)), f)
+    retval <- lapply(seq_len(ncol(x)), function(i) x[, i])
 
-    # the colnames of the original timeseries becomes the names of the list
+    # the colnames of the original timeseries become the names of the list
     cnames <- colnames(x)
     if (!is.null(cnames)) {
-        names(retval) <- colnames(x)
+        names(retval) <- cnames
     } else {
         # The return value should always have names. Otherwise, a problem
         # could occur when the list is converted to a regts again
