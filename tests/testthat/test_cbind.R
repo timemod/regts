@@ -46,7 +46,6 @@ test_that("univariate timeseries and matrix", {
     ts_labels(a) <- "Timeseries a"
     m <- matrix(21:30, nc = 2)
     ref <- as.regts(ts.union(a, m))
-    colnames(ref)[2:3] <- c("m_1", "m_2")
     ts_labels(ref) <- c("Timeseries a", "", "")
     expect_identical(cbind(a, m), ref)
 
@@ -81,9 +80,8 @@ test_that("multivariate timeseries without colnames", {
     regts2 <- regts(matrix(rnorm(10), ncol = 2), start = "2011Q2",
                     labels = labels2)
     ref <- as.regts(ts.union(regts1, regts2))
-    colnames(ref) <- c("regts1_1", "regts1_2", "regts2_1", "regts2_2")
     ts_labels(ref) <- c(labels1, labels2)
     expect_identical(cbind(regts1, regts2), ref)
     expect_identical(colnames(cbind(a = regts1, regts2)),
-                     c("a_1", "a_2", "regts2_1", "regts2_2"))
+                     c("a.1", "a.2", "regts2.1", "regts2.2"))
 })

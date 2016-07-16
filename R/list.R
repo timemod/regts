@@ -51,7 +51,7 @@ as.list.regts <- function(x, ...) {
         if (nc == 1) {
             names(retval) <- xname
         } else {
-            names(retval) <- paste(xname, 1:nc, sep = "_")
+            names(retval) <- paste(xname, 1:nc, sep = ".")
         }
     }
     return (retval)

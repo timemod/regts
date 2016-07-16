@@ -64,7 +64,7 @@ test_that("as.list for multivariate timeseries", {
 test_that("as.list for multivariate timeseries without colnames and labels", {
     regts1 <- regts(matrix(rnorm(10), ncol = 2), start = "2010M2")
     l1 <- as.list(regts1)
-    ts_names <- paste("regts1", 1:2, sep = "_")
+    ts_names <- paste("regts1", 1:2, sep = ".")
     expect_identical(l1[[1]], regts1[, 1])
     expect_identical(l1[[2]], regts1[, 2])
     expect_identical(names(l1), ts_names)
