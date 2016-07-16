@@ -87,9 +87,11 @@ regts <- function(data, start, end = NULL, frequency = NA, names,
         # regts(1, start = "2010Q2", end = "2011Q3").
         # Therefore, add a dimension attribute so that the timeseries can carry
         # a column name.
-        dim_attr <- list(dim = c(length(x), 1), dimnames = list(NULL, names))
-        attributes(x) <- c(dim_attr, attributes(x))
+        dim_attr <- list(dim = c(length(retval), 1),
+                         dimnames = list(NULL, names))
+        attributes(retval) <- c(dim_attr, attributes(retval))
     }
+
     return (retval)
 }
 

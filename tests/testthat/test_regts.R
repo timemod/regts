@@ -229,3 +229,14 @@ test_that("column selection in a timeseries with 1 row", {
     expect_identical(regts1[, ], as.regts(ts1[, , drop = FALSE]))
 })
 
+test_that("colnames for regts that is not a matrix", {
+    regts1 <- regts(1, start = "2010Q2", end = "2010Q3")
+    expect_null(colnames(regts1))
+    expect_identical(regts1, regts(rep(1, 2), "2010Q2"))
+    regts1 <- regts(1, start = "2010Q2", end = "2010Q3", names = "var a")
+    expect_identical(colnames(regts1), "var a")
+    expect_identical(regts1, regts(rep(1, 2), "2010Q2", names = "var a"))
+    expect_identical(regts1, regts(matrix(rep(1, 2), nc = 1), "2010Q2",
+                                   names = "var a"))
+})
+
