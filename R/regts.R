@@ -283,9 +283,9 @@ add_columns <- function(x, new_colnames) {
                         inherits(i, "regperiod_range"))) {
         # call C++ function get_regperiod_range
         ts_range <- get_regperiod_range(x)
-        # call C++ function convert_range_selector, this function also
-        # checks  the frequency of sel_range
-        sel_range <- convert_range_selector(as.regperiod_range(i), ts_range)
+        #
+        sel_range <- convert_selection_range(as.regperiod_range(i),
+                                                   ts_range)
         if (sel_range[1] < ts_range[1] || sel_range[2] > ts_range[2]) {
             ts_range <- c(min(sel_range[1], ts_range[1]),
                           max(sel_range[2], ts_range[2]), ts_range[3])
@@ -342,25 +342,35 @@ add_columns <- function(x, new_colnames) {
     }
 }
 
-convert_range_selector <- function(range, ts_range) {
-    if (ts_range[3] %% range[3] != 0) {
-        stop(paste("frequency of timeseries not divisible by the frequency of",
-                   "the selectort"))
+# This function converts regperiod_range object sel_range so that it is a valid
+# period selector for a timeseries with period range ts_range. This implies
+# that the frequency is made equal to the frequency of ts_range and that
+# NA values are replaced by the values of ts_range.
+convert_selection_range <- function(sel_range, ts_range) {
+
+    # convert frequency
+    if (ts_range[3] %% sel_range[3] != 0) {
+        stop(paste0("frequency of timeseries (", ts_range[3],
+                    ") not divisible by the frequency of",
+                    "the selector (", sel_range[3], ")."))
     }
-    fac <- ts_range[3] %/% range[3]
-    range_new <- numeric(3)
-    range_new[1] <- floor(range[1] * fac)
-    range_new[2] <- floor((range[2] + 1) * fac - 1)
-    range_new[3] <- ts_range[3]
-    range_new <- ifelse(is.na(range_new), ts_range, range_new)
-    return (range_new)
+    fac <- ts_range[3] %/% sel_range[3]
+    new_sel_range <- numeric(3)
+    new_sel_range[1] <- floor(sel_range[1] * fac)
+    new_sel_range[2] <- floor((sel_range[2] + 1) * fac - 1)
+    new_sel_range[3] <- ts_range[3]
+
+    # replace NA values by values from ts_range
+    new_sel_range <- ifelse(is.na(new_sel_range), ts_range, new_sel_range)
+
+    return (new_sel_range)
 }
 
-window_regts <- function(x, range) {
+window_regts <- function(x, sel_range) {
     ts_range <- get_regperiod_range(x)
-    range_new <- convert_range_selector(range, ts_range)
-    nper_new <- lensub__(range_new)
-    shift <- range_new[1] - ts_range[1]
+    sel_range <- convert_selection_range(sel_range, ts_range)
+    nper_new <- lensub__(sel_range)
+    shift <- sel_range[1] - ts_range[1]
     rmin <- max(1, 1 - shift)
     rmax <- min(nper_new, lensub__(ts_range) - shift)
     if (is.matrix(x)) {
@@ -373,7 +383,7 @@ window_regts <- function(x, range) {
         data[rmin:rmax] <- x[(rmin+shift):(rmax+shift)]
     }
 
-    return (create_regts(data, range_new[1], range_new[2], range_new[3],
+    return (create_regts(data, sel_range[1], sel_range[2], sel_range[3],
                                  ts_labels(x)))
 }
 

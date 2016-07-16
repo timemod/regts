@@ -239,4 +239,3 @@ test_that("colnames for regts that is not a matrix", {
     expect_identical(regts1, regts(matrix(rep(1, 2), nc = 1), "2010Q2",
                                    names = "var a"))
 })
-
