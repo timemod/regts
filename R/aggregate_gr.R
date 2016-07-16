@@ -12,7 +12,7 @@
 #' @useDynLib regts
 #' @importFrom Rcpp sourceCpp
 aggregate_gr <- function(x,  method, nfrequency = 1) {
-    if (!inherits(x, 'ts')) {
+    if (!is.ts(x)) {
         stop("Argument x is not a timeseries")
     }
     if (!is.numeric(x)) {

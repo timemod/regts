@@ -281,11 +281,11 @@ add_columns <- function(x, new_colnames) {
 
     if (!missing(i) && (is.character(i) || inherits(i, "regperiod") ||
                         inherits(i, "regperiod_range"))) {
+
         # call C++ function get_regperiod_range
         ts_range <- get_regperiod_range(x)
-        #
-        sel_range <- convert_selection_range(as.regperiod_range(i),
-                                                   ts_range)
+
+        sel_range <- convert_selection_range(as.regperiod_range(i), ts_range)
         if (sel_range[1] < ts_range[1] || sel_range[2] > ts_range[2]) {
             ts_range <- c(min(sel_range[1], ts_range[1]),
                           max(sel_range[2], ts_range[2]), ts_range[3])
@@ -419,11 +419,7 @@ ts_labels <- function(x) {
         if (!is.character(value)) {
             stop("value should be a character vector")
         }
-        nc <- ncol(x)
-        if (is.null(nc)) {
-            nc <- 1
-        }
-        if (length(value) != nc) {
+        if (length(value) != NCOL(x)) {
             stop(paste("The length of the labels argument should be equal",
                        "to the number of columns"))
         }
@@ -453,12 +449,8 @@ update_ts_labels <- function(x, labels) {
         return (x)
     }
     lbls <- ts_labels(x)
-    nc <- ncol(x)
-    if (is.null(nc)) {
-        nc <- 1
-    }
     if (is.null(lbls)) {
-        lbls <- rep("", nc)
+        lbls <- rep("", NCOL(x))
         names(lbls) <- colnames(x)
     }
     sel <- which(colnames(x) %in% names(labels))

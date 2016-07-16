@@ -12,7 +12,7 @@ filter_columns(x, regex, drop = TRUE)
 
 \item{regex}{a regular expression used to select column}
 
-\item{drop}{simplify the result}
+\item{drop}{if \code{TRUE}, the result is coerced to a vector if possible.}
 }
 \value{
 the selection of object \code{x}

@@ -7,7 +7,7 @@
 #' @param x any R object that supports column selection (\code{data.frame},
 #' \code{matrix}, \code{ts}, \code{regts})
 #' @param regex a regular expression used to select column
-#' @param drop simplify the result
+#' @param drop if \code{TRUE}, the result is coerced to a vector if possible.
 #' @return the selection of object \code{x}
 #' @export
 filter_columns <- function(x, regex, drop = TRUE) {
