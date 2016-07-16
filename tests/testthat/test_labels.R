@@ -81,3 +81,23 @@ test_that("labels are preserved in miscellaneous timeseries functions", {
     expect_identical(ts_labels(x), ts_labels(x_agg_gr))
     expect_identical(ts_labels(x), ts_labels(x_windows))
 })
+
+test_that("column selection in a timeseries with 1 row and labels", {
+    # selecting more than one column in a timeseries with 1 row has an odd
+    # result for class ts if drop = TRUE. This behaviour is corrected for
+    # in regts (see the implementation of "[.regts")
+
+    regts1 <- regts(matrix(1:3, nc = 3), "2010Q2", names = c("a", "b", "c"),
+                    labels = c("Var a", "Var b", "Var c"))
+
+    # select two columns
+    ref <- regts(matrix(2:3, nc = 2), "2010Q2", names = c("b", "c"),
+                 labels = c("Var b", "Var c"))
+    expect_identical(regts1[, c("b", "c")], ref)
+
+    # select one column (regts1[, "c"] is a named vector)
+    ref <- regts(3, "2010Q2", labels = "Var c")
+    names(ref) <- "c"
+    expect_equal(regts1[, "c"], ref)
+})
+

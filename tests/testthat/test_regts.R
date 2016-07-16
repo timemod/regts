@@ -203,3 +203,25 @@ test_that("several tests for character timeseries", {
     window(ts2, start = c(2010, 4), end = c(2010, 4)) <- "aap";
     expect_identical(regts2, as.regts(ts2))
 })
+
+test_that("column selection in a timeseries with 1 row", {
+    # selecting more than one column in a timeseries with 1 row has an odd
+    # result for class ts if drop = TRUE. This behaviour is corrected for
+    # in regts (see the implementation of "[.regts")
+
+    regts1 <- regts(matrix(1:3, nc = 3), "2010Q2", names = c("a", "b", "c"))
+    ts1 <- as.ts(regts1)
+
+    # select two columns
+    ref <- regts(matrix(2:3, nc = 2), "2010Q2", names = c("b", "c"))
+    expect_identical(regts1[, c("b", "c")], ref)
+    expect_identical(regts1[, c("b", "c")],
+                     as.regts(ts1[, c("b", "c"), drop = FALSE]))
+
+    # select one column (regts1[, "c"] is a named vector)
+    ref <- regts(3, "2010Q2")
+    names(ref) <- "c"
+    expect_equal(regts1[, "c"], ref)
+    expect_identical(regts1[, "c"], as.regts(ts1[, "c"]))
+})
+

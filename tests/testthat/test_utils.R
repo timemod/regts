@@ -13,7 +13,8 @@ test_that("filter_columns, univariate timseries", {
                      df[, 'a', drop = FALSE])
     expect_identical(filter_columns(df, 'x', drop = FALSE),
                      df[, character(0), drop = FALSE])
-    expect_identical(filter_columns(ts1, 'a'), ts1[, 1, drop = FALSE])
+    expect_identical(filter_columns(ts1, 'a', drop = FALSE),
+                     ts1[, 1, drop = FALSE])
     expect_identical(filter_columns(ts1, 'x', drop = FALSE),
                      ts1[, character(0), drop = FALSE])
 })
