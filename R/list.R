@@ -47,8 +47,8 @@ as.list.regts <- function(x, ...) {
         # could occur when the list is converted to a regts again
         # by using do.call(cbind, l)
         xname <- deparse(substitute(x))
-        nc <- ncol(x)
-        if (is.null(nc) || nc == 1) {
+        nc <- NCOL(x)
+        if (nc == 1) {
             names(retval) <- xname
         } else {
             names(retval) <- paste(xname, 1:nc, sep = "_")
