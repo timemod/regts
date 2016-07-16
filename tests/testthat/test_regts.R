@@ -5,7 +5,7 @@ test_that("constructor regts for univariate timeseries", {
     regts1 <- regts(1:10, start = "2010Q4")
     ts1 <- ts(1:10, start = c(2010,4), frequency = 4)
     expect_identical(regts1, as.regts(ts1))
-    expect_identical(as.ts(regts1), ts1)
+    expect_identical(as.ts(regts1), regts1)
     expect_identical(class(regts1), c("regts", "ts"))
     expect_identical(is.regts(regts1), TRUE)
     expect_identical(is.regts(ts1), FALSE)
@@ -14,7 +14,7 @@ test_that("constructor regts for univariate timeseries", {
     regts1 <- regts(matrix(1:10, ncol = 1), start = "2010Q4", names = "a")
     ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010,4), frequency = 4, names = "a")
     expect_identical(regts1, as.regts(ts1))
-    expect_identical(as.ts(regts1), ts1)
+    expect_identical(as.ts(regts1), regts1)
 
     regts1 <- regts(1:10, start = "2010", end = "2012")
     expect_identical(regts1, as.regts(ts(1:10, start = 2010, end = 2012, frequency = 1)))
@@ -193,7 +193,7 @@ test_that("several tests for character timeseries", {
     regts1 <- regts(data, start = "2010Q4", names = c("a", "b"))
     ts1 <- ts(data, start = c(2010,4), frequency = 4, names = c("a", "b"))
     expect_identical(regts1, as.regts(ts1))
-    expect_identical(as.ts(regts1), ts1)
+    expect_identical(as.ts(regts1), regts1)
     expect_identical(regts1["2011Q2/2011Q3"],
                 as.regts(window(ts1, start = c(2011, 2), end = c(2011, 3))))
 
@@ -210,7 +210,7 @@ test_that("column selection in a timeseries with 1 row", {
     # in regts (see the implementation of "[.regts")
 
     regts1 <- regts(matrix(1:3, nc = 3), "2010Q2", names = c("a", "b", "c"))
-    ts1 <- as.ts(regts1)
+    ts1 <- regts:::unregts(regts1)
 
     # select two columns
     ref <- regts(matrix(2:3, nc = 2), "2010Q2", names = c("b", "c"))

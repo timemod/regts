@@ -4,10 +4,10 @@ library(zoo)
 source("tests/performance_tests/time_commands.R")
 
 regts1 <- regts(as.numeric(1:300), start = "2010Q2", labels = "aap")
-ts1 <- as.ts(regts1)
+ts1 <- regts:::unregts(regts1)
 zoo1 <- as.zooreg(ts1)
 regts2 <- regts(as.numeric(1:300), start = "2010Q2")
-ts2 <- as.ts(regts2)
+ts2 <- regts:::unregts(regts2)
 zoo2 <- as.zooreg(ts2)
 
 commands <- c("ts1 + 1",

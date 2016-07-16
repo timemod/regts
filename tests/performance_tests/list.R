@@ -16,7 +16,7 @@ colnames(data) <- namen
 
 regts1 <- regts(data, start = "2010Q2")
 #ts_labels(regts1) <- namen
-ts1 <- as.ts(regts1)
+ts1 <- regts:::unregts(regts1)
 zoo1 <- as.zoo(ts1)
 
 lts <- as.list(ts1)
