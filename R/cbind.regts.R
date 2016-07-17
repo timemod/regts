@@ -27,14 +27,14 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
         ret <- ts.intersect(..., dframe = FALSE)
     }
 
-    if (!is.matrix(ret)) {
-        # single ts
+    if (!is.mts(ret)) {
         return (ret)
     }
 
     # The following code is to create column names for the result.
-    # We do not like the column names created by ts.union and ts.intersect,
-    # therefore determine our own column names
+    # We do not like the column names created by ts.union and ts.intersect when
+    # the arguments are multivariate timeseries with colnames,
+    # therefore we create our own column names
     args <- list(...)
     cnames <- lapply(args, FUN = colnames)
 
@@ -47,12 +47,12 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
         # and there are no duplicates. No further checking, which causes
         # extra cpu time, is required. This situation typically occurs
         # in calls such as do.call(cbind, as.list(regts1)).
-        ret <- handle_labels(as.regts(ret), args)
-        return (ret)
+        return (add_labels(as.regts(ret), args))
     }
 
     if (any(missing_colnames_vec)) {
-        # handle missing colnames
+        # create colnames for arguments without colnames.
+        # this mechanism is the same as in ts.intersect and ts.union.
         ts_names <- get_ts_names(...)
         get_colnames <- function(i) {
             if (missing_colnames[[i]]) {
@@ -96,12 +96,16 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
     cnames <- unlist(cnames)
     colnames(ret) <- cnames
 
-    ret <- handle_labels(as.regts(ret), args)
-    return (ret)
+    return (add_labels(as.regts(ret), args))
 }
 
 get_ts_names <- function(...) {
-    # returns the names of the ... arguments
+    # Returns the names of the ... arguments.
+    # For example, if cbind was called as cbind(a, b), then this
+    # function returns c("a", "b"). However, if cbind was called as
+    # cbind(x = a, y= b), then the returned value if c("x", "y").
+    # This code is based on the function stats:::.makeNamesTs.
+
     l <- as.list(substitute(list(...)))[-1L]
     nm <- names(l)
     fixup <- if (is.null(nm)) {
@@ -119,31 +123,26 @@ get_ts_names <- function(...) {
     return (nm)
 }
 
-# Returns the timeseries label from an arbitrary object.
-get_labels <- function(x) {
-    if (is.ts(x)) {
+add_labels <- function(x, args) {
+    # Add ts_labels in args to x.
+
+    if (all(unlist(lapply(args, FUN = function(x) is.null(ts_labels(x)))))) {
+        # no arguments with labels
+        return (x)
+    }
+
+    get_labels <- function(x) {
+        # Returns the ts_labels of an R object, or a vector of empy
+        # labels if x does not have labels
         lbls <- ts_labels(x)
         if (!is.null(lbls)) {
             return (lbls)
+        } else {
+            return (rep("", NCOL(x)))
         }
     }
-    # no ts_labels present, create empty labels
-    nc <- ncol(x)
-    if (!is.null(nc)) {
-        return (rep("", nc))
-    } else {
-        return ("")
-    }
-}
-
-# Check if the arguments in ... contain any label, and if so than add
-# all labels to x
-handle_labels <- function(x, args) {
-    has_labels <- any(unlist(lapply(args,
-                                    FUN = function(x) !is.null(ts_labels(x)))))
-    if (has_labels) {
-        labels <- unname(unlist(lapply(args, FUN = get_labels)))
-        ts_labels(x) <- labels
-    }
+    labels <- unname(unlist(lapply(args, FUN = get_labels)))
+    ts_labels(x) <- labels
     return(x)
 }
+
