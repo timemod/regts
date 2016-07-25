@@ -305,16 +305,8 @@ add_columns <- function(x, new_colnames) {
 #' @importFrom stats is.ts
 #' @export
 "[.regts" <- function(x, i, j, drop = TRUE) {
-    if (!missing(i) && (is.character(i) || inherits(i, "regperiod") ||
-                        inherits(i, "regperiod_range"))) {
-        # first select columns
-        if (!missing(j)) {
-            x <- x[, j, drop = drop]
-        }
-        # the row selector is a regperiod_range. Use window_regts
-        x <- window_regts(x, as.regperiod_range(i))
-        return (x)
-    } else {
+
+    if (missing(i)) {
         lbls <- ts_labels(x)
         if (!is.null(lbls) && !missing(j)) {
             lbls <- lbls[j]
@@ -322,20 +314,29 @@ add_columns <- function(x, new_colnames) {
         if (is.matrix(x) && nrow(x) == 1 && (missing(j) || length(j) > 1)) {
             # the result is very weird is the timeseries has a single row
             # and if drop = TRUE is used
-            x <- NextMethod(.Generic, drop = FALSE)
+            ret <- NextMethod(.Generic, drop = FALSE)
         } else {
-            x <- NextMethod(.Generic)
+            ret <- NextMethod(.Generic)
         }
-
-        # x can be something else than a timeseries, for example an integer
-        if (is.ts(x)) {
-            x <- as.regts(x)
-            if (!is.null(lbls)) {
-                ts_labels(x) <- lbls
+        ret <- as.regts(ret)
+        if (!is.null(lbls)) {
+            ts_labels(ret) <- lbls
+        }
+        return (ret)
+    } else {
+        # row selection present
+        if (is.character(i) || inherits(i, "regperiod") ||
+            inherits(i, "regperiod_range")) {
+            # first select columns
+            if (!missing(j)) {
+                x <- x[, j, drop = drop]
             }
-            return (x)
-        } else {
-            return (x)
+            # the row selector is a regperiod_range. Use window_regts
+            return (window_regts(x, as.regperiod_range(i)))
+        } else  {
+            # numeric / logical row selection: the result is a  matrix or vector
+            # (no longer a ts)
+            return (NextMethod(.Generic))
         }
     }
 }

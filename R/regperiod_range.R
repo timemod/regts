@@ -116,7 +116,12 @@ as.regperiod_range <- function(x, frequency = NA, ...) {
 #' regperiod_range object
 #' @export
 as.regperiod_range.character <- function(x, frequency = NA, ...) {
-    return (parse_regperiod_range(x, frequency));
+    if (length(x) > 1) {
+        warning(paste("Vector with length > 1 passed to",
+                      "as.regperiod_range.character.",
+                       "Only the first element is used."))
+    }
+    return (parse_regperiod_range(x[1], frequency));
 }
 
 #' @export
