@@ -8,7 +8,7 @@ test_that("constructor regts for univariate timeseries", {
 
     expect_error(update_ts_labels(regts1, list(a = "ts a", x = "???")),
                  paste("x does not have column names. update_labels requires a",
-                       " regts object with named columns"))
+                       "regts object with named columns"))
 })
 
 test_that("constructor regts for univariate matrix timeseries", {

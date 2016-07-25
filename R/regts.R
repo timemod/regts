@@ -448,7 +448,7 @@ update_ts_labels <- function(x, labels) {
     }
     if (is.null(colnames(x))) {
         stop(paste("x does not have column names. update_labels requires a",
-                   " regts object with named columns"))
+                   "regts object with named columns"))
     }
     lbls <- ts_labels(x)
     if (is.null(lbls)) {
