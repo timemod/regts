@@ -2,23 +2,17 @@
 #' @importFrom stats window
 #' @export
 window.regts <- function(x, ...) {
-    lbls <- ts_labels(x)
-    x <- as.regts(NextMethod(.Generic))
-    if (!is.null(lbls)) {
-        ts_labels(x) <- lbls
-    }
-    return (x)
+    ret <- as.regts(NextMethod(.Generic))
+    ts_labels(ret) <- ts_labels(x)
+    return (ret)
 }
 
 # The S3 method diff.ts removes the regts class, therefore use as.regts.
 #' @export
 diff.regts <- function(x, ...) {
-    lbls <- ts_labels(x)
-    x <- as.regts(NextMethod(.Generic))
-    if (!is.null(lbls)) {
-        ts_labels(x) <- lbls
-    }
-    return (x)
+    ret <- as.regts(NextMethod(.Generic))
+    ts_labels(ret) <- ts_labels(x)
+    return (ret)
 }
 
 # The S3 method aggregate.ts removes the regts class, therefore call  as.regts.
@@ -29,7 +23,6 @@ diff.regts <- function(x, ...) {
 #' @importFrom stats aggregate
 #' @export
 aggregate.regts <- function(x, nfrequency = 1, ...) {
-    lbls <- ts_labels(x)
     rep <- frequency(x) / nfrequency
     p1 <- start_period(x)
     extra <- as.integer(p1) %% rep
@@ -38,15 +31,16 @@ aggregate.regts <- function(x, nfrequency = 1, ...) {
         p1 <- p1 + rep - extra
         x <- window_regts(x, regperiod_range(p1, NULL))
     }
-    ret <- as.regts(NextMethod(.Generic))
 
-    if (is.null(colnames(x))) {
+    ret <- as.regts(aggregate.ts(x, nfrequency, ...))
+
+    if (is.matrix(x) && NCOL(x) == 1 && is.null(colnames(x))) {
         # aggregate.ts create colnames Series 1, Series 2 etc. if x does not
-        # have colnames. We do not want that.
-        colnames(ret) <- NULL
+        # have colnames and if x is a matrix. For a multivariate this is ok,
+        # but we do not want that if x is a univariate ts.
+       colnames(ret) <- NULL
     }
-    if (!is.null(lbls)) {
-        ts_labels(ret) <- lbls
-    }
+
+    ts_labels(ret) <- ts_labels(x)
     return (ret)
 }
