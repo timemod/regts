@@ -78,7 +78,7 @@ regts <- function(data, start, end = NULL, frequency = NA, names,
         } else {
             if (length(names) != ncol(data)) {
                 stop(paste("The length of the names vector is not equal to",
-                           " the number of columns"))
+                           "the number of columns"))
             }
             colnames(data) <- names
         }
