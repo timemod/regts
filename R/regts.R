@@ -242,6 +242,7 @@ as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
 #' @describeIn as.regts Default method to convert an R object to a
 #' \code{\link{regts}}. This method first employs \code{\link[stats]{as.ts}}
 #' and then \code{\link{as.regts.ts}}
+#' @importFrom stats as.ts
 #' @export
 as.regts.default <- function(x, ...) {
     return (as.regts(as.ts(x, ...)))
