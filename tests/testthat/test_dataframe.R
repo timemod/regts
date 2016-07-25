@@ -4,7 +4,7 @@ test_that("as.regts.data.frame for univariate quarterly timeseries", {
     df <- data.frame(period = c("2015Q3", "2015Q4", "2016Q1"), a = 1:3,
                      stringsAsFactors = FALSE)
     ts1 <- as.regts(df, time_column = 1)
-    ts2 <- regts(1:3 , start = "2015Q3", names = "a")
+    ts2 <- regts(matrix(1:3, ncol = 1) , start = "2015Q3", names = "a")
     expect_identical(ts1, ts2)
     df2 <- df[-1]
     rownames(df2) <- df[[1]]

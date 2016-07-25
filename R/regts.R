@@ -15,8 +15,9 @@
 #' @param frequency the frequency of the timeseries. This argument should only be specified if
 #' the start or end period is specified with a general period format without period indicator,
 #' e.g. \code{"2011-3"}
-#' @param names a character vector of names for the series: defaults to the
-#' colnames of data
+#' @param names a character vector of names for the series in multiple series:
+#' defaults to the colnames of data, or \code{Series 1}, \code{Series 2},
+#' \code{...}.
 #' @param labels a character vector of labels (descriptions of the timeseries)
 #' @return a \code{regts} object
 #' @examples
@@ -72,44 +73,39 @@ regts <- function(data, start, end = NULL, frequency = NA, names,
     }
 
     if (!missing(names)) {
-        data <- as.matrix(data)
-        if (length(names) != ncol(data)) {
-            stop("The length of the names vector is not equal to the number of columns")
+        if (is.vector(data)) {
+            warning("Argument names is ignored if data is a vector")
+        } else {
+            if (length(names) != ncol(data)) {
+                stop(paste("The length of the names vector is not equal to",
+                           " the number of columns"))
+            }
+            colnames(data) <- names
         }
-        colnames(data) <- names
     }
 
-    retval <- create_regts(data, start, end, freq, labels)
-
-    if (!missing(names) && is.null(attr(retval, "dim"))) {
-        # Univariate timeseries wihout dimension attribute.
-        # This situation will occur for the following example:
-        # regts(1, start = "2010Q2", end = "2011Q3").
-        # Therefore, add a dimension attribute so that the timeseries can carry
-        # a column name.
-        dim_attr <- list(dim = c(length(retval), 1),
-                         dimnames = list(NULL, names))
-        attributes(retval) <- c(dim_attr, attributes(retval))
-    }
-
-    return (retval)
+    return (create_regts(data, start, end, freq, labels))
 }
 
 create_regts <- function(data, startp, endp, freq, labels) {
-    if (is.matrix(data) && ncol(data) > 1) {
-        classes <- c("regts", "mts", "ts", "matrix")
-    } else {
-        classes <- c("regts", "ts")
-    }
+    ncols <- NCOL(data)
+    classes <- if (ncols > 1) c("regts", "mts", "ts", "matrix")
+               else classes <- c("regts", "ts")
     start_vector <- c(startp %/% freq, startp %% freq + 1)
 
     if (is.null(endp)) {
         retval <- ts(data, start = start_vector,  frequency = freq,
-                     class = classes, names = colnames(data))
+                     class = classes)
     } else {
         end_vector <- c(endp   %/% freq, endp   %% freq + 1)
         retval <- ts(data, start = start_vector,  end = end_vector,
-                     frequency = freq,  class = classes, names = colnames(data))
+                     frequency = freq,  class = classes)
+    }
+
+    if (ncols == 1 && is.matrix(data) && is.null(colnames(data)))  {
+        # if colnames(data) == NULL, the function ts has generated
+        # the column name "Series 1". We do not want that
+        colnames(retval) <- NULL
     }
 
     if (!is.null(labels)) {
@@ -223,8 +219,9 @@ as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
         subp_max <- max(times)
         per_count <- subp_max - subp_min + 1
         pmin <- create_regperiod(subp_min, frequency = freq)
-        ret <- regts(matrix(NA, nrow = per_count, ncol = ncol(data)),
-                     start = pmin, names = colnames(data))
+        mat <- matrix(NA, nrow = per_count, ncol = ncol(data))
+        colnames(mat) <- colnames(data)
+        ret <- regts(mat, start = pmin)
         rows <- times - subp_min +1
         ret[rows, ] <- data
     }
@@ -430,9 +427,9 @@ ts_labels <- function(x) {
     return (x)
 }
 
-#' Update one or more timeseries labels in a \code{regts} object
+#' Update one or more timeseries labels in a multivariate \code{regts} object
 #'
-#' @param x a \code{\link{regts}} object
+#' @param x a multivariate \code{\link{regts}} object
 #' @param labels a named list. The names are the column names
 #' and the values are the labels. Specify \code{NULL} to remove all labels.
 #' @examples
@@ -447,6 +444,10 @@ update_ts_labels <- function(x, labels) {
     if (is.null(labels)) {
         ts_labels(x) <- NULL
         return (x)
+    }
+    if (is.null(colnames(x))) {
+        stop(paste("x does not have column names. update_labels requires a",
+                   " regts object with named columns"))
     }
     lbls <- ts_labels(x)
     if (is.null(lbls)) {

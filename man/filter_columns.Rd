@@ -2,12 +2,12 @@
 % Please edit documentation in R/utils.R
 \name{filter_columns}
 \alias{filter_columns}
-\title{Select columns using  a filter}
+\title{Select columns using a filter}
 \usage{
 filter_columns(x, regex, drop = TRUE)
 }
 \arguments{
-\item{x}{any R object that supports column selection (\code{data.frame},
+\item{x}{any R object with column names (\code{data.frame},
 \code{matrix}, \code{ts}, \code{regts})}
 
 \item{regex}{a regular expression used to select column}
@@ -18,8 +18,8 @@ filter_columns(x, regex, drop = TRUE)
 the selection of object \code{x}
 }
 \description{
-This function selects columns of R objects that support column
-selection (e.g. a \code{data.frame}, \code{matrix}, \code{ts} or
+This function selects columns of an R object that has columns names
+(e.g. a \code{data.frame}, \code{matrix}, \code{ts} or
 \code{regts})  using a
 regular expression.
 }

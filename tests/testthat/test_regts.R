@@ -22,11 +22,15 @@ test_that("constructor regts for univariate timeseries", {
     expect_error(regts(1:10, start = "2010-1"),
                  "Frequency of period 2010-1 unknown. Specify argument frequency.")
 
-    regts1 <- regts(1:10, start = "2010-1", frequency = 3, names = "a")
-    ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010, 1), frequency = 3, names = "a")
+
+    regts1 <- regts(1:10, start = "2010-1", frequency = 4)
+    ts1 <- ts(1:10, start = c(2010, 1), frequency = 4, names = NULL)
     expect_identical(as.regts(regts1), as.regts(ts1))
 
-
+    m <- matrix(1:10, ncol = 1)
+    regts1 <- regts(m, start = "2010-1", frequency = 3, names = "a")
+    ts1 <- ts(m, start = c(2010, 1), frequency = 3, names = "a")
+    expect_identical(as.regts(regts1), as.regts(ts1))
 })
 
 test_that("constructor regts for multivariate time series", {
@@ -172,7 +176,7 @@ test_that("period and column selection at the lhs of an assignment", {
 })
 
 test_that("colnames are preserved in miscellaneous timeseries functions", {
-    x <- regts(1:10, start = "2010Q4", names = "a")
+    x <- regts(matrix(1:10, nc = 1), start = "2010Q4", names = "a")
     x_sin <- sin(x)
     x_lag <- lag(x)
     x_diff <- diff(x)
@@ -233,9 +237,9 @@ test_that("colnames for regts that is not a matrix", {
     regts1 <- regts(1, start = "2010Q2", end = "2010Q3")
     expect_null(colnames(regts1))
     expect_identical(regts1, regts(rep(1, 2), "2010Q2"))
-    regts1 <- regts(1, start = "2010Q2", end = "2010Q3", names = "var a")
-    expect_identical(colnames(regts1), "var a")
-    expect_identical(regts1, regts(rep(1, 2), "2010Q2", names = "var a"))
-    expect_identical(regts1, regts(matrix(rep(1, 2), nc = 1), "2010Q2",
-                                   names = "var a"))
+
+    expect_warning(regts1 <- regts(1, start = "2010Q2", end = "2010Q3",
+                                   names = "var a"),
+                   "Argument names is ignored if data is a vector")
+    expect_null(colnames(regts1))
 })

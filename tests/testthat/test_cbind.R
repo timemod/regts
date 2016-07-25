@@ -79,9 +79,19 @@ test_that("multivariate timeseries without colnames", {
     labels2 <- c("Var c", "Var d")
     regts2 <- regts(matrix(rnorm(10), ncol = 2), start = "2011Q2",
                     labels = labels2)
+
+
+    expect_error(cbind(regts1, regts2), paste("Duplicate column names",
+       "\\(Series 1 Series 2\\). Specify argument suffixes."))
+
     ref <- as.regts(ts.union(regts1, regts2))
+    colnames(ref) <- c("Series 1_regts1", "Series 2_regts1",
+                       "Series 1_regts2", "Series 2_regts2")
     ts_labels(ref) <- c(labels1, labels2)
-    expect_identical(cbind(regts1, regts2), ref)
-    expect_identical(colnames(cbind(a = regts1, regts2)),
-                     c("a.1", "a.2", "regts2.1", "regts2.2"))
+
+    expect_identical(cbind(regts1, regts2, suffixes = c("_regts1", "_regts2")),
+                     ref)
+    expect_identical(cbind(a = regts1, regts2, suffixes = c("_regts1", "_regts2")),
+                     ref)
+
 })

@@ -78,8 +78,9 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
     if (anyDuplicated(all_names)) {
         dupl <- duplicated(all_names)
         if (missing(suffixes)) {
-            stop (paste0("Duplicate column names (", all_names[dupl],
-                       "). Specify argument suffixes."))
+            stop (paste0("Duplicate column names (",
+                         paste(unique(all_names[dupl]), collapse = " "),
+                         "). Specify argument suffixes."))
         } else if (length(suffixes) < length(args)) {
             stop (paste0("Length of argument suffixes is smaller than the",
                         " number of objects to be joined (", length(args),

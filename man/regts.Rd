@@ -22,8 +22,9 @@ from the dimension of \code{data}}
 the start or end period is specified with a general period format without period indicator,
 e.g. \code{"2011-3"}}
 
-\item{names}{a character vector of names for the series: defaults to the
-colnames of data}
+\item{names}{a character vector of names for the series in multiple series:
+defaults to the colnames of data, or \code{Series 1}, \code{Series 2},
+\code{...}.}
 
 \item{labels}{a character vector of labels (descriptions of the timeseries)}
 }

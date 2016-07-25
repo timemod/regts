@@ -2,7 +2,18 @@ context("labels")
 
 test_that("constructor regts for univariate timeseries", {
 
-    regts1 <- regts(1:10, start = "2010Q4", names = "a",
+    regts1 <- regts(1:10, start = "2010Q4", labels = "Timeseries a")
+    res <- "Timeseries a"
+    expect_identical(ts_labels(regts1), res)
+
+    expect_error(update_ts_labels(regts1, list(a = "ts a", x = "???")),
+                 paste("x does not have column names. update_labels requires a",
+                       " regts object with named columns"))
+})
+
+test_that("constructor regts for univariate matrix timeseries", {
+
+    regts1 <- regts(matrix(1:10, nc = 1), start = "2010Q4", names = "a",
                     labels = "Timeseries a")
     res <- "Timeseries a"
     names(res) <- "a"
@@ -17,15 +28,9 @@ test_that("constructor regts for univariate timeseries", {
 test_that("constructor regts for univariate character timeseries", {
 
     regts1 <- regts(paste0("text", as.character(1:10)), start = "2010Q4",
-                           names = "a", labels = "Timeseries a")
+                           labels = "Timeseries a")
     res <- "Timeseries a"
-    names(res) <- "a"
     expect_identical(ts_labels(regts1), res)
-
-    regts2 <- update_ts_labels(regts1, list(a = "ts a", x = "???"))
-    res2 <- res
-    res2['a'] <- "ts a"
-    expect_identical(ts_labels(regts2), res2)
 })
 
 test_that("constructor regts for multivariate timeseries", {
@@ -66,8 +71,25 @@ test_that("adding a column to a regts", {
     expect_identical(ts_labels(regts2), ref2)
 })
 
-test_that("labels are preserved in miscellaneous timeseries functions", {
-    x <- regts(1:10, start = "2010Q4", names = "a", labels = "Timeseries a")
+test_that("labels are preserved in miscellaneous timeseries functions (uni)", {
+    x <- regts(1:10, start = "2010Q4", labels = "Timeseries a")
+    x_sin <- sin(x)
+    x_lag <- lag(x)
+    x_diff <- diff(x)
+    x_agg <- aggregate(x)
+    x_agg_gr <- aggregate_gr(x, method = "cgr")
+    x_windows <- window(x, start = c(2011, 4))
+    expect_identical(ts_labels(x), ts_labels(x_sin))
+    expect_identical(ts_labels(x), ts_labels(x_lag))
+    expect_identical(ts_labels(x), ts_labels(x_diff))
+    expect_identical(ts_labels(x), ts_labels(x_agg))
+    expect_identical(ts_labels(x), ts_labels(x_agg_gr))
+    expect_identical(ts_labels(x), ts_labels(x_windows))
+})
+
+test_that("labels are preserved in miscellaneous timeseries functions (multi)", {
+    x <- regts(matrix(1:20, nc = 2), start = "2010Q4",
+               labels = c("Timeseries a", "Timeseries b"))
     x_sin <- sin(x)
     x_lag <- lag(x)
     x_diff <- diff(x)
