@@ -84,7 +84,7 @@ as.character.regperiod <- function(x, ...) {
         } else {
             freq_char <- "-"
         }
-        return (paste0(get_year(x), freq_char, get_subperiod(x)))
+        return (paste0(get_year__(x), freq_char, get_subperiod__(x)))
     }
 }
 
@@ -99,13 +99,45 @@ frequency.regperiod <- function(x, ...) {
 }
 
 # internal function
-get_year <- function(x) {
+get_year__ <- function(x) {
     return (as.numeric(x) %/% frequency(x))
 }
 
 # internal function
-get_subperiod <- function(x) {
+get_subperiod__ <- function(x) {
     return (as.numeric(x) %% frequency(x) + 1)
+}
+
+#' Returns the year of a \code{\link{regperiod}}
+#' @param x a \code{regperiod}
+#' @return the year
+#' @examples
+#' get_year(regperiod("2010Q3"))
+#' @seealso \code{\link{get_subperiod}}
+#' @export
+get_year <- function(x) {
+    if (!is.regperiod(x)) {
+        stop("Argument x is not a regperiod")
+    }
+    return (get_year__(x))
+}
+
+#' Returns the subperiod of a \code{\link{regperiod}}
+#'
+#' This function returns the subperiod within a year.
+#' For example, for \code{regperiod} \code{2011Q3} the function
+#' returns 3.
+#' @param x a \code{regperiod}
+#' @return the subperiod of a regperiod
+#' @examples
+#' get_subperiod(regperiod("2010Q3"))
+#' @seealso \code{\link{get_year}}
+#' @export
+get_subperiod <- function(x) {
+    if (!is.regperiod(x)) {
+        stop("Argument x is not a regperiod")
+    }
+    return (get_subperiod__(x))
 }
 
 #' @export

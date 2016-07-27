@@ -21,6 +21,7 @@ diff.regts <- function(x, ...) {
 # that is aggregated to a yearly timeseries starts at 2010.2q)).
 # In that case the initial period must be shifted
 #' @importFrom stats aggregate
+#' @importFrom stats aggregate.ts
 #' @export
 aggregate.regts <- function(x, nfrequency = 1, ...) {
     rep <- frequency(x) / nfrequency

@@ -76,3 +76,9 @@ test_that("print regperiod", {
     expect_output(print(regperiod("2010q2")),"2010Q2")
     expect_output(print(regperiod("2010-1", freq = 12) - 3),"2009M10")
 })
+
+test_that("get_year / get_subperiod", {
+    p1 <- regperiod("2010Q3")
+    expect_identical(get_year(p1), 2010)
+    expect_identical(get_subperiod(p1), 3)
+})
