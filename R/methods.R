@@ -35,10 +35,9 @@ aggregate.regts <- function(x, nfrequency = 1, ...) {
 
     ret <- as.regts(aggregate.ts(x, nfrequency, ...))
 
-    if (is.matrix(x) && NCOL(x) == 1 && is.null(colnames(x))) {
+    if (is.matrix(x) && is.null(colnames(x))) {
         # aggregate.ts create colnames Series 1, Series 2 etc. if x does not
-        # have colnames and if x is a matrix. For a multivariate this is ok,
-        # but we do not want that if x is a univariate ts.
+        # have colnames and if x is a matrix. We do not want that.
        colnames(ret) <- NULL
     }
 

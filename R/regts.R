@@ -15,9 +15,8 @@
 #' @param frequency the frequency of the timeseries. This argument should only be specified if
 #' the start or end period is specified with a general period format without period indicator,
 #' e.g. \code{"2011-3"}
-#' @param names a character vector of names for the series in multiple series:
-#' defaults to the colnames of data, or \code{Series 1}, \code{Series 2},
-#' \code{...}.
+#' @param names a character vector with the column names for the series
+#' if \code{data} is a matrix or data frame. Defaults to the colnames of data.
 #' @param labels a character vector of labels (descriptions of the timeseries)
 #' @return a \code{regts} object
 #' @examples
@@ -58,8 +57,8 @@
 #' @importFrom stats ts
 #' @importFrom stats frequency
 #' @export
-regts <- function(data, start, end = NULL, frequency = NA, names,
-                  labels = NULL) {
+regts <- function(data, start, end = NULL, frequency = NA,
+                  names = colnames(data), labels = NULL) {
 
     start <- as.regperiod(start, frequency)
     freq  <- frequency(start)
@@ -72,22 +71,20 @@ regts <- function(data, start, end = NULL, frequency = NA, names,
         end <- as.numeric(end) # this turns out to be more efficient
     }
 
-    if (!missing(names)) {
+    # check argument names
+    if (!missing(names) && !is.null(names)) {
         if (is.vector(data)) {
             warning("Argument names is ignored if data is a vector")
-        } else {
-            if (length(names) != ncol(data)) {
+        } else if (length(names) != ncol(data)) {
                 stop(paste("The length of the names vector is not equal to",
                            "the number of columns"))
-            }
-            colnames(data) <- names
         }
     }
 
-    return (create_regts(data, start, end, freq, labels))
+    return (create_regts(data, names, start, end, freq, labels))
 }
 
-create_regts <- function(data, startp, endp, freq, labels) {
+create_regts <- function(data, names, startp, endp, freq, labels) {
     ncols <- NCOL(data)
     classes <- if (ncols > 1) c("regts", "mts", "ts", "matrix")
                else classes <- c("regts", "ts")
@@ -95,17 +92,11 @@ create_regts <- function(data, startp, endp, freq, labels) {
 
     if (is.null(endp)) {
         retval <- ts(data, start = start_vector,  frequency = freq,
-                     class = classes)
+                     class = classes, names = names)
     } else {
         end_vector <- c(endp   %/% freq, endp   %% freq + 1)
         retval <- ts(data, start = start_vector,  end = end_vector,
-                     frequency = freq,  class = classes)
-    }
-
-    if (ncols == 1 && is.matrix(data) && is.null(colnames(data)))  {
-        # if colnames(data) == NULL, the function ts has generated
-        # the column name "Series 1". We do not want that
-        colnames(retval) <- NULL
+                     frequency = freq,  class = classes, names = names)
     }
 
     if (!is.null(labels)) {
@@ -375,15 +366,16 @@ window_regts <- function(x, sel_range) {
     if (is.matrix(x)) {
         data <- matrix(NA, nrow = nper_new, ncol = ncol(x))
         data[rmin:rmax, ] <- x[(rmin+shift):(rmax+shift), ]
-        colnames(data) <- colnames(x)
+        cnames <- colnames(x)
     } else {
         data <- numeric(nper_new)
         data <- NA
         data[rmin:rmax] <- x[(rmin+shift):(rmax+shift)]
+        cnames <- NULL
     }
 
-    return (create_regts(data, sel_range[1], sel_range[2], sel_range[3],
-                                 ts_labels(x)))
+    return (create_regts(data, cnames, sel_range[1], sel_range[2], sel_range[3],
+                         ts_labels(x)))
 }
 
 

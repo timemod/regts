@@ -4,7 +4,8 @@
 \alias{regts}
 \title{Create a \code{regts} timeseries object}
 \usage{
-regts(data, start, end = NULL, frequency = NA, names, labels = NULL)
+regts(data, start, end = NULL, frequency = NA, names = colnames(data),
+  labels = NULL)
 }
 \arguments{
 \item{data}{a vector or matrix of the observed time-series values. A data frame will be
@@ -22,9 +23,8 @@ from the dimension of \code{data}}
 the start or end period is specified with a general period format without period indicator,
 e.g. \code{"2011-3"}}
 
-\item{names}{a character vector of names for the series in multiple series:
-defaults to the colnames of data, or \code{Series 1}, \code{Series 2},
-\code{...}.}
+\item{names}{a character vector with the column names for the series
+if \code{data} is a matrix or data frame. Defaults to the colnames of data.}
 
 \item{labels}{a character vector of labels (descriptions of the timeseries)}
 }

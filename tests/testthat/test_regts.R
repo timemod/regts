@@ -243,3 +243,12 @@ test_that("colnames for regts that is not a matrix", {
                    "Argument names is ignored if data is a vector")
     expect_null(colnames(regts1))
 })
+
+test_that("multivariate ts without colnames", {
+    regts1 <- regts(matrix(1:3, nc = 3), "2010Q2")
+    regts2 <- regts(matrix(1:3, nc = 3), "2010Q2", names = NULL)
+    expect_null(colnames(regts1))
+    expect_null(colnames(regts2))
+    expect_identical(regts1, regts2)
+})
+

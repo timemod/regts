@@ -67,8 +67,11 @@ test_that("as.list for multivariate timeseries without colnames and labels", {
     l1 <- as.list(regts1)
     expect_identical(l1[[1]], regts1[, 1])
     expect_identical(l1[[2]], regts1[, 2])
-    expect_identical(names(l1), colnames(regts1))
-    expect_identical(do.call(cbind, l1), regts1)
+
+    ref  <- regts1
+    colnames(ref) <- c("regts1.1", "regts1.2")
+    expect_identical(names(l1), colnames(ref))
+    expect_identical(do.call(cbind, l1), ref)
 })
 
 test_that("usage of within", {
