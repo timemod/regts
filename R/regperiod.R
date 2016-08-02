@@ -168,7 +168,7 @@ as.regperiod.character <- function(x, frequency = NA, ...) {
 #' @export
 as.regperiod.numeric <- function(x, frequency, ...) {
     if (all.equal(x, as.integer(x)) == TRUE) {
-        if (missing(frequency) || frequency == 1) {
+        if (missing(frequency) || is.na(frequency) || frequency == 1) {
             return (create_regperiod(as.numeric(x) , 1))
         }
     } else if (missing(frequency)) {

@@ -60,12 +60,12 @@
 #' @importFrom stats ts
 #' @importFrom stats frequency
 #' @export
-regts <- function(data, start, end, frequency = NA,
-                  names = colnames(data), labels = NULL) {
+regts <- function(data, start, end, frequency = NA, names = colnames(data),
+                  labels = NULL) {
 
     # CHECK THE PERIOD
     if (missing(start) && missing(end)) {
-        stop("Either 'start' or and 'end' should be specified")
+        start = regperiod("1")
     }
     if (!missing(start)) {
         start <- as.regperiod(start, frequency)
@@ -79,10 +79,10 @@ regts <- function(data, start, end, frequency = NA,
             stop("'start' and 'end' have different frequencies")
         }
     }
-    if (missing(start)) {
-        start <- end - NROW(data) + 1
-    } else if (missing(end)) {
+    if (missing(end)) {
         end <- start + NROW(data) - 1
+    } else if (missing(start)){
+        start <- end - NROW(data) + 1
     }
 
     # from now on, work with numerical values (the number of subperiod after

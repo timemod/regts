@@ -252,3 +252,24 @@ test_that("multivariate ts without colnames", {
     expect_identical(regts1, regts2)
 })
 
+test_that("start and end, univariate", {
+    expect_identical(regts(1:10), regts(1:10, start = "1", end = "10"))
+    expect_identical(regts(1:10), regts(1:10, start = 1, end = 10))
+    expect_identical(regts(1:10), regts(1:10, start = 1))
+    expect_identical(regts(1:10), regts(1:10, end = 10))
+    expect_identical(regts(rep(1, 10)), regts(1, start = 1, end = 10))
+    expect_identical(regts(rep(1:2, 5)), regts(1:2, start = 1, end = 10))
+})
+
+
+test_that("start and end, multivariate", {
+    data <- matrix(1:10, ncol = 2)
+    expect_identical(regts(data), regts(data, start = "1", end = "5"))
+    expect_identical(regts(data[1:2, ]), regts(data, start = 1, end = 2))
+    expect_identical(regts(data[1, , drop = FALSE]),
+                     regts(data, start = 1, end = 1))
+    expect_identical(regts(data[1, , drop = FALSE], start = 1, end = 2),
+                     regts(rbind(data[1, , drop=FALSE], data[1, , drop = FALSE]),
+                                 start = 1, end = 2))
+
+})

@@ -11,7 +11,7 @@ as.regperiod(x, ...)
 
 \item{...}{object passed to methods}
 
-\item{frequency}{the frequency of the regperiod. This is mandatory
+\item{frequency}{the frequency of the regperiod. This argument is mandatory
 if the frequency cannot be detected automatically.}
 }
 \value{

@@ -89,5 +89,6 @@ test_that("as.regperiod.numeric", {
     expect_identical(as.regperiod(as.integer(2010)), regperiod("2010"))
     expect_identical(as.regperiod(2010, frequency = 4), regperiod("2010Q1"))
     expect_identical(as.regperiod(2010.75, frequency = 4), regperiod("2010Q4"))
+    expect_error(as.regperiod(2010.75), "Argument frequency should be specified")
 })
 
