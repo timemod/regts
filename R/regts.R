@@ -7,11 +7,14 @@
 #' @param data a vector or matrix of the observed time-series values. A data frame will be
 #' coerced to a numeric matrix via \code{\link{data.matrix}}. (See also the description of the
 #' function \code{\link[stats]{ts}} of the \code{\link{stats}} package).
-#' @param start the starting period as a  \code{\link{regperiod}} object or a character string that can
-#' be converted to a \code{regperiod} object
-#' @param end the end period as a  \link{regperiod} object or a character string that can
-#' be converted to a \code{regperiod} object. If not specified, then the end period is calculated
-#' from the dimension of \code{data}
+#' @param start the starting period as a  \code{\link{regperiod}} object or a
+#' character string that can be converted to a \code{regperiod} object.
+#' If not specified, then the end period is calculated
+#' from argument \code{end} and the dimension of \code{data}
+#' @param end the end period as a  \link{regperiod} object or a character string
+#' that can be converted to a \code{regperiod} object. If not specified, then
+#' the end period is calculated from argument \code{start} and
+#' the dimension of \code{data}
 #' @param frequency the frequency of the timeseries. This argument should only be specified if
 #' the start or end period is specified with a general period format without period indicator,
 #' e.g. \code{"2011-3"}
@@ -57,53 +60,94 @@
 #' @importFrom stats ts
 #' @importFrom stats frequency
 #' @export
-regts <- function(data, start, end = NULL, frequency = NA,
+regts <- function(data, start, end, frequency = NA,
                   names = colnames(data), labels = NULL) {
 
-    start <- as.regperiod(start, frequency)
-    freq  <- frequency(start)
-    start <- as.numeric(start)  # this turns out to be more efficient
-    if (!is.null(end)) {
+    # CHECK THE PERIOD
+    if (missing(start) && missing(end)) {
+        stop("Either 'start' or and 'end' should be specified")
+    }
+    if (!missing(start)) {
+        start <- as.regperiod(start, frequency)
+        freq <- frequency(start)
+    }
+    if (!missing(end)) {
         end <- as.regperiod(end, frequency)
-        if (frequency(end) != freq) {
-           stop("The frequency of the second period does not agree")
+        if (missing(start)) {
+            freq <- frequency(end)
+        } else if (frequency(end) != freq) {
+            stop("'start' and 'end' have different frequencies")
         }
-        end <- as.numeric(end) # this turns out to be more efficient
+    }
+    if (missing(start)) {
+        start <- end - NROW(data) + 1
+    } else if (missing(end)) {
+        end <- start + NROW(data) - 1
     }
 
-    # check argument names
-    if (!missing(names) && !is.null(names)) {
-        if (is.vector(data)) {
+    # from now on, work with numerical values (the number of subperiod after
+    # Christ), this is more efficient.
+    start <- as.numeric(start)
+    end   <- as.numeric(end)
+
+    if (start > end) {
+        stop("'start' cannot be after 'end'")
+    }
+
+    # CONVERT DATA
+    if (is.data.frame(data)) {
+        data <- data.matrix(data)
+    }
+    if (is.matrix(data)) {
+        ndata <- nrow(data)
+        if (!is.null(names) && length(names) != ncol(data)) {
+            stop(paste("The length of the names vector is not equal to",
+                       "the number of columns"))
+        }
+        dimnames(data) <- list(NULL, names)
+
+    } else {
+        ndata <- length(data)
+        if (!missing(names)) {
             warning("Argument names is ignored if data is a vector")
-        } else if (length(names) != ncol(data)) {
-                stop(paste("The length of the names vector is not equal to",
-                           "the number of columns"))
         }
     }
+    if (ndata == 0) {
+        stop("'ts' object must have one or more observations")
+    }
+    nobs <- end - start + 1
+    if (nobs != ndata) {
+        data <- if (is.matrix(data)) {
+                    if (ndata < nobs)
+                        data[rep_len(1L:ndata, nobs), ]
+                    else if (ndata > nobs)
+                        data[1L:nobs, , drop = FALSE]
+                } else {
+                    if (ndata < nobs) {
+                        rep_len(data, nobs)
+                    } else if (ndata > nobs) {
+                        data[1L:nobs]
+                    }
+                }
+    }
 
-    return (create_regts(data, names, start, end, freq, labels))
+    return (create_regts(data, start, end, freq, labels))
 }
 
-create_regts <- function(data, names, startp, endp, freq, labels) {
-    ncols <- NCOL(data)
-    classes <- if (ncols > 1) c("regts", "mts", "ts", "matrix")
-               else classes <- c("regts", "ts")
-    start_vector <- c(startp %/% freq, startp %% freq + 1)
-
-    if (is.null(endp)) {
-        retval <- ts(data, start = start_vector,  frequency = freq,
-                     class = classes, names = names)
-    } else {
-        end_vector <- c(endp   %/% freq, endp   %% freq + 1)
-        retval <- ts(data, start = start_vector,  end = end_vector,
-                     frequency = freq,  class = classes, names = names)
-    }
-
+# Internal function to create a regts. No checking of input data.
+# startp and endp are the number of subperiods (e.g. quarters) after
+# Christ, freq is the frequency of the timeseries.
+create_regts <- function(data, startp, endp, freq, labels) {
+    attr(data, "tsp") <- c(startp / freq, endp / freq, freq)
+    class(data) <- if (NCOL(data) > 1) {
+                       c("regts", "mts", "ts", "matrix")
+                   }  else {
+                       c("regts", "ts")
+                   }
     if (!is.null(labels)) {
-        ts_labels(retval) <- labels
+        ts_labels(data) <- labels
     }
-
-    return (retval)
+    return (data)
 }
 
 #' Tests whether an object is a \code{\link{regts}} timeseries object
@@ -366,15 +410,14 @@ window_regts <- function(x, sel_range) {
     if (is.matrix(x)) {
         data <- matrix(NA, nrow = nper_new, ncol = ncol(x))
         data[rmin:rmax, ] <- x[(rmin+shift):(rmax+shift), ]
-        cnames <- colnames(x)
+        colnames(data) <- colnames(x)
     } else {
-        data <- numeric(nper_new)
-        data <- NA
+        data <- logical(nper_new)
+        data[] <- NA
         data[rmin:rmax] <- x[(rmin+shift):(rmax+shift)]
-        cnames <- NULL
     }
 
-    return (create_regts(data, cnames, sel_range[1], sel_range[2], sel_range[3],
+    return (create_regts(data, sel_range[1], sel_range[2], sel_range[3],
                          ts_labels(x)))
 }
 

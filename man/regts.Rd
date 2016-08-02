@@ -4,7 +4,7 @@
 \alias{regts}
 \title{Create a \code{regts} timeseries object}
 \usage{
-regts(data, start, end = NULL, frequency = NA, names = colnames(data),
+regts(data, start, end, frequency = NA, names = colnames(data),
   labels = NULL)
 }
 \arguments{
@@ -12,12 +12,15 @@ regts(data, start, end = NULL, frequency = NA, names = colnames(data),
 coerced to a numeric matrix via \code{\link{data.matrix}}. (See also the description of the
 function \code{\link[stats]{ts}} of the \code{\link{stats}} package).}
 
-\item{start}{the starting period as a  \code{\link{regperiod}} object or a character string that can
-be converted to a \code{regperiod} object}
+\item{start}{the starting period as a  \code{\link{regperiod}} object or a
+character string that can be converted to a \code{regperiod} object.
+If not specified, then the end period is calculated
+from argument \code{end} and the dimension of \code{data}}
 
-\item{end}{the end period as a  \link{regperiod} object or a character string that can
-be converted to a \code{regperiod} object. If not specified, then the end period is calculated
-from the dimension of \code{data}}
+\item{end}{the end period as a  \link{regperiod} object or a character string
+that can be converted to a \code{regperiod} object. If not specified, then
+the end period is calculated from argument \code{start} and
+the dimension of \code{data}}
 
 \item{frequency}{the frequency of the timeseries. This argument should only be specified if
 the start or end period is specified with a general period format without period indicator,

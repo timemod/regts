@@ -71,7 +71,7 @@ test_that("as.list for multivariate timeseries without colnames and labels", {
     ref  <- regts1
     colnames(ref) <- c("regts1.1", "regts1.2")
     expect_identical(names(l1), colnames(ref))
-    expect_identical(do.call(cbind, l1), ref)
+    expect_equal(do.call(cbind, l1), ref)
 })
 
 test_that("usage of within", {

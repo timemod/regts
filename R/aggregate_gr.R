@@ -30,12 +30,11 @@ aggregate_gr <- function(x,  method, nfrequency = 1) {
     range_new <- res[[2]]
 
     if (is_mat) {
-        cnames <- colnames(x)
+        colnames(data) <- colnames(x)
     } else {
         dim(data) <- NULL
-        cnames <- NULL
     }
 
-    return (create_regts(data, cnames, range_new[1], range_new[2], range_new[3],
+    return (create_regts(data, range_new[1], range_new[2], range_new[3],
                          ts_labels(x)))
 }
