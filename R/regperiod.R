@@ -148,6 +148,8 @@ print.regperiod <- function(x, ...) {
 #' Coerce an R object to a regperiod
 #'
 #' @param x an R object
+#' @param frequency the frequency of the regperiod. This argument is mandatory
+#' if the frequency cannot be detected automatically.
 #' @param ... object passed to methods
 #' @return a \link{regperiod}
 #' @export
@@ -159,8 +161,22 @@ as.regperiod.regperiod <- function(x, ...) {
 }
 
 #' @export
-as.regperiod.character <- function(x, ...) {
-    return (regperiod(x, ...))
+as.regperiod.character <- function(x, frequency = NA, ...) {
+    return (regperiod(x, frequency = frequency, ...))
+}
+
+#' @export
+as.regperiod.numeric <- function(x, frequency, ...) {
+    if (all.equal(x, as.integer(x)) == TRUE) {
+        if (missing(frequency) || frequency == 1) {
+            return (create_regperiod(as.numeric(x) , 1))
+        }
+    } else if (missing(frequency)) {
+        stop("Argument frequency should be specified")
+    }
+    year <- floor(x)
+    subp <- floor(frequency * (x %% 1))
+    return (create_regperiod(year * frequency + subp , frequency))
 }
 
 # Create a regperiod object based on the number of subperiods after Christ.

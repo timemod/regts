@@ -10,6 +10,9 @@ as.regperiod(x, ...)
 \item{x}{an R object}
 
 \item{...}{object passed to methods}
+
+\item{frequency}{the frequency of the regperiod. This is mandatory
+if the frequency cannot be detected automatically.}
 }
 \value{
 a \link{regperiod}

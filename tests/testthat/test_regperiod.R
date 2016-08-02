@@ -82,3 +82,12 @@ test_that("get_year / get_subperiod", {
     expect_identical(get_year(p1), 2010)
     expect_identical(get_subperiod(p1), 3)
 })
+
+test_that("as.regperiod.numeric", {
+    expect_identical(as.regperiod(2010), regperiod("2010"))
+    expect_identical(as.regperiod(2010.001, frequency = 1), regperiod("2010"))
+    expect_identical(as.regperiod(as.integer(2010)), regperiod("2010"))
+    expect_identical(as.regperiod(2010, frequency = 4), regperiod("2010Q1"))
+    expect_identical(as.regperiod(2010.75, frequency = 4), regperiod("2010Q4"))
+})
+
