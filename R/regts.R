@@ -302,11 +302,14 @@ add_columns <- function(x, new_colnames) {
 #' @importFrom stats is.mts
 #' @export
 "[<-.regts" <- function (x, i, j, value) {
-
     if (!missing(j) && is.character(j)) {
         # Check if j contains names of columns not present in x.
         # Add missing columns if necessary
-        new_colnames <- setdiff(j, colnames(x))
+        cnames <- colnames(x)
+        if (is.null(cnames)) {
+            stop("object has no column names")
+        }
+        new_colnames <- setdiff(j, cnames)
         if (length(new_colnames) > 0) {
             x <- add_columns(x, new_colnames)
         }
