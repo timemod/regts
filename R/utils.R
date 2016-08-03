@@ -12,6 +12,8 @@
 #' @examples
 #' data <- regts(matrix(1:20, ncol = 4), start = "2010Q2",
 #'               names = c("nlc", "ukc", "nly", "uky"))
+#'
+#' # select all columns with names starting with nl
 #' nl_data <- select_columns(data, "nl.*")
 #' @export
 select_columns <- function(x, regex, drop = TRUE) {
