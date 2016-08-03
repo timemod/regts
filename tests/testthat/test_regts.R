@@ -273,3 +273,15 @@ test_that("start and end, multivariate", {
                                  start = 1, end = 2))
 
 })
+
+test_that("start and end, multivariate (1 column)", {
+    data <- matrix(1:5, ncol = 1)
+    expect_identical(regts(data), regts(data, start = "1", end = "5"))
+    expect_identical(regts(data[1:2, , drop = FALSE]), regts(data, start = 1, end = 2))
+    expect_identical(regts(data[1, , drop = FALSE]),
+                     regts(data, start = 1, end = 1))
+    expect_identical(regts(data[1, , drop = FALSE], start = 1, end = 2),
+                     regts(rbind(data[1, , drop=FALSE], data[1, , drop = FALSE]),
+                           start = 1, end = 2))
+
+})

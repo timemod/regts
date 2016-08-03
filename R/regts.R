@@ -119,7 +119,7 @@ regts <- function(data, start, end, frequency = NA, names = colnames(data),
     if (nobs != ndata) {
         data <- if (is.matrix(data)) {
                     if (ndata < nobs)
-                        data[rep_len(1L:ndata, nobs), ]
+                        data[rep_len(1L:ndata, nobs),  , drop = FALSE]
                     else if (ndata > nobs)
                         data[1L:nobs, , drop = FALSE]
                 } else {
