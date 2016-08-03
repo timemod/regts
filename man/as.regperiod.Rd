@@ -2,9 +2,15 @@
 % Please edit documentation in R/regperiod.R
 \name{as.regperiod}
 \alias{as.regperiod}
+\alias{as.regperiod.character}
+\alias{as.regperiod.numeric}
 \title{Coerce an R object to a regperiod}
 \usage{
 as.regperiod(x, ...)
+
+\method{as.regperiod}{character}(x, frequency = NA, ...)
+
+\method{as.regperiod}{numeric}(x, frequency = NA, ...)
 }
 \arguments{
 \item{x}{an R object}
@@ -20,4 +26,10 @@ a \link{regperiod}
 \description{
 Coerce an R object to a regperiod
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{character}: Coerce a character string to a \code{regperiod}
+
+\item \code{numeric}: Coerce a numerical value string to a \code{regperiod}
+}}
 

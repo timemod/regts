@@ -160,18 +160,20 @@ as.regperiod.regperiod <- function(x, ...) {
     return (x)
 }
 
+#' @describeIn as.regperiod Coerce a character string to a \code{regperiod}
 #' @export
 as.regperiod.character <- function(x, frequency = NA, ...) {
     return (regperiod(x, frequency = frequency, ...))
 }
 
+#' @describeIn as.regperiod Coerce a numerical value string to a \code{regperiod}
 #' @export
-as.regperiod.numeric <- function(x, frequency, ...) {
+as.regperiod.numeric <- function(x, frequency = NA, ...) {
     if (all.equal(x, as.integer(x)) == TRUE) {
-        if (missing(frequency) || is.na(frequency) || frequency == 1) {
+        if (is.na(frequency) || frequency == 1) {
             return (create_regperiod(as.numeric(x) , 1))
         }
-    } else if (missing(frequency)) {
+    } else if (is.na(frequency)) {
         stop("Argument frequency should be specified")
     }
     year <- floor(x)
