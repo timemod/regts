@@ -398,9 +398,8 @@ convert_selection_range <- function(sel_range, ts_range) {
     new_sel_range[2] <- floor((sel_range[2] + 1) * fac - 1)
     new_sel_range[3] <- ts_range[3]
 
-    # replace NA values by values from ts_range
+        # replace NA values by values from ts_range
     new_sel_range <- ifelse(is.na(new_sel_range), ts_range, new_sel_range)
-
     return (new_sel_range)
 }
 
