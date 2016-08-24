@@ -412,12 +412,16 @@ window_regts <- function(x, sel_range) {
     rmax <- min(nper_new, lensub__(ts_range) - shift)
     if (is.matrix(x)) {
         data <- matrix(NA, nrow = nper_new, ncol = ncol(x))
-        data[rmin:rmax, ] <- x[(rmin+shift):(rmax+shift), ]
+        if (rmax >= rmin) {
+            data[rmin:rmax, ] <- x[(rmin+shift):(rmax+shift), ]
+        }
         colnames(data) <- colnames(x)
     } else {
         data <- logical(nper_new)
         data[] <- NA
-        data[rmin:rmax] <- x[(rmin+shift):(rmax+shift)]
+        if (rmax >= rmin) {
+            data[rmin:rmax] <- x[(rmin+shift):(rmax+shift)]
+        }
     }
 
     return (create_regts(data, sel_range[1], sel_range[2], sel_range[3],

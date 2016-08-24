@@ -17,5 +17,8 @@ LazyData: TRUE
 RoxygenNote: 5.0.1
 Imports: Rcpp
 Depends: Hmisc
-Suggests: testthat, zoo
+Suggests: testthat, zoo,
+    knitr,
+    rmarkdown
 LinkingTo: Rcpp
+VignetteBuilder: knitr
