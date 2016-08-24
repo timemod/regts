@@ -400,6 +400,7 @@ convert_selection_range <- function(sel_range, ts_range) {
 
         # replace NA values by values from ts_range
     new_sel_range <- ifelse(is.na(new_sel_range), ts_range, new_sel_range)
+
     return (new_sel_range)
 }
 
