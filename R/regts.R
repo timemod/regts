@@ -26,6 +26,7 @@
 #' # univariate timeseries
 #' ts1 <- regts(1:10, start = "2010Q4")
 #'
+#'
 #' # multivariate timeseries
 #' ts2 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"))
 #'
