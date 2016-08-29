@@ -18,6 +18,6 @@ the 'convergence difference' as described above
 \code{cvgdif} calculates the difference  between two numbers
 \eqn{x_1} and \eqn{x_2} according to \eqn{\frac{|x_1 - x_2|}{\max(|x_2|, 1)}}.
 This difference is equivalent to the convergence test employed in the
-package \code{macromod}.
+package \code{isismdl}.
 }
 

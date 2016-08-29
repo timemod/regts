@@ -167,7 +167,7 @@ calculate_difference <- function(common_names, x1, x2, tol, fun) {
 #' \code{cvgdif} calculates the difference  between two numbers
 #' \eqn{x_1} and \eqn{x_2} according to \eqn{\frac{|x_1 - x_2|}{\max(|x_2|, 1)}}.
 #' This difference is equivalent to the convergence test employed in the
-#' package \code{macromod}.
+#' package \code{isismdl}.
 #' @param x1 first number
 #' @param x2 second number
 #' @return the 'convergence difference' as described above
