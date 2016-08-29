@@ -72,6 +72,7 @@ regperiod_range <- function(p1, p2 = p1, frequency = NA) {
     return (create_regperiod_range(p1, p2, freq))
 }
 
+
 #' Test if an object is a regperiod_range.
 #'
 #' @param x an object
@@ -80,6 +81,13 @@ regperiod_range <- function(p1, p2 = p1, frequency = NA) {
 is.regperiod_range <- function(x) {
     return (inherits(x, "regperiod_range"))
 }
+
+# internal function to create a regperiod_range from start, end
+# and frequency
+create_regperiod_range <- function(start, end, frequency) {
+    return (structure(c(start, end, frequency), class = "regperiod_range"))
+}
+
 
 # binary operators (arithmetic and logical)
 #' @export
@@ -112,31 +120,20 @@ Ops.regperiod_range <- function(e1, e2) {
         }
     } else if (.Generic %in% c("+", "-")) {
         # arithmetic operator + or -
-        retval <- NextMethod(.Generic)
         if (is.regperiod_range(e1) && is.numeric(e2) && length(e2) == 1) {
             if (e2 != as.integer(e2)) {
                 stop("Second operand must be an integer number")
             }
-            if (.Generic == "+") {
-                retval[1] <- e1[1] + e2
-                retval[2] <- e1[2] + e2
-            } else if (.Generic == "-") {
-                retval[1] <- e1[1] - e2
-                retval[2] <- e1[2] - e2
-            }
-            retval[3] <- e1[3]
+            # e1[ ] +/- e2
+            start_end <- do.call(.Generic, list(e1[1:2], e2))
+            retval <- create_regperiod(start_end[1], start_end[2], e1[3])
         } else if (is.numeric(e1) && length(e1) == 1 && is.regperiod_range(e2)) {
             if (e1 != as.integer(e1)) {
                 stop("First operand must be an integer number")
             }
-            if (.Generic == "+") {
-                retval[1] <- e2[1] + e1
-                retval[2] <- e2[2] + e1
-            } else if (.Generic == "-") {
-                retval[1] <- e2[1] - e1
-                retval[2] <- e2[2] - e1
-            }
-            retval[3] <- e2[3]
+            # e2[ ] +/- e1
+            start_end <- do.call(.Generic, list(e2[1:2], e1))
+            retval <- create_regperiod(start_end[1], start_end[2], e2[3])
         } else {
             stop(paste("Arithmetic operators + and - only allowed on a",
                        "combination of regperiod_range and integer number"))
@@ -147,11 +144,6 @@ Ops.regperiod_range <- function(e1, e2) {
     }
 }
 
-# internal function to create a regperiod_range from start, end
-# and frequency
-create_regperiod_range <- function(start, end, frequency) {
-    return (structure(c(start, end, frequency), class = "regperiod_range"))
-}
 
 #' Coerce an R object to a \code{\link{regperiod_range}}
 #'
