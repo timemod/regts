@@ -56,6 +56,7 @@ test_that("arithmetic operators: only + and - allowed", {
     expect_identical(regperiod("2010") - 4, regperiod("2006"))
     expect_identical(regperiod("2010m2") - 8, regperiod("2009m6"))
     expect_identical(regperiod("2010m2") - regperiod("2009m6"), 8)
+    expect_identical(regperiod("2010q2") + 4, 4 + regperiod("2010q2"))	
 
     expect_error(regperiod("2010Q1") * 2,
                  "Illegal arithmetic operation, only \\+ and \\- allowed")

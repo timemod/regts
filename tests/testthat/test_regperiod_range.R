@@ -80,6 +80,7 @@ test_that("arithmetic operators: only + and - allowed", {
     expect_identical(regperiod_range("2010q2","2011q2") + 4, regperiod_range("2011q2","2012q2"))
     expect_identical(regperiod_range("2010","2014") - 4, regperiod_range("2006","2010"))
     expect_identical(regperiod_range("2010m2","2010m3") - 8, regperiod_range("2009m6","2009m7"))
+    expect_identical(regperiod_range("2010q2","2011q2") + 4, 4 + regperiod_range("2010q2","2011q2"))
 
     expect_error(regperiod_range("2010Q1", "2010Q1") + 1.2,
                 "Second operand must be an integer number")
