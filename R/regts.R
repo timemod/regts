@@ -408,6 +408,9 @@ window_regts <- function(x, sel_range) {
     ts_range <- get_regperiod_range(x)
     sel_range <- convert_selection_range(sel_range, ts_range)
     nper_new <- lensub__(sel_range)
+    if (nper_new < 0) {
+        stop("Illegal selection")
+    }
     shift <- sel_range[1] - ts_range[1]
     rmin <- max(1, 1 - shift)
     rmax <- min(nper_new, lensub__(ts_range) - shift)
