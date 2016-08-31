@@ -97,18 +97,15 @@ Ops.regperiod_range <- function(e1, e2) {
         # logical operator
         if (is.regperiod_range(e1) && is.regperiod_range(e2)) {
             if (.Generic == "==") {
-                return(e1[1] == e2[1] && e1[2] == e2[2] && e1[3] == e2[3])
+                return (all(e1 == e2))
             } else if (.Generic == "!=") {
-                return(e1[1] != e2[1] || e1[2] != e2[2] || e1[3] != e2[3])
-            }
-            else if (e1[3] != e2[3]) {
+                return (any(e1 != e2))
+            } else if (e1[3] != e2[3]) {
                 stop(paste("Logical operations '<, <=, >, >=' on regperiod_ranges",
                            "with different frequencies are not allowed"))
-            }
-            else {
-                retval <- (do.call(.Generic, list(e1[1], e2[1])) &&
-                           do.call(.Generic, list(e1[2], e2[2])))
-                return(retval)
+            } else {
+                return (do.call(.Generic, list(e1[1], e2[1])) &&
+                        do.call(.Generic, list(e1[2], e2[2])))
             }
         } else {
             stop(paste("Both operators must be regperiod_ranges",
