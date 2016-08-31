@@ -96,24 +96,20 @@ Ops.regperiod_range <- function(e1, e2) {
     if (.Generic %in% c("==", "!=", "<", ">", "<=", ">=")) {
         # logical operator
         if (is.regperiod_range(e1) && is.regperiod_range(e2)) {
-            if (e1[3] != e2[3]) {
-                stop(paste("Logical operations on regperiod_ranges with different",
-                           "frequencies are not allowed"))
-            }
             if (.Generic == "==") {
-                return(e1[1] == e2[1] && e1[2] == e2[2])
+                return(e1[1] == e2[1] && e1[2] == e2[2] && e1[3] == e2[3])
             } else if (.Generic == "!=") {
-                return(e1[1] != e2[1] || e1[2] != e2[2])
-            } else if (.Generic == ">") {
-                return(e1[1] >  e2[1] && e1[2] >  e2[2])
-            } else if (.Generic == ">=") {
-                return(e1[1] >= e2[1] && e1[2] >= e2[2])
-            } else if (.Generic == "<") {
-                return(e1[1] <  e2[1] && e1[2] <  e2[2])
-            } else if (.Generic == "<=") {
-                return(e1[1] <= e2[1] && e1[2] <= e2[2])
+                return(e1[1] != e2[1] || e1[2] != e2[2] || e1[3] != e2[3])
             }
-
+            else if (e1[3] != e2[3]) {
+                stop(paste("Logical operations '<, <=, >, >=' on regperiod_ranges",
+                           "with different frequencies are not allowed"))
+            }
+            else {
+                retval <- (do.call(.Generic, list(e1[1], e2[1])) &&
+                           do.call(.Generic, list(e1[2], e2[2])))
+                return(retval)
+            }
         } else {
             stop(paste("Both operators must be regperiod_ranges",
                        "when using logical operators"))
@@ -126,14 +122,14 @@ Ops.regperiod_range <- function(e1, e2) {
             }
             # e1[ ] +/- e2
             start_end <- do.call(.Generic, list(e1[1:2], e2))
-            retval <- create_regperiod(start_end[1], start_end[2], e1[3])
+            retval <- create_regperiod_range(start_end[1], start_end[2], e1[3])
         } else if (is.numeric(e1) && length(e1) == 1 && is.regperiod_range(e2)) {
             if (e1 != as.integer(e1)) {
                 stop("First operand must be an integer number")
             }
             # e2[ ] +/- e1
             start_end <- do.call(.Generic, list(e2[1:2], e1))
-            retval <- create_regperiod(start_end[1], start_end[2], e2[3])
+            retval <- create_regperiod_range(start_end[1], start_end[2], e2[3])
         } else {
             stop(paste("Arithmetic operators + and - only allowed on a",
                        "combination of regperiod_range and integer number"))

@@ -65,12 +65,14 @@ test_that("logical operators", {
     expect_true(regperiod_range("2010M2","2010M3") <= regperiod_range("2010M12","2011M1"))
     expect_true(regperiod_range("2010Q2","2010Q2") == regperiod_range("2010Q2","2010Q2"))
     expect_true(regperiod_range("2010Q2","2010Q3") != regperiod_range("2010Q1","2010Q2"))
+	expect_true(regperiod_range("2010Q1","2010Q2") != regperiod_range("2010M1","2010M2"))
+
     expect_false(regperiod_range("2010Q2","2010Q4") < regperiod_range("2010Q1","2010Q3"))
     expect_false(regperiod_range("2010Q2","2010Q4") != regperiod_range("2010Q2","2010Q4"))
     expect_false(regperiod_range("2010Q1","2010Q2") == regperiod_range("2010Q4","2010Q5"))
 	
-	expect_error(regperiod_range("2010Q1","2010Q2") != regperiod_range("2010M1","2010M2"),
-                 paste("Logical operations on regperiod_ranges with different",
+    expect_error(regperiod_range("2010Q1","2010Q2") <= regperiod_range("2010M1","2010M2"),
+                 paste("Logical operations '<, <=, >, >=' on regperiod_ranges with different",
                  "frequencies are not allowed"))
 	expect_error(regperiod_range("2010Q1","2010Q2") > 1,
                  "Both operators must be regperiod_ranges when using logical operators")					
