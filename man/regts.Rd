@@ -4,7 +4,7 @@
 \alias{regts}
 \title{Create a \code{regts} timeseries object}
 \usage{
-regts(data, start, end, frequency = NA, names = colnames(data),
+regts(data, start, end, period, frequency = NA, names = colnames(data),
   labels = NULL)
 }
 \arguments{
@@ -21,6 +21,9 @@ from argument \code{end} and the dimension of \code{data}}
 that can be converted to a \code{regperiod} object. If not specified, then
 the end period is calculated from argument \code{start} and
 the dimension of \code{data}}
+
+\item{period}{the period range as a \code{\link{regperiod_range}} object. This
+argument replaces arguments \code{start} and \code{end}.}
 
 \item{frequency}{the frequency of the timeseries. This argument should only be specified if
 the start or end period is specified with a general period format without period indicator,
@@ -51,6 +54,10 @@ ts2 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"))
 # multivariate timeseries with labels
 ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"),
              labels = paste("Timeseries", c("a", "b", "c")))
+
+# multivariate timeseries with period
+range <- regperiod_range("2016Q1", "2017Q4")
+ts4 <- regts(matrix(1:16, ncol = 2), period = range, names = c("a", "b"))
 
 # create a half-yearly timeseries, because \\code{end} is specified the
 # length of the timeseries is smaller than the length of data (10).
