@@ -15,9 +15,12 @@
 #' that can be converted to a \code{regperiod} object. If not specified, then
 #' the end period is calculated from argument \code{start} and
 #' the dimension of \code{data}
+#' @param period the period range as a \code{\link{regperiod_range}} object. This
+#' argument replaces arguments \code{start} and \code{end}.
 #' @param frequency the frequency of the timeseries. This argument should only be specified if
 #' the start or end period is specified with a general period format without period indicator,
 #' e.g. \code{"2011-3"}
+
 #' @param names a character vector with the column names for the series
 #' if \code{data} is a matrix or data frame. Defaults to the colnames of data.
 #' @param labels a character vector of labels (descriptions of the timeseries)
@@ -33,6 +36,10 @@
 #'# multivariate timeseries with labels
 #' ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"),
 #'              labels = paste("Timeseries", c("a", "b", "c")))
+#'
+#'# multivariate timeseries with period
+#' range <- regperiod_range("2016Q1", "2017Q4")
+#' ts4 <- regts(matrix(1:16, ncol = 2), period = range, names = c("a", "b"))
 #'
 #' # create a half-yearly timeseries, because \code{end} is specified the
 #' # length of the timeseries is smaller than the length of data (10).
@@ -61,29 +68,42 @@
 #' @importFrom stats ts
 #' @importFrom stats frequency
 #' @export
-regts <- function(data, start, end, frequency = NA, names = colnames(data),
-                  labels = NULL) {
+regts <- function(data, start, end, period, frequency = NA,
+                  names = colnames(data), labels = NULL) {
 
     # CHECK THE PERIOD
-    if (missing(start) && missing(end)) {
+    if (!missing(period) && !missing(start)) {
+        stop("Arguments 'start' and 'period' exclude each other!")
+    }
+    if (missing(start) && missing(end) && missing(period)) {
         start = regperiod("1")
     }
-    if (!missing(start)) {
-        start <- as.regperiod(start, frequency)
-        freq <- frequency(start)
-    }
-    if (!missing(end)) {
-        end <- as.regperiod(end, frequency)
-        if (missing(start)) {
-            freq <- frequency(end)
-        } else if (frequency(end) != freq) {
-            stop("'start' and 'end' have different frequencies")
+
+    if (!missing(period)) {
+        if (!is.regperiod_range(period)) {
+            period <- as.regperiod_range(period)
         }
-    }
-    if (missing(end)) {
-        end <- start + NROW(data) - 1
-    } else if (missing(start)){
-        start <- end - NROW(data) + 1
+        start <- start_period(period)
+        end <- end_period(period)
+        freq <- frequency(start)
+    } else {
+        if (!missing(start)) {
+            start <- as.regperiod(start, frequency)
+            freq <- frequency(start)
+        }
+        if (!missing(end)) {
+            end <- as.regperiod(end, frequency)
+            if (missing(start)) {
+                freq <- frequency(end)
+            } else if (frequency(end) != freq) {
+                stop("'start' and 'end' have different frequencies")
+            }
+        }
+        if (missing(end)) {
+            end <- start + NROW(data) - 1
+        } else if (missing(start)){
+            start <- end - NROW(data) + 1
+        }
     }
 
     # from now on, work with numerical values (the number of subperiod after

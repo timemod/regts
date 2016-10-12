@@ -11,8 +11,9 @@ test_that("constructor regts for univariate timeseries", {
     expect_identical(is.regts(ts1), FALSE)
     expect_identical(is.ts(regts1), TRUE)
 
-    regts1 <- regts(matrix(1:10, ncol = 1), start = "2010Q4", names = "a")
-    ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010,4), frequency = 4, names = "a")
+    range <- regperiod_range("2010Q1", "2012Q2")
+    regts1 <- regts(matrix(1:10, ncol = 1), period = range, names = "a")
+    ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010,1), frequency = 4, names = "a")
     expect_identical(regts1, as.regts(ts1))
     expect_identical(as.ts(regts1), regts1)
 
@@ -21,7 +22,8 @@ test_that("constructor regts for univariate timeseries", {
 
     expect_error(regts(1:10, start = "2010-1"),
                  "Frequency of period 2010-1 unknown. Specify argument frequency.")
-
+    expect_error(regts(1:10, start = "2010-1", period = regperiod_range("2010Q1")),
+                 "Arguments 'start' and 'period' exclude each other.")
 
     regts1 <- regts(1:10, start = "2010-1", frequency = 4)
     ts1 <- ts(1:10, start = c(2010, 1), frequency = 4, names = NULL)
@@ -52,7 +54,7 @@ test_that("constructor regts for multivariate time series", {
 })
 
 test_that("get_regperiod_range", {
-    regts1 <- regts(1, start = "2010Q1", end = "2011Q4")
+    regts1 <- regts(1, period = regperiod_range("2010Q1", "2011Q4"))
     expect_identical(get_regperiod_range(regts1),
                      regperiod_range("2010Q1", "2011Q4"))
     regts2 <- regts(c("aap", "noot", "mies"), start = "2010M1", end = "2011M4")
@@ -189,7 +191,6 @@ test_that("colnames are preserved in miscellaneous timeseries functions", {
     expect_identical(colnames(x), colnames(x_agg))
     expect_identical(colnames(x), colnames(x_agg_gr))
     expect_identical(colnames(x), colnames(x_windows))
-    expect_identical(colnames(x), colnames(x_windows))
 })
 
 test_that("several tests for character timeseries", {
@@ -213,11 +214,11 @@ test_that("column selection in a timeseries with 1 row", {
     # result for class ts if drop = TRUE. This behaviour is corrected for
     # in regts (see the implementation of "[.regts")
 
-    regts1 <- regts(matrix(1:3, nc = 3), "2010Q2", names = c("a", "b", "c"))
+    regts1 <- regts(matrix(1:3, nc = 3), start = "2010Q2", names = c("a", "b", "c"))
     ts1 <- regts:::unregts(regts1)
 
     # select two columns
-    ref <- regts(matrix(2:3, nc = 2), "2010Q2", names = c("b", "c"))
+    ref <- regts(matrix(2:3, nc = 2), start = "2010Q2", names = c("b", "c"))
     expect_identical(regts1[, c("b", "c")], ref)
     expect_identical(regts1[, c("b", "c")],
                      as.regts(ts1[, c("b", "c"), drop = FALSE]))
@@ -236,7 +237,7 @@ test_that("column selection in a timeseries with 1 row", {
 test_that("colnames for regts that is not a matrix", {
     regts1 <- regts(1, start = "2010Q2", end = "2010Q3")
     expect_null(colnames(regts1))
-    expect_identical(regts1, regts(rep(1, 2), "2010Q2"))
+    expect_identical(regts1, regts(rep(1, 2), start = "2010Q2"))
 
     expect_warning(regts1 <- regts(1, start = "2010Q2", end = "2010Q3",
                                    names = "var a"),
@@ -252,34 +253,38 @@ test_that("multivariate ts without colnames", {
     expect_identical(regts1, regts2)
 })
 
-test_that("start and end, univariate", {
+test_that("start and end/period, univariate", {
     expect_identical(regts(1:10), regts(1:10, start = "1", end = "10"))
     expect_identical(regts(1:10), regts(1:10, start = 1, end = 10))
     expect_identical(regts(1:10), regts(1:10, start = 1))
     expect_identical(regts(1:10), regts(1:10, end = 10))
+    expect_identical(regts(1:10), regts(1:10, period = regperiod_range("1","10")))
     expect_identical(regts(rep(1, 10)), regts(1, start = 1, end = 10))
     expect_identical(regts(rep(1:2, 5)), regts(1:2, start = 1, end = 10))
+    expect_identical(regts(rep(1:2, 5)), regts(1:2, period = regperiod_range("1","10")))
 })
 
 
-test_that("start and end, multivariate", {
+test_that("start and end/period, multivariate", {
     data <- matrix(1:10, ncol = 2)
     expect_identical(regts(data), regts(data, start = "1", end = "5"))
     expect_identical(regts(data[1:2, ]), regts(data, start = 1, end = 2))
+    expect_identical(regts(data[1:2, ]), regts(data, period = regperiod_range("1","2")))
     expect_identical(regts(data[1, , drop = FALSE]),
                      regts(data, start = 1, end = 1))
     expect_identical(regts(data[1, , drop = FALSE], start = 1, end = 2),
                      regts(rbind(data[1, , drop=FALSE], data[1, , drop = FALSE]),
-                                 start = 1, end = 2))
+                           period = regperiod_range("1","2")))
 
 })
 
-test_that("start and end, multivariate (1 column)", {
+test_that("start and end/period, multivariate (1 column)", {
     data <- matrix(1:5, ncol = 1)
     expect_identical(regts(data), regts(data, start = "1", end = "5"))
+    expect_identical(regts(data), regts(data, period = regperiod_range("1","5")))
     expect_identical(regts(data[1:2, , drop = FALSE]), regts(data, start = 1, end = 2))
-    expect_identical(regts(data[1, , drop = FALSE]),
-                     regts(data, start = 1, end = 1))
+    expect_identical(regts(data[1, , drop = FALSE]), regts(data, start = 1, end = 1))
+    expect_identical(regts(data[1, , drop = FALSE]), regts(data, period = regperiod_range("1","1")))
     expect_identical(regts(data[1, , drop = FALSE], start = 1, end = 2),
                      regts(rbind(data[1, , drop=FALSE], data[1, , drop = FALSE]),
                            start = 1, end = 2))
