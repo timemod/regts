@@ -480,11 +480,11 @@ int pr_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *prtext;
-#line 1 "period_scanner.l"
+#line 1 "lex_yacc/period_scanner.l"
 /*
  * lexical analyzer for period string
  */
-#line 6 "period_scanner.l"
+#line 6 "lex_yacc/period_scanner.l"
 #include <cstring>
 #include <string>
 #include <algorithm>
@@ -697,7 +697,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 39 "period_scanner.l"
+#line 39 "lex_yacc/period_scanner.l"
 
 
 #line 704 "period_scanner.cpp"
@@ -785,44 +785,44 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 41 "period_scanner.l"
+#line 41 "lex_yacc/period_scanner.l"
 {prlval = atoi(prtext); return NUMBER;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 43 "period_scanner.l"
+#line 43 "lex_yacc/period_scanner.l"
 {prlval = get_frequency(prtext); return FREQ;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 45 "period_scanner.l"
+#line 45 "lex_yacc/period_scanner.l"
 {return YEAR_CHARACTER;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 47 "period_scanner.l"
+#line 47 "lex_yacc/period_scanner.l"
 {return SEP;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 49 "period_scanner.l"
+#line 49 "lex_yacc/period_scanner.l"
 {prlval = get_month_number(prtext);
                int type = prlval > 0 ? MONTH_NAME : INVALID;
                return type;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 53 "period_scanner.l"
+#line 53 "lex_yacc/period_scanner.l"
 /* eat up white space */
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 55 "period_scanner.l"
+#line 55 "lex_yacc/period_scanner.l"
 {return INVALID;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 57 "period_scanner.l"
+#line 57 "lex_yacc/period_scanner.l"
 ECHO;
 	YY_BREAK
 #line 829 "period_scanner.cpp"
@@ -1823,7 +1823,7 @@ void prfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 57 "period_scanner.l"
+#line 57 "lex_yacc/period_scanner.l"
 
 
 

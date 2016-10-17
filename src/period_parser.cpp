@@ -70,7 +70,7 @@
 #define yychar          prchar
 
 /* Copy the first part of user declarations.  */
-#line 19 "period_parser.yy" /* yacc.c:339  */
+#line 19 "lex_yacc/period_parser.yy" /* yacc.c:339  */
 
     #include <stdio.h>
     #include <Rcpp.h>
@@ -1230,50 +1230,50 @@ yyreduce:
   switch (yyn)
     {
         case 7:
-#line 56 "period_parser.yy" /* yacc.c:1646  */
+#line 56 "lex_yacc/period_parser.yy" /* yacc.c:1646  */
     {year = (yyvsp[0]); freq = 1; subperiod = 1;}
 #line 1236 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 59 "period_parser.yy" /* yacc.c:1646  */
+#line 59 "lex_yacc/period_parser.yy" /* yacc.c:1646  */
     {year = (yyvsp[-1]); freq = 1; subperiod = 1;}
 #line 1242 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 67 "period_parser.yy" /* yacc.c:1646  */
+#line 67 "lex_yacc/period_parser.yy" /* yacc.c:1646  */
     {year = (yyvsp[-3]); subperiod = (yyvsp[-1]); freq = (yyvsp[0]);}
 #line 1248 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 69 "period_parser.yy" /* yacc.c:1646  */
+#line 69 "lex_yacc/period_parser.yy" /* yacc.c:1646  */
     {year = (yyvsp[0]); subperiod = (yyvsp[-2]); freq = (yyvsp[-3]);}
 #line 1254 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 71 "period_parser.yy" /* yacc.c:1646  */
+#line 71 "lex_yacc/period_parser.yy" /* yacc.c:1646  */
     {year = (yyvsp[-3]); subperiod = (yyvsp[0]); freq = (yyvsp[-1]);}
 #line 1260 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 73 "period_parser.yy" /* yacc.c:1646  */
+#line 73 "lex_yacc/period_parser.yy" /* yacc.c:1646  */
     {year = (yyvsp[0]); subperiod = (yyvsp[-3]); freq = (yyvsp[-2]);}
 #line 1266 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 75 "period_parser.yy" /* yacc.c:1646  */
+#line 75 "lex_yacc/period_parser.yy" /* yacc.c:1646  */
     {year = (yyvsp[-2]); subperiod = (yyvsp[0]); freq = (yyvsp[-1]);
                 check_year_subperiod(freq, year, subperiod);}
 #line 1273 "period_parser.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 82 "period_parser.yy" /* yacc.c:1646  */
+#line 82 "lex_yacc/period_parser.yy" /* yacc.c:1646  */
     {year = (yyvsp[-2]); subperiod = (yyvsp[0]);
                 if (!ISNA(given_freq)) {
                     check_year_subperiod(given_freq, year, subperiod);
@@ -1282,7 +1282,7 @@ yyreduce:
     break;
 
   case 17:
-#line 89 "period_parser.yy" /* yacc.c:1646  */
+#line 89 "lex_yacc/period_parser.yy" /* yacc.c:1646  */
     {year = (yyvsp[0]); subperiod = (yyvsp[-2]); freq = 12;}
 #line 1288 "period_parser.cpp" /* yacc.c:1646  */
     break;
@@ -1516,7 +1516,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 92 "period_parser.yy" /* yacc.c:1906  */
+#line 92 "lex_yacc/period_parser.yy" /* yacc.c:1906  */
 
 
 void prerror(const char *s) {}
