@@ -6,6 +6,7 @@
 #include <cstring>
 #include <string>
 #include <algorithm>
+#include <Rcpp.h>
 
 #include "period_scanner.h"
 #include "period_parser.h"
@@ -27,6 +28,8 @@ static int get_frequency(const char *c);
  */
 
 #define YY_NEVER_INTERACTIVE 1
+
+#define YY_FATAL_ERROR(msg) Rf_error(msg)
 
 %}
 

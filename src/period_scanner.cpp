@@ -488,6 +488,7 @@ char *prtext;
 #include <cstring>
 #include <string>
 #include <algorithm>
+#include <Rcpp.h>
 
 #include "period_scanner.h"
 #include "period_parser.h"
@@ -510,7 +511,9 @@ static int get_frequency(const char *c);
 
 #define YY_NEVER_INTERACTIVE 1
 
-#line 514 "period_scanner.cpp"
+#define YY_FATAL_ERROR(msg) Rf_error(msg)
+
+#line 517 "period_scanner.cpp"
 
 #define INITIAL 0
 
@@ -697,10 +700,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 39 "lex_yacc/period_scanner.l"
+#line 42 "lex_yacc/period_scanner.l"
 
 
-#line 704 "period_scanner.cpp"
+#line 707 "period_scanner.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -785,47 +788,47 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 41 "lex_yacc/period_scanner.l"
+#line 44 "lex_yacc/period_scanner.l"
 {prlval = atoi(prtext); return NUMBER;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 43 "lex_yacc/period_scanner.l"
+#line 46 "lex_yacc/period_scanner.l"
 {prlval = get_frequency(prtext); return FREQ;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 45 "lex_yacc/period_scanner.l"
+#line 48 "lex_yacc/period_scanner.l"
 {return YEAR_CHARACTER;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 47 "lex_yacc/period_scanner.l"
+#line 50 "lex_yacc/period_scanner.l"
 {return SEP;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 49 "lex_yacc/period_scanner.l"
+#line 52 "lex_yacc/period_scanner.l"
 {prlval = get_month_number(prtext);
                int type = prlval > 0 ? MONTH_NAME : INVALID;
                return type;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 53 "lex_yacc/period_scanner.l"
+#line 56 "lex_yacc/period_scanner.l"
 /* eat up white space */
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 55 "lex_yacc/period_scanner.l"
+#line 58 "lex_yacc/period_scanner.l"
 {return INVALID;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 57 "lex_yacc/period_scanner.l"
+#line 60 "lex_yacc/period_scanner.l"
 ECHO;
 	YY_BREAK
-#line 829 "period_scanner.cpp"
+#line 832 "period_scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1823,7 +1826,7 @@ void prfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 57 "lex_yacc/period_scanner.l"
+#line 60 "lex_yacc/period_scanner.l"
 
 
 
