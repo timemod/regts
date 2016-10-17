@@ -10,7 +10,7 @@ output:
 linkcolor: blue    
 ---
 <!--
-%\VignetteEngine{knitr}
+%\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{Introduction package regts}
 -->
 

@@ -6,7 +6,7 @@ test_that("constructor regts for univariate timeseries", {
     res <- "Timeseries a"
     expect_identical(ts_labels(regts1), res)
 
-    expect_error(update_ts_labels(regts1, list(a = "ts a", x = "???")),
+    expect_error(update_ts_labels(regts1, c(a = "ts a", x = "???")),
                  paste("x does not have column names. update_labels requires a",
                        "regts object with named columns"))
 })
@@ -19,7 +19,7 @@ test_that("constructor regts for univariate matrix timeseries", {
     names(res) <- "a"
     expect_identical(ts_labels(regts1), res)
 
-    regts2 <- update_ts_labels(regts1, list(a = "ts a", x = "???"))
+    regts2 <- update_ts_labels(regts1, c(a = "ts a", x = "???"))
     res2 <- res
     res2['a'] <- "ts a"
     expect_identical(ts_labels(regts2), res2)
@@ -42,7 +42,7 @@ test_that("constructor regts for multivariate timeseries", {
     names(res) <- c("a", "b")
     expect_identical(ts_labels(regts1), res)
 
-    regts2 <- update_ts_labels(regts1, list(a = "ts a", x = "???"))
+    regts2 <- update_ts_labels(regts1, c(a = "ts a", x = "???"))
     res2 <- res
     res2['a'] <- "ts a"
     expect_identical(ts_labels(regts1), res)
@@ -65,7 +65,7 @@ test_that("adding a column to a regts", {
 
     expect_identical(ts_labels(regts1), ref)
 
-    regts2 <- update_ts_labels(regts1, list(x = "Timeseries x"))
+    regts2 <- update_ts_labels(regts1, c(x = "Timeseries x"))
     ref2 <- c("Timeseries a", "Timeseries b", "Timeseries x")
     names(ref2) <- colnames(regts2)
     expect_identical(ts_labels(regts2), ref2)

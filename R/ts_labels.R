@@ -44,12 +44,13 @@ ts_labels <- function(x) {
 #' Update one or more timeseries labels in a multivariate \code{regts} object
 #'
 #' @param x a multivariate \code{\link{regts}} object
-#' @param labels a named list. The names are the column names
-#' and the values are the labels. Specify \code{NULL} to remove all labels.
+#' @param labels a named character vector. The names are the names
+#' of the timeseries (columns) whose label will be updated.
+#' Specify \code{NULL} to remove all labels.
 #' @examples
 #' ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"),
 #'              labels = c("Timeseries a", "???"))
-#' ts <-update_ts_labels(ts, list(b = "Timeseries b"))
+#' ts <-update_ts_labels(ts, c(b = "Timeseries b"))
 #' print(ts_labels(ts))
 #'
 #' @seealso \code{\link{ts_labels}}
@@ -69,7 +70,7 @@ update_ts_labels <- function(x, labels) {
         names(lbls) <- colnames(x)
     }
     sel <- which(colnames(x) %in% names(labels))
-    lbls[sel] <- as.character(labels[colnames(x)[sel]])
+    lbls[sel] <- labels[colnames(x)[sel]]
     ts_labels(x) <- lbls
     return (x)
 }

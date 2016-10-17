@@ -54,14 +54,14 @@ transpose_df  <- function(x, colname_column, label_column) {
         x <- x[-columns_to_remove]
     }
 
-    old_labels <- as.character(label(x))
+    old_labels <- as.character(Hmisc::label(x))
     ret <- as.data.frame(t(x))
 
     if (!missing(colname_column)) {
         colnames(ret) <- new_colnames
     }
     if (has_labels) {
-        label(ret, self = FALSE) <- labels
+        Hmisc::label(ret, self = FALSE) <- labels
     }
 
     if (any(nchar(old_labels) > 0)) {
