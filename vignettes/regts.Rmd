@@ -413,7 +413,7 @@ ts_labels(t2) <- NULL # remove all labels from multivariate timeseries t2
 For updating one or more timeseries labels in a multivariate `regts` object, the function `update_ts_labels` is provided:
 
 ```{r eval = TRUE}
-rts <- update_ts_labels(rts, list(b = "Updated content b"))
+rts <- update_ts_labels(rts, c(b = "Updated content b"))
 ```
 ```{r echo = FALSE}
 ts_labels(rts)
