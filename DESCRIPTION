@@ -15,8 +15,7 @@ Description: This package contains a number of tools to work efficiently with
 License: What license is it under?
 LazyData: TRUE
 RoxygenNote: 5.0.1
-Imports: Rcpp
-Depends: Hmisc
+Imports: Rcpp, Hmisc
 Suggests: testthat, zoo,
     knitr,
     rmarkdown

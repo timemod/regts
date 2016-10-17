@@ -7,7 +7,6 @@
 #' @param x a \code{regts}
 #' @param ... additional arguments to be passed to methods.
 #' @return A \code{data.frame}
-#' @importFrom Hmisc label<-
 #' @export
 #' @examples
 #' ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),
@@ -25,7 +24,7 @@ as.data.frame.regts <- function(x, ...) {
     # handle labels
     lbls <- ts_labels(x)
     if (!is.null(lbls)) {
-        label(ret, self = FALSE) <- lbls
+        Hmisc::label(ret, self = FALSE) <- lbls
     }
     return(ret)
 }

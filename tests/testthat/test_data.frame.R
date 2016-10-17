@@ -36,7 +36,7 @@ test_that("as.regts.data.frame for multivariate yearly timeseries", {
 test_that("as.regts.data.frame for multivariate yearly timeseries with labels", {
     df <- data.frame(periods = c(2015, 2016, 2017), a = 1:3, b = 4:6)
     ts_labels <- paste("Timeseries", c("a", "b"))
-    label(df, self = FALSE) <- c("", ts_labels)
+    Hmisc::label(df, self = FALSE) <- c("", ts_labels)
     ts1 <- as.regts(df, time_column = 1)
     ts2 <- regts(matrix(1:6, ncol =  2), start = "2015", names = c("a", "b"),
                  labels = ts_labels)

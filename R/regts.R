@@ -211,8 +211,7 @@ is.regts <- function(x) {
 #' # create a data frame with the time index in the first column and special
 #' # time format "2015 3" instead of "2015Q3", and convert to regts
 #' df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
-#' ts <- as.regts(df, time_column = 1, frequency = 4)
-#' @importFrom Hmisc label
+#' ts <- as.regts(df, time_col
 #' @export
 as.regts <- function(x, ...) {
     UseMethod("as.regts")
@@ -283,7 +282,7 @@ as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
     }
 
     # handle labels
-    lbls <- label(x)
+    lbls <- Hmisc::label(x)
     if (!all(nchar(lbls) == 0)) {
         # remove the time column(s) from the labels
         if (time_column != 0) {
