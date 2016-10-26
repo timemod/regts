@@ -211,7 +211,7 @@ is.regts <- function(x) {
 #' # create a data frame with the time index in the first column and special
 #' # time format "2015 3" instead of "2015Q3", and convert to regts
 #' df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
-#' ts <- as.regts(df, time_col
+#' ts <- as.regts(df, time_column = 1, frequency = 4)
 #' @export
 as.regts <- function(x, ...) {
     UseMethod("as.regts")

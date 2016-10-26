@@ -7,14 +7,15 @@ PKG_CXXFLAGS = -std=c++0x
 LEX = flex
 YACC = bison
 LYPREFIX = pr
+LEX_YACC_DIR = lex_yacc
 
 all: $(SHLIB) period_scanner.o period_parser.o
 
 # rules for lex and yacc
-period_scanner.cpp : period_scanner.l
+period_scanner.cpp : $(LEX_YACC_DIR)/period_scanner.l
 	$(LEX)  -P$(LYPREFIX) -o$@ $<
 
-period_parser.cpp : period_parser.yy
+period_parser.cpp : $(LEX_YACC_DIR)/period_parser.yy
 	$(YACC) --defines=period_parser.h -p $(LYPREFIX) -o $@ $<
 
 # dependencies C files
@@ -23,8 +24,6 @@ period_scanner.o : period_scanner.cpp period_parser.cpp period_scanner.h \
                    months.h
 months.o : months.h
 parse_regperiod.o : parse_period.h
-
 period_range.o : period_range.h
 aggr_gr.o : period_range.h
 window_regts.o : period_range.h
-
