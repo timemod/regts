@@ -26,11 +26,6 @@
 #' computing difference is \code{\link{cvgdif}}, which computes relative differences
 #' if the absolute value of \code{x2} is larger than 1.
 #' @return a list with the following components
-#'  \item{tol}{The tolerance parameter}
-#'  \item{missing_names1}{The names of columns present in \code{x2} but missing
-#'                        in \code{x1}}
-#'  \item{missing_names2}{The names of columns present in \code{x1} but missing
-#'                        in \code{x2}}
 #'  \item{equal}{\code{TRUE} if \code{x1} and \code{x2} have the same column names
 #'              and if all differences are smaller than or equal to \code{tol}}
 #'  \item{difnames}{The names of the common columns with differences
@@ -38,6 +33,11 @@
 #'  \item{dif}{A \code{\link{regts}} with the computed differences for the common columns with
 #'             differences larger than \code{tol}, or \code{NULL} if there
 #'             are no differences}
+#'  \item{missing_names1}{The names of columns present in \code{x2} but missing
+#'                        in \code{x1}}
+#'  \item{missing_names2}{The names of columns present in \code{x1} but missing
+#'                        in \code{x2}}
+#'  \item{tol}{The tolerance parameter}
 #' @examples
 #' library(regts)
 #'
@@ -107,14 +107,14 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
         difnames <- character(0)
     }
 
-    retval <- list(tol           = tol,
-                   missing_names1 = missing_names1,
-                   missing_names2 = missing_names2,
-                   equal          = length(missing_names1) == 0 &&
+    retval <- list(equal          = length(missing_names1) == 0 &&
                                     length(missing_names2) == 0 &&
                                     length(difnames) == 0,
                    difnames       = difnames,
-                   dif            = dif)
+                   dif            = dif,
+                   missing_names1 = missing_names1,
+                   missing_names2 = missing_names2,
+                   tol            = tol)
 
     return (retval)
 }
