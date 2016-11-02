@@ -348,7 +348,7 @@ add_columns <- function(x, new_colnames) {
             x <- window_regts(x, ts_range)
         }
         i <- seq(sel_range[1] - ts_range[1] + 1,
-                 length.out = lensub__(sel_range))
+                 length.out = length_range__(sel_range))
         # if argument j is missing, then we have to add an empty
         # column selection. x[i] does not return the same as x[i, ].
         if (missing(j) && is.mts(x)) {
@@ -426,13 +426,13 @@ convert_selection_range <- function(sel_range, ts_range) {
 window_regts <- function(x, sel_range) {
     ts_range <- get_regperiod_range(x)
     sel_range <- convert_selection_range(sel_range, ts_range)
-    nper_new <- lensub__(sel_range)
+    nper_new <- length_range__(sel_range)
     if (nper_new < 0) {
         stop("Illegal selection")
     }
     shift <- sel_range[1] - ts_range[1]
     rmin <- max(1, 1 - shift)
-    rmax <- min(nper_new, lensub__(ts_range) - shift)
+    rmax <- min(nper_new, length_range__(ts_range) - shift)
     if (is.matrix(x)) {
         data <- matrix(NA, nrow = nper_new, ncol = ncol(x))
         if (rmax >= rmin) {

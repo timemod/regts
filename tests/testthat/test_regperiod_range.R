@@ -51,13 +51,13 @@ test_that("start_period and end_period", {
 test_that("length subrange", {
     r <- regperiod_range("2010Q4", "2011Q3")
     s <- regperiod_range("2016Q1", "2016Q4")
-    expect_identical(lensub(r), lensub(s))
+    expect_identical(length_range(r), length_range(s))
 
     r <- regperiod_range("2010", "2013")
     s <- regperiod_range("2014", "2017")
-    expect_identical(lensub(r), lensub(s))
+    expect_identical(length_range(r), length_range(s))
     t <- as.character(r)
-    expect_error(lensub(t), "Variable should be a regperiod_range object")
+    expect_error(length_range(t), "Variable should be a regperiod_range object")
 })
 
 test_that("logical operators", {

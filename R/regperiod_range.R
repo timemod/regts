@@ -29,7 +29,7 @@
 #'
 #' #create a regperiod_range for a timeseries with frequency 2 (half year)
 #' regperiod_range("2010-2", "2016-2", frequency = 2)
-#' @seealso \code{\link{lensub}}, \code{\link{start_period}},
+#' @seealso \code{\link{length_range}}, \code{\link{start_period}},
 #' \code{\link{end_period}}
 #' @export
 regperiod_range <- function(p1, p2 = p1, frequency = NA) {
@@ -210,24 +210,27 @@ as.character.regperiod_range <- function(x, ...) {
     return (retval)
 }
 
-#' Returns the number of subperiods in a \code{\link{regperiod_range}} object.
+#' Returns the number of periods in a \code{\link{regperiod_range}} object.
 #'
 #' @param  x a \code{regperiod_range}
-#' @return The number of subperiods in the range, or \code{Inf} is the
+#' @return The number of periods in the range, or \code{Inf} is the
 #' range is not bounded
+#' @examples
+#' range <- regperiod_range("2010Q2", "2011Q3")
+#' length_range(range)  # the result will be 6
 #' @export
-lensub  <- function(x) {
+length_range  <- function(x) {
     if (!inherits(x, "regperiod_range")) {
         stop("Variable should be a regperiod_range object")
     }
     if (is.na(x[1]) | is.na(x[2])) {
         return (Inf)
     }
-    return(lensub__(x))
+    return(length_range__(x))
 }
 
-lensub__  <- function(x) {
-# Internal lensub function, no check for NA's or variabletype
+length_range__  <- function(x) {
+# Internal length_range function, no check for NA's or variabletype
     return (x[2] - x[1] + 1)
 }
 

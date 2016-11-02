@@ -9,7 +9,7 @@ set.seed(12345)
 
 test_that("quarterly to year, single timeseries", {
     p <- regperiod_range("2009Q2", "2013Q3")
-    ts_q <- regts(rnorm(lensub(p)), start = start_period(p))
+    ts_q <- regts(rnorm(length_range(p)), start = start_period(p))
     ts_y1 <- aggregate(ts_q)
     ts_y2 <- aggregate(ts_q["2009Q3/"])
     ts_y3 <- aggregate(ts_q["2009Q4/"])
@@ -21,7 +21,7 @@ test_that("quarterly to year, single timeseries", {
 
 test_that("monthly to quarterly, two timeseries", {
     p <- regperiod_range("2010M2", "2011M11")
-    ts_m <- regts(matrix(rnorm(lensub(p) * 2), ncol = 2),
+    ts_m <- regts(matrix(rnorm(length_range(p) * 2), ncol = 2),
                   start = start_period(p))
     ts_q1 <- aggregate(ts_m, nfrequency = 4)
     ts_q2 <- aggregate(ts_m["2010M3/"], nfrequency = 4)

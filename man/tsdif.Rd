@@ -24,11 +24,6 @@ if the absolute value of \code{x2} is larger than 1.}
 }
 \value{
 a list with the following components
- \item{tol}{The tolerance parameter}
- \item{missing_names1}{The names of columns present in \code{x2} but missing
-                       in \code{x1}}
- \item{missing_names2}{The names of columns present in \code{x1} but missing
-                       in \code{x2}}
  \item{equal}{\code{TRUE} if \code{x1} and \code{x2} have the same column names
              and if all differences are smaller than or equal to \code{tol}}
  \item{difnames}{The names of the common columns with differences
@@ -36,6 +31,11 @@ a list with the following components
  \item{dif}{A \code{\link{regts}} with the computed differences for the common columns with
             differences larger than \code{tol}, or \code{NULL} if there
             are no differences}
+ \item{missing_names1}{The names of columns present in \code{x2} but missing
+                       in \code{x1}}
+ \item{missing_names2}{The names of columns present in \code{x1} but missing
+                       in \code{x2}}
+ \item{tol}{The tolerance parameter}
 }
 \description{
 This function can be used to compare two multivariate timeseries objects.
