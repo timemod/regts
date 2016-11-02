@@ -187,6 +187,8 @@ is.regts <- function(x) {
 #' @param time_column the column names or numbers of the data frame
 #' in which the time is stored. Specify \code{0} if the index is in the row names
 #' of the data frame
+#' @param numeric if values are non numeric then by default they are converted
+#' to numeric
 #' @param fun a function for converting values in the time column to
 #' \code{\link{regperiod}} objects
 #' @param ... arguments passed to \code{fun}
@@ -233,21 +235,36 @@ as.regts.ts <- function(x, ...) {
 #' @describeIn as.regts Convert a \code{\link{data.frame}} to a
 #' \code{\link{regts}}
 #' @export
-as.regts.data.frame <- function(x, time_column = 0, fun = regperiod,
-                                ...) {
+as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
+                                fun = regperiod, ...) {
 
     # extract time column(s) and data from the input data frame,
-    # and convert to a matrix
+    # and convert to a matrix. data are converted to numeric if necessary
+
     if (time_column == 0) {
-        times <- rownames(x)
+        times <- row.names(x)
         data <- x
     } else {
         if (is.character(time_column)) {
-            time_column <- which(colnames(x) %in% time_column)
+            time_column <- which(col.names(x) %in% time_column)
         }
         times <- x[[time_column]]
         data <- x[-time_column]
     }
+
+    # convert (by default) non numeric data
+    # use sapply to keep the matrix structure, rownames get lost
+    if (numeric && !is.numeric(data)){
+        if (NROW(data) > 1) {
+            data <- sapply(data, FUN = as.numeric)
+        } else {
+            # if data has only 1 row, sapply doesn't work properly
+            data <- lapply(data, FUN = as.numeric)
+            # convert list, result has type matrix
+            data <- do.call(cbind, data)
+        }
+    }
+
     data <- as.matrix(data)
 
     # convert the contents of the time column to a list of regperiods

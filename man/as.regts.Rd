@@ -11,7 +11,8 @@ as.regts(x, ...)
 
 \method{as.regts}{ts}(x, ...)
 
-\method{as.regts}{data.frame}(x, time_column = 0, fun = regperiod, ...)
+\method{as.regts}{data.frame}(x, time_column = 0, numeric = TRUE,
+  fun = regperiod, ...)
 
 \method{as.regts}{default}(x, ...)
 }
@@ -23,6 +24,9 @@ as.regts(x, ...)
 \item{time_column}{the column names or numbers of the data frame
 in which the time is stored. Specify \code{0} if the index is in the row names
 of the data frame}
+
+\item{numeric}{if values are non numeric then by default they are converted
+to numeric}
 
 \item{fun}{a function for converting values in the time column to
 \code{\link{regperiod}} objects}
