@@ -1,3 +1,4 @@
+
 library(regts)
 context("tsdif")
 
@@ -14,9 +15,8 @@ difference <- regts(matrix(data = rep(0.01, 6), nc = 2), start = "2008Q4",
 difference["2008Q3", ] <- NA
 difference["2009Q3", ] <- NA
 
-res_correct <- list(tol = 0, missing_names1 = "d",  missing_names2 = "c",
-                    equal = FALSE, difnames = c("a", "b"),
-                    dif = difference)
+res_correct <- list(equal = FALSE, difnames = c("a", "b"), dif = difference,
+                    missing_names1 = "d",  missing_names2 = "c", tol = 0)
 
 test_that("simple example", {
     res <- tsdif(ts1, ts2)
@@ -25,10 +25,9 @@ test_that("simple example", {
 
 test_that("no difference", {
     res <- tsdif(ts1, ts1)
-    res_no_dif <- list(tol = 0, missing_names1 = character(0),
-                         missing_names2 = character(0),
-                         equal = TRUE, difnames = character(0),
-                         dif = NULL)
+    res_no_dif <- list(equal = TRUE, difnames = character(0), dif = NULL,
+                       missing_names1 = character(0), missing_names2 = character(0),
+                       tol = 0)
     expect_equal(res, res_no_dif)
 })
 
@@ -59,10 +58,9 @@ test_that("no common columns", {
     x2 <- ts2
     colnames(x2) <- toupper(colnames(ts2))
     res <- tsdif(ts1, x2)
-    res_correct2 <- list(tol = 0, missing_names1 = c("A", "B", "D"),
-                         missing_names2 = c("a", "b", "c"),
-                         equal = FALSE, difnames = character(0),
-                          dif = NULL)
+    res_correct2 <- list(equal = FALSE, difnames = character(0),
+                         dif = NULL, missing_names1 = c("A", "B", "D"),
+                         missing_names2 = c("a", "b", "c"), tol = 0)
     expect_equal(res, res_correct2)
 })
 
@@ -82,10 +80,10 @@ test_that("single ts as result", {
 
 test_that("single common column", {
     res <- tsdif(ts1[, c("a", "c")], ts2[, c("d", "a")])
-    res_correct2 <- list(tol = 0, missing_names1 = "d",  missing_names2 = "c",
-                         equal = FALSE, difnames = c("a"),
+    res_correct2 <- list(equal = FALSE, difnames = c("a"),
                          dif = regts(matrix(data = c(NA, rep(0.01, 3), NA), nc = 1),
-                                     start = "2008Q3", names = c("a")))
+                                     start = "2008Q3", names = c("a")),
+                         missing_names1 = "d",  missing_names2 = "c", tol = 0)
     expect_equal(res, res_correct2)
 })
 
@@ -105,10 +103,9 @@ test_that("no column namessimple", {
 
     difference3 <- difference[, 1:2]
     colnames(difference3) <- c("column 1", "column 2")
-    res_correct3 <- list(tol = 0, missing_names1 = character(0),
-                         missing_names2 = "column 3",
-                        equal = FALSE, difnames = c("column 1", "column 2"),
-                        dif = difference3)
+    res_correct3 <- list(equal = FALSE, difnames = c("column 1", "column 2"),
+                        dif = difference3, missing_names1 = character(0),
+                        missing_names2 = "column 3", tol = 0)
     expect_equal(res, res_correct3)
 })
 

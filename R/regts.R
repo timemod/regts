@@ -242,15 +242,17 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     # and convert to a matrix. data are converted to numeric if necessary
 
     if (time_column == 0) {
-        times <- row.names(x)
+        times <- rownames(x)
         data <- x
     } else {
         if (is.character(time_column)) {
-            time_column <- which(col.names(x) %in% time_column)
+            time_column <- which(colnames(x) %in% time_column)
         }
         times <- x[[time_column]]
         data <- x[-time_column]
     }
+
+
 
     # convert (by default) non numeric data
     # use sapply to keep the matrix structure, rownames get lost
@@ -259,13 +261,19 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
             data <- sapply(data, FUN = as.numeric)
         } else {
             # if data has only 1 row, sapply doesn't work properly
+            cnames <- colnames(data)
+            data <- as.matrix(data)
             data <- lapply(data, FUN = as.numeric)
             # convert list, result has type matrix
             data <- do.call(cbind, data)
+            colnames(data) <- cnames
         }
     }
+    else {
+        data <- as.matrix(data)
+    }
 
-    data <- as.matrix(data)
+
 
     # convert the contents of the time column to a list of regperiods
     times <- lapply(as.character(times), FUN = fun, ...)
