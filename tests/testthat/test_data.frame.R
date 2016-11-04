@@ -57,3 +57,29 @@ test_that("as.regts.data.frame for multivariate quarterly irregular timeseries",
                  names = c("a", "b"))
     expect_identical(ts1, ts2)
 })
+
+test_that("as.regts.data.frame for argument numeric", {
+    df <- data.frame(periods = c(2015, 2016, 2017),
+                     awn = c("1","2","3"), bwn = c("4","5","6"), stringsAsFactors = FALSE )
+    ts1 <- as.regts(df, time_column = "periods")
+    # use as.numeric to create non integer values, ts1 has also non integer values
+    ts2 <- regts(matrix(as.numeric(1:6), ncol = 2), start = "2015", names = c("awn","bwn"))
+    expect_identical(ts1, ts2)
+})
+
+test_that("as.regts.data.frame for argument numeric, a one row data frame", {
+    df <- data.frame(awn = "1.1", bwn = "2.2", stringsAsFactors = FALSE )
+    rownames(df) <- 2015
+    ts1 <- as.regts(df)
+    ts2 <- regts(matrix(c(1.1,2.2), ncol = 2), start = "2015", names = c("awn","bwn"))
+    expect_identical(ts1, ts2)
+})
+
+test_that("as.regts.data.frame for argument numeric = FALSE", {
+    df <- data.frame(periods = c(2015, 2016, 2017),
+                     awn = c("1","2","3"), bwn = c("4","5","6"), stringsAsFactors = FALSE )
+    ts1 <- as.regts(df, time_column = "periods", numeric = FALSE)
+    # use as.numeric to create non integer values, ts1 has also non integer values
+    ts2 <- regts(matrix(c("1","2","3","4","5","6"), ncol = 2), start = "2015", names = c("awn","bwn"))
+    expect_identical(ts1, ts2)
+})

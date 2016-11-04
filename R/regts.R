@@ -255,14 +255,15 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
 
 
     # convert (by default) non numeric data
-    # use sapply to keep the matrix structure, rownames get lost
     if (numeric && !is.numeric(data)){
+        # for multirow data use sapply to keep the matrix structure (rownames get lost)
         if (NROW(data) > 1) {
             data <- sapply(data, FUN = as.numeric)
         } else {
-            # if data has only 1 row, sapply doesn't work properly
+            # colnames get lost in lapply
             cnames <- colnames(data)
             data <- as.matrix(data)
+            # if data has only 1 row, sapply doesn't work properly
             data <- lapply(data, FUN = as.numeric)
             # convert list, result has type matrix
             data <- do.call(cbind, data)
