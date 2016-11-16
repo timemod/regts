@@ -187,8 +187,9 @@ is.regts <- function(x) {
 #' @param time_column the column names or numbers of the data frame
 #' in which the time is stored. Specify \code{0} if the index is in the row names
 #' of the data frame
-#' @param numeric if values are non numeric then by default they are converted
-#' to numeric
+#' @param numeric logical: should non numeric values be converted to numeric data.
+#' By default they are converted to numeric. This can be changed by setting
+#' \code{numeric = FALSE}
 #' @param fun a function for converting values in the time column to
 #' \code{\link{regperiod}} objects
 #' @param ... arguments passed to \code{fun}
@@ -252,29 +253,15 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
         data <- x[-time_column]
     }
 
-
-
     # convert (by default) non numeric data
-    if (numeric && !is.numeric(data)){
-        # for multirow data use sapply to keep the matrix structure (rownames get lost)
-        if (NROW(data) > 1) {
-            data <- sapply(data, FUN = as.numeric)
-        } else {
-            # colnames get lost in lapply
-            cnames <- colnames(data)
-            data <- as.matrix(data)
-            # if data has only 1 row, sapply doesn't work properly
-            data <- lapply(data, FUN = as.numeric)
-            # convert list, result has type matrix
-            data <- do.call(cbind, data)
-            colnames(data) <- cnames
-        }
+    if (numeric && any(!sapply(data, FUN = is.numeric))){
+#       # colnames get lost in lapply but they are no longer needed
+        l <- lapply(data, FUN = as.numeric)
+        datamat <- do.call(cbind, l)
     }
     else {
-        data <- as.matrix(data)
+        datamat <- as.matrix(data)
     }
-
-
 
     # convert the contents of the time column to a list of regperiods
     times <- lapply(as.character(times), FUN = fun, ...)
@@ -289,10 +276,10 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     }
 
     times <- unlist(times)
-    if (identical(times, times[1]:times[nrow(data)])) {
+    if (identical(times, times[1]:times[nrow(datamat)])) {
         # normal regular timeseries, no missing periods and periods
         # are ordered synchronically
-        ret <- regts(data, start = create_regperiod(times[1], freq))
+        ret <- regts(datamat, start = create_regperiod(times[1], freq))
     } else {
         # irregular timeseries in dataframe (missing periods or
         # unorderered time index)
@@ -300,11 +287,11 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
         subp_max <- max(times)
         per_count <- subp_max - subp_min + 1
         pmin <- create_regperiod(subp_min, frequency = freq)
-        mat <- matrix(NA, nrow = per_count, ncol = ncol(data))
-        colnames(mat) <- colnames(data)
+        mat <- matrix(NA, nrow = per_count, ncol = ncol(datamat))
+        colnames(mat) <- colnames(datamat)
         ret <- regts(mat, start = pmin)
         rows <- times - subp_min +1
-        ret[rows, ] <- data
+        ret[rows, ] <- datamat
     }
 
     # handle labels
