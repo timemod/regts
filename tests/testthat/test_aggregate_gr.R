@@ -16,7 +16,7 @@ agg_diff_1 <- function(x, nfrequency = 1) {
 # frequency nfrequency. First calculate difference, then calculate aggregate.
 agg_diff_2 <- function(x, method, nfrequency = 1) {
     x_diff <- diff(x)
-    if (method == "cgr") {
+    if (method == "dif1s") {
         x_diff <- x_diff * (frequency(x) / nfrequency)
     }
     return (aggregate_gr(x_diff, method, nfrequency))
@@ -36,54 +36,54 @@ agg_reldiff_1 <- function(x, nfrequency = 1) {
 agg_reldiff_2 <- function(x, method, nfrequency = 1) {
     x_diff <- diff(x) / lag(x, - 1)
     colnames(x_diff) <- colnames(x)
-    if (method == "cgrc") {
+    if (method == "pct") {
         x_diff <- 100 * x_diff
     }
     return (aggregate_gr(x_diff, method, nfrequency))
 }
 
-test_that("cgr and cgrs, quarterly to year, single timeseries", {
+test_that("dif1s and dif1, quarterly to year, single timeseries", {
     p         <- regperiod_range("2008Q2", "2013Q3")
     ts_q      <- regts(rnorm(length_range(p)), start = start_period(p))
     ref <- agg_diff_1(ts_q) # the correct result
-    expect_equal(agg_diff_2(ts_q, method = "cgr"), ref);
-    expect_equal(agg_diff_2(ts_q["2008Q4/"], method = "cgrs"), ref);
-    expect_equal(agg_diff_2(ts_q["2009Q1/"], method = "cgr"), ref);
+    expect_equal(agg_diff_2(ts_q, method = "dif1s"), ref);
+    expect_equal(agg_diff_2(ts_q["2008Q4/"], method = "dif1"), ref);
+    expect_equal(agg_diff_2(ts_q["2009Q1/"], method = "dif1s"), ref);
 })
 
-test_that("cgru and cgrc, quarterly to year, single timeseries", {
+test_that("pct and rel, quarterly to year, single timeseries", {
     p         <- regperiod_range("2008Q2", "2013Q3")
     ts_q      <- regts(rnorm(length_range(p)), start = start_period(p))
     ref <- agg_reldiff_1(ts_q) # the correct result
-    expect_equal(agg_reldiff_2(ts_q, method = "cgru"), ref);
-    expect_equal(agg_reldiff_2(ts_q["2009Q1/"], method = "cgrc"), ref * 100);
+    expect_equal(agg_reldiff_2(ts_q, method = "rel"), ref);
+    expect_equal(agg_reldiff_2(ts_q["2009Q1/"], method = "pct"), ref * 100);
 })
 
-test_that("cgr and cgru, monthly to quarterly, two timeseries", {
+test_that("dif1s and rel, monthly to quarterly, two timeseries", {
     p <- regperiod_range("2010M11", "2011M11")
     ts_m <- regts(matrix(rnorm(length_range(p) * 2), ncol = 2),
                  start = start_period(p), names = c("a", "b"),
                  labels = c("ts a", "ts b"))
     ref_abs <- agg_diff_1(ts_m, nfrequency = 4)
-    expect_equal(agg_diff_2(ts_m, method = "cgr", nfrequency = 4), ref_abs);
+    expect_equal(agg_diff_2(ts_m, method = "dif1s", nfrequency = 4), ref_abs);
     ref_rel <- agg_reldiff_1(ts_m, nfrequency = 4)
-    expect_equal(agg_reldiff_2(ts_m["2011M1/"], method = "cgru", nfrequency = 4),
+    expect_equal(agg_reldiff_2(ts_m["2011M1/"], method = "rel", nfrequency = 4),
                  ref_rel);
 })
 
-test_that("cgr and cgrs, quarterly to year, single timeseries with NA values", {
+test_that("dif1s and dif1, quarterly to year, single timeseries with NA values", {
     p         <- regperiod_range("2009Q1", "2015Q4")
     ts_q      <- regts(rnorm(length_range(p)), start = start_period(p))
     ts_q["2009Q1"] <- NA
     ts_q["2012Q2"] <- NA
     ts_q["2015Q4"] <- NA
     ref_abs <- agg_diff_1(ts_q) # the correct result
-    expect_equal(agg_diff_2(ts_q, method = "cgr"), ref_abs);
+    expect_equal(agg_diff_2(ts_q, method = "dif1s"), ref_abs);
     ref_rel <- agg_reldiff_1(ts_q) # the correct result
-    expect_equal(agg_reldiff_2(ts_q, method = "cgru"), ref_rel);
+    expect_equal(agg_reldiff_2(ts_q, method = "rel"), ref_rel);
 })
 
-test_that("cgr and cgrs, quarterly to year, single timeseries with Inf, -Inf or
+test_that("dif1s and dif1, quarterly to year, single timeseries with Inf, -Inf or
           NaN values", {
     p         <- regperiod_range("2009Q1", "2015Q4")
     ts_q      <- regts(rnorm(length_range(p)), start = start_period(p))
@@ -91,9 +91,9 @@ test_that("cgr and cgrs, quarterly to year, single timeseries with Inf, -Inf or
     ts_q["2012Q2"] <- 0/0
     ts_q["2015Q4"] <- -1/0
     ref_abs <- agg_diff_1(ts_q) # the correct result
-    expect_equal(agg_diff_2(ts_q, method = "cgr"), ref_abs);
+    expect_equal(agg_diff_2(ts_q, method = "dif1s"), ref_abs);
     ref_rel <- agg_reldiff_1(ts_q) # the correct result
-    ref_rel['2015'] <- NaN  # the cgru and cgrs methods  cannot distinguish
+    ref_rel['2015'] <- NaN  # the pct and dif1 methods  cannot distinguish
                               #Inf, Inf and NaN
-    expect_equal(agg_reldiff_2(ts_q, method = "cgru"), ref_rel);
+    expect_equal(agg_reldiff_2(ts_q, method = "rel"), ref_rel);
 })
