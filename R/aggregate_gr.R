@@ -4,14 +4,15 @@
 #' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object
 #' @param nfrequency the frequency of the result, should be higher than
 #' the frequency of timeseries \code{x}
-#' @param method Aggregation method: \code{"cgr"}, \code{"cgrs"}, \code{"cgru"}
-#' or \code{"cgrc"}. Consult the Isis reference manual for an explanation of
+#' @param method Aggregation method: \code{"dif1s"}, \code{"dif1"}, \code{"pct"}
+#' or \code{"rel"}. Consult the Regts vignette for an explanation of
 #' these methods
 #' @return a \code{regts} with frequency \code{frequency}
 #' @export
 #' @useDynLib regts
 #' @importFrom Rcpp sourceCpp
-aggregate_gr <- function(x,  method, nfrequency = 1) {
+aggregate_gr <- function(x, method = c("dif1s", "dif1","pct","rel"), nfrequency = 1) {
+    method <- match.arg(method)
     if (!is.ts(x)) {
         stop("Argument x is not a timeseries")
     }

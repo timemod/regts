@@ -33,18 +33,18 @@ List agg_gr(NumericMatrix ts_old, const int freq_new,
 
     NumericMatrix data(nper_new, ts_old.ncol());
 
-    if (method == "cgr" || method == "cgrs") {
+    if (method == "dif1s" || method == "dif1") {
         int shift = per_new.first * rep - (rep - 1) - per_old.first;
         for (int col = 0; col < ts_old.ncol(); col++) {
             agg_gr_abs(ts_old(_, col), data(_, col), rep, shift);
         }
-        if (method == "cgr") {
+        if (method == "dif1s") {
             data = data / rep;
         }
-    } else if (method == "cgru" || method == "cgrc") {
+    } else if (method == "rel" || method == "pct") {
         int shift = per_new.first * rep - rep  - per_old.first;
         double *work = new double[2*rep];
-        int perc = method == "cgru" ? 1 : 100;
+        int perc = method == "rel" ? 1 : 100;
         for (int col = 0; col < ts_old.ncol(); col++) {
             agg_gr_rel(ts_old(_, col), data(_, col), work, rep, shift, perc);
         }
