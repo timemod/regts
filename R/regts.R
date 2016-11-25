@@ -253,15 +253,13 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
         data <- x[-time_column]
     }
 
+    datamat <- as.matrix(data)
+
     # convert (by default) non numeric data
-    if (numeric && any(!sapply(data, FUN = is.numeric))){
-#       # colnames get lost in lapply but they are no longer needed
-        l <- lapply(data, FUN = as.numeric)
-        datamat <- do.call(cbind, l)
+    if (numeric && !is.numeric(datamat)){
+        datamat <- apply(datamat, MARGIN = c(1, 2), FUN = as.numeric)
     }
-    else {
-        datamat <- as.matrix(data)
-    }
+
 
     # convert the contents of the time column to a list of regperiods
     times <- lapply(as.character(times), FUN = fun, ...)
