@@ -36,6 +36,17 @@ test_that("as.regperiod_range.character", {
           "The start period \\(2010Q4\\) is after the end period \\(2010Q2\\)")
 })
 
+test_that("as.regperiod_range.regperiod", {
+    prd <- regperiod("2010")
+    range <- regperiod_range("2010", "2010")
+    expect_identical(as.regperiod_range(prd), range)
+})
+
+test_that("as.character.regperiod_range", {
+    range <- regperiod_range("2000", "2010")
+    expect_identical(as.character(range),"2000/2010")
+})
+
 test_that("start_period and end_period", {
     r <- regperiod_range("2010Q4", "2011Q3")
     expect_identical(start_period(r), regperiod("2010Q4"))
@@ -70,12 +81,12 @@ test_that("logical operators", {
     expect_false(regperiod_range("2010Q2","2010Q4") < regperiod_range("2010Q1","2010Q3"))
     expect_false(regperiod_range("2010Q2","2010Q4") != regperiod_range("2010Q2","2010Q4"))
     expect_false(regperiod_range("2010Q1","2010Q2") == regperiod_range("2010Q4","2010Q5"))
-	
+
     expect_error(regperiod_range("2010Q1","2010Q2") <= regperiod_range("2010M1","2010M2"),
                  paste("Logical operations '<, <=, >, >=' on regperiod_ranges with different",
                  "frequencies are not allowed"))
 	expect_error(regperiod_range("2010Q1","2010Q2") > 1,
-                 "Both operators must be regperiod_ranges when using logical operators")					
+                 "Both operators must be regperiod_ranges when using logical operators")
 })
 
 test_that("arithmetic operators: only + and - allowed", {
@@ -91,6 +102,13 @@ test_that("arithmetic operators: only + and - allowed", {
     expect_error(regperiod_range("2010Q1","2010Q1") - regperiod_range("2010Q1","2010Q1"),
 				paste("Arithmetic operators \\+ and \\- only allowed on a",
                 "combination of regperiod\\_range and integer number"))
-				
-               
 })
+
+test_that("is.regperiod_range",{
+    expect_identical(is.regperiod_range(regperiod_range("2010q2","2011q2")), TRUE)
+    expect_identical(is.regperiod_range("2010q2/2011q2"), FALSE)
+    range <- as.regperiod_range("2000/2010")
+    expect_identical(is.regperiod_range(range), TRUE)
+    expect_identical(range, regperiod_range("2000", "2010"))
+})
+

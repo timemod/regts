@@ -51,8 +51,23 @@ test_that("constructor regts for multivariate timeseries", {
     expect_identical(ts_labels(regts1[, 'b']), unname(res['b']))
     expect_identical(ts_labels(regts1[, c('a', 'b')]), res)
     expect_identical(ts_labels(regts1[, c('b', 'a')]), res[c("b", "a")])
+
+    regts2 <- update_ts_labels(regts1, NULL)
+    expect_identical(ts_labels(regts2), NULL)
+
 })
 
+
+test_that("adding labels to a regts", {
+    regts1 <- regts(matrix(rep(1:10), ncol = 2), start = "2010Q4",
+                    names = c("a", "b"))
+    ts_labels(regts1) <- c("ta", "tb")
+    regts1 <- update_ts_labels(regts1, c(a = "Timeseries a"))
+    regts2 <- regts(matrix(rep(1:10), ncol = 2), start = "2010Q4",
+                    names = c("a", "b"),
+                    labels = c("Timeseries a", "tb"))
+    expect_identical(regts1, regts2)
+})
 
 test_that("adding a column to a regts", {
     regts1 <- regts(matrix(rep(1:10), ncol = 2), start = "2010Q4",
@@ -69,6 +84,17 @@ test_that("adding a column to a regts", {
     ref2 <- c("Timeseries a", "Timeseries b", "Timeseries x")
     names(ref2) <- colnames(regts2)
     expect_identical(ts_labels(regts2), ref2)
+})
+
+test_that("error messages", {
+    expect_error(regts(matrix(1:4, ncol = 2), start = "2010", names = c("a","b"),
+                       labels = c(1,2)), "value should be a character vector")
+    expect_error(regts(matrix(1:4, ncol = 2), start = "2010", names = c("a","b"),
+                       labels = c("1","2","3")),
+                 "The length of the labels argument should be equal to the number of columns")
+    regts1 <- regts(matrix(1:4, ncol = 2), start = "2010")
+    expect_error(update_ts_labels(regts1, labels = c("a","b")),
+                 "x does not have column names. update_labels requires a regts object with named columns")
 })
 
 test_that("labels are preserved in miscellaneous timeseries functions (uni)", {
