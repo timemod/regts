@@ -1,8 +1,8 @@
-name  , label        , 2010Q1,2010Q2,2010Q3,2010Q4
-bbpwn ,"bbp"         , 6.83  , 6.98 , 6.65 , 6.21
-bet_wn,"taxes"       , 23.4  , 23.0 , 23.4 , 23.2
-clt_wn,"expenses"    , 19.3  , 19.8 , 19.5 , 19.8
-hl__hr,"productivity", 3.84  , 3.45 , 3.54 , 3.86
-a__mn_,"labour"      , 19.38 , 19.35, 19.83, 19.54
+name    label          2010Q1 2010Q2 2010Q3 2010Q4
+bbpwn  "bbp"           6.83    6.98   6.65   6.21
+bet_wn "taxes"         23.4    23.0   23.4   23.2
+clt_wn "expenses"      19.3    19.8   19.5   19.8
+hl__hr "productivity"  3.84    3.45   3.54   3.86
+a__mn_ "labour"        19.38   19.35  19.83  19.54
 
 
