@@ -25,8 +25,9 @@ as.regts(x, ...)
 in which the time is stored. Specify \code{0} if the index is in the row names
 of the data frame}
 
-\item{numeric}{if values are non numeric then by default they are converted
-to numeric}
+\item{numeric}{logical: should non numeric values be converted to numeric data.
+By default they are converted to numeric. This can be changed by setting
+\code{numeric = FALSE}}
 
 \item{fun}{a function for converting values in the time column to
 \code{\link{regperiod}} objects}

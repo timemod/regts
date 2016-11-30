@@ -1,4 +1,8 @@
 .Rproj.user
 .Rhistory
 .RData
-inst/doc
+pkg/inst/doc
+pkg.pdf
+pkg.log
+regts.Rcheck
+

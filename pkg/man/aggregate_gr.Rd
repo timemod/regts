@@ -5,13 +5,13 @@
 \title{Converts timeseries with absolute or relative growth rates to a lower
 frequency}
 \usage{
-aggregate_gr(x, method, nfrequency = 1)
+aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"), nfrequency = 1)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} of \code{\link{regts}} object}
 
-\item{method}{Aggregation method: \code{"cgr"}, \code{"cgrs"}, \code{"cgru"}
-or \code{"cgrc"}. Consult the Isis reference manual for an explanation of
+\item{method}{Aggregation method: \code{"dif1s"}, \code{"dif1"}, \code{"pct"}
+or \code{"rel"}. Consult the Regts vignette for an explanation of
 these methods}
 
 \item{nfrequency}{the frequency of the result, should be higher than
