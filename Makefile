@@ -1,16 +1,13 @@
-# This is a gnu makefile. The makefile contains some commands that makes
-# it easy to build and install the package, but is it NOT used to build
-# the package itself (for that purpose R CMD INSTALL in used).
-# On Windows, the Rtools directories (e.g. c:\Rtools\bin and 
-# c:\Rtools\gcc-4.6.3\bin) should be in the path, but you should not use
-# the make of c:\Rtools\bin to run this file. Instead use the standard 
-# gnuwin32 make command (at the ontwikkelomgeving at the CPB, use 
-# command gwmake instead of make).
+# This is a gnu makefile with several commands to build, document and test
+# the package.  The actual building and installation of the package is achieved
+# with the standard R commands R CMD BUOLD and R CMD INSTALL.
+#
+# This script assumes that environment variable R_LIBS_USER exists.
+
 PKGDIR=pkg
-VIEWER=gvim
-OSNAME := $(shell uname | tr A-Z a-z)
 INSTALL_FLAGS=--no-multiarch --with-keep.source 
 RCHECKARG=--no-multiarch
+PKG_CXXFLAGS = -std=c++0x -I $(R_LIBS_USER)\Rcpp\include 
 
 # Package name, Version and date from DESCIPTION
 PKG=$(shell grep 'Package:' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2)
@@ -18,9 +15,13 @@ PKGTAR=$(PKG)_$(shell grep 'Version' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2).t
 PKGDATE=$(shell grep 'Date' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2)
 TODAY=$(shell date "+%Y-%m-%d")
 
-PKG_CXXFLAGS = -std=c++0x -I $(HOME)/R/x86_64-pc-linux-gnu-library/3.3/Rcpp/include 
-
-.PHONY: clean cleanx check install uninstall mkpkg bin pdf
+OSNAME := $(shell uname | tr A-Z a-z)
+ifeq ($(findstring windows, $(OSNAME)), windows) 
+    OSTYPE = windows
+else
+    # Linux or MAC OSX
+    OSTYPE = unix
+endif
 
 help:
 	@echo
@@ -47,20 +48,20 @@ CXX=$(shell R CMD config CXX)
 CPP_FLAGS=$(shell R CMD config --cppflags)
 
 flags:
+	@echo "OSTYPE=$(OSTYPE)"
 	@echo "SHELL=$(SHELL)"
 	@echo "CPP_FLAGS=$(CPP_FLAGS)"
+	@echo "PKG_CXXFLAGS=$(PKG_CXXFLAGS)"
 	@echo "PKGDIR=$(PKGDIR)"
 	@echo "PKG=$(PKG)"
 	@echo "PKGTAR=$(PKGTAR)"
 	@echo "PKGDATE=$(PKGDATE)"
-	@echo "R .libPaths()"
 	@echo "FC=$(FC)"
 	@echo "F77=$(F77)"
 	@echo "CC=$(CC)"
 	@echo "CPP=$(CPP)"
 	@echo "CPP_FLAGS=$(CPP_FLAGS)"
 	@R --no-save --quiet --slave -e '.libPaths()'
-
 
 test:
 	Rscript test.R
@@ -79,7 +80,14 @@ check: cleanx syntax
 	@echo ""
 
 syntax:
-	$(CXX) $(CPP_FLAGS) $(PKG_CXXFLAGS) -c -fsyntax-only -Wall -pedantic $(PKGDIR)/src/*.c*
+ifneq ($(findstring windows, $(OSNAME)), windows) 
+	$(CXX) "$(CPP_FLAGS)" $(PKG_CXXFLAGS) -c -fsyntax-only -Wall -pedantic $(PKGDIR)/src/*.c*
+else
+        # On Windows, the compiler complains about misssig Rcpp.h.
+        # I have no idea why (the path to the Rcpp headers is added, see PKG_CXXFLAGS).
+        # It appears to have something to do with the make system of Rtools.
+	@echo syntax checking does not work yet on Windows
+endif
 
 cleanx:
 # Apple Finder rubbish
