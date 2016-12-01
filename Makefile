@@ -7,7 +7,7 @@
 PKGDIR=pkg
 INSTALL_FLAGS=--no-multiarch --with-keep.source 
 RCHECKARG=--no-multiarch
-PKG_CXXFLAGS = -std=c++0x -I $(R_LIBS_USER)\Rcpp\include 
+PKG_CXXFLAGS = -std=c++0x -I $(R_LIBS_USER)/Rcpp/include 
 
 # Package name, Version and date from DESCIPTION
 PKG=$(shell grep 'Package:' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2)
