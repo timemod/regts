@@ -3,11 +3,11 @@
 #' Bind two or more time series objects with a common frequency.
 #' By default, the period range of the result is the union of the period ranges
 #' of the individual timeseries. The result is padded with \code{NA}s if
-#' neccesary. If argument \code{union} is false, then the period range
+#' necessary. If argument \code{union} is false, then the period range
 #' of the result is the intersection of the period ranges.
 #'
 #' @param  ... two or more univariate or multivariate time series,
-#' or objects which can coerced to time series
+#' or objects which can be coerced to time series
 #' @param union if \code{TRUE}, then the period range of the result
 #' is the union of the period ranges of the joined objects
 #' (the result is padded with \code{NA}s if necessary). If \code{FALSE},
@@ -18,6 +18,11 @@
 #' column names
 #' @seealso \code{\link{as.list.regts}}
 #' @importFrom stats ts.union ts.intersect
+#' @examples
+#' a <- regts(1:5, start = "2011Q1")
+#' b <- regts(matrix(11:15, nc = 1), start = "2011Q2")
+#' cbind(a, b)
+#' cbind(a, b, union = FALSE)
 #' @export
 cbind.regts <- function(..., union = TRUE, suffixes) {
 

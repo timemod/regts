@@ -23,8 +23,12 @@ regperiod <- function(x, frequency = NA) {
 
 #' Test if an object is a regperiod.
 #'
-#' @param x an object
-#' @return <code>TRUE</code> if the object a \code{regperiod}
+#' @param x any R object
+#' @return \code{TRUE} if the object is a \code{regperiod}
+#' @examples
+#' p <- regperiod("2016Q1")
+#' is.regperiod(p)
+#' is.regperiod("2016Q1")
 #' @export
 is.regperiod <- function(x) {
     return (inherits(x, "regperiod"))
@@ -93,6 +97,9 @@ as.character.regperiod <- function(x, ...) {
 #' @param x a \code{regperiod}
 #' @param ... additional arguments for future methods
 #' @return the frequency of the \code{regperiod}
+#' @examples
+#' p <- regperiod("2016Q1")
+#' freq <- frequency(p)
 #' @export
 frequency.regperiod <- function(x, ...) {
     return (attr(x, "frequency"))
@@ -128,7 +135,7 @@ get_year <- function(x) {
 #' For example, for \code{regperiod} \code{2011Q3} the function
 #' returns 3.
 #' @param x a \code{regperiod}
-#' @return the subperiod of a regperiod
+#' @return the subperiod of a \code{regperiod}
 #' @examples
 #' get_subperiod(regperiod("2010Q3"))
 #' @seealso \code{\link{get_year}}
@@ -147,11 +154,14 @@ print.regperiod <- function(x, ...) {
 
 #' Coerce an R object to a regperiod
 #'
-#' @param x an R object
+#' @param x any R object
 #' @param frequency the frequency of the regperiod. This argument is mandatory
 #' if the frequency cannot be detected automatically.
 #' @param ... object passed to methods
 #' @return a \link{regperiod}
+#' @examples
+#' as.regperiod("2010Q3")
+#' as.regperiod(2010)
 #' @export
 as.regperiod <- function(x, ...) UseMethod("as.regperiod")
 

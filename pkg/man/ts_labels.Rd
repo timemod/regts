@@ -20,7 +20,7 @@ labels.}
 Retrieve or set labels for the timeseries. Timeseries labels
 can be used to give a description of the contents of the timeseries.
 The labels are stored in a named list: the names are the timeseries names
-(column names), and the values the correpsonding label.
+(column names), and the values the corresponding label.
 }
 \section{Functions}{
 \itemize{

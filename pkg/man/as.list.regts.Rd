@@ -19,7 +19,6 @@ This function converts a \code{\link{regts}} to a list of univariate
 \code{regts} objects.
 }
 \examples{
-
 regts1 <- regts(matrix(1:6, ncol = 2), start = "2015Q3", names = c("a", "b"))
 
 # convert regts1 to a list

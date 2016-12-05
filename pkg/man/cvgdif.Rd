@@ -20,4 +20,18 @@ the 'convergence difference' as described above
 This difference is equivalent to the convergence test employed in the
 package \code{isismdl}.
 }
+\examples{
+# create two timeseries x1 and x2
+x1 <- regts(matrix(data = rep(1:27), nc = 3), start = "2008Q4",
+           names = c("a", "b", "c"))
+x2 <- x1 + 0.001
+colnames(x2) <- c("a", "b", "d")
+
+# calculate the differences
+cvgdif(x1, x2)
+
+}
+\seealso{
+\code{\link{tsdif}}
+}
 

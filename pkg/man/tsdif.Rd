@@ -19,7 +19,7 @@ than tol are ignored.}
 \item{fun}{function to compute differences. This function should accept
 two arguments (two numbers) for which the difference is computed.
 By default the absolute difference is computed. A useful function for
-computing difference is \code{\link{cvgdif}}, which computes relative differences
+computing differences is \code{\link{cvgdif}}, which computes relative differences
 if the absolute value of \code{x2} is larger than 1.}
 }
 \value{
@@ -39,6 +39,8 @@ a list with the following components
 }
 \description{
 This function can be used to compare two multivariate timeseries objects.
+The result is a list with a \code{\link{regts}} component with the computed
+differences or \code{NULL} if there are no differences.
 The function reports the names of columns with differences larger than a
 specified tolerance, and the names of the columns present in one object
 but missing in the other object.
@@ -74,6 +76,6 @@ print(dif3$difnames)
 
 }
 \seealso{
-\code{\link{regts}}
+\code{\link{regts}}, \code{\link{tsdif}}
 }
 

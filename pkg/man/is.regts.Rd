@@ -7,7 +7,7 @@
 is.regts(x)
 }
 \arguments{
-\item{x}{an arbitrary R object}
+\item{x}{any R object}
 }
 \value{
 \code{TRUE} if \code{x} is a \code{regts}
@@ -17,5 +17,7 @@ Tests whether an object is a \code{\link{regts}} timeseries object
 }
 \seealso{
 \code{\link{regts}} and  \code{\link{as.regts}}
+a <- regts(1:15, start = "2011Q2")
+is.regts(a)
 }
 

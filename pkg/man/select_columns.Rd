@@ -10,7 +10,7 @@ select_columns(x, regex, drop = TRUE)
 \item{x}{an R object with column names (e.g. a \code{data.frame},
 \code{matrix}, \code{ts} or \code{regts})}
 
-\item{regex}{a regular expression used to select column}
+\item{regex}{a regular expression used to select a column}
 
 \item{drop}{if \code{TRUE}, the result is coerced to a vector if possible.}
 }
@@ -19,7 +19,7 @@ the column selection of object \code{x}
 }
 \description{
 This function selects columns of an R object with column names
-(for example a \code{\link{data.frame}}, \code{\link{matrix}} or
+(for example a \code{\link{data.frame}}, \code{\link{matrix}},
 \code{\link[stats]{ts}} or \code{\link{regts}}).
 The columns with names matching a given regular expression are selected.
 }

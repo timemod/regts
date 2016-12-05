@@ -2,6 +2,8 @@
 #' objects
 #'
 #' This function can be used to compare two multivariate timeseries objects.
+#' The result is a list with a \code{\link{regts}} component with the computed
+#' differences or \code{NULL} if there are no differences.
 #' The function reports the names of columns with differences larger than a
 #' specified tolerance, and the names of the columns present in one object
 #' but missing in the other object.
@@ -23,7 +25,7 @@
 #' @param fun function to compute differences. This function should accept
 #' two arguments (two numbers) for which the difference is computed.
 #' By default the absolute difference is computed. A useful function for
-#' computing difference is \code{\link{cvgdif}}, which computes relative differences
+#' computing differences is \code{\link{cvgdif}}, which computes relative differences
 #' if the absolute value of \code{x2} is larger than 1.
 #' @return a list with the following components
 #'  \item{equal}{\code{TRUE} if \code{x1} and \code{x2} have the same column names
@@ -59,8 +61,8 @@
 #'dif3 <- tsdif(x1, x2, tol = 1e-4, fun = cvgdif)
 #'print(dif3$difnames)
 #'
-#'@seealso
-#'\code{\link{regts}}
+#' @seealso
+#'\code{\link{regts}}, \code{\link{tsdif}}
 #'
 tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
 
@@ -171,6 +173,20 @@ calculate_difference <- function(common_names, x1, x2, tol, fun) {
 #' @param x1 first number
 #' @param x2 second number
 #' @return the 'convergence difference' as described above
+#'
+#'@seealso
+#'\code{\link{tsdif}}
+#'
+#' @examples
+#'# create two timeseries x1 and x2
+#'x1 <- regts(matrix(data = rep(1:27), nc = 3), start = "2008Q4",
+#'            names = c("a", "b", "c"))
+#'x2 <- x1 + 0.001
+#'colnames(x2) <- c("a", "b", "d")
+#'
+#'# calculate the differences
+#'cvgdif(x1, x2)
+#'
 #' @export
 cvgdif <- function(x1, x2) {
     x_abs = abs(x2)

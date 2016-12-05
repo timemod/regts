@@ -7,12 +7,17 @@
 is.regperiod(x)
 }
 \arguments{
-\item{x}{an object}
+\item{x}{any R object}
 }
 \value{
-<code>TRUE</code> if the object a \code{regperiod}
+\code{TRUE} if the object is a \code{regperiod}
 }
 \description{
 Test if an object is a regperiod.
+}
+\examples{
+p <- regperiod("2016Q1")
+is.regperiod(p)
+is.regperiod("2016Q1")
 }
 

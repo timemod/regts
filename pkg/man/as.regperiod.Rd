@@ -13,7 +13,7 @@ as.regperiod(x, ...)
 \method{as.regperiod}{numeric}(x, frequency = NA, ...)
 }
 \arguments{
-\item{x}{an R object}
+\item{x}{any R object}
 
 \item{...}{object passed to methods}
 
@@ -32,4 +32,8 @@ Coerce an R object to a regperiod
 
 \item \code{numeric}: Coerce a numerical value string to a \code{regperiod}
 }}
+\examples{
+as.regperiod("2010Q3")
+as.regperiod(2010)
+}
 

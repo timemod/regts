@@ -7,10 +7,10 @@
 is.regperiod_range(x)
 }
 \arguments{
-\item{x}{an object}
+\item{x}{any R object}
 }
 \value{
-<code>TRUE</code> if the object is a \code{regperiod_range}
+\code{TRUE} if the object is a \code{regperiod_range}
 }
 \description{
 Test if an object is a regperiod_range.

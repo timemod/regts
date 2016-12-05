@@ -10,7 +10,7 @@ get_subperiod(x)
 \item{x}{a \code{regperiod}}
 }
 \value{
-the subperiod of a regperiod
+the subperiod of a \code{regperiod}
 }
 \description{
 This function returns the subperiod within a year.

@@ -10,7 +10,7 @@
 #' that can be converted to a \code{regperiod}, or \code{NULL}). If \code{p1}
 #' is \code{NULL}, the lower bound of the period range is undetermined.
 #' @param p2 the last period (a \code{regperiod}, a character string
-#' that can be converted to a \code{regperiod}). If \code{p2} is
+#' that can be converted to a \code{regperiod}, or \code{NULL}). If \code{p2} is
 #' \code{NULL}, the upper bound of the period range is undetermined.
 #' @param frequency frequency of the regperiod objects. This argument is mandatory
 #' if argument \code{p1} or \code{p2} is a character with general period format
@@ -31,6 +31,9 @@
 #' regperiod_range("2010-2", "2016-2", frequency = 2)
 #' @seealso \code{\link{length_range}}, \code{\link{start_period}},
 #' \code{\link{end_period}}
+#' range <- regperiod_range("2016Q1/2017Q1")
+#' is.regperiod_range(range)
+#' is.regperiod_range("2016Q1/2017Q1")
 #' @export
 regperiod_range <- function(p1, p2 = p1, frequency = NA) {
     if (is.null(p1) & is.null(p2)) {
@@ -75,8 +78,8 @@ regperiod_range <- function(p1, p2 = p1, frequency = NA) {
 
 #' Test if an object is a regperiod_range.
 #'
-#' @param x an object
-#' @return <code>TRUE</code> if the object is a \code{regperiod_range}
+#' @param x any R object
+#' @return \code{TRUE} if the object is a \code{regperiod_range}
 #' @export
 is.regperiod_range <- function(x) {
     return (inherits(x, "regperiod_range"))
@@ -140,7 +143,7 @@ Ops.regperiod_range <- function(e1, e2) {
 
 #' Coerce an R object to a \code{\link{regperiod_range}}
 #'
-#' @param x an R object
+#' @param x any R object
 #' @param frequency the frequency (mandatory for
 #' \code{as.regperiod_range.character}
 #' if a period format without frequency indicator has been used,

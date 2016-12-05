@@ -8,7 +8,7 @@ cbind.regts(..., union = TRUE, suffixes)
 }
 \arguments{
 \item{...}{two or more univariate or multivariate time series,
-or objects which can coerced to time series}
+or objects which can be coerced to time series}
 
 \item{union}{if \code{TRUE}, then the period range of the result
 is the union of the period ranges of the joined objects
@@ -24,8 +24,14 @@ column names}
 Bind two or more time series objects with a common frequency.
 By default, the period range of the result is the union of the period ranges
 of the individual timeseries. The result is padded with \code{NA}s if
-neccesary. If argument \code{union} is false, then the period range
+necessary. If argument \code{union} is false, then the period range
 of the result is the intersection of the period ranges.
+}
+\examples{
+a <- regts(1:5, start = "2011Q1")
+b <- regts(matrix(11:15, nc = 1), start = "2011Q2")
+cbind(a, b)
+cbind(a, b, union = FALSE)
 }
 \seealso{
 \code{\link{as.list.regts}}

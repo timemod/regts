@@ -18,10 +18,17 @@ these methods}
 the frequency of timeseries \code{x}}
 }
 \value{
-a \code{regts} with frequency \code{frequency}
+a \code{regts} with frequency \code{nfrequency}
 }
 \description{
 Converts timeseries with absolute or relative growth rates to a lower
 frequency
+}
+\examples{
+ts_q <- regts(rnorm(10), start = "2016.Q1"))
+aggregate_gr(ts_q, method = "dif1s")
+
+ts_m <- regts(matrix(rnorm(20), ncol = 2), start = "2017.M1", names = c("a", "b"))
+aggregate_gr(ts_m, method = "rel", nfrequency = 4)
 }
 

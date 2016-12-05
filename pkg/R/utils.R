@@ -1,12 +1,12 @@
 #' Select columns using a regular expression
 #'
 #' This function selects columns of an R object with column names
-#' (for example a \code{\link{data.frame}}, \code{\link{matrix}} or
+#' (for example a \code{\link{data.frame}}, \code{\link{matrix}},
 #' \code{\link[stats]{ts}} or \code{\link{regts}}).
 #' The columns with names matching a given regular expression are selected.
 #' @param x an R object with column names (e.g. a \code{data.frame},
 #' \code{matrix}, \code{ts} or \code{regts})
-#' @param regex a regular expression used to select column
+#' @param regex a regular expression used to select a column
 #' @param drop if \code{TRUE}, the result is coerced to a vector if possible.
 #' @return the column selection of object \code{x}
 #' @examples

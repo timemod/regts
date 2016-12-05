@@ -8,13 +8,14 @@ regts(data, start, end, period, frequency = NA, names = colnames(data),
   labels = NULL)
 }
 \arguments{
-\item{data}{a vector or matrix of the observed time-series values. A data frame will be
-coerced to a numeric matrix via \code{\link{data.matrix}}. (See also the description of the
+\item{data}{a vector or matrix of the observed time-series values. A data frame
+will be coerced to a numeric matrix via \code{\link{data.matrix}}.
+(See also the description of the
 function \code{\link[stats]{ts}} of the \code{\link{stats}} package).}
 
 \item{start}{the starting period as a  \code{\link{regperiod}} object or a
 character string that can be converted to a \code{regperiod} object.
-If not specified, then the end period is calculated
+If not specified, then the start period is calculated
 from argument \code{end} and the dimension of \code{data}}
 
 \item{end}{the end period as a  \link{regperiod} object or a character string
@@ -22,12 +23,13 @@ that can be converted to a \code{regperiod} object. If not specified, then
 the end period is calculated from argument \code{start} and
 the dimension of \code{data}}
 
-\item{period}{the period range as a \code{\link{regperiod_range}} object. This
-argument replaces arguments \code{start} and \code{end}.}
+\item{period}{the period range as a \code{\link{regperiod_range}} object or a
+character string that can be converted to a \code{regperiod_range} object.
+This argument replaces arguments \code{start} and \code{end}.}
 
-\item{frequency}{the frequency of the timeseries. This argument should only be specified if
-the start or end period is specified with a general period format without period indicator,
-e.g. \code{"2011-3"}}
+\item{frequency}{the frequency of the timeseries. This argument should only be
+specified if the start, end or period argument is specified with a general
+period format without period indicator, e.g. \code{"2011-3"}}
 
 \item{names}{a character vector with the column names for the series
 if \code{data} is a matrix or data frame. Defaults to the colnames of data.}
@@ -41,7 +43,6 @@ a \code{regts} object
 The \code{regts} class is an extension of the \code{\link[stats]{ts}} class
 of the \link{stats} package. Working with \code{regts} makes it easier to
 select periods.
-#'
 }
 \examples{
 # univariate timeseries
@@ -59,9 +60,9 @@ ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"),
 range <- regperiod_range("2016Q1", "2017Q4")
 ts4 <- regts(matrix(1:16, ncol = 2), period = range, names = c("a", "b"))
 
-# create a half-yearly timeseries, because \\code{end} is specified the
+# create a half-yearly timeseries; because argument end is specified the
 # length of the timeseries is smaller than the length of data (10).
-ts4 <- regts(1:10, start = "2010-1", end = '2011-2', frequency = 2)
+ts5 <- regts(1:10, start = "2010-1", end = '2011-2', frequency = 2)
 }
 \seealso{
 The function \code{\link{is.regts}} can be used to test if an object is a

@@ -7,7 +7,13 @@
 #' @param method Aggregation method: \code{"dif1s"}, \code{"dif1"}, \code{"pct"}
 #' or \code{"rel"}. Consult the Regts vignette for an explanation of
 #' these methods
-#' @return a \code{regts} with frequency \code{frequency}
+#' @return a \code{regts} with frequency \code{nfrequency}
+#' @examples
+#' ts_q <- regts(rnorm(10), start = "2016.Q1"))
+#' aggregate_gr(ts_q, method = "dif1s")
+#'
+#' ts_m <- regts(matrix(rnorm(20), ncol = 2), start = "2017.M1", names = c("a", "b"))
+#' aggregate_gr(ts_m, method = "rel", nfrequency = 4)
 #' @export
 #' @useDynLib regts
 #' @importFrom Rcpp sourceCpp

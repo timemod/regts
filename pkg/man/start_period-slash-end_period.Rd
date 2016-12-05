@@ -27,13 +27,25 @@ end_period(x)
 \item{x}{a \code{regts} or \code{regperiod_range} object}
 }
 \value{
-A \code{regperiod} object representing the first or last period of 
+A \code{regperiod} object representing the first or last period of
 the range. The return value can be \code{NULL} if argument \code{x} is a
 \code{regperiod_range} with no lower or upper boundary.
 }
 \description{
 This function returns the start or end period of a
-timeseries object (a \code{\link{regts}} or \code{\link[stats]{ts}}))
+timeseries object (a \code{\link{regts}} or \code{\link[stats]{ts}})
 or a \code{regperiod_range}.
+}
+\examples{
+# start and end period of a range
+range <- regperiod_range("2010Q4", "2011Q3")
+start_period(range)
+end_period(range)
+
+# start and end period of a regts
+data <- regts(matrix(1:20, ncol = 2), start = "2010Q2", names = c("nl", "uk"))
+start_period(data)
+end_period(data)
+
 }
 

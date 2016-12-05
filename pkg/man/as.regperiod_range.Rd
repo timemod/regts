@@ -13,7 +13,7 @@ as.regperiod_range(x, frequency = NA, ...)
 \method{as.regperiod_range}{regperiod}(x, ...)
 }
 \arguments{
-\item{x}{an R object}
+\item{x}{any R object}
 
 \item{frequency}{the frequency (mandatory for
 \code{as.regperiod_range.character}

@@ -17,4 +17,8 @@ the frequency of the \code{regperiod}
 \description{
 Returns the frequency of a \link{regperiod} object
 }
+\examples{
+p <- regperiod("2016Q1")
+freq <- frequency(p)
+}
 

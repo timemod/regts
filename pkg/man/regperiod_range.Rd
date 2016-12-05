@@ -12,7 +12,7 @@ that can be converted to a \code{regperiod}, or \code{NULL}). If \code{p1}
 is \code{NULL}, the lower bound of the period range is undetermined.}
 
 \item{p2}{the last period (a \code{regperiod}, a character string
-that can be converted to a \code{regperiod}). If \code{p2} is
+that can be converted to a \code{regperiod}, or \code{NULL}). If \code{p2} is
 \code{NULL}, the upper bound of the period range is undetermined.}
 
 \item{frequency}{frequency of the regperiod objects. This argument is mandatory
@@ -46,5 +46,8 @@ regperiod_range("2010-2", "2016-2", frequency = 2)
 \seealso{
 \code{\link{length_range}}, \code{\link{start_period}},
 \code{\link{end_period}}
+range <- regperiod_range("2016Q1/2017Q1")
+is.regperiod_range(range)
+is.regperiod_range("2016Q1/2017Q1")
 }
 
