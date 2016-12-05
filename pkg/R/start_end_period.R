@@ -1,24 +1,27 @@
-#' Returns the start or end period of a timeseries object or a a
+#' Returns the start or end period of a timeseries object or a
 #' \code{\link{regperiod_range}}
 #'
 #' This function returns the start or end period of a
 #' timeseries object (a \code{\link{regts}} or \code{\link[stats]{ts}}))
 #' or a \code{regperiod_range}.
 #' @param x  a \code{regts} or \code{regperiod_range} object
-#' @return A \code{regperiod} object representing the first or last period of the
-#' range. The return value can be \code{NULL} if argument \code{x} is a
+#' @return A \code{regperiod} object representing the first or last period of 
+#' the range. The return value can be \code{NULL} if argument \code{x} is a
 #' \code{regperiod_range} with no lower or upper boundary.
+#' @name start_period/end_period
+NULL
+
+#' @rdname start_period-slash-end_period
 #' @export
 start_period <- function(x) {
     UseMethod("start_period")
 }
 
-#' @rdname start_period
+#' @rdname start_period-slash-end_period
 #' @export
 end_period <- function(x) UseMethod("end_period")
 
-#' @describeIn start_period Returns the first or last period of a
-#' \code{regperiod_range}
+#' @rdname start_period-slash-end_period
 #' @export
 start_period.regperiod_range <- function(x) {
     if (!is.na(x[1])) {
@@ -28,8 +31,7 @@ start_period.regperiod_range <- function(x) {
     }
 }
 
-#' @describeIn start_period Returns the first period of a
-#' timeseries object
+#' @rdname start_period-slash-end_period
 #' @export
 start_period.ts <- function(x) {
     r <- get_regperiod_range(x)
@@ -41,7 +43,7 @@ start_period.default <- function(x) {
     stop(paste("start_period not defined for objects of class", class(x)))
 }
 
-#' @rdname start_period
+#' @rdname start_period-slash-end_period
 #' @export
 end_period.regperiod_range <- function(x) {
     if (!is.na(x[2])) {
@@ -51,7 +53,7 @@ end_period.regperiod_range <- function(x) {
     }
 }
 
-#' @rdname start_period
+#' @rdname start_period-slash-end_period
 #' @export
 end_period.ts <- function(x) {
     r <- get_regperiod_range(x)
