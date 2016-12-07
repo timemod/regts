@@ -9,7 +9,7 @@
 #' these methods
 #' @return a \code{regts} with frequency \code{nfrequency}
 #' @examples
-#' ts_q <- regts(rnorm(10), start = "2016.Q1"))
+#' ts_q <- regts(rnorm(10), start = "2016.Q1")
 #' aggregate_gr(ts_q, method = "dif1s")
 #'
 #' ts_m <- regts(matrix(rnorm(20), ncol = 2), start = "2017.M1", names = c("a", "b"))
