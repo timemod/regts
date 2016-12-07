@@ -5,9 +5,10 @@
 # This script assumes that environment variable R_LIBS_USER exists.
 
 PKGDIR=pkg
-INSTALL_FLAGS=--no-multiarch --with-keep.source 
+INSTALL_FLAGS=--no-multiarch --with-keep.source
 RCHECKARG=--no-multiarch
-PKG_CXXFLAGS = -std=c++0x -I $(R_LIBS_USER)/Rcpp/include 
+R_HOME=$(shell R RHOME)
+PKG_CXXFLAGS = -std=c++0x `"$(R_HOME)/bin/Rscript" -e "Rcpp:::CxxFlags()"`
 
 # Package name, Version and date from DESCIPTION
 PKG=$(shell grep 'Package:' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2)
@@ -16,7 +17,7 @@ PKGDATE=$(shell grep 'Date' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2)
 TODAY=$(shell date "+%Y-%m-%d")
 
 OSNAME := $(shell uname | tr A-Z a-z)
-ifeq ($(findstring windows, $(OSNAME)), windows) 
+ifeq ($(findstring windows, $(OSNAME)), windows)
     OSTYPE = windows
 else
     # Linux or MAC OSX
@@ -48,6 +49,7 @@ CXX=$(shell R CMD config CXX)
 CPP_FLAGS=$(shell R CMD config --cppflags)
 
 flags:
+	@echo "R_HOME=$(R_HOME)"
 	@echo "OSTYPE=$(OSTYPE)"
 	@echo "SHELL=$(SHELL)"
 	@echo "CPP_FLAGS=$(CPP_FLAGS)"
@@ -80,7 +82,7 @@ check: cleanx syntax
 	@echo ""
 
 syntax:
-ifneq ($(findstring windows, $(OSNAME)), windows) 
+ifneq ($(findstring windows, $(OSNAME)), windows)
 	$(CXX) "$(CPP_FLAGS)" $(PKG_CXXFLAGS) -c -fsyntax-only -Wall -pedantic $(PKGDIR)/src/*.c*
 else
         # On Windows, the compiler complains about misssig Rcpp.h.
