@@ -48,7 +48,7 @@ List agg_gr(NumericMatrix ts_old, const int freq_new,
         for (int col = 0; col < ts_old.ncol(); col++) {
             agg_gr_rel(ts_old(_, col), data(_, col), work, rep, shift, perc);
         }
-        delete work;
+        delete[] work;
     } else {
         Rf_error((std::string("Illegal aggregation method ") + method).c_str());
     }
