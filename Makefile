@@ -1,8 +1,6 @@
 # This is a gnu makefile with several commands to build, document and test
 # the package.  The actual building and installation of the package is achieved
 # with the standard R commands R CMD BUOLD and R CMD INSTALL.
-#
-# This script assumes that environment variable R_LIBS_USER exists.
 
 PKGDIR=pkg
 INSTALL_FLAGS=--no-multiarch --with-keep.source
