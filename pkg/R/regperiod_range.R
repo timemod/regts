@@ -46,7 +46,7 @@ regperiod_range <- function(p1, p2 = p1, frequency = NA) {
     if (missing(p2)) {
         # direct conversion, inputs "2016q1" and "2016q1/2017q1" are possible
         return(as.regperiod_range(p1, frequency))
-    } else {
+    } else if (!is.null(p1)) {
         p1 <- as.regperiod(p1, frequency)
         freq1 <- attr(p1, 'frequency')
     }
