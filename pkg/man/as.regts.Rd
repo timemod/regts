@@ -27,7 +27,7 @@ of the data frame}
 
 \item{numeric}{logical: should non numeric values be converted to numeric data.
 By default they are converted to numeric. This can be changed by setting
-\code{numeric = FALSE}}
+\code{numeric = FALSE}.}
 
 \item{fun}{a function for converting values in the time column to
 \code{\link{regperiod}} objects}
@@ -55,7 +55,7 @@ and then \code{\link{as.regts.ts}}
 x <- ts(1:3, start = c(2015,3), frequency = 4)
 x <- as.regts(x)
 
-# Now two examples for converting a data.frame
+# Now three examples for converting a data.frame
 
 # create a data frame with timeseries and with the
 # time index in the rownames, and convert to a regts
@@ -67,6 +67,12 @@ ts <- as.regts(df)
 # time format "2015 3" instead of "2015Q3", and convert to regts
 df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
 ts <- as.regts(df, time_column = 1, frequency = 4)
+
+# create a dataframe with non numeric data and convert to regts
+# Strings containing non numeric values are converted to NA
+# Logical values TRUE/FALSE are converted to 1/0
+df <- data.frame(a = c("1", "2", "X"), b = c(TRUE, FALSE, TRUE), stringsAsFactors = FALSE)
+as.regts(df)
 }
 \seealso{
 \code{\link{regts}}, \code{\link{is.regts}},

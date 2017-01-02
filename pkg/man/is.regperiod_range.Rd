@@ -10,9 +10,14 @@ is.regperiod_range(x)
 \item{x}{any R object}
 }
 \value{
-\code{TRUE} if the object is a \code{regperiod_range}
+\code{TRUE} if the object is a \code{\link{regperiod_range}}
 }
 \description{
 Test if an object is a regperiod_range.
+}
+\examples{
+range <- regperiod_range("2016Q1/2017Q1")
+is.regperiod_range(range)
+is.regperiod_range("2016Q1/2017Q1")
 }
 

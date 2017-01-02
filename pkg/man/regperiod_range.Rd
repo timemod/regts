@@ -42,12 +42,10 @@ regperiod_range("2010Q2", NULL)
 
 #create a regperiod_range for a timeseries with frequency 2 (half year)
 regperiod_range("2010-2", "2016-2", frequency = 2)
+
 }
 \seealso{
 \code{\link{length_range}}, \code{\link{start_period}},
 \code{\link{end_period}}
-range <- regperiod_range("2016Q1/2017Q1")
-is.regperiod_range(range)
-is.regperiod_range("2016Q1/2017Q1")
 }
 

@@ -2,7 +2,7 @@
 #' frequency
 #'
 #' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object
-#' @param nfrequency the frequency of the result, should be higher than
+#' @param nfrequency the frequency of the result should be higher than
 #' the frequency of timeseries \code{x}
 #' @param method Aggregation method: \code{"dif1s"}, \code{"dif1"}, \code{"pct"}
 #' or \code{"rel"}. Consult the Regts vignette for an explanation of

@@ -1,18 +1,18 @@
 #' Transpose a \code{\link{data.frame}}
 #'
 #' The function transposes a data frame. If the data frame contains
-#' labels that has been set by the function \code{\link[Hmisc]{label}} of the
+#' labels that have been set by the function \code{\link[Hmisc]{label}} of the
 #' package \code{Hmisc}, then the first column of the returned data frame will
-#' contain the labels. Conversely, you can specify the column that will become
+#' contain the labels. Conversely, you can specify the column that contains
 #' the labels of the transposed data frame.
 #'
 #' @param x a data frame
-#' @param colname_column the name or the index of the column that will be used
-#' as the column names of the transposed data frame. By default the
+#' @param colname_column the name or the index of the column that contains
+#' the column names of the transposed data frame. By default the
 #' row names of the original data frame are used as column names of the new data
 #'  frame.
-#' @param label_column the name or the index of the column that will be used
-#' to create labels for the transposed data frame. By default no labels
+#' @param label_column the name or the index of the column that contains
+#' the labels for the transposed data frame. By default no labels
 #' are created
 #' @return the transposed data frame
 #' @examples

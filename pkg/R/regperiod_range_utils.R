@@ -1,7 +1,7 @@
 #' Calculates the intersection of two regperiod_range objects.
 #'
 #' This function calculates the intersection of two regperiod_range
-#' objects. The start and end periods of the regperiod_range objects should
+#' objects. The start and end periods of the regperiod_range objects may
 #' not be NULL.
 #' @param range1 a \code{regperiod_range} object
 #' @param range2 another \code{regperiod_range} object
@@ -33,7 +33,7 @@ regrange_intersect <- function(range1, range2) {
 #' Calculates the union of two regperiod_range objects.
 #'
 #' This function calculates the union of two regperiod_range objects
-#' The start and end periods of the regperiod_range objects should not be NULL.
+#' The start and end periods of the regperiod_range objects may not be NULL.
 #' @param range1 a \code{regperiod_range} object
 #' @param range2 another \code{regperiod_range} object
 #' @return the union of \code{range1} and \code{range2}.

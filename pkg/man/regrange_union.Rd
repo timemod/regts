@@ -16,7 +16,7 @@ the union of \code{range1} and \code{range2}.
 }
 \description{
 This function calculates the union of two regperiod_range objects
-The start and end periods of the regperiod_range objects should not be NULL.
+The start and end periods of the regperiod_range objects may not be NULL.
 }
 \examples{
 range1 <- regperiod_range("2016Q1", "2017Q4")

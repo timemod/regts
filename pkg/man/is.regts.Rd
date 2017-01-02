@@ -15,9 +15,11 @@ is.regts(x)
 \description{
 Tests whether an object is a \code{\link{regts}} timeseries object
 }
-\seealso{
-\code{\link{regts}} and  \code{\link{as.regts}}
+\examples{
 a <- regts(1:15, start = "2011Q2")
 is.regts(a)
+}
+\seealso{
+\code{\link{regts}} and  \code{\link{as.regts}}
 }
 

@@ -29,11 +29,10 @@
 #'
 #' #create a regperiod_range for a timeseries with frequency 2 (half year)
 #' regperiod_range("2010-2", "2016-2", frequency = 2)
+#'
 #' @seealso \code{\link{length_range}}, \code{\link{start_period}},
 #' \code{\link{end_period}}
-#' range <- regperiod_range("2016Q1/2017Q1")
-#' is.regperiod_range(range)
-#' is.regperiod_range("2016Q1/2017Q1")
+
 #' @export
 regperiod_range <- function(p1, p2 = p1, frequency = NA) {
     if (is.null(p1) & is.null(p2)) {
@@ -79,7 +78,11 @@ regperiod_range <- function(p1, p2 = p1, frequency = NA) {
 #' Test if an object is a regperiod_range.
 #'
 #' @param x any R object
-#' @return \code{TRUE} if the object is a \code{regperiod_range}
+#' @return \code{TRUE} if the object is a \code{\link{regperiod_range}}
+#' @examples
+#' range <- regperiod_range("2016Q1/2017Q1")
+#' is.regperiod_range(range)
+#' is.regperiod_range("2016Q1/2017Q1")
 #' @export
 is.regperiod_range <- function(x) {
     return (inherits(x, "regperiod_range"))

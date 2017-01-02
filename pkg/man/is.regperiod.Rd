@@ -10,7 +10,7 @@ is.regperiod(x)
 \item{x}{any R object}
 }
 \value{
-\code{TRUE} if the object is a \code{regperiod}
+\code{TRUE} if the object is a \code{\link{regperiod}}
 }
 \description{
 Test if an object is a regperiod.

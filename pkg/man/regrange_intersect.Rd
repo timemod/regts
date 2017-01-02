@@ -17,7 +17,7 @@ It returns NULL if there is no intersection
 }
 \description{
 This function calculates the intersection of two regperiod_range
-objects. The start and end periods of the regperiod_range objects should
+objects. The start and end periods of the regperiod_range objects may
 not be NULL.
 }
 \examples{

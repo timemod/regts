@@ -14,7 +14,7 @@ aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"), nfrequency = 1)
 or \code{"rel"}. Consult the Regts vignette for an explanation of
 these methods}
 
-\item{nfrequency}{the frequency of the result, should be higher than
+\item{nfrequency}{the frequency of the result should be higher than
 the frequency of timeseries \code{x}}
 }
 \value{

@@ -178,6 +178,7 @@ create_regts <- function(data, startp, endp, freq, labels) {
 #' @return \code{TRUE} if \code{x} is a \code{regts}
 #' @seealso
 #' \code{\link{regts}} and  \code{\link{as.regts}}
+#' @examples
 #' a <- regts(1:15, start = "2011Q2")
 #' is.regts(a)
 #' @export
@@ -193,13 +194,12 @@ is.regts <- function(x) {
 #' of the data frame
 #' @param numeric logical: should non numeric values be converted to numeric data.
 #' By default they are converted to numeric. This can be changed by setting
-#' \code{numeric = FALSE}
+#' \code{numeric = FALSE}.
 #' @param fun a function for converting values in the time column to
 #' \code{\link{regperiod}} objects
 #' @param ... arguments passed to \code{fun}
 #' @return a \code{regts} object
-#' @seealso
-#' \code{\link{regts}}, \code{\link{is.regts}},
+#' @seealso \code{\link{regts}}, \code{\link{is.regts}},
 #' \code{\link{as.data.frame.regts}},
 #' \code{\link{as.list.regts}}, \code{\link{start_period}}, \code{\link{end_period}}
 #' @examples
@@ -207,7 +207,7 @@ is.regts <- function(x) {
 #' x <- ts(1:3, start = c(2015,3), frequency = 4)
 #' x <- as.regts(x)
 #'
-#' # Now two examples for converting a data.frame
+#' # Now three examples for converting a data.frame
 #'
 #' # create a data frame with timeseries and with the
 #' # time index in the rownames, and convert to a regts
@@ -219,6 +219,12 @@ is.regts <- function(x) {
 #' # time format "2015 3" instead of "2015Q3", and convert to regts
 #' df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
 #' ts <- as.regts(df, time_column = 1, frequency = 4)
+#'
+#' # create a dataframe with non numeric data and convert to regts
+#' # Strings containing non numeric values are converted to NA
+#' # Logical values TRUE/FALSE are converted to 1/0
+#' df <- data.frame(a = c("1", "2", "X"), b = c(TRUE, FALSE, TRUE), stringsAsFactors = FALSE)
+#' as.regts(df)
 #' @export
 as.regts <- function(x, ...) {
     UseMethod("as.regts")

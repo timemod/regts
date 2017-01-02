@@ -9,7 +9,9 @@ regperiod(x, frequency = NA)
 \arguments{
 \item{x}{a string}
 
-\item{frequency}{frequency of the regperiod object.}
+\item{frequency}{frequency of the regperiod object.
+Argument \code{frequency} is mandatory if a general regperiod format
+such as "2011-1" has been specified}
 }
 \value{
 a \code{regperiod} object
@@ -17,8 +19,6 @@ a \code{regperiod} object
 \description{
 Possible string formats are for example \code{"2010Q2"},
 \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
-Argument \code{frequency} is mandatory if a general regperiod format
-such as "2011-1" has been specified
 }
 \examples{
 regperiod("2010Q3")

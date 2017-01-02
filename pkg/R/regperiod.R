@@ -2,11 +2,11 @@
 #'
 #' Possible string formats are for example \code{"2010Q2"},
 #' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
-#' Argument \code{frequency} is mandatory if a general regperiod format
-#' such as "2011-1" has been specified
 #'
 #' @param x a string
 #' @param frequency frequency of the regperiod object.
+#' Argument \code{frequency} is mandatory if a general regperiod format
+#' such as "2011-1" has been specified
 #' @return a \code{regperiod} object
 #' @examples
 #' regperiod("2010Q3")
@@ -24,7 +24,7 @@ regperiod <- function(x, frequency = NA) {
 #' Test if an object is a regperiod.
 #'
 #' @param x any R object
-#' @return \code{TRUE} if the object is a \code{regperiod}
+#' @return \code{TRUE} if the object is a \code{\link{regperiod}}
 #' @examples
 #' p <- regperiod("2016Q1")
 #' is.regperiod(p)
