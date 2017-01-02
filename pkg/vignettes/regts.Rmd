@@ -381,11 +381,12 @@ the beginning of the Christian era, starting with 0 (`8067 = 2016 * 4 + 3`).
 
 ## `regperiod_range`
 There is also a `regperiod_range`, an object that represents an interval of 
-periods. Such a range can be created in the following way:
+periods. Such a range can be created in the following ways:
 
 ```{r}
 range <- regperiod_range("2014Q4", "2017Q4")
 range
+regperiod_range("2014Q4/2017Q4")
 ```
 
 The lower or upper bound of the range may also be undetermined:
@@ -441,7 +442,7 @@ regperiods is not allowed.'].
 In section \ref{sec:periodselection} we have shown how periods can be selected 
 with a string. A `regperiod` can also be used to select or update a period of a 
 timeseries object.  Consider the following (previously defined) timeseries:
-\newpage
+
 ```{r}
 rts
 ```
