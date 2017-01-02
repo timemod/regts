@@ -1,13 +1,17 @@
 #' Create a \code{regperiod_range} object.
 #'
 #' Create a \code{regperiod_range} object from two \code{\link{regperiod}} objects
-#' or character strings that can be converted to \code{regperiod} objects with
-#' function \code{\link{as.regperiod}}. The \code{regperiod_range} object is used to
+#' or two character strings that can be converted to \code{regperiod} objects with
+#' function \code{\link{as.regperiod}}. It is also possible to use one character
+#' string that can be converted to a \code{regperiod_range} object with function
+#' \code{\link{as.regperiod_range}}.
+#' The \code{regperiod_range} object is used to
 #' represent an interval of \code{regperiod},  for example, a period from
 #' \code{"2012Q2"} to \code{"2016Q4"}.
 #'
 #' @param p1 the first period (a \code{regperiod}, a character string
-#' that can be converted to a \code{regperiod}, or \code{NULL}). If \code{p1}
+#' that can be converted to a \code{regperiod}, a \code{regperiod_range},
+#' or \code{NULL}). If \code{p1}
 #' is \code{NULL}, the lower bound of the period range is undetermined.
 #' @param p2 the last period (a \code{regperiod}, a character string
 #' that can be converted to a \code{regperiod}, or \code{NULL}). If \code{p2} is
@@ -19,6 +23,7 @@
 #' @examples
 #' # create a regperiod_range from 2010Q2 to 2016Q3
 #' regperiod_range("2010Q2", "2016Q3")
+#' regperiod_range("2010Q2/2016Q3")
 #'
 #' # create a regperiod_range for the first 5 quarters after 2013Q2
 #' p1 <- regperiod("2013Q3")
@@ -35,10 +40,13 @@
 
 #' @export
 regperiod_range <- function(p1, p2 = p1, frequency = NA) {
-    if (is.null(p1) & is.null(p2)) {
+    if (is.null(p1) && is.null(p2)) {
         stop("At least one of the periods should not be NULL")
     }
-    if (!is.null(p1)) {
+    if (missing(p2)) {
+        # direct conversion, inputs "2016q1" and "2016q1/2017q1" are possible
+        return(as.regperiod_range(p1, frequency))
+    } else {
         p1 <- as.regperiod(p1, frequency)
         freq1 <- attr(p1, 'frequency')
     }
