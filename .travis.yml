@@ -2,6 +2,7 @@
 # travis config
 
 sudo: required
+dist: xenial
 
 language: r
 cache: packages
