@@ -7,6 +7,13 @@ test_that("constructor regperiod_range", {
                      "2010M2/2010M2")
     expect_identical(as.character(regperiod_range("2010q2", NULL)),
                      "2010Q2/")
+    # "d1/d2" is an alternative way to ("d1","d2") to construct a regperiod_range
+    expect_identical(regperiod_range("2010 q 2", "2011Q3"),
+                     regperiod_range("2010Q2/2011Q3"))
+    expect_identical(regperiod_range("2010M2"),
+                     regperiod_range("2010M2/2010M2"))
+    expect_identical(regperiod_range("2010q2", NULL),
+                     regperiod_range("2010Q2/"))
     expect_error(regperiod_range("2001-4", "2014Q"),
           "Frequency of period 2001-4 unknown. Specify argument frequency.")
     expect_error(regperiod_range("2001", "2014Q4"),

@@ -31,18 +31,18 @@ in the row are NA.  Specify \code{"any"} to change this behaviour.
 \examples{
 # remove only leading NAs
 ts1 <- regts(c(NA,1,3,NA,4,8,NA), start = "2000")
-na.trim(ts1, sides = "left")
+na_skip(ts1, sides = "left")
 
 # remove trailing NAs if all elements in the row are NA
 data <- matrix(c(1,3,NA,2,5,NA,3,7,NA), ncol = 3)
 rts <- regts(data, start = "2010Q2", names = c("a", "b", "c"))
-na.trim(rts, sides = "right")
+na_skip(rts, sides = "right")
 
 data <- matrix(c(NA,3,NA,NA,5,6,NA,7,NA), ncol = 3)
 rts <- regts(data, start = "2010Q1", names = c("a", "b", "c"))
 # remove leading/trailing NAs if all elements in the row are NA
-na.trim(rts)
+na_skip(rts)
 # or remove NAs if any NA occurs in that row
-na.trim(rts, is.na = "any")
+na_skip(rts, is.na = "any")
 }
 
