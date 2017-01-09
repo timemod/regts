@@ -110,7 +110,7 @@ mkpkg: cleanx syntax
 bin:
 	-@rm -rf tmp
 	mkdir tmp
-	R CMD INSTALL -l ./tmp --build $(PKGDIR)
+	R CMD INSTALL $(INSTALL_FLAGS) -l ./tmp --build $(PKGDIR)
 
 document:
 	-@rm -f $(PKGDIR).pdf
