@@ -5,4 +5,6 @@ pkg/inst/doc
 pkg.pdf
 pkg.log
 regts.Rcheck
+regts*zip
+tmp/
 
