@@ -48,7 +48,7 @@ NumericVector parse_regperiod_range(const std::string &period_text,
         if (s1.size() == 0 && s2.size() == 0) {
             Rf_error("Illegal period range %s.", period_text.c_str());
         }
-        double f1, f2;
+        double f1 = 0.0, f2 = 0.0;
         if (s1.size() > 0) {
             parse_single_period(s1, frequency, p1, f);
             f1 = f; // for checking

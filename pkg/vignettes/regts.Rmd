@@ -1335,15 +1335,24 @@ $Z_t$ and $Z_{t-1}$ into the definition of $X_t$
 \begin{displaymath}
 X_t = \sum_{i=1}^n
         \left(
-          \sum_{j=i+1}^n x_{t-1,j} + \sum_{j=1}^n x_{t-1,j+n}
+          \sum_{j=i+1}^n x_{t-1,j} + \sum_{j=1}^i x_{t,j}
         \right) / n
 \end{displaymath}
-where $x_{t,j} = x_{t-1,j+n}$.
-By changing indices in the two inner summations this can be simplified 
-considerably. Set $j=i+k$ in the first inner sum and $j=i+k-n$ in the second 
-and after some rearrangement we get
+This expression can be futher simplified by changing the order of summation.
+For the first summation, we can write
+\begin{eqnarray*}
+ \sum_{i=1}^n  \sum_{j=i+1}^n x_{t-1,j} &=&  \sum_{j=2}^n  \sum_{i=1}^{j-1} x_{t-1,j} \\
+                                        &=&   \sum_{j=2}^n  (j-1) x_{t-1,j}
+\end{eqnarray*}
+Similarly,
+\begin{eqnarray*}
+ \sum_{i=1}^n  \sum_{j=1}^i x_{t,j}  &=&  \sum_{j=1}^n  \sum_{i=j}^{n} x_{t,j} \\
+                                        &=&   \sum_{j=1}^n  (n - j + 1) x_{t,j}
+\end{eqnarray*}
+
+The final equation is given by
 \begin{displaymath}
-X_t = \sum_{i=1}^n \sum_{k=1}^n x_{t-1,i+k} / n
+X_t =  \left(  \sum_{j=2}^n  (j-1) x_{t-1,j} -    \sum_{j=1}^n  (n - j + 1) x_{t,j} \right) / n
 \end{displaymath}
 
 
@@ -1389,7 +1398,7 @@ Z_{t-1} = z_{t-2,n}  \sum_{i=1}^{n} \prod_{j=1}^{i}(1+ x_{t-1,j})
 we obtain
 \begin{displaymath}
 X_t = \frac{\prod_{j=2}^{n}(1+ x_{t-1,j}) \sum_{i=1}^{n} \prod_{j=1}^{i}(1+ x_{t,j})}
-{1 + \sum_{i=2}^{n} \prod_{j=2}^{i}(1+ x_{t-1,j})}) - 1
+{1 + \sum_{i=2}^{n} \prod_{j=2}^{i}(1+ x_{t-1,j})} - 1
 \end{displaymath}
 
 ### `pct` method {-}

@@ -33,8 +33,8 @@ List agg_gr(NumericMatrix ts_old, const int freq_new,
 
     NumericMatrix data(nper_new, ts_old.ncol());
 
+    int shift = per_new.first * rep - rep - per_old.first;
     if (method == "dif1s" || method == "dif1") {
-        int shift = per_new.first * rep - (rep - 1) - per_old.first;
         for (int col = 0; col < ts_old.ncol(); col++) {
             agg_gr_abs(ts_old(_, col), data(_, col), rep, shift);
         }
@@ -42,7 +42,6 @@ List agg_gr(NumericMatrix ts_old, const int freq_new,
             data = data / rep;
         }
     } else if (method == "rel" || method == "pct") {
-        int shift = per_new.first * rep - rep  - per_old.first;
         double *work = new double[2*rep];
         int perc = method == "rel" ? 1 : 100;
         for (int col = 0; col < ts_old.ncol(); col++) {
@@ -62,11 +61,13 @@ List agg_gr(NumericMatrix ts_old, const int freq_new,
 void agg_gr_abs(NumericMatrix::Column column_old,
                 NumericMatrix::Column column_new, int rep, int shift) {
     for (int row = 0; row < column_new.size(); row++) {
+        for (int i = 1; i < rep; i++) {
+            column_new[row] = column_new[row] + i *
+                              column_old[i + rep * row + shift];
+        }
         for (int i = 0; i < rep; i++) {
-            for (int j = 0; j < rep; j++) {
-                column_new[row] = column_new[row] +
-                              column_old[i + j + rep * row + shift];
-            }
+            column_new[row] = column_new[row] + (rep - i) *
+                              column_old[i + rep + rep * row + shift];
         }
     }
 }
@@ -80,7 +81,7 @@ void agg_gr_rel(NumericMatrix::Column column_old,
                 int shift, int perc) {
 
     bool na_found = false;
-    double xtot1, xtot2, help1, help2;
+    double xtot1 = 0.0, xtot2 = 0.0, help1 = 0.0, help2 = 0.0;
     for (int row = 0; row < column_new.size(); row++) {
         if (row == 0 || na_found) {
             na_found = false;
