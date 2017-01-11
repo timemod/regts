@@ -1340,19 +1340,19 @@ X_t = \sum_{i=1}^n
 \end{displaymath}
 This expression can be futher simplified by changing the order of summation.
 For the first summation, we can write
-\begin{eqnarray*}
- \sum_{i=1}^n  \sum_{j=i+1}^n x_{t-1,j} &=&  \sum_{j=2}^n  \sum_{i=1}^{j-1} x_{t-1,j} \\
-                                        &=&   \sum_{j=2}^n  (j-1) x_{t-1,j}
-\end{eqnarray*}
+\begin{displaymath}
+ \sum_{i=1}^n  \sum_{j=i+1}^n x_{t-1,j} = \sum_{j=2}^n \sum_{i=1}^{j-1} x_{t-1,j}
+                    = \sum_{j=2}^n  (j-1) x_{t-1,j}
+\end{displaymath}
 Similarly,
-\begin{eqnarray*}
- \sum_{i=1}^n  \sum_{j=1}^i x_{t,j}  &=&  \sum_{j=1}^n  \sum_{i=j}^{n} x_{t,j} \\
-                                        &=&   \sum_{j=1}^n  (n - j + 1) x_{t,j}
-\end{eqnarray*}
+\begin{displaymath}
+ \sum_{i=1}^n  \sum_{j=1}^i x_{t,j} = \sum_{j=1}^n  \sum_{i=j}^{n} x_{t,j} =
+                             \sum_{j=1}^n  (n - j + 1) x_{t,j}
+\end{displaymath}
 
 The final equation is given by
 \begin{displaymath}
-X_t =  \left(  \sum_{j=2}^n  (j-1) x_{t-1,j} -    \sum_{j=1}^n  (n - j + 1) x_{t,j} \right) / n
+X_t =  \left(  \sum_{j=2}^n  (j-1) x_{t-1,j} +  \sum_{j=1}^n  (n - j + 1) x_{t,j} \right) / n
 \end{displaymath}
 
 
