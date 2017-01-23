@@ -87,7 +87,16 @@ regts <- function(data, start, end, period, frequency = NA,
         }
         start <- start_period(period)
         end <- end_period(period)
-        freq <- frequency(start)
+        # start and end cannot both be NULL
+        if(!is.null(start)){
+            freq <- frequency(start)
+            if(is.null(end)){
+                end <- start + NROW(data) - 1
+            }
+        } else {
+            freq <- frequency(end)
+            start <- end - NROW(data) + 1
+        }
     } else {
         if (!missing(start)) {
             start <- as.regperiod(start, frequency)

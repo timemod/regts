@@ -62,6 +62,20 @@ test_that("get_regperiod_range", {
                      regperiod_range("2010M1", "2011M4"))
 })
 
+test_that("arguments: start, end & period", {
+    regts1 <- regts(1:5, start = "2010Q1", end = "2011Q1")
+    regts2 <- regts(1:5, start = "2010Q1")
+    regts3 <- regts(1:5, end = "2011Q1")
+    regts4 <- regts(1:5, period = "2010Q1/2011Q1")
+    regts5 <- regts(1:5, period = "2010Q1/")
+    regts6 <- regts(1:5, period = "/2011Q1")
+    expect_identical(regts1, regts2)
+    expect_identical(regts1, regts3)
+    expect_identical(regts1, regts4)
+    expect_identical(regts1, regts5)
+    expect_identical(regts1, regts6)
+})
+
 test_that("period selection in univariate timeseries", {
     ts1 <- ts(1:8, start = c(2010, 1), end = c(2011, 4), frequency = 4,
               names = NULL)

@@ -54,17 +54,6 @@ test_that("as.character.regperiod_range", {
     expect_identical(as.character(range),"2000/2010")
 })
 
-test_that("start_period and end_period", {
-    r <- regperiod_range("2010Q4", "2011Q3")
-    expect_identical(start_period(r), regperiod("2010Q4"))
-    expect_identical(end_period(r), regperiod("2011Q3"))
-    r <- regperiod_range("2010", NULL)
-    expect_identical(start_period(r), regperiod("2010"))
-    expect_identical(end_period(r), NULL)
-    r <- regperiod_range(NULL, "2010m3")
-    expect_identical(start_period(r), NULL)
-    expect_identical(end_period(r), regperiod("2010M3"))
-})
 
 test_that("length subrange", {
     r <- regperiod_range("2010Q4", "2011Q3")
