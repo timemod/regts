@@ -312,7 +312,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
 
     # handle labels
     lbls <- Hmisc::label(x)
-    if (!all(nchar(lbls) == 0)) {
+    if (!all(nchar(lbls, type = "bytes") == 0)) {
         # remove the time column(s) from the labels
         if (time_column != 0) {
             lbls <- lbls[-time_column]
