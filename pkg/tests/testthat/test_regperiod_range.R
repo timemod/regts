@@ -104,7 +104,7 @@ test_that("is.regperiod_range",{
     expect_identical(is.regperiod_range(regperiod_range("2010q2","2011q2")), TRUE)
     expect_identical(is.regperiod_range("2010q2/2011q2"), FALSE)
     r00_10 <- as.regperiod_range("2000/2010")
-    expect_identical(is.regperiod_range(range00_10), TRUE)
-    expect_identical(range, regperiod_range("2000", "2010"))
+    expect_identical(is.regperiod_range(r00_10), TRUE)
+    expect_identical(r00_10, regperiod_range("2000", "2010"))
 })
 
