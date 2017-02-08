@@ -11,8 +11,8 @@ test_that("constructor regts for univariate timeseries", {
     expect_identical(is.regts(ts1), FALSE)
     expect_identical(is.ts(regts1), TRUE)
 
-    range <- regperiod_range("2010Q1", "2012Q2")
-    regts1 <- regts(matrix(1:10, ncol = 1), period = range, names = "a")
+    r1 <- regperiod_range("2010Q1", "2012Q2")
+    regts1 <- regts(matrix(1:10, ncol = 1), period = r1, names = "a")
     ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010,1), frequency = 4, names = "a")
     expect_identical(regts1, as.regts(ts1))
     expect_identical(as.ts(regts1), regts1)
