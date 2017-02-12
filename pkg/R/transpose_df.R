@@ -64,7 +64,7 @@ transpose_df  <- function(x, colname_column, label_column) {
         Hmisc::label(ret, self = FALSE) <- labels
     }
 
-    if (any(nchar(old_labels) > 0)) {
+    if (any(nchar(old_labels, type = "bytes") > 0)) {
         ret <- cbind(labels = old_labels, ret)
     }
     return (ret)
