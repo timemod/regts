@@ -46,6 +46,7 @@ start_period.regperiod_range <- function(x) {
 #' @rdname start_period-slash-end_period
 #' @export
 start_period.ts <- function(x) {
+    # call C++ function get_regperiod_range
     r <- get_regperiod_range(x)
     return (create_regperiod(r[1], r[3]))
 }
@@ -68,6 +69,7 @@ end_period.regperiod_range <- function(x) {
 #' @rdname start_period-slash-end_period
 #' @export
 end_period.ts <- function(x) {
+    # call C++ function get_regperiod_range
     r <- get_regperiod_range(x)
     return (create_regperiod(r[2], r[3]))
 }

@@ -1,6 +1,7 @@
-#' Create a \code{regperiod_range} object.
+#' Create or get a \code{regperiod_range} object.
 #'
-#' Create a \code{regperiod_range} object from two \code{\link{regperiod}} objects
+#' Get the \code{regperiod_range} from a \code{regts} or a \code{ts} object.
+#' Or create a \code{regperiod_range} object from two \code{\link{regperiod}} objects
 #' or two character strings that can be converted to \code{regperiod} objects with
 #' function \code{\link{as.regperiod}}. It is also possible to use one character
 #' string that can be converted to a \code{regperiod_range} object with function
@@ -9,10 +10,13 @@
 #' represent an interval of \code{regperiod},  for example, a period from
 #' \code{"2012Q2"} to \code{"2016Q4"}.
 #'
+#' @param x a \code{regts} or a \code{ts} object
 #' @param p1 the first period (a \code{regperiod}, a character string
 #' that can be converted to a \code{regperiod}, a \code{regperiod_range},
 #' or \code{NULL}). If \code{p1}
 #' is \code{NULL}, the lower bound of the period range is undetermined.
+#' p1 can also be a regts or ts, than the regperiod_range of a timeseries is
+#' obtained.
 #' @param p2 the last period (a \code{regperiod}, a character string
 #' that can be converted to a \code{regperiod}, or \code{NULL}). If \code{p2} is
 #' \code{NULL}, the upper bound of the period range is undetermined.
@@ -21,6 +25,10 @@
 #' without frequency indicator (e.g. \code{"2011-1"})
 #' @return a \code{regperiod_range} object
 #' @examples
+#' # get the regperiod_range from an existing regts
+#' rts <- regts(matrix(1:10, ncol = 2), start = "2017", names = c("a", "b"))
+#' rng <- regperiod_range(rts)
+#'
 #' # create a regperiod_range from 2010Q2 to 2016Q3
 #' regperiod_range("2010Q2", "2016Q3")
 #' regperiod_range("2010Q2/2016Q3")
@@ -39,7 +47,27 @@
 #' \code{\link{end_period}}
 
 #' @export
-regperiod_range <- function(p1, p2 = p1, frequency = NA) {
+regperiod_range <- function(x, ...) {
+    UseMethod("regperiod_range")
+}
+
+#' @describeIn regperiod_range Get the \code{regperiod_range} from a \code{regts} object
+#' @export
+regperiod_range.regts <- function(x, ...){
+    return(get_regperiod_range(x))
+}
+
+#' @describeIn regperiod_range Get the \code{regperiod_range} from a \code{ts} object
+#' @export
+regperiod_range.ts <- function(x, ...){
+    return(get_regperiod_range(x))
+}
+
+#' @describeIn regperiod_range Create a regperiod_range from two \code{regperiods}
+#' or two characterstrings or via the \code{as.regperiod_range} function.
+#' @export
+regperiod_range.default <- function(p1, p2 = p1, frequency = NA) {
+
     if (is.null(p1) && is.null(p2)) {
         stop("At least one of the periods should not be NULL")
     }

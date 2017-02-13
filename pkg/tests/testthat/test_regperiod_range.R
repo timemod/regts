@@ -1,5 +1,12 @@
 context("regperiod_range")
 
+test_that("regperiod_range from a (reg)ts", {
+    regts1 <- regts(1, period = regperiod_range("2010Q1", "2011Q4"))
+    expect_identical(regperiod_range(regts1), regperiod_range("2010Q1", "2011Q4"))
+    regts2 <- regts(c("aap", "noot", "mies"), start = "2010M1", end = "2011M4")
+    expect_identical(regperiod_range(regts2), regperiod_range("2010M1", "2011M4"))
+})
+
 test_that("constructor regperiod_range", {
     expect_identical(as.character(regperiod_range("2010 q 2", "2011Q3")),
                      "2010Q2/2011Q3")

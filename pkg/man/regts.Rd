@@ -79,7 +79,7 @@ Function \code{\link{cbind}} can be used to bind two or more
 timeseries objects and create a multivariate \code{regts}.
 
 Information about the time period of the timeseries can be obtained
-with the functions \code{\link{get_regperiod_range}},
+with the functions \code{\link{regperiod_range}},
 \code{\link{start_period}} and \code{\link{end_period}}.
 
 See also the description of the functions for handling labels

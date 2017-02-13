@@ -2,15 +2,28 @@
 % Please edit documentation in R/regperiod_range.R
 \name{regperiod_range}
 \alias{regperiod_range}
-\title{Create a \code{regperiod_range} object.}
+\alias{regperiod_range.default}
+\alias{regperiod_range.regts}
+\alias{regperiod_range.ts}
+\title{Create or get a \code{regperiod_range} object.}
 \usage{
-regperiod_range(p1, p2 = p1, frequency = NA)
+regperiod_range(x, ...)
+
+\method{regperiod_range}{regts}(x, ...)
+
+\method{regperiod_range}{ts}(x, ...)
+
+\method{regperiod_range}{default}(p1, p2 = p1, frequency = NA)
 }
 \arguments{
+\item{x}{a \code{regts} or a \code{ts} object}
+
 \item{p1}{the first period (a \code{regperiod}, a character string
 that can be converted to a \code{regperiod}, a \code{regperiod_range},
 or \code{NULL}). If \code{p1}
-is \code{NULL}, the lower bound of the period range is undetermined.}
+is \code{NULL}, the lower bound of the period range is undetermined.
+p1 can also be a regts or ts, than the regperiod_range of a timeseries is
+obtained.}
 
 \item{p2}{the last period (a \code{regperiod}, a character string
 that can be converted to a \code{regperiod}, or \code{NULL}). If \code{p2} is
@@ -24,7 +37,8 @@ without frequency indicator (e.g. \code{"2011-1"})}
 a \code{regperiod_range} object
 }
 \description{
-Create a \code{regperiod_range} object from two \code{\link{regperiod}} objects
+Get the \code{regperiod_range} from a \code{regts} or a \code{ts} object.
+Or create a \code{regperiod_range} object from two \code{\link{regperiod}} objects
 or two character strings that can be converted to \code{regperiod} objects with
 function \code{\link{as.regperiod}}. It is also possible to use one character
 string that can be converted to a \code{regperiod_range} object with function
@@ -33,7 +47,20 @@ The \code{regperiod_range} object is used to
 represent an interval of \code{regperiod},  for example, a period from
 \code{"2012Q2"} to \code{"2016Q4"}.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{regts}: Get the \code{regperiod_range} from a \code{regts} object
+
+\item \code{ts}: Get the \code{regperiod_range} from a \code{ts} object
+
+\item \code{default}: Create a regperiod_range from two \code{regperiods}
+or two characterstrings or via the \code{as.regperiod_range} function.
+}}
 \examples{
+# get the regperiod_range from an existing regts
+rts <- regts(matrix(1:10, ncol = 2), start = "2017", names = c("a", "b"))
+rng <- regperiod_range(rts)
+
 # create a regperiod_range from 2010Q2 to 2016Q3
 regperiod_range("2010Q2", "2016Q3")
 regperiod_range("2010Q2/2016Q3")
