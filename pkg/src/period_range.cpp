@@ -32,7 +32,11 @@ PeriodRange get_period_range(const NumericMatrix &ts) {
     return get_period_range(tsp);
 }
 
-
+//' Returns the \link{regperiod_range} of a timeseries.
+//'
+//' @param x a timeseries (\link{ts} or \link{regts})
+//' @return a \code{regperiod_range}
+//' @export
 // [[Rcpp::export]]
 NumericVector get_regperiod_range(const SEXP &x) {
     if (!Rf_inherits(x, "ts")) {
