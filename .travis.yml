@@ -2,7 +2,7 @@
 # travis config
 
 sudo: required
-dist: xenial
+dist: trusty
 warnings_are_errors: false
 
 language: r
