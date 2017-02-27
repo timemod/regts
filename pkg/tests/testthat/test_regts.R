@@ -11,8 +11,8 @@ test_that("constructor regts for univariate timeseries", {
     expect_identical(is.regts(ts1), FALSE)
     expect_identical(is.ts(regts1), TRUE)
 
-    range <- regperiod_range("2010Q1", "2012Q2")
-    regts1 <- regts(matrix(1:10, ncol = 1), period = range, names = "a")
+    r1 <- regperiod_range("2010Q1", "2012Q2")
+    regts1 <- regts(matrix(1:10, ncol = 1), period = r1, names = "a")
     ts1 <- ts(matrix(1:10, ncol = 1), start = c(2010,1), frequency = 4, names = "a")
     expect_identical(regts1, as.regts(ts1))
     expect_identical(as.ts(regts1), regts1)
@@ -60,6 +60,20 @@ test_that("get_regperiod_range", {
     regts2 <- regts(c("aap", "noot", "mies"), start = "2010M1", end = "2011M4")
     expect_identical(get_regperiod_range(regts2),
                      regperiod_range("2010M1", "2011M4"))
+})
+
+test_that("arguments: start, end & period", {
+    regts1 <- regts(1:5, start = "2010Q1", end = "2011Q1")
+    regts2 <- regts(1:5, start = "2010Q1")
+    regts3 <- regts(1:5, end = "2011Q1")
+    regts4 <- regts(1:5, period = "2010Q1/2011Q1")
+    regts5 <- regts(1:5, period = "2010Q1/")
+    regts6 <- regts(1:5, period = "/2011Q1")
+    expect_identical(regts1, regts2)
+    expect_identical(regts1, regts3)
+    expect_identical(regts1, regts4)
+    expect_identical(regts1, regts5)
+    expect_identical(regts1, regts6)
 })
 
 test_that("period selection in univariate timeseries", {

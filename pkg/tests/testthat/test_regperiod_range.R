@@ -45,26 +45,15 @@ test_that("as.regperiod_range.character", {
 
 test_that("as.regperiod_range.regperiod", {
     prd <- regperiod("2010")
-    range <- regperiod_range("2010", "2010")
-    expect_identical(as.regperiod_range(prd), range)
+    r2010 <- regperiod_range("2010", "2010")
+    expect_identical(as.regperiod_range(prd), r2010)
 })
 
 test_that("as.character.regperiod_range", {
-    range <- regperiod_range("2000", "2010")
-    expect_identical(as.character(range),"2000/2010")
+    r00_10 <- regperiod_range("2000", "2010")
+    expect_identical(as.character(r00_10),"2000/2010")
 })
 
-test_that("start_period and end_period", {
-    r <- regperiod_range("2010Q4", "2011Q3")
-    expect_identical(start_period(r), regperiod("2010Q4"))
-    expect_identical(end_period(r), regperiod("2011Q3"))
-    r <- regperiod_range("2010", NULL)
-    expect_identical(start_period(r), regperiod("2010"))
-    expect_identical(end_period(r), NULL)
-    r <- regperiod_range(NULL, "2010m3")
-    expect_identical(start_period(r), NULL)
-    expect_identical(end_period(r), regperiod("2010M3"))
-})
 
 test_that("length subrange", {
     r <- regperiod_range("2010Q4", "2011Q3")
@@ -114,8 +103,8 @@ test_that("arithmetic operators: only + and - allowed", {
 test_that("is.regperiod_range",{
     expect_identical(is.regperiod_range(regperiod_range("2010q2","2011q2")), TRUE)
     expect_identical(is.regperiod_range("2010q2/2011q2"), FALSE)
-    range <- as.regperiod_range("2000/2010")
-    expect_identical(is.regperiod_range(range), TRUE)
-    expect_identical(range, regperiod_range("2000", "2010"))
+    r00_10 <- as.regperiod_range("2000/2010")
+    expect_identical(is.regperiod_range(r00_10), TRUE)
+    expect_identical(r00_10, regperiod_range("2000", "2010"))
 })
 

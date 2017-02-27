@@ -87,7 +87,16 @@ regts <- function(data, start, end, period, frequency = NA,
         }
         start <- start_period(period)
         end <- end_period(period)
-        freq <- frequency(start)
+        # start and end cannot both be NULL
+        if(!is.null(start)){
+            freq <- frequency(start)
+            if(is.null(end)){
+                end <- start + NROW(data) - 1
+            }
+        } else {
+            freq <- frequency(end)
+            start <- end - NROW(data) + 1
+        }
     } else {
         if (!missing(start)) {
             start <- as.regperiod(start, frequency)
@@ -303,7 +312,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
 
     # handle labels
     lbls <- Hmisc::label(x)
-    if (!all(nchar(lbls) == 0)) {
+    if (!all(nchar(lbls, type = "bytes") == 0)) {
         # remove the time column(s) from the labels
         if (time_column != 0) {
             lbls <- lbls[-time_column]
