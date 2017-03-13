@@ -40,4 +40,3 @@ The functions \code{\link{do.call}} and \code{\link{cbind}}
 can be used to convert the list of timeseries objects to a multivariate
 \code{regts} (see the example).
 }
-

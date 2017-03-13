@@ -2,6 +2,8 @@
 #include <string>
 #include "parse_period.h"
 using Rcpp::NumericVector;
+using Rcpp::LogicalVector;
+using Rcpp::IntegerVector;
 using std::string;
 
 static string trim(const string& str);
@@ -102,6 +104,17 @@ static void parse_single_period(const std::string &period_text,
 	    }
         subperiods = per.year * freq + per.subperiod - 1;
     }
+}
+
+// [[Rcpp::export]]
+LogicalVector is_period_text_(std::vector<std::string> strings) {
+    int n = strings.size();
+    LogicalVector ret(n);
+    for (int i = 0; i < n; i++) {
+        ParsedPeriod per = parse_period(strings[i], NA_INTEGER);
+        ret[i] = !per.error;
+    }
+    return ret;
 }
 
 static string trim(const string& str) {

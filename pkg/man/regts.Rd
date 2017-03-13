@@ -85,4 +85,3 @@ with the functions \code{\link{get_regperiod_range}},
 See also the description of the functions for handling labels
 (\code{\link{ts_labels}} and \code{\link{update_ts_labels}}).
 }
-

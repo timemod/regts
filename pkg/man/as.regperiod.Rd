@@ -32,8 +32,8 @@ Coerce an R object to a regperiod
 
 \item \code{numeric}: Coerce a numerical value string to a \code{regperiod}
 }}
+
 \examples{
 as.regperiod("2010Q3")
 as.regperiod(2010)
 }
-

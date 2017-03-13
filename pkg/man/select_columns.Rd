@@ -30,4 +30,3 @@ data <- regts(matrix(1:20, ncol = 4), start = "2010Q2",
 # select all columns with names starting with nl
 nl_data <- select_columns(data, "nl.*")
 }
-
