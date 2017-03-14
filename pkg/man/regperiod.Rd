@@ -2,12 +2,12 @@
 % Please edit documentation in R/regperiod.R
 \name{regperiod}
 \alias{regperiod}
-\title{Create a \code{regperiod} object based on a string.}
+\title{Create a \code{regperiod} object based on a string or an integer.}
 \usage{
 regperiod(x, frequency = NA)
 }
 \arguments{
-\item{x}{a string}
+\item{x}{a single string or integer}
 
 \item{frequency}{frequency of the regperiod object.
 Argument \code{frequency} is mandatory if a general regperiod format
@@ -23,5 +23,5 @@ Possible string formats are for example \code{"2010Q2"},
 \examples{
 regperiod("2010Q3")
 regperiod("2010-4", frequency = 3)
+regperiod(2015)
 }
-

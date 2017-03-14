@@ -42,6 +42,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// is_period_text_
+LogicalVector is_period_text_(std::vector<std::string> strings);
+RcppExport SEXP regts_is_period_text_(SEXP stringsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type strings(stringsSEXP);
+    rcpp_result_gen = Rcpp::wrap(is_period_text_(strings));
+    return rcpp_result_gen;
+END_RCPP
+}
 // get_regperiod_range
 NumericVector get_regperiod_range(const SEXP& x);
 RcppExport SEXP regts_get_regperiod_range(SEXP xSEXP) {

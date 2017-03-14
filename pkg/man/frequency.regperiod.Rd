@@ -21,4 +21,3 @@ Returns the frequency of a \link{regperiod} object
 p <- regperiod("2016Q1")
 freq <- frequency(p)
 }
-

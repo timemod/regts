@@ -5,6 +5,7 @@ test_that("constructor regperiod", {
     expect_identical(as.character(regperiod("2010 q 2")), "2010Q2")
     expect_identical(as.character(regperiod("2010Q8")), "2011Q4")
     expect_identical(as.character(regperiod("2012")), "2012")
+    expect_identical(as.character(regperiod(2012)), "2012")
     expect_identical(as.character(regperiod("2012M3")), "2012M3")
     expect_identical(as.character(regperiod("2001-4", frequency = 4)), "2001Q4")
     expect_identical(as.character(regperiod("2001 4", frequency = 12)), "2001M4")
@@ -93,3 +94,12 @@ test_that("as.regperiod.numeric", {
     expect_error(as.regperiod(2010.75), "Argument frequency should be specified")
 })
 
+
+test_that("regts:::is_period_text", {
+    expect_identical(regts:::is_period_text(c("2060", "noot", "2012M2",
+                                              "2010-2", "2010Q3QA")),
+                     c(TRUE, FALSE, TRUE, TRUE, FALSE))
+    expect_identical(regts:::is_period_text(c("2060", "noot", "2012M2",
+                                              "2010-2", "2010Q3QA")),
+                     c(TRUE, FALSE, TRUE, TRUE, FALSE))
+})

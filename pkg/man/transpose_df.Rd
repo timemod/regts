@@ -36,4 +36,3 @@ df_t <- transpose_df(df, colname_column = 1, label_column = 2)
 print(df_t)
 print(transpose_df(df_t))
 }
-
