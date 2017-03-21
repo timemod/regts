@@ -12,9 +12,9 @@ Author: Rob van Harrevelt [aut, cre],
 Maintainer: Rob van Harrevelt <rvanharrevelt@gmail.com>
 Description: This package contains a number of tools to work efficiently with
    regular timeseries, in particular monthy, quarterly and yearly timeseries.
-License:  GPL-3
+License: GPL-3
 LazyData: TRUE
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 Imports: Rcpp, Hmisc
 Suggests: testthat, knitr, rmarkdown
 LinkingTo: Rcpp

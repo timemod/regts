@@ -1,9 +1,9 @@
-#' Create a \code{regperiod} object based on a string.
+#' Create a \code{regperiod} object based on a string or an integer.
 #'
 #' Possible string formats are for example \code{"2010Q2"},
 #' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
 #'
-#' @param x a string
+#' @param x a single string or integer
 #' @param frequency frequency of the regperiod object.
 #' Argument \code{frequency} is mandatory if a general regperiod format
 #' such as "2011-1" has been specified
@@ -11,15 +11,19 @@
 #' @examples
 #' regperiod("2010Q3")
 #' regperiod("2010-4", frequency = 3)
+#' regperiod(2015)
 #' @export
 #' @useDynLib regts
 #' @importFrom Rcpp sourceCpp
 regperiod <- function(x, frequency = NA) {
-    if (!is.character(x)) {
-        stop("Argument x is not a character")
+    if (is.numeric(x)) {
+        x <- as.character(x)
     }
     return (parse_regperiod(x, frequency))
 }
+
+
+
 
 #' Test if an object is a regperiod.
 #'
@@ -197,3 +201,40 @@ create_regperiod <- function(subperiod_count, frequency) {
     return (structure(subperiod_count, class = "regperiod",
                       frequency = frequency))
 }
+
+
+# PRIVATE METHODS THAT COULD BE USEFULL FOR AUTOMATIC CONVERSIONS
+# OF DATA FRAMES to TS
+
+# Checks if character or numerical values can be converted to a regperiod_range
+# INPUT
+# x a character or integer vector
+#
+# RETURN
+# a logical vector with element equal to \code{TRUE} is the
+# corresponding element in \code{x} can be converted to a
+# regperiod_range
+is_period_text <- function(x) {
+    if (is.numeric(x)) {
+        x <- as.character(x)
+    }
+    return(is_period_text_(x))
+}
+
+# Returns the frequency of characters or numerical values that represent
+# a \code{\link{regperiod_range}} object.
+#
+# The elements of the vector should be valid regperiod range objects.
+#
+# @param x a character or integer vector
+# @return a logical vector with element quequial to \code{TRUE} is the
+# corresponding element in \code{x} can be converted to a
+# \code{\link{regperiod_range}}
+get_frequency <- function(x) {
+    if (is.numeric(x)) {
+        x <- as.character(x)
+    }
+    return(is_period_text_(x))
+}
+
+
