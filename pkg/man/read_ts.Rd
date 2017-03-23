@@ -4,7 +4,7 @@
 \alias{read_ts}
 \title{Reads timeseries from a data frame}
 \usage{
-read_ts(df, columnwise)
+read_ts(df, columnwise, labels = c("no", "after", "before"))
 }
 \arguments{
 \item{df}{a \code{data.frame}}
@@ -12,6 +12,8 @@ read_ts(df, columnwise)
 \item{columnwise}{a logical value: are the timeseries stored columnwise?
 If not specified, then \code{read_ts} tries to figure out itself if
 the timeseries are stored columnwise or rowwise}
+
+\item{labels}{label option: should labels be read or not. See details.}
 }
 \value{
 a \code{regts} object

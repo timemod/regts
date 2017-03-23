@@ -4,9 +4,12 @@
 #' @param columnwise a logical value: are the timeseries stored columnwise?
 #' If not specified, then \code{read_ts} tries to figure out itself if
 #' the timeseries are stored columnwise or rowwise
+#' @param labels label option: should labels be read or not. See details.
 #' @return a \code{regts} object
 #' @export
-read_ts <- function(df, columnwise) {
+read_ts <- function(df, columnwise, labels = c("no", "after", "before")) {
+
+    labels <- match.arg(labels)
 
     # TODO: what about stringAsFactors?
 
@@ -15,9 +18,9 @@ read_ts <- function(df, columnwise) {
     }
 
     if (columnwise) {
-        return(read_ts_columnwise(df))
+        return(read_ts_columnwise(df, labels))
     } else {
-        return(read_ts_rowwise(df))
+        return(read_ts_rowwise(df, labels))
     }
 }
 
@@ -31,7 +34,12 @@ is_posint <- function(x) {
 #  - optionally labels in first row (TO DO!)
 #  - time axis in rownames, or any other column.
 #    columns before the time column are skipped
-read_ts_columnwise <- function(df) {
+read_ts_columnwise <- function(df, labels) {
+
+    if (labels == "before") {
+        stop(paste("For columnwise timeseries, the label option 'before'",
+                    "is not allowed"))
+    }
 
     period_info <- find_period_column(df)
     col_nr <- period_info$col_nr
@@ -97,39 +105,80 @@ find_period_column <- function(df) {
 #    optionally labels in the second column
 #  - optionally labels in first column, variable names second column
 #    (argument labels_first)
-read_ts_rowwise <- function(df) {
+read_ts_rowwise <- function(df, labels) {
 
     is_period <- is_period_text(colnames(df))
-    col_nr <- Position(function(x) {x}, is_period)
+
+    first_data_col <- Position(function(x) {x}, is_period)
 
     standard_rownames <- all(is_posint(rownames(df)))
+
     if (standard_rownames) {
-        colname_column <- 1
+
+        # the row names do not contain variable names
+        if (labels == "before") {
+            colname_column <- first_data_col - 1
+            label_columns <- seq_len(colname_column - 1)
+        } else {
+            colname_column <- 1
+            if (first_data_col > colname_column + 1) {
+                label_columns <- (colname_column + 1) : (first_data_col - 1)
+            } else {
+                label_columns <- integer(0)
+            }
+        }
+
+        # remove rows without variable names
+        df <- df[nchar(df[, colname_column]) > 0, , drop = FALSE]
+
     } else {
+
         colname_column <- 0
+
+        # remove empty row names
+        if (colname_column == 0) {
+            df <- df[nchar(rownames(df)) > 0, , drop = FALSE]
+        }
+
+        # variable names in the row names
+        if (labels == "before") {
+            stop(paste("Label option 'before' is not allowed",
+                       "if the row names are not numbered"))
+        }
+
+        label_columns <- seq_len(first_data_col - 1)
     }
-     # remove all columns without period
+
+    if (labels != "no") {
+        labels <- df[, label_columns, drop = FALSE]
+        l <- lapply(labels, as.character)
+        labels <- do.call(paste, l)
+        labels <- trimws(labels)
+    }
+
+    # remove all columns without period except for the colname column
     keep_cols <- is_period
-    if (colname_column == 1) {
-        keep_cols[1] <- TRUE
+    if (colname_column >= 1) {
+        keep_cols[colname_column] <- TRUE
     }
-
-    # remove empty row names
-    if (colname_column == 0) {
-        df <- df[nchar(rownames(df)) > 0, , drop = FALSE]
-    }
-
     df <- df[ ,  keep_cols, drop = FALSE]
 
+    if (colname_column > 1) {
+        colname_column <- 1
+    }
 
-    if (colname_column == 1) {
+    if (colname_column >= 1) {
         df <- transpose_df(df, colname_column = colname_column)
     } else {
         df <- transpose_df(df)
     }
 
-    # remove empty column names (in the future, as.regts will take care of that)
+    # remove empty column names
     df <- df[ , nchar(colnames(df)) > 0, drop = FALSE]
 
-    return(as.regts(df))
+    ret <- as.regts(df)
+    if (labels != "no" && any(nchar(labels) > 0)){
+        ts_labels(ret) <- labels
+    }
+    return(ret)
 }
