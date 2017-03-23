@@ -25,9 +25,9 @@
     #include "period_scanner.h"
     #include "parse_period.h"
     using Rcpp::NumericVector;
-    static int year, subperiod;
+    static double year, subperiod;
     static double freq, given_freq;
-    static void check_year_subperiod(int freq, int &year, int &frac);
+    static void check_year_subperiod(double freq, double &year, double &frac);
     void prerror(const char *s);
 %}
 
@@ -93,7 +93,7 @@ month:     MONTH_NAME opt_sep NUMBER  /* e.g. may 2012 */
 
 void prerror(const char *s) {}
 
-static void check_year_subperiod(int freq, int &year, int &subp) {
+static void check_year_subperiod(double freq, double &year, double &subp) {
 
    // Periods with the format X sep Y are ambigious: both X and Y
    // could be the year. For example, for the period "3q2000", the first
@@ -103,18 +103,18 @@ static void check_year_subperiod(int freq, int &year, int &subp) {
    // year and subperiod should be swapped.
 
     if (subp > freq && year <= freq) {
-        int y = year;
+        double y = year;
         year = subp;
         subp = y;
     }
 }
 
-ParsedPeriod parse_period(const std::string &period_text, int frequency) {
+ParsedPeriod parse_period(const std::string &period_text, double frequency) {
 
     // initialise global variables
-    year       = NA_INTEGER;
-    freq       = NA_INTEGER;
-    subperiod  = NA_INTEGER;
+    year       = NA_REAL;
+    freq       = NA_REAL;
+    subperiod  = NA_REAL;
     given_freq = frequency;
 
     init_period_scanner(period_text);

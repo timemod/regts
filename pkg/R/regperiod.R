@@ -206,9 +206,10 @@ create_regperiod <- function(subperiod_count, frequency) {
 # PRIVATE METHODS THAT COULD BE USEFULL FOR AUTOMATIC CONVERSIONS
 # OF DATA FRAMES to TS
 
-# Checks if character or numerical values can be converted to a regperiod_range
+# Checks if character or numerical values can be converted to a
+# regperiod_range
 # INPUT
-# x a character or integer vector
+# x a character or numeric vector
 #
 # RETURN
 # a logical vector with element equal to \code{TRUE} is the
@@ -220,21 +221,3 @@ is_period_text <- function(x) {
     }
     return(is_period_text_(x))
 }
-
-# Returns the frequency of characters or numerical values that represent
-# a \code{\link{regperiod_range}} object.
-#
-# The elements of the vector should be valid regperiod range objects.
-#
-# @param x a character or integer vector
-# @return a logical vector with element quequial to \code{TRUE} is the
-# corresponding element in \code{x} can be converted to a
-# \code{\link{regperiod_range}}
-get_frequency <- function(x) {
-    if (is.numeric(x)) {
-        x <- as.character(x)
-    }
-    return(is_period_text_(x))
-}
-
-

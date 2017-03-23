@@ -1,8 +1,8 @@
 class ParsedPeriod {
 public:
-    int year, subperiod, freq;
+    double year, subperiod, freq;
     bool error;
-    ParsedPeriod(int year, int subperiod, int freq, bool error) {
+    ParsedPeriod(double year, double subperiod, double freq, bool error) {
         this->year = year;
         this->subperiod = subperiod;
         this->freq = freq;
@@ -10,4 +10,4 @@ public:
     }
 };
 
-ParsedPeriod parse_period(const std::string &period_text, int frequency);
+ParsedPeriod parse_period(const std::string &period_text, double frequency);

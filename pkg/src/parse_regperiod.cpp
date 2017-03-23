@@ -2,8 +2,8 @@
 #include <string>
 #include "parse_period.h"
 using Rcpp::NumericVector;
+using Rcpp::CharacterVector;
 using Rcpp::LogicalVector;
-using Rcpp::IntegerVector;
 using std::string;
 
 static string trim(const string& str);
@@ -83,20 +83,20 @@ static void parse_single_period(const std::string &period_text,
     
     subperiods = NA_REAL;
     freq       = NA_REAL;
-    ParsedPeriod per = parse_period(period_text, (int) given_freq);
+    ParsedPeriod per = parse_period(period_text, given_freq);
 
     if (per.error) {
         Rf_error("Illegal period %s.", period_text.c_str());
     } else {
         freq = per.freq;
-        if (per.freq == NA_INTEGER) {
+        if (ISNA(per.freq)) {
             if (ISNA(given_freq)) {
                 Rf_error("Frequency of period %s unknown."
                          " Specify argument frequency.", period_text.c_str());
                 return;
             }
 	        freq = given_freq;;
-	    } else if (!ISNA(given_freq) && per.freq != (int) given_freq) {
+	    } else if (!ISNA(given_freq) && per.freq != given_freq) {
 	        Rf_error("Specified frequency %d does not agree with actual "
                      "frequency in period %s.", (int) given_freq,
                      period_text.c_str());
@@ -108,13 +108,13 @@ static void parse_single_period(const std::string &period_text,
 
 // [[Rcpp::export]]
 LogicalVector is_period_text_(std::vector<std::string> strings) {
-    int n = strings.size();
-    LogicalVector ret(n);
-    for (int i = 0; i < n; i++) {
-        ParsedPeriod per = parse_period(strings[i], NA_INTEGER);
-        ret[i] = !per.error;
-    }
-    return ret;
+     int n = strings.size();
+     LogicalVector out(n);
+     for (int i = 0; i < n; i++) {
+          ParsedPeriod per = parse_period(strings[i], NA_REAL);
+          out[i] = !per.error;
+     }
+     return out;
 }
 
 static string trim(const string& str) {

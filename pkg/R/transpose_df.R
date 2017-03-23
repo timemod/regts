@@ -27,7 +27,6 @@ transpose_df  <- function(x, colname_column, label_column) {
 
     #todo: check arguments. x should be a dataframe, colname_column
     # and label_column a numeric  or character vector of length 1
-
     if (!missing(colname_column)) {
         if (is.character(colname_column)) {
             colname_column <- which(colnames(x) %in% colname_column)
