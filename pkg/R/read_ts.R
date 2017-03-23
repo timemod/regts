@@ -42,21 +42,50 @@ read_ts_columnwise <- function(df, labels) {
     }
 
     period_info <- find_period_column(df)
-    col_nr <- period_info$col_nr
+    time_column <- period_info$col_nr
     is_period <- period_info$is_period
+    first_data_row <- Position(function(x) {x}, is_period)
+    label_rows <- seq_len(first_data_row - 1)
+
+    # remove column without names to the left of the time_columns
+    keep_cols <- nchar(colnames(df)) > 0
+    if (time_column > 0) {
+        keep_cols[1:time_column] <- TRUE
+    }
+    df <- df[, keep_cols, drop = FALSE]
 
     # Ff colr_nr > 1, then remove all previous columns
     # NOTE: we have to do this before rows without period are removed,
     # because the latter procedure will also remove empty columns
-    if (col_nr > 1) {
-        df <- df[, -(1:col_nr-1), drop = FALSE]
-        col_nr <- 1
+    if (time_column > 1) {
+        df <- df[, -(1:time_column-1), drop = FALSE]
+        time_column <- 1
+    }
+
+
+    if (labels == "after") {
+        lbl_data <- df[label_rows, , drop = FALSE]
+        if (time_column > 0) {
+            lbl_data <- lbl_data[, -time_column, drop = FALSE]
+        }
+        if (length(label_rows) == 1) {
+            labels <- as.character(lbl_data)
+        } else {
+            labels <- as.data.frame(t(lbl_data))
+            l <- lapply(labels, as.character)
+            labels <- do.call(paste, l)
+            labels <- trimws(labels)
+        }
     }
 
     # remove rows without period
     df <- df[is_period, , drop = FALSE]
 
-    return(as.regts(df, time_column = col_nr))
+    ret <- as.regts(df, time_column = time_column)
+    if (labels != "no" && any(nchar(labels) > 0)){
+        ts_labels(ret) <- labels
+    }
+    return(ret)
 }
 
 # Find a period column for a standard (columnwise) data frame.
