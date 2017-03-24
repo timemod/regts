@@ -79,3 +79,25 @@ test_that("columnwise4.csv is read correctly",  {
 	expect_identical(result3, correct_result * 1)
 	expect_identical(result4, correct_result_labels)
 })
+
+test_that("columnwise5.csv is read correctly",  {
+
+    csv_file <- "csv/columnwise5.csv"
+
+    correct_result_labels <- correct_result * 1
+    ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b (EUR)")
+
+	df <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE)
+
+    result <- read_ts(df, columnwise = TRUE)
+	expect_identical(result[, 1:2], correct_result * 1)
+
+    result2 <- read_ts(df, columnwise = TRUE, labels = "after")
+	expect_identical(result2[, 1:2], correct_result_labels)
+
+    result3 <- read_ts(df, frequency = 4)
+	expect_identical(result3[, 1:2], correct_result * 1)
+
+    result4 <- read_ts(df, frequency = 4, labels = "after")
+	expect_identical(result4[, 1:2], correct_result_labels)
+})
