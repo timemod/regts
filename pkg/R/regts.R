@@ -272,6 +272,9 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
         data <- x[-time_column]
     }
 
+    # remove columns with empty names
+    data <- data[which(!colnames(data) == "")]
+
     # convert (by default) non numeric data (characters -> NA)
     if (numeric){
         datamat <- data.matrix(data)
@@ -310,13 +313,10 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
         ret[rows, ] <- datamat
     }
 
-    # handle labels
-    lbls <- Hmisc::label(x)
+    # handle labels, use data because of empty names columns
+    lbls <- Hmisc::label(data)
     if (!all(nchar(lbls, type = "bytes") == 0)) {
-        # remove the time column(s) from the labels
-        if (time_column != 0) {
-            lbls <- lbls[-time_column]
-        }
+
         ts_labels(ret) <- lbls
     }
 
