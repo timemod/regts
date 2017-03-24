@@ -97,7 +97,7 @@ read_ts_columnwise <- function(df, frequency, labels) {
   label_rows <- seq_len(first_data_row - 1)
 
   # remove column without names to the left of the time_columns
-  keep_cols <- nchar(colnames(df)) > 0
+  keep_cols <- colnames(df) != ""
   if (time_column > 0) {
     keep_cols[1:time_column] <- TRUE
   }
@@ -131,7 +131,7 @@ read_ts_columnwise <- function(df, frequency, labels) {
   df <- df[is_period, , drop = FALSE]
 
   ret <- as.regts(df, time_column = time_column, frequency = frequency)
-  if (labels != "no" && any(nchar(labels) > 0)){
+  if (labels != "no" && any(labels != "")){
     ts_labels(ret) <- labels
   }
   return(ret)
@@ -207,7 +207,7 @@ read_ts_rowwise <- function(df, frequency, labels) {
     }
 
     # remove rows without variable names
-    df <- df[nchar(df[, colname_column]) > 0, , drop = FALSE]
+    df <- df[df[, colname_column] != "", , drop = FALSE]
 
   } else {
 
@@ -215,7 +215,7 @@ read_ts_rowwise <- function(df, frequency, labels) {
 
     # remove empty row names
     if (colname_column == 0) {
-      df <- df[nchar(rownames(df)) > 0, , drop = FALSE]
+      df <- df[rownames(df) != "", , drop = FALSE]
     }
 
     # variable names in the row names
@@ -252,10 +252,10 @@ read_ts_rowwise <- function(df, frequency, labels) {
   }
 
   # remove empty column names
-  df <- df[ , nchar(colnames(df)) > 0, drop = FALSE]
+  df <- df[ , colnames(df) != "", drop = FALSE]
 
   ret <- as.regts(df, frequency = frequency)
-  if (labels != "no" && any(nchar(labels) > 0)){
+  if (labels != "no" && any(labels != "")){
     ts_labels(ret) <- labels
   }
   return(ret)
