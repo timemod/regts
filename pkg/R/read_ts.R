@@ -1,7 +1,7 @@
 #' Reads timeseries from a data frame
 #'
 #' This function attempts to read timeseries from a data frame.
-#' The timeseries can be stored both rowwise and columnwise in the data frame.
+#' The timeseries can be stored both rowwise or columnwise in the data frame.
 #' The function tries to find valid period texts in the data frame.
 #' Valid period texts should have the format recognized by function
 #' \code{\link{regperiod}}, for example \code{"2010Q2"},
@@ -74,6 +74,7 @@ read_ts <- function(df, columnwise, frequency = NA,
   all_na <- unlist(lapply(df, FUN = function(x) {!all(is.na(x))}))
   df <- df[ , all_na, drop = FALSE]
 
+
   # TODO: what about stringAsFactors?
 
   if (missing(columnwise)) {
@@ -81,7 +82,7 @@ read_ts <- function(df, columnwise, frequency = NA,
     if (use_colnames) {
       periods <- colnames(df)
     } else {
-      periods <- as.character(df[1, ])
+      periods <- get_strings(df[1, ])
     }
     columnwise <- !any(is_period_text(periods, frequency))
   }
@@ -96,6 +97,12 @@ read_ts <- function(df, columnwise, frequency = NA,
 # returns true if x is a positive integer
 is_posint <- function(x) {
   return(grepl("^\\d+$", as.character(x)))
+}
+
+get_strings <- function(x) {
+  ret <- as.character(x)
+  ret[is.na(ret)] <- ""
+  return(ret)
 }
 
 # Standard columnwise format:
@@ -140,7 +147,7 @@ read_ts_columnwise <- function(df, frequency, labels, use_colnames) {
   if (use_colnames) {
     keep_cols <- colnames(df) != ""
   } else {
-    keep_cols <- as.character(df[name_row, ]) != ""
+    keep_cols <- get_strings(df[name_row, ]) != ""
   }
   if (time_column > 0) {
     keep_cols[1:time_column] <- TRUE
@@ -161,10 +168,10 @@ read_ts_columnwise <- function(df, frequency, labels, use_colnames) {
       lbl_data <- lbl_data[, -time_column, drop = FALSE]
     }
     if (length(label_rows) == 1) {
-      labels <- as.character(lbl_data)
+      labels <- get_strings(lbl_data)
     } else {
       labels <- as.data.frame(t(lbl_data))
-      l <- lapply(labels, as.character)
+      l <- lapply(labels, get_strings)
       labels <- do.call(paste, l)
       labels <- trimws(labels)
     }
@@ -208,7 +215,7 @@ find_period_column <- function(df, frequency) {
 
   # try to find the first column with period.
   for (i in 1:ncol(df)) {
-    is_period <- is_period_text(df[, i], frequency)
+    is_period <- is_period_text(get_strings(df[, i]), frequency)
     if (any(is_period)) {
       col_index <- i
       row_nr <- Position(function(x) {x}, is_period)
@@ -283,7 +290,7 @@ read_ts_rowwise <- function(df, frequency, labels, use_colnames) {
 
   if (labels != "no") {
     labels <- df[, label_columns, drop = FALSE]
-    l <- lapply(labels, as.character)
+    l <- lapply(labels, get_strings)
     labels <- do.call(paste, l)
     labels <- trimws(labels)
   }
@@ -299,14 +306,14 @@ read_ts_rowwise <- function(df, frequency, labels, use_colnames) {
     name_column <- 1
   }
 
-    if (name_column >= 1) {
+  if (name_column >= 1) {
     df <- transpose_df(df, colname_column = name_column)
   } else {
     df <- transpose_df(df)
   }
 
   # remove empty column names
-  df <- df[ , colnames(df) != "", drop = FALSE]
+  df <- df[ , get_strings(colnames(df)) != "", drop = FALSE]
 
   ret <- as.regts(df, frequency = frequency)
   if (labels != "no" && any(labels != "")){

@@ -15,7 +15,7 @@ Description: This package contains a number of tools to work efficiently with
 License: GPL-3
 LazyData: TRUE
 RoxygenNote: 6.0.1
-Imports: Rcpp, Hmisc
+Imports: Rcpp, Hmisc, data.table, readxl
 Suggests: testthat, knitr, rmarkdown
 LinkingTo: Rcpp
 VignetteBuilder: knitr
