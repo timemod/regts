@@ -11,93 +11,153 @@ correct_result <- cbind(a, b)
 
 test_that("columnwise1.csv is read correctly",  {
 
-    csv_file <- "csv/columnwise1.csv"
+  csv_file <- "csv/columnwise1.csv"
 
-	df <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE)
-    result <- read_ts(df)
-	expect_identical(result, correct_result)
+  df <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE)
+  result <- read_ts(df)
+  expect_identical(result, correct_result)
 
-    df2 <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE,
-               row.names = 1)
-    result2 <- read_ts(df2)
-	expect_identical(result2, correct_result)
+  df2 <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE,
+                  row.names = 1)
+  result2 <- read_ts(df2)
+  expect_identical(result2, correct_result)
+
+  df3 <- read.csv(csv_file, header = FALSE, stringsAsFactors = FALSE)
+  result3 <- read_ts(df3, use_colnames = FALSE)
+  expect_identical(result3, correct_result * 1)
 })
 
 test_that("columnwise2.csv is read correctly",  {
 
-    csv_file <- "csv/columnwise2.csv"
+  csv_file <- "csv/columnwise2.csv"
 
-	df <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE)
-    result <- read_ts(df)
-	expect_identical(result, correct_result)
+  df <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE)
+  result <- read_ts(df)
+  expect_identical(result, correct_result)
+
+  df2 <- read.csv(csv_file, header = FALSE, stringsAsFactors = FALSE)
+  result2 <- read_ts(df2, use_colnames = FALSE)
+  expect_identical(result2, correct_result * 1)
 })
 
 test_that("columnwise3.csv is read correctly",  {
 
-    csv_file <- "csv/columnwise3.csv"
+  csv_file <- "csv/columnwise3.csv"
 
-	df <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE)
-    result <- read_ts(df)
-	expect_equal(result, correct_result)
-	expect_identical(result, correct_result * 1)
+  df <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE)
+  result <- read_ts(df)
+  expect_equal(result, correct_result)
+  expect_identical(result, correct_result * 1)
 
-    correct_result_labels <- correct_result * 1
-    ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b")
+  correct_result_labels <- correct_result * 1
+  ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b")
 
-    result2 <- read_ts(df, labels = "after")
-	expect_identical(result2, correct_result_labels)
+  result2 <- read_ts(df, labels = "after")
+  expect_identical(result2, correct_result_labels)
 
-	df3 <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE,
-                   row.names = 1)
-    result3 <- read_ts(df3, labels = "no")
-    result4 <- read_ts(df3, labels = "after")
+  df3 <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE,
+                  row.names = 1)
+  result3 <- read_ts(df3, labels = "no")
+  result4 <- read_ts(df3, labels = "after")
 
-	expect_identical(result3, correct_result * 1)
-	expect_identical(result4, correct_result_labels)
+  expect_identical(result3, correct_result * 1)
+  expect_identical(result4, correct_result_labels)
+})
+
+test_that("columnwise3.csv is read correctly (use_colnames = FALSE)",  {
+
+  csv_file <- "csv/columnwise3.csv"
+
+  df <- read.csv(csv_file, header = FALSE, stringsAsFactors = FALSE)
+  result <- read_ts(df, use_colnames = FALSE)
+  expect_equal(result, correct_result)
+  expect_identical(result, correct_result * 1)
+
+  correct_result_labels <- correct_result * 1
+  ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b")
+
+  result2 <- read_ts(df, labels = "after", use_colnames = FALSE)
+  expect_identical(result2, correct_result_labels)
+
+  result3 <- read_ts(df, labels = "no", use_colnames = FALSE)
+  result4 <- read_ts(df, labels = "after", use_colnames = FALSE)
+
+  expect_identical(result3, correct_result * 1)
+  expect_identical(result4, correct_result_labels)
+
+  correct_result_labels2 <- correct_result * 1
+  colnames(correct_result_labels2) <- c("Timeseries a", "Timeseries b")
+  ts_labels(correct_result_labels2) <- c("a", "b")
+
+  result5 <- read_ts(df, labels = "before", use_colnames = FALSE)
+  expect_identical(result5, correct_result_labels2)
 })
 
 test_that("columnwise4.csv is read correctly",  {
 
-    csv_file <- "csv/columnwise4.csv"
+  csv_file <- "csv/columnwise4.csv"
 
-	df <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE)
-    result <- read_ts(df)
-	expect_equal(result, correct_result)
-	expect_identical(result, correct_result * 1)
+  df <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE)
+  result <- read_ts(df)
+  expect_equal(result, correct_result)
+  expect_identical(result, correct_result * 1)
 
-    correct_result_labels <- correct_result * 1
-    ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b (EUR)")
+  correct_result_labels <- correct_result * 1
+  ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b (EUR)")
 
-    result2 <- read_ts(df, labels = "after")
-	expect_identical(result2, correct_result_labels)
+  result2 <- read_ts(df, labels = "after")
+  expect_identical(result2, correct_result_labels)
 
-	df3 <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE,
-                   row.names = 1)
-    result3 <- read_ts(df3, labels = "no")
-    result4 <- read_ts(df3, labels = "after")
+  df3 <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE,
+                  row.names = 1)
+  result3 <- read_ts(df3, labels = "no")
+  result4 <- read_ts(df3, labels = "after")
 
-	expect_identical(result3, correct_result * 1)
-	expect_identical(result4, correct_result_labels)
+  expect_identical(result3, correct_result * 1)
+  expect_identical(result4, correct_result_labels)
 })
+
+test_that("columnwise4.csv is read correctly (use_colnames = FALSE)",  {
+
+  csv_file <- "csv/columnwise4.csv"
+
+  df <- read.csv(csv_file, header = FALSE, stringsAsFactors = FALSE)
+  result <- read_ts(df, use_colnames = FALSE)
+  expect_equal(result, correct_result)
+  expect_identical(result, correct_result * 1)
+
+  correct_result_labels <- correct_result * 1
+  ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b (EUR)")
+
+  result2 <- read_ts(df, labels = "after", use_colnames = FALSE)
+  expect_identical(result2, correct_result_labels)
+
+  result3 <- read_ts(df, labels = "no", use_colnames = FALSE)
+  result4 <- read_ts(df, labels = "after", use_colnames = FALSE)
+
+  expect_identical(result3, correct_result * 1)
+  expect_identical(result4, correct_result_labels)
+})
+
 
 test_that("columnwise5.csv is read correctly",  {
 
-    csv_file <- "csv/columnwise5.csv"
+  csv_file <- "csv/columnwise5.csv"
 
-    correct_result_labels <- correct_result * 1
-    ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b (EUR)")
+  correct_result_labels <- correct_result * 1
+  ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b (EUR)")
 
-	df <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE)
+  df <- read.csv(csv_file, check.names = FALSE, stringsAsFactors = FALSE)
 
-    result <- read_ts(df, columnwise = TRUE)
-	expect_identical(result[, 1:2], correct_result * 1)
+  result <- read_ts(df, columnwise = TRUE)
+  expect_identical(result[, 1:2], correct_result * 1)
 
-    result2 <- read_ts(df, columnwise = TRUE, labels = "after")
-	expect_identical(result2[, 1:2], correct_result_labels)
+  result2 <- read_ts(df, columnwise = TRUE, labels = "after")
+  expect_identical(result2[, 1:2], correct_result_labels)
 
-    result3 <- read_ts(df, frequency = 4)
-	expect_identical(result3[, 1:2], correct_result * 1)
+  result3 <- read_ts(df, frequency = 4)
+  expect_identical(result3[, 1:2], correct_result * 1)
 
-    result4 <- read_ts(df, frequency = 4, labels = "after")
-	expect_identical(result4[, 1:2], correct_result_labels)
+  result4 <- read_ts(df, frequency = 4, labels = "after")
+  expect_identical(result4[, 1:2], correct_result_labels)
 })

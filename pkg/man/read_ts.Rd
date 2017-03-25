@@ -4,7 +4,8 @@
 \alias{read_ts}
 \title{Reads timeseries from a data frame}
 \usage{
-read_ts(df, columnwise, frequency = NA, labels = c("no", "after", "before"))
+read_ts(df, columnwise, frequency = NA, labels = c("no", "after", "before"),
+  use_colnames = TRUE)
 }
 \arguments{
 \item{df}{a \code{data.frame}}
@@ -18,6 +19,11 @@ This argument is mandatory if the file contains a period texts without
 frequency indicator (for example "2011-1")}
 
 \item{labels}{label option. See details.}
+
+\item{use_colnames}{if \code{TRUE}, then this function searches for
+variable names (for columnwise timeseries) or periods (for rowwise timeseries)
+in the column names. If \code{FALSE}, then the first row of the data frame is
+used.}
 }
 \value{
 a \code{regts} object
@@ -47,8 +53,12 @@ All columns to the left of the time column are ignored.
 There may be one or more rows between the column names and the rows
 where the actual timeseries are stored.
 If argument \code{labels = "after"}  then the texts in these
-rows will be used to create timeseries labels. For columnwise timeseries,
-the label option \code{"before"} is not allowed.
+rows will be used to create timeseries labels.
+the last row before the columns where the data start is supposed to contain
+the variable names and the row before the variable name columns
+contain label information. If argument \code{use_colnames = TRUE},
+then the label option \code{"before"} is not allowed for columnwise timeseries,
+since in that the column names are the timeseries names.
 
 For \strong{rowwise} timeseries, the column name should contain the periods.
 Columns for which the corresponding column name is not a valid period

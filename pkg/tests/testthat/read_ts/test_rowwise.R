@@ -21,13 +21,17 @@ test_that("rowwise1.csv is read correctly",  {
                        row.names = 1)
 	result2 <- read_ts(df2)
 	expect_identical(result2, correct_result)
+
+	df3 <- read.csv(csv_file, header = FALSE, stringsAsFactors = FALSE)
+	result3 <- read_ts(df3, use_colnames = FALSE)
+	expect_identical(result3, correct_result * 1)
 })
 
 test_that("rowwise2.csv is read correctly",  {
 
-    # create a version with the correct labels
-    correct_result_labels <- correct_result
-    ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b (EUR)")
+  # create a version with the correct labels
+  correct_result_labels <- correct_result
+  ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b (EUR)")
 
 	csv_file <- "csv/rowwise2.csv"
 
@@ -44,8 +48,17 @@ test_that("rowwise2.csv is read correctly",  {
 	expect_identical(result3, correct_result_labels)
 
 	expect_error(read_ts(df3, labels = "before"),
-                paste("Label option 'before' is not allowed if the row",
-                     "names are not numbered"))
+	             paste("Label option 'before' is not allowed if the row",
+	                   "names are not numbered"))
+
+	df4 <- read.csv(csv_file, header = FALSE, stringsAsFactors = FALSE)
+	result4 <- read_ts(df4, use_colnames = FALSE)
+	expect_identical(result4, correct_result * 1)
+
+	result5 <- read_ts(df4, labels = "after", use_colnames = FALSE)
+	expect_identical(result5, correct_result_labels * 1)
+
+
 })
 
 test_that("rowwise3.csv is read correctly",  {

@@ -54,7 +54,7 @@ transpose_df  <- function(x, colname_column, label_column) {
   }
 
   old_labels <- as.character(Hmisc::label(x))
-  ret <- as.data.frame(t(x))
+  ret <- as.data.frame(t(x), stringsAsFactors = FALSE)
 
   if (!missing(colname_column)) {
     colnames(ret) <- new_colnames

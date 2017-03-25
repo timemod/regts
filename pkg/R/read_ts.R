@@ -23,8 +23,13 @@
 #' There may be one or more rows between the column names and the rows
 #' where the actual timeseries are stored.
 #' If argument \code{labels = "after"}  then the texts in these
-#' rows will be used to create timeseries labels. For columnwise timeseries,
-#' the label option \code{"before"} is not allowed.
+#' rows will be used to create timeseries labels.
+#  If \code{labels = "before"},
+#' the last row before the columns where the data start is supposed to contain
+#' the variable names and the row before the variable name columns
+#' contain label information. If argument \code{use_colnames = TRUE},
+#' then the label option \code{"before"} is not allowed for columnwise timeseries,
+#' since in that the column names are the timeseries names.
 #'
 #' For \strong{rowwise} timeseries, the column name should contain the periods.
 #' Columns for which the corresponding column name is not a valid period
@@ -53,23 +58,38 @@
 #' This argument is mandatory if the file contains a period texts without
 #' frequency indicator (for example "2011-1")
 #' @param labels label option. See details.
+#' @param use_colnames if \code{TRUE}, then this function searches for
+#' variable names (for columnwise timeseries) or periods (for rowwise timeseries)
+#' in the column names. If \code{FALSE}, then the first row of the data frame is
+#' used.
 #' @return a \code{regts} object
 #' @export
 read_ts <- function(df, columnwise, frequency = NA,
-                    labels = c("no", "after", "before")) {
+                    labels = c("no", "after", "before"),
+                    use_colnames = TRUE) {
 
   labels <- match.arg(labels)
+
+  # remove all columns with only NA's
+  all_na <- unlist(lapply(df, FUN = function(x) {!all(is.na(x))}))
+  df <- df[ , all_na, drop = FALSE]
 
   # TODO: what about stringAsFactors?
 
   if (missing(columnwise)) {
-    columnwise <- !any(is_period_text(colnames(df), frequency))
+    # check if the timeseries are columnwise or rowwise
+    if (use_colnames) {
+      periods <- colnames(df)
+    } else {
+      periods <- as.character(df[1, ])
+    }
+    columnwise <- !any(is_period_text(periods, frequency))
   }
 
   if (columnwise) {
-    return(read_ts_columnwise(df, frequency, labels))
+    return(read_ts_columnwise(df, frequency, labels, use_colnames))
   } else {
-    return(read_ts_rowwise(df, frequency, labels))
+    return(read_ts_rowwise(df, frequency, labels, use_colnames))
   }
 }
 
@@ -83,21 +103,45 @@ is_posint <- function(x) {
 #  - optionally labels in first row (TO DO!)
 #  - time axis in rownames, or any other column.
 #    columns before the time column are skipped
-read_ts_columnwise <- function(df, frequency, labels) {
+read_ts_columnwise <- function(df, frequency, labels, use_colnames) {
 
-  if (labels == "before") {
-    stop(paste("For columnwise timeseries, the label option 'before'",
-               "is not allowed"))
+  if (use_colnames && labels == "before") {
+    stop(paste("For columnwise timeseries with column headers,",
+                "the label option 'before is not allowed"))
   }
 
   period_info <- find_period_column(df, frequency)
   time_column <- period_info$col_nr
   is_period <- period_info$is_period
   first_data_row <- Position(function(x) {x}, is_period)
-  label_rows <- seq_len(first_data_row - 1)
+
+  # compute the row with variable names. 0 means: column names
+  # and the label rows
+  if (use_colnames) {
+    name_row <- 0
+    label_rows <- seq_len(first_data_row - 1)
+  } else if (labels != "before") {
+    name_row <- 1
+    if (first_data_row > 2) {
+      label_rows <- 2:(first_data_row -1)
+    } else {
+      label_rows <- integer(0)
+    }
+  } else {  # labels == before
+    name_row <- first_data_row - 1
+    if (first_data_row > 2) {
+      label_rows <- 1:(first_data_row - 2)
+    } else {
+      labels_rows <- integer(0)
+    }
+  }
 
   # remove column without names to the left of the time_columns
-  keep_cols <- colnames(df) != ""
+  if (use_colnames) {
+    keep_cols <- colnames(df) != ""
+  } else {
+    keep_cols <- as.character(df[name_row, ]) != ""
+  }
   if (time_column > 0) {
     keep_cols[1:time_column] <- TRUE
   }
@@ -111,8 +155,7 @@ read_ts_columnwise <- function(df, frequency, labels) {
     time_column <- 1
   }
 
-
-  if (labels == "after") {
+  if (labels != "no" && length(label_rows) > 0) {
     lbl_data <- df[label_rows, , drop = FALSE]
     if (time_column > 0) {
       lbl_data <- lbl_data[, -time_column, drop = FALSE]
@@ -125,6 +168,10 @@ read_ts_columnwise <- function(df, frequency, labels) {
       labels <- do.call(paste, l)
       labels <- trimws(labels)
     }
+  }
+
+  if (!use_colnames) {
+    colnames(df) <- df[name_row, , drop = FALSE]
   }
 
   # remove rows without period
@@ -183,9 +230,16 @@ find_period_column <- function(df, frequency) {
 #    optionally labels in the second column
 #  - optionally labels in first column, variable names second column
 #    (argument labels_first)
-read_ts_rowwise <- function(df, frequency, labels) {
+read_ts_rowwise <- function(df, frequency, labels, use_colnames) {
 
-  is_period <- is_period_text(colnames(df), frequency)
+  if (use_colnames) {
+    periods <- colnames(df)
+  } else {
+    periods <- as.character(df[1, ])
+    df <- df[-1, , drop = FALSE]
+    colnames(df) <- periods
+  }
+  is_period <- is_period_text(periods, frequency)
 
   first_data_col <- Position(function(x) {x}, is_period)
 
@@ -195,26 +249,26 @@ read_ts_rowwise <- function(df, frequency, labels) {
 
     # the row names do not contain variable names
     if (labels == "before") {
-      colname_column <- first_data_col - 1
-      label_columns <- seq_len(colname_column - 1)
+      name_column <- first_data_col - 1
+      label_columns <- seq_len(name_column - 1)
     } else {
-      colname_column <- 1
-      if (first_data_col > colname_column + 1) {
-        label_columns <- (colname_column + 1) : (first_data_col - 1)
+      name_column <- 1
+      if (first_data_col > name_column + 1) {
+        label_columns <- (name_column + 1) : (first_data_col - 1)
       } else {
         label_columns <- integer(0)
       }
     }
 
     # remove rows without variable names
-    df <- df[df[, colname_column] != "", , drop = FALSE]
+    df <- df[df[, name_column] != "", , drop = FALSE]
 
   } else {
 
-    colname_column <- 0
+    name_column <- 0
 
     # remove empty row names
-    if (colname_column == 0) {
+    if (name_column == 0) {
       df <- df[rownames(df) != "", , drop = FALSE]
     }
 
@@ -236,17 +290,17 @@ read_ts_rowwise <- function(df, frequency, labels) {
 
   # remove all columns without period except for the colname column
   keep_cols <- is_period
-  if (colname_column >= 1) {
-    keep_cols[colname_column] <- TRUE
+  if (name_column >= 1) {
+    keep_cols[name_column] <- TRUE
   }
   df <- df[ ,  keep_cols, drop = FALSE]
 
-  if (colname_column > 1) {
-    colname_column <- 1
+  if (name_column > 1) {
+    name_column <- 1
   }
 
-  if (colname_column >= 1) {
-    df <- transpose_df(df, colname_column = colname_column)
+    if (name_column >= 1) {
+    df <- transpose_df(df, colname_column = name_column)
   } else {
     df <- transpose_df(df)
   }
@@ -258,5 +312,6 @@ read_ts_rowwise <- function(df, frequency, labels) {
   if (labels != "no" && any(labels != "")){
     ts_labels(ret) <- labels
   }
+
   return(ret)
 }
