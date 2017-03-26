@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_ts_xlsx.R
 \name{read_ts_xlsx}
 \alias{read_ts_xlsx}
-\title{Reads timeseries from an xls(x) file}
+\title{Reads timeseries from a sheet of an  xls(x) file}
 \usage{
 read_ts_xlsx(filename, columnwise, frequency = NA, skiprow, skipcol,
   labels = c("no", "after", "before"), ...)
@@ -47,12 +47,13 @@ what you want, then you have to clean and preprocess the data
 frame so that is has a more standard format (see Details).
 }
 \details{
-If the column names contain any valid period, then \code{read_ts} assumes
+If the first row contain any valid period, then \code{read_ts} assumes
 that the timeseries are stored rowwise. Otherwise it assumes that the
 timeseries are store columnwise.
 
-For \strong{columnwise} timeseries, the column names should contains the timeseries
-names. The periods can be in the row names or in any column of the data frame.
+For \strong{columnwise} timeseries, the first row that is not skipped (see
+argument \code{skiprow}) should contain the variable names.
+The periods can be in any column on the sheet.
 All columns to the left of the time column are ignored.
 There may be one or more rows between the column names and the rows
 where the actual timeseries are stored.
@@ -64,10 +65,11 @@ contain label information. If argument \code{use_colnames = TRUE},
 then the label option \code{"before"} is not allowed for columnwise timeseries,
 since in that the column names are the timeseries names.
 
-For \strong{rowwise} timeseries, the column name should contain the periods.
-Columns for which the corresponding column name is not a valid period
+For \strong{rowwise} timeseries, the first row that is not skipped (see
+argument \code{skiprow}) should contain the periods.
+Columns for which the corresponding period is not a valid period
 are ignored. The timeseries names can be in the row names or in
-the first column of the data frame.
+the first column of the sheet.
 There may be one or more columns between the column with variable names
 and the columns where the actual timeseries are stored.
 If argument \code{labels = "after"}  then the texts in these
@@ -77,7 +79,7 @@ the variable names and the columns before the variable name columns
 contain label information.
 
 Sometimes it helps to supply information about the structure of
-the data frame. Specify option  \code{columnwise} is you know
+the data on the sheet. Specify option  \code{columnwise} is you know
 that the timeseries ares stored rowwise or columnwise. Specify
 argument \code{frequency} is you already know the frequency of the timeseries.
 Argument \code{frequency} is mandatory if a general period format
