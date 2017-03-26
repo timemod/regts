@@ -1,7 +1,7 @@
 library(regts)
 library(testthat)
 
-context("read_ts for columnwise files (no labels)")
+context("read_ts for columnwise files")
 
 # construct correct result
 period <- regperiod_range("2010Q2/2011Q2")

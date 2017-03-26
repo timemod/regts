@@ -99,12 +99,6 @@ is_posint <- function(x) {
   return(grepl("^\\d+$", as.character(x)))
 }
 
-get_strings <- function(x) {
-  ret <- as.character(x)
-  ret[is.na(ret)] <- ""
-  return(ret)
-}
-
 # Standard columnwise format:
 #  - variable names in column names
 #  - optionally labels in first row (TO DO!)
@@ -242,7 +236,7 @@ read_ts_rowwise <- function(df, frequency, labels, use_colnames) {
   if (use_colnames) {
     periods <- colnames(df)
   } else {
-    periods <- as.character(df[1, ])
+    periods <- get_strings(df[1, ])
     df <- df[-1, , drop = FALSE]
     colnames(df) <- periods
   }
@@ -268,16 +262,12 @@ read_ts_rowwise <- function(df, frequency, labels, use_colnames) {
     }
 
     # remove rows without variable names
-    df <- df[df[, name_column] != "", , drop = FALSE]
+    df <- df[get_strings(df[, name_column]) != "", , drop = FALSE]
 
   } else {
 
     name_column <- 0
-
-    # remove empty row names
-    if (name_column == 0) {
-      df <- df[rownames(df) != "", , drop = FALSE]
-    }
+    df <- df[get_strings(rownames(df)) != "", , drop = FALSE]
 
     # variable names in the row names
     if (labels == "before") {
@@ -311,9 +301,6 @@ read_ts_rowwise <- function(df, frequency, labels, use_colnames) {
   } else {
     df <- transpose_df(df)
   }
-
-  # remove empty column names
-  df <- df[ , get_strings(colnames(df)) != "", drop = FALSE]
 
   ret <- as.regts(df, frequency = frequency)
   if (labels != "no" && any(labels != "")){

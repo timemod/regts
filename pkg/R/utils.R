@@ -17,10 +17,18 @@
 #' nl_data <- select_columns(data, "nl.*")
 #' @export
 select_columns <- function(x, regex, drop = TRUE) {
-    cnames <- colnames(x)
-    if (is.null(cnames)) {
-        stop("No column names available. No selection possible")
-    }
-    sel <- grep(regex, cnames)
-    return (x[ , sel, drop = drop])
+  cnames <- colnames(x)
+  if (is.null(cnames)) {
+    stop("No column names available. No selection possible")
+  }
+  sel <- grep(regex, cnames)
+  return (x[ , sel, drop = drop])
+}
+
+# converts an object to a character vector with stringd.
+# NAs are converted to ""
+get_strings <- function(x) {
+  ret <- as.character(x)
+  ret[is.na(ret)] <- ""
+  return(ret)
 }

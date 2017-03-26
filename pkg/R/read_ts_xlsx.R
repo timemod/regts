@@ -80,6 +80,10 @@ read_ts_xlsx <- function(filename, columnwise, frequency = NA,
 
   df <- read_excel(filename, skip = skip, col_names = FALSE, ...)
 
+  # read_excel sometimes creates a weird structure: convert to standard
+  # data frame
+  df <- as.data.frame(df)
+
   if (!missing(skipcol)) {
     df <- df[ , -(1:skipcol), drop = FALSE]
   }
