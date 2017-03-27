@@ -86,10 +86,10 @@ read_ts_xlsx <- function(filename, columnwise, frequency = NA,
   # data frame
   df <- as.data.frame(df)
 
-  if (!missing(skipcol)) {
+  if (!missing(skipcol) && skipcol > 0) {
     df <- df[ , -(1:skipcol), drop = FALSE]
   }
 
-  return(read_ts(df, use_colnames = FALSE, columnwise = columnwise,
-                 frequency = frequency, labels = labels))
+  return(read_ts_simple(df, columnwise = columnwise, frequency = frequency,
+                        labels = labels))
 }

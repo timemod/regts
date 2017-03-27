@@ -82,10 +82,10 @@ read_ts_csv <- function(filename, columnwise, frequency = NA,
 
   df <- fread(filename, skip = skip, header = FALSE, data.table = FALSE, ...)
 
-  if (!missing(skipcol)) {
+  if (!missing(skipcol) && skipcol > 0) {
     df <- df[ , -(1:skipcol), drop = FALSE]
   }
 
-  return(read_ts(df, use_colnames = FALSE, columnwise = columnwise,
-                 frequency = frequency, labels = labels))
+  return(read_ts_simple(df, columnwise = columnwise, frequency = frequency,
+                        labels = labels))
 }
