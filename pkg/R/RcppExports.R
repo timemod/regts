@@ -13,8 +13,8 @@ parse_regperiod_range <- function(period_text, frequency) {
     .Call('regts_parse_regperiod_range', PACKAGE = 'regts', period_text, frequency)
 }
 
-is_period_text_ <- function(strings) {
-    .Call('regts_is_period_text_', PACKAGE = 'regts', strings)
+is_period_text_ <- function(strings, given_freq) {
+    .Call('regts_is_period_text_', PACKAGE = 'regts', strings, given_freq)
 }
 
 #' Returns the \link{regperiod_range} of a timeseries.

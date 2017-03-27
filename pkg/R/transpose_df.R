@@ -25,47 +25,46 @@
 #' @export
 transpose_df  <- function(x, colname_column, label_column) {
 
-    #todo: check arguments. x should be a dataframe, colname_column
-    # and label_column a numeric  or character vector of length 1
-
-    if (!missing(colname_column)) {
-        if (is.character(colname_column)) {
-            colname_column <- which(colnames(x) %in% colname_column)
-        }
-        new_colnames <- as.character(x[[colname_column]])
-        columns_to_remove <- colname_column
-    } else {
-        columns_to_remove <- integer()
+  #todo: check arguments. x should be a dataframe, colname_column
+  # and label_column a numeric  or character vector of length 1
+  if (!missing(colname_column)) {
+    if (is.character(colname_column)) {
+      colname_column <- which(colnames(x) %in% colname_column)
     }
+    new_colnames <- as.character(x[[colname_column]])
+    columns_to_remove <- colname_column
+  } else {
+    columns_to_remove <- integer()
+  }
 
-    if (!missing(label_column)) {
-        if (is.character(label_column)) {
-            label_column <- which(colnames(x) %in% label_column)
-        }
-        labels <- as.character(x[[label_column]])
-        columns_to_remove <- c(columns_to_remove, label_column)
-        has_labels <- TRUE
-    } else {
-        has_labels <- FALSE
+  if (!missing(label_column)) {
+    if (is.character(label_column)) {
+      label_column <- which(colnames(x) %in% label_column)
     }
+    labels <- as.character(x[[label_column]])
+    columns_to_remove <- c(columns_to_remove, label_column)
+    has_labels <- TRUE
+  } else {
+    has_labels <- FALSE
+  }
 
-    # remove columns
-    if (length(columns_to_remove) > 0) {
-        x <- x[-columns_to_remove]
-    }
+  # remove columns
+  if (length(columns_to_remove) > 0) {
+    x <- x[-columns_to_remove]
+  }
 
-    old_labels <- as.character(Hmisc::label(x))
-    ret <- as.data.frame(t(x))
+  old_labels <- as.character(Hmisc::label(x))
+  ret <- as.data.frame(t(x), stringsAsFactors = FALSE)
 
-    if (!missing(colname_column)) {
-        colnames(ret) <- new_colnames
-    }
-    if (has_labels) {
-        Hmisc::label(ret, self = FALSE) <- labels
-    }
+  if (!missing(colname_column)) {
+    colnames(ret) <- new_colnames
+  }
+  if (has_labels) {
+    Hmisc::label(ret, self = FALSE) <- labels
+  }
 
-    if (any(nchar(old_labels, type = "bytes") > 0)) {
-        ret <- cbind(labels = old_labels, ret)
-    }
-    return (ret)
+  if (any(nchar(old_labels, type = "bytes") > 0)) {
+    ret <- cbind(labels = old_labels, ret)
+  }
+  return (ret)
 }
