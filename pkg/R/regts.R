@@ -273,14 +273,26 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     }
 
     # remove columns with empty names
-    data <- data[which(!colnames(data) == "")]
+    data <- data[which(!(get_strings(colnames(data)) == ""))]
 
     # convert (by default) non numeric data (characters -> NA)
     if (numeric){
-        datamat <- data.matrix(data)
-    } else {
-        datamat <- as.matrix(data)
+      # do not use function data.matrix, this is too slow
+      f <- function(x) {
+        if (is.numeric(x)) {
+          return(x)
+        } else {
+          return(as.numeric(x))
+        }
+      }
+      row_names <- rownames(data)
+      col_names <- colnames(data)
+      data <- as.data.frame(lapply(data, FUN = f))
+      rownames(data) <- row_names
+      colnames(data) <- col_names
     }
+
+    datamat <- as.matrix(data)
 
     # convert the contents of the time column to a list of regperiods
     times <- lapply(as.character(times), FUN = fun, ...)
