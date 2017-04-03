@@ -1,6 +1,6 @@
-,,a,b
-,,,
-,2010Q2,1,10
-Macro analysis results,NOTE: We have no other data for  2010,,
-,2011Q1,5,50
-,2011Q2,6,60
+,a,b
+,Timeseries a,Timeseries b
+2010Q2,1,10
+NOTE: We have no other data for  2010,,
+2011Q1,5,50
+2011Q2,6,60
