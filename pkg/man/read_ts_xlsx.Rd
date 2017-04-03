@@ -31,26 +31,34 @@ of package \code{readxl}}
 a \code{regts} object
 }
 \description{
-This function attempts to read timeseries from a xls(x) file.
+This function attempts to read timeseries from an xls(x) file.
 The xls(x) file is actually read by function \code{\link[readxl]{read_excel}}
-of package \code{readxl}
-The timeseries can be stored both rowwise or columnwise in the file.
-The function tries to find valid period texts.
+of package \code{readxl}.
+The timeseries can be stored both rowwise or columnwise on the sheet.
+The function tries to find valid period texts on the sheet.
 Valid period texts should have the format recognized by function
 \code{\link{regperiod}}, for example \code{"2010Q2"},
 \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
 An integer value is considered as a period wih frequency year.
-In many cases, this function will read timeseries correctly
-and this will save you a lot of work. However, \emph{you should always
-carefully check the results of this function}. If the result is not
-what you want, then you have to clean and preprocess the data
-frame so that is has a more standard format (see Details).
+In many cases, this function will read timeseries correctly.
+However, \emph{you should always carefully check the results of this
+function}. If the result is not
+what you want, then you have read the data into a data frame
+(for example by using function \code{read_excel} of package \code{readxl}),
+then convert the data frame to a standard columnwise data frame
+and finally convert it to a \code{regts} by using funtion \code{as.regts}.
 }
 \details{
-If the first row contain any valid period, then \code{read_ts} assumes
-that the timeseries are stored rowwise. Otherwise it assumes that the
-timeseries are store columnwise.
+If argument \code{columnwise} has not been specified, then
+function \code{read_ts_xlsx} searches for any valid period text in the first
+row after the skipped rows on the sheet. If a valid period was found, then
+\code{read_ts} assumes that the timeseries are stored rowwise. Otherwise it
+assumes that the timeseries are store columnwise.
 
+\strong{columnwise timeseries}
+
+For columnwise timeseries, the first row that is not skipped (see
+argument \code{skiprow}) should contain the variable names.
 For \strong{columnwise} timeseries, the first row that is not skipped (see
 argument \code{skiprow}) should contain the variable names.
 The periods can be in any column on the sheet.
@@ -62,10 +70,15 @@ rows will be used to create timeseries labels.
 the last row before the columns where the data start is supposed to contain
 the variable names and the row before the variable name columns
 contain label information. If argument \code{use_colnames = TRUE},
-then the label option \code{"before"} is not allowed for columnwise timeseries,
-since in that the column names are the timeseries names.
+then the label option \code{"before"} is not allowed for columnwise
+timeseries, since in that the column names are the timeseries names.
 
-For \strong{rowwise} timeseries, the first row that is not skipped (see
+\strong{rowwise timeseries}
+
+\if{html}{\figure{xlsfileschema.jpg}{options: width=200}}
+\if{latex}{\figure{xlsfileschema.jpg}{options: width=5in}}
+
+For rowwise timeseries, the first row that is not skipped (see
 argument \code{skiprow}) should contain the periods.
 Columns for which the corresponding period is not a valid period
 are ignored. The timeseries names can be in the row names or in
