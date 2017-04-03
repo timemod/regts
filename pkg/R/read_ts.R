@@ -14,6 +14,12 @@ read_ts <- function(df, columnwise, frequency = NA,
   }
 
   if (!columnwise) {
+
+    # first convert the data frame to a character data frame,
+    # otherwise the result of function t is sometimes incorrect
+    df <- as.data.frame(lapply(df, FUN = as.character), stringsAsFactors = FALSE)
+
+    # transpose
     df <- as.data.frame(t(df), stringsAsFactors = FALSE)
   }
 
@@ -36,8 +42,12 @@ read_ts <- function(df, columnwise, frequency = NA,
     if (first_data_row > 2) {
       label_rows <- 1:(first_data_row - 2)
     } else {
-      labels_rows <- integer(0)
+      label_rows <- integer(0)
     }
+  }
+
+  if (length(label_rows) == 0) {
+    labels <- "no"
   }
 
   # remove column withouts names to the right of the time_columns
@@ -48,7 +58,7 @@ read_ts <- function(df, columnwise, frequency = NA,
   }
   df <- df[, keep_cols, drop = FALSE]
 
-  if (labels != "no" && length(label_rows) > 0) {
+  if (labels != "no") {
     lbl_data <- df[label_rows, , drop = FALSE]
     lbl_data <- lbl_data[ , -1, drop = FALSE]
     if (length(label_rows) == 1) {
@@ -67,7 +77,7 @@ read_ts <- function(df, columnwise, frequency = NA,
   df <- df[is_period, , drop = FALSE]
 
   ret <- as.regts(df, time_column = 1, frequency = frequency)
-  if (labels != "no" && any(labels != "")){
+  if (labels != "no" && any(labels != "")) {
     ts_labels(ret) <- labels
   }
 
