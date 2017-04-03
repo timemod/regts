@@ -14,6 +14,12 @@ read_ts <- function(df, columnwise, frequency = NA,
   }
 
   if (!columnwise) {
+
+    # first convert the data frame to a character data frame,
+    # otherwise the result of function t is sometimes incorrect
+    df <- as.data.frame(lapply(df, FUN = as.character), stringsAsFactors = FALSE)
+
+    # transpose
     df <- as.data.frame(t(df), stringsAsFactors = FALSE)
   }
 
