@@ -24,7 +24,7 @@ frequency indicator (for example "2011-1")}
 
 \item{labels}{label option. See details.}
 
-\item{...}{arguments passed to function \code{\link[read_excel]{read_excel}}
+\item{...}{arguments passed to function \code{\link[readxl]{read_excel}}
 of package \code{readxl}}
 }
 \value{
@@ -32,8 +32,8 @@ a \code{regts} object
 }
 \description{
 This function attempts to read timeseries from a xls(x) file.
-The xls(x) file is actually read by function \code{\link[read_excel]{read_excel}}
-of package \code{data.table}
+The xls(x) file is actually read by function \code{\link[readxl]{read_excel}}
+of package \code{readxl}
 The timeseries can be stored both rowwise or columnwise in the file.
 The function tries to find valid period texts.
 Valid period texts should have the format recognized by function

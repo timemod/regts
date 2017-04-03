@@ -24,8 +24,8 @@ frequency indicator (for example "2011-1")}
 
 \item{labels}{label option. See details.}
 
-\item{...}{arguments passed to function \code{\link[fread]{fread}} of package
-\code{read.table}}
+\item{...}{arguments passed to function \code{\link[data.table]{fread}} of
+package \code{read.table}}
 }
 \value{
 a \code{regts} object

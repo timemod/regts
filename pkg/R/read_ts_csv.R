@@ -64,8 +64,8 @@
 #' @param skiprow the number of rows to skip
 #' @param skipcol the number of columns to skip
 #' @param labels label option. See details.
-#' @param ... arguments passed to function \code{\link[fread]{fread}} of package
-#' \code{read.table}
+#' @param ... arguments passed to function \code{\link[data.table]{fread}} of
+#' package \code{read.table}
 #' @return a \code{regts} object
 #' @importFrom data.table fread
 #' @export
@@ -86,6 +86,6 @@ read_ts_csv <- function(filename, columnwise, frequency = NA,
     df <- df[ , -(1:skipcol), drop = FALSE]
   }
 
-  return(read_ts_simple(df, columnwise = columnwise, frequency = frequency,
-                        labels = labels))
+  return(read_ts(df, columnwise = columnwise, frequency = frequency,
+                  labels = labels))
 }

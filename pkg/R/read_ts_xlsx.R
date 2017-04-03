@@ -1,8 +1,8 @@
 #' Reads timeseries from a sheet of an  xls(x) file
 #'
 #' This function attempts to read timeseries from a xls(x) file.
-#' The xls(x) file is actually read by function \code{\link[read_excel]{read_excel}}
-#' of package \code{data.table}
+#' The xls(x) file is actually read by function \code{\link[readxl]{read_excel}}
+#' of package \code{readxl}
 #' The timeseries can be stored both rowwise or columnwise in the file.
 #' The function tries to find valid period texts.
 #' Valid period texts should have the format recognized by function
@@ -64,7 +64,7 @@
 #' @param skiprow the number of rows to skip
 #' @param skipcol the number of columns to skip
 #' @param labels label option. See details.
-#' @param ... arguments passed to function \code{\link[read_excel]{read_excel}}
+#' @param ... arguments passed to function \code{\link[readxl]{read_excel}}
 #' of package \code{readxl}
 #' @return a \code{regts} object
 #' @importFrom readxl read_excel
@@ -90,6 +90,6 @@ read_ts_xlsx <- function(filename, columnwise, frequency = NA,
     df <- df[ , -(1:skipcol), drop = FALSE]
   }
 
-  return(read_ts_simple(df, columnwise = columnwise, frequency = frequency,
-                        labels = labels))
+  return(read_ts(df, columnwise = columnwise, frequency = frequency,
+                 labels = labels))
 }
