@@ -62,7 +62,7 @@
 #'print(dif3$difnames)
 #'
 #' @seealso
-#'\code{\link{regts}}, \code{\link{tsdif}}
+#'\code{\link{regts}}
 #'
 tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
 
