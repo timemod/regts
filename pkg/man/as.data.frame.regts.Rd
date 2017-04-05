@@ -27,4 +27,3 @@ ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),
            labels = c("Timeseries a", "Timeseries b"))
 print(as.data.frame(ts))
 }
-

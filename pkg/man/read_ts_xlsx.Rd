@@ -99,4 +99,3 @@ argument \code{frequency} is you already know the frequency of the timeseries.
 Argument \code{frequency} is mandatory if a general period format
 such as  \code{"2011-1"} has been used.
 }
-

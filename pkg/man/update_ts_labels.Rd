@@ -26,4 +26,3 @@ print(ts_labels(ts))
 \seealso{
 \code{\link{ts_labels}}
 }
-

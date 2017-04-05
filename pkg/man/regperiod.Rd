@@ -25,4 +25,3 @@ regperiod("2010Q3")
 regperiod("2010-4", frequency = 3)
 regperiod(2015)
 }
-
