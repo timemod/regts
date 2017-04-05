@@ -23,4 +23,3 @@ get_subperiod(regperiod("2010Q3"))
 \seealso{
 \code{\link{get_year}}
 }
-

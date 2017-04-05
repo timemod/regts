@@ -34,4 +34,3 @@ cvgdif(x1, x2)
 \seealso{
 \code{\link{tsdif}}
 }
-

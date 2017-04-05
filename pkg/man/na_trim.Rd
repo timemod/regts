@@ -45,4 +45,3 @@ na_trim(rts, method = "first")
 # or remove rows if any NA occurs in that row
 na_trim(rts, is_na = "any")
 }
-

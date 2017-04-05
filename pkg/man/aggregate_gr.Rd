@@ -31,4 +31,3 @@ aggregate_gr(ts_q, method = "dif1s")
 ts_m <- regts(matrix(rnorm(20), ncol = 2), start = "2017.M1", names = c("a", "b"))
 aggregate_gr(ts_m, method = "rel", nfrequency = 4)
 }
-

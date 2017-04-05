@@ -28,4 +28,3 @@ range_intersect <- regrange_intersect(range1, range2)
 \seealso{
 \code{\link{union}}
 }
-
