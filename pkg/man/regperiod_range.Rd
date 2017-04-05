@@ -53,3 +53,4 @@ regperiod_range("2010-2", "2016-2", frequency = 2)
 \code{\link{length_range}}, \code{\link{start_period}},
 \code{\link{end_period}}
 }
+

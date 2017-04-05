@@ -15,3 +15,4 @@ a \code{regperiod_range}
 \description{
 Returns the \link{regperiod_range} of a timeseries.
 }
+

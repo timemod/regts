@@ -20,3 +20,4 @@ Returns the number of periods in a \code{\link{regperiod_range}} object.
 range <- regperiod_range("2010Q2", "2011Q3")
 length_range(range)  # the result will be 6
 }
+

@@ -22,3 +22,4 @@ is.regts(a)
 \seealso{
 \code{\link{regts}} and  \code{\link{as.regts}}
 }
+

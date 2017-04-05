@@ -4,7 +4,7 @@
 \alias{cbind.regts}
 \title{Bind two or more timeseries}
 \usage{
-\method{cbind}{regts}(..., union = TRUE, suffixes)
+cbind.regts(..., union = TRUE, suffixes)
 }
 \arguments{
 \item{...}{two or more univariate or multivariate time series,
@@ -36,3 +36,4 @@ cbind(a, b, union = FALSE)
 \seealso{
 \code{\link{as.list.regts}}
 }
+

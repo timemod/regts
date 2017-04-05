@@ -76,5 +76,6 @@ print(dif3$difnames)
 
 }
 \seealso{
-\code{\link{regts}}, \code{\link{tsdif}}
+\code{\link{regts}}
 }
+

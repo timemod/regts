@@ -46,7 +46,6 @@ regperiod_range object
 \item \code{regperiod}: Convert a single \code{\link{regperiod}} to a
 \link{regperiod_range}.
 }}
-
 \examples{
 as.regperiod_range("2010Q2/2016Q3")
 as.regperiod_range("2010Q2/")
@@ -57,3 +56,4 @@ as.regperiod_range("2016Q1")
 p <- regperiod("2010Q2")
 as.regperiod_range(p)
 }
+

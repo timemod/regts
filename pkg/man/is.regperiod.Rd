@@ -20,3 +20,4 @@ p <- regperiod("2016Q1")
 is.regperiod(p)
 is.regperiod("2016Q1")
 }
+

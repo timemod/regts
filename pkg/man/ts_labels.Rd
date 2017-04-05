@@ -28,7 +28,6 @@ The labels are stored in a named list: the names are the timeseries names
 
 \item \code{ts_labels<-}: Sets the timeseries labels
 }}
-
 \examples{
 ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"))
 ts_labels(ts) <- c("Timeseries a", "Timeseries b")
@@ -40,3 +39,4 @@ print(as.data.frame(ts_labels(ts)))
 \seealso{
 \code{\link{regts}}, \code{\link{update_ts_labels}}
 }
+

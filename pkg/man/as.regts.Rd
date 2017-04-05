@@ -2,9 +2,9 @@
 % Please edit documentation in R/regts.R
 \name{as.regts}
 \alias{as.regts}
-\alias{as.regts.ts}
 \alias{as.regts.data.frame}
 \alias{as.regts.default}
+\alias{as.regts.ts}
 \title{Coerce an object to a \code{\link{regts}} timeseries object}
 \usage{
 as.regts(x, ...)
@@ -50,7 +50,6 @@ Coerce an object to a \code{\link{regts}} timeseries object
 \code{\link{regts}}. This method first employs \code{\link[stats]{as.ts}}
 and then \code{\link{as.regts.ts}}
 }}
-
 \examples{
 # convert a ts to regts
 x <- ts(1:3, start = c(2015,3), frequency = 4)
@@ -80,3 +79,4 @@ as.regts(df)
 \code{\link{as.data.frame.regts}},
 \code{\link{as.list.regts}}, \code{\link{start_period}}, \code{\link{end_period}}
 }
+
