@@ -26,11 +26,11 @@
 #'
 #'\strong{columnwise timeseries}
 #'
+#' \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=200}}
+#' \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
+#'
 #' For columnwise timeseries, the first row that is not skipped (see
 #' argument \code{skiprow}) should contain the variable names.
-#' For columnwise timeseries, the first row that is not skipped (see
-#' argument \code{skiprow}) should contain the variable names.
-
 #' The periods can be in any column.
 #' All columns to the left of the time column are ignored.
 #' There may be one or more rows between the column names and the rows
@@ -38,29 +38,30 @@
 #' If argument \code{labels = "after"}  then the texts in these
 #' rows will be used to create timeseries labels.
 #  If \code{labels = "before"},
-#' the last row before the columns where the data start is supposed to contain
-#' the variable names and the row before the variable name columns
-#' contain label information. If argument \code{use_colnames = TRUE},
+#' the last row before the data is supposed to contain
+#' the variable names. Now the row before the variable name columns
+#' should contain label information. If argument \code{use_colnames = TRUE},
 #' then the label option \code{"before"} is not allowed for columnwise
-#' timeseries, since in that the column names are the timeseries names.
+#' timeseries, since in that case the column names are the timeseries names.
 #'
 #' \strong{rowwise timeseries}
 #'
-#' \if{html}{\figure{xlsfileschema.jpg}{options: width=200}}
-#' \if{latex}{\figure{xlsfileschema.jpg}{options: width=5in}}
+#' \if{html}{\figure{xlsschemarowwise.jpg}{options: width=200}}
+#' \if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
 #'
 #' For rowwise timeseries, the first row that is not skipped (see
 #' argument \code{skiprow}) should contain the periods.
 #' Columns for which the corresponding period is not a valid period
-#' are ignored. The timeseries names can be in the row names or in
-#' the first column.
+#' are ignored. The timeseries names should be in the first column.
+#' Otherwise use argument \code{skipcol} to specify the number of
+#' columns to skip.
 #' There may be one or more columns between the column with variable names
 #' and the columns where the actual timeseries are stored.
 #' If argument \code{labels = "after"}  then the texts in these
 #' columns will be used to create timeseries labels. If \code{labels = "before"},
-#' the last column before the columns where the data start is supposed to contain
-#' the variable names and the columns before the variable name columns
-#' contain label information.
+#' the last column before the data is supposed to contain
+#' the variable names. The columns before the variable name column
+#' now should contain label information.
 #'
 #' Sometimes it helps to supply information about the structure of
 #' the data in the file. Specify option  \code{columnwise} is you know
