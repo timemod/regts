@@ -5,8 +5,8 @@ context("read_ts_csv")
 
 # construct correct result
 period <- regperiod_range("2010Q2/2011Q2")
-a <- regts(c(1L, NA_integer_, NA_integer_, 5L, 6L), period = period)
-b <- 10L * a
+a <- regts(c(1, NA, NA, 5, 6), period = period)
+b <- 10 * a
 correct_result <- cbind(a, b)
 
 correct_result_labels <- correct_result

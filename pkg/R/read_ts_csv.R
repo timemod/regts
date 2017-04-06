@@ -103,16 +103,28 @@ read_ts_csv <- function(filename, columnwise, frequency = NA,
     skip <- 0
   }
 
-  if (missing(columnwise)) {
+  if (missing(columnwise) || columnwise) {
     first_line <- fread(filename, nrows = 1, skip = skip, header = FALSE,
                         data.table = FALSE, ...)
-    columnwise <- !any(is_period_text(get_strings(first_line), frequency))
+    is_period <- is_period_text(get_strings(first_line), frequency)
+    first_prd_col <- Position(function(x) {x}, is_period)
+    if (missing(columnwise)) {
+      columnwise <- is.na(first_prd_col)
+    }
   }
 
   # read the data data frame. For rowwise timeseries, the time index is put in
   # the header
-  df <- fread(filename, skip = skip, header = !columnwise, data.table = FALSE,
+  if (columnwise) {
+    df <- fread(filename, skip = skip, header = FALSE, data.table = FALSE,
               ...)
+  } else {
+    nper <- length(is_period) - first_prd_col + 1
+    colClasses <- c(rep("character", first_prd_col - 1),
+                    rep("numeric", nper))
+    df <- fread(filename, skip = skip, header = TRUE, data.table = FALSE,
+                colClasses = colClasses, ...)
+  }
 
   if (!missing(skipcol) && skipcol > 0) {
     df <- df[ , -(1:skipcol), drop = FALSE]

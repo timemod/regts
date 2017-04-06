@@ -1,5 +1,6 @@
 # internal function to read timeseries rowwise from a data frame with
-# the time index in the column header
+# the time index in the column header. This function assumes that
+# all columns in df are numeric.
 read_ts_rowwise <- function(df, frequency,
                             labels = c("no", "after", "before")) {
 
@@ -34,5 +35,7 @@ read_ts_rowwise <- function(df, frequency,
   # transpose
   df <- transpose_df(df, colname_column = name_col, label_column = label_cols)
 
-  return(as.regts(df, frequency = frequency))
+  # here use numeric = FALSE, because here we already know that
+  # the timeseries is numeric
+  return(as.regts(df, frequency = frequency, numeric = FALSE))
 }
