@@ -11,9 +11,12 @@
 #' the column names of the transposed data frame. By default the
 #' row names of the original data frame are used as column names of the new data
 #'  frame.
-#' @param label_column the name or the index of the column that contains
-#' the labels for the transposed data frame. By default no labels
-#' are created
+#' @param label_column a numeric or character vector with the
+#' indices or the names of the columns that contains
+#' the row labels. If this is a vector of
+#' length larger than 1, then the texts in the columns are combined
+#' to create single labels for the columns of the transposed data frame.
+#' By default labels are ignored.
 #' @return the transposed data frame
 #' @examples
 #' df <- data.frame(variables = c("a", "b"),
@@ -37,11 +40,14 @@ transpose_df  <- function(x, colname_column, label_column) {
     columns_to_remove <- integer()
   }
 
-  if (!missing(label_column)) {
+  if (!missing(label_column) && length(label_column) > 0) {
     if (is.character(label_column)) {
       label_column <- which(colnames(x) %in% label_column)
     }
-    labels <- as.character(x[[label_column]])
+    labels <- x[, label_column, drop = FALSE]
+    l <- lapply(labels, get_strings)
+    labels <- do.call(paste, l)
+    labels <- trimws(labels)
     columns_to_remove <- c(columns_to_remove, label_column)
     has_labels <- TRUE
   } else {
