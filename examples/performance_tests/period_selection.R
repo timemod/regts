@@ -7,7 +7,7 @@ regts1 <- regts(matrix(as.numeric(1:30), ncol = 1), start = "2010Q2")
 ts1 <- regts:::unregts(regts1)
 zoo1 <- as.zooreg(ts1)
 
-p1 <- as.regperiod_range("2010Q4/2011Q1")
+p1 <- as.period_range("2010Q4/2011Q1")
 
 # start and end period for zoo
 startp <- as.yearqtr(start_period(p1))
