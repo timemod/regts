@@ -2,21 +2,21 @@
 % Please edit documentation in R/regperiod.R
 \name{get_year}
 \alias{get_year}
-\title{Returns the year of a \code{\link{regperiod}}}
+\title{Returns the year of a \code{\link{period}}}
 \usage{
 get_year(x)
 }
 \arguments{
-\item{x}{a \code{regperiod}}
+\item{x}{a \code{period}}
 }
 \value{
 the year
 }
 \description{
-Returns the year of a \code{\link{regperiod}}
+Returns the year of a \code{\link{period}}
 }
 \examples{
-get_year(regperiod("2010Q3"))
+get_year(period("2010Q3"))
 }
 \seealso{
 \code{\link{get_subperiod}}

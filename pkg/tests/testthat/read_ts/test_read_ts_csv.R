@@ -4,8 +4,8 @@ library(testthat)
 context("read_ts_csv")
 
 # construct correct result
-period <- regperiod_range("2010Q2/2011Q2")
-a <- regts(c(1, NA, NA, 5, 6), period = period)
+prd <- period_range("2010Q2/2011Q2")
+a <- regts(c(1, NA, NA, 5, 6), prd_range = prd)
 b <- 10 * a
 correct_result <- cbind(a, b)
 

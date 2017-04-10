@@ -4,17 +4,17 @@
 using Rcpp::NumericMatrix;
 using Rcpp::NumericVector;
 
-NumericVector PeriodRange::get_regperiod_range() {
+NumericVector PeriodRange::get_period_range() {
     NumericVector result(3);
     result[0] = first;
     result[1] = last;
     result[2] = freq;
-    result.attr("class") = "regperiod_range";
+    result.attr("class") = "period_range";
     return (result);
 }
 
 // Returns the period range based on the tsp attribute of a timeseries
-PeriodRange get_period_range(const NumericVector &tsp) {
+PeriodRange get_prd_range(const NumericVector &tsp) {
     PeriodRange per;
     per.freq  = tsp[2];
     int year1 = floor(tsp[0]);
@@ -27,23 +27,23 @@ PeriodRange get_period_range(const NumericVector &tsp) {
 }
 
 // Returns the PeriodRange of a numerical timeseries.
-PeriodRange get_period_range(const NumericMatrix &ts) {
+PeriodRange get_prd_range(const NumericMatrix &ts) {
     NumericVector tsp = ts.attr("tsp");
-    return get_period_range(tsp);
+    return get_prd_range(tsp);
 }
 
-//' Returns the \link{regperiod_range} of a timeseries.
+//' Returns the \link{period_range} of a timeseries.
 //'
 //' @param x a timeseries (\link{ts} or \link{regts})
-//' @return a \code{regperiod_range}
+//' @return a \code{period_range}
 //' @export
 // [[Rcpp::export]]
-NumericVector get_regperiod_range(const SEXP &x) {
+NumericVector get_period_range(const SEXP &x) {
     if (!Rf_inherits(x, "ts")) {
         Rf_error("Argument is not a timeseries");
     }
     SEXP attr = Rf_getAttrib(x, Rf_install("tsp"));
     NumericVector tsp(attr);
-    PeriodRange range = get_period_range(tsp);
-    return range.get_regperiod_range();
+    PeriodRange range = get_prd_range(tsp);
+    return range.get_period_range();
 }

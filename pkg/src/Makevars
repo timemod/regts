@@ -23,7 +23,7 @@ period_parser.o : period_parser.cpp period_scanner.h parse_period.h
 period_scanner.o : period_scanner.cpp period_parser.cpp period_scanner.h \
                    months.h
 months.o : months.h
-parse_regperiod.o : parse_period.h
+parse_period.o : parse_period.h
 period_range.o : period_range.h
 aggr_gr.o : period_range.h
 window_regts.o : period_range.h

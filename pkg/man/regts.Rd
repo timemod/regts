@@ -4,7 +4,7 @@
 \alias{regts}
 \title{Create a \code{regts} timeseries object}
 \usage{
-regts(data, start, end, period, frequency = NA, names = colnames(data),
+regts(data, start, end, prd_range, frequency = NA, names = colnames(data),
   labels = NULL)
 }
 \arguments{
@@ -13,18 +13,18 @@ will be coerced to a numeric matrix via \code{\link{data.matrix}}.
 (See also the description of the
 function \code{\link[stats]{ts}} of the \code{\link{stats}} package).}
 
-\item{start}{the starting period as a  \code{\link{regperiod}} object or a
-character string that can be converted to a \code{regperiod} object.
+\item{start}{the starting period as a  \code{\link{period}} object or a
+character string that can be converted to a \code{period} object.
 If not specified, then the start period is calculated
 from argument \code{end} and the dimension of \code{data}}
 
-\item{end}{the end period as a  \link{regperiod} object or a character string
-that can be converted to a \code{regperiod} object. If not specified, then
+\item{end}{the end period as a  \link{period} object or a character string
+that can be converted to a \code{period} object. If not specified, then
 the end period is calculated from argument \code{start} and
 the dimension of \code{data}}
 
-\item{period}{the period range as a \code{\link{regperiod_range}} object or a
-character string that can be converted to a \code{regperiod_range} object.
+\item{prd_range}{the period range as a \code{\link{period_range}} object or a
+character string that can be converted to a \code{period_range} object.
 This argument replaces arguments \code{start} and \code{end}.}
 
 \item{frequency}{the frequency of the timeseries. This argument should only be
@@ -57,7 +57,7 @@ ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"),
              labels = paste("Timeseries", c("a", "b", "c")))
 
 # multivariate timeseries with period
-range <- regperiod_range("2016Q1", "2017Q4")
+range <- period_range("2016Q1", "2017Q4")
 ts4 <- regts(matrix(1:16, ncol = 2), period = range, names = c("a", "b"))
 
 # create a half-yearly timeseries; because argument end is specified the
@@ -79,7 +79,7 @@ Function \code{\link{cbind}} can be used to bind two or more
 timeseries objects and create a multivariate \code{regts}.
 
 Information about the time period of the timeseries can be obtained
-with the functions \code{\link{get_regperiod_range}},
+with the functions \code{\link{get_period_range}},
 \code{\link{start_period}} and \code{\link{end_period}}.
 
 See also the description of the functions for handling labels

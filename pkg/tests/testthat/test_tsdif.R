@@ -39,7 +39,7 @@ test_that("differences smaller than tol", {
     expect_equal(res, res_tol)
 
     # now use the sample without NA values, there should be no differences
-    sample <- regperiod_range("2008Q4", "2009Q2")
+    sample <- period_range("2008Q4", "2009Q2")
     res2 <- tsdif(ts1[sample, ], ts2[sample,  ],  tol = 0.1)
     res2_tol <- res_tol
     res2_tol$difnames <- character(0)
@@ -66,7 +66,7 @@ test_that("no common columns", {
 
 
 test_that("single ts as result", {
-    sample <- regperiod_range("2008Q4", "2009Q2")
+    sample <- period_range("2008Q4", "2009Q2")
     x2 <- ts2[sample, ]
     x2[sample, 'b'] <- ts1[sample, 'b'] + 0.11
     res <- tsdif(ts1[sample, ], x2,  tol = 0.1)

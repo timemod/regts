@@ -1,13 +1,13 @@
 #' Returns the start or end period of a timeseries object or a
-#' \code{\link{regperiod_range}}
+#' \code{\link{period_range}}
 #'
 #' This function returns the start or end period of a
 #' timeseries object (a \code{\link{regts}} or \code{\link[stats]{ts}})
-#' or a \code{regperiod_range}.
-#' @param x  a \code{regts} or \code{regperiod_range} object
-#' @return A \code{regperiod} object representing the first or last period of
+#' or a \code{period_range}.
+#' @param x  a \code{regts} or \code{period_range} object
+#' @return A \code{period} object representing the first or last period of
 #' the range. The return value can be \code{NULL} if argument \code{x} is a
-#' \code{regperiod_range} with no lower or upper boundary.
+#' \code{period_range} with no lower or upper boundary.
 #'
 #' @name start_period/end_period
 NULL
@@ -15,7 +15,7 @@ NULL
 #' @rdname start_period-slash-end_period
 #' @examples
 #' # start and end period of a range
-#' range <- regperiod_range("2010Q4", "2011Q3")
+#' range <- period_range("2010Q4", "2011Q3")
 #' start_period(range)
 #' end_period(range)
 #'
@@ -35,9 +35,9 @@ end_period <- function(x) UseMethod("end_period")
 
 #' @rdname start_period-slash-end_period
 #' @export
-start_period.regperiod_range <- function(x) {
+start_period.period_range <- function(x) {
     if (!is.na(x[1])) {
-        return (create_regperiod(x[1], x[3]))
+        return (create_period(x[1], x[3]))
     } else {
         return (NULL)
     }
@@ -46,8 +46,8 @@ start_period.regperiod_range <- function(x) {
 #' @rdname start_period-slash-end_period
 #' @export
 start_period.ts <- function(x) {
-    r <- get_regperiod_range(x)
-    return (create_regperiod(r[1], r[3]))
+    r <- get_period_range(x)
+    return (create_period(r[1], r[3]))
 }
 
 #' @export
@@ -57,9 +57,9 @@ start_period.default <- function(x) {
 
 #' @rdname start_period-slash-end_period
 #' @export
-end_period.regperiod_range <- function(x) {
+end_period.period_range <- function(x) {
     if (!is.na(x[2])) {
-        return (create_regperiod(x[2], x[3]))
+        return (create_period(x[2], x[3]))
     } else {
         return (NULL)
     }
@@ -68,8 +68,8 @@ end_period.regperiod_range <- function(x) {
 #' @rdname start_period-slash-end_period
 #' @export
 end_period.ts <- function(x) {
-    r <- get_regperiod_range(x)
-    return (create_regperiod(r[2], r[3]))
+    r <- get_period_range(x)
+    return (create_period(r[2], r[3]))
 }
 
 #' @export
