@@ -16,7 +16,7 @@
 #' that can be converted to a \code{period} object. If not specified, then
 #' the end period is calculated from argument \code{start} and
 #' the dimension of \code{data}
-#' @param prd_range the period range as a \code{\link{period_range}} object or a
+#' @param period the period range as a \code{\link{period_range}} object or a
 #' character string that can be converted to a \code{period_range} object.
 #' This argument replaces arguments \code{start} and \code{end}.
 #' @param frequency the frequency of the timeseries. This argument should only be
@@ -70,23 +70,23 @@
 #' @importFrom stats ts
 #' @importFrom stats frequency
 #' @export
-regts <- function(data, start, end, prd_range, frequency = NA,
+regts <- function(data, start, end, period, frequency = NA,
                   names = colnames(data), labels = NULL) {
 
   # Check the periodrange
-  if (!missing(prd_range) && !missing(start)) {
-    stop("Arguments 'start' and 'prd_range' exclude each other!")
+  if (!missing(period) && !missing(start)) {
+    stop("Arguments 'start' and 'period' exclude each other!")
   }
-  if (missing(start) && missing(end) && missing(prd_range)) {
-    start = period("1")
+  if (missing(start) && missing(end) && missing(period)) {
+    start = regts:::period("1")
   }
 
-  if (!missing(prd_range)) {
-    if (!is.period_range(prd_range)) {
-      prd_range <- as.period_range(prd_range)
+  if (!missing(period)) {
+    if (!is.period_range(period)) {
+      period <- as.period_range(period)
     }
-    start <- start_period(prd_range)
-    end <- end_period(prd_range)
+    start <- start_period(period)
+    end <- end_period(period)
     # start and end cannot both be NULL
     if(!is.null(start)){
       freq <- frequency(start)

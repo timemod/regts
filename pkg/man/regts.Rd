@@ -4,7 +4,7 @@
 \alias{regts}
 \title{Create a \code{regts} timeseries object}
 \usage{
-regts(data, start, end, prd_range, frequency = NA, names = colnames(data),
+regts(data, start, end, period, frequency = NA, names = colnames(data),
   labels = NULL)
 }
 \arguments{
@@ -23,7 +23,7 @@ that can be converted to a \code{period} object. If not specified, then
 the end period is calculated from argument \code{start} and
 the dimension of \code{data}}
 
-\item{prd_range}{the period range as a \code{\link{period_range}} object or a
+\item{period}{the period range as a \code{\link{period_range}} object or a
 character string that can be converted to a \code{period_range} object.
 This argument replaces arguments \code{start} and \code{end}.}
 

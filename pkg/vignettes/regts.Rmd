@@ -120,7 +120,7 @@ ts_data <- regts(1:10, start = "2016-1", end = "2017-1", frequency = 2)
 
 Instead of arguments `start` and `end` you can also specify argument `period`:
 ```{r}
-ts_data <- regts(1:10, prd_range = "2016Q1/2016Q4")
+ts_data <- regts(1:10, period = "2016Q1/2016Q4")
 ```
 Input for this period may be a character string as shown above, but also a 
 variable of type  `period_range`. This type will be explained in section \ref{sec:period}.
@@ -400,7 +400,7 @@ A `period_range` variable can be used in the `regts` function, specifying the
  
 ```{r}
 range1 <- period_range("2016Q1", "2016Q3")
-rts <- regts(matrix(1:18, ncol = 3), prd_range = range1, names = c("a", "b", "c"))
+rts <- regts(matrix(1:18, ncol = 3), period = range1, names = c("a", "b", "c"))
 rts
 ```
 The length of a `period_range` may be obtained by using the `nperiod` function:
@@ -415,7 +415,7 @@ last period in a `period_range`:
 start_period(range1)
 end_period(range1)
 range2 <- period_range(start_period(range1)+1, end_period(range1)-1)
-ts <- regts(data, prd_range = range2)
+ts <- regts(data, period = range2)
 ```
 
 ## Shifting period(s)
