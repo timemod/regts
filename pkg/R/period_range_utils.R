@@ -12,7 +12,7 @@
 #' range2 <- period_range("2017Q1", "2018Q2")
 #' range_intersect <- range_intersect(range1, range2)
 #' @seealso
-#' \code{\link{regrange_union}}
+#' \code{\link{range_union}}
 #' @export
 range_intersect <- function(range1, range2) {
 
@@ -42,7 +42,7 @@ range_intersect <- function(range1, range2) {
 #' range2 <- period_range("2017Q1", "2018Q2")
 #' range_union <- range_union(range1, range2)
 #' @seealso
-#' \code{\link{regrange_intersect}}
+#' \code{\link{range_intersect}}
 #' @export
 range_union <- function(range1, range2) {
 
