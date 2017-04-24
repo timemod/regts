@@ -12,7 +12,7 @@ as.regts(x, ...)
 \method{as.regts}{ts}(x, ...)
 
 \method{as.regts}{data.frame}(x, time_column = 0, numeric = TRUE,
-  fun = regperiod, ...)
+  fun = period, ...)
 
 \method{as.regts}{default}(x, ...)
 }
@@ -30,7 +30,7 @@ By default they are converted to numeric. This can be changed by setting
 \code{numeric = FALSE}.}
 
 \item{fun}{a function for converting values in the time column to
-\code{\link{regperiod}} objects}
+\code{\link{period}} objects}
 }
 \value{
 a \code{regts} object

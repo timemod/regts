@@ -17,18 +17,18 @@ convert_range_selector_alt <- function(range, ts_range) {
     # An error will occur for example if timeseries x has period
     # 2010Q1/2011Q2 while range is 2012Q2/.
     if (range[1] > range[2]) {
-        p_start <- start_period.regperiod_range(range)
-        p_end   <- end_period.regperiod_range(range)
+        p_start <- start_period.period_range(range)
+        p_end   <- end_period.period_range(range)
         stop(paste("Start period", p_start, "before end period", p_end))
     }
     return (range)
 }
 
-# Converts the frequency of a regperiod_range object, from lower to higher
+# Converts the frequency of a period_range object, from lower to higher
 # frequency.
 modify_frequency_alt <- function(x, new_freq) {
     if (new_freq %% x[3] != 0) {
-        stop("Frequency of regperiod_range is no divisor of the required frequency")
+        stop("Frequency of period_range is no divisor of the required frequency")
     }
     factor <- new_freq %/% x[3]
     x[1] <- x[1] * factor
@@ -37,8 +37,8 @@ modify_frequency_alt <- function(x, new_freq) {
     return (x)
 }
 
-ts_range <- regperiod_range("2010Q2", "2014Q2")
-p1 <- as.regperiod_range("2011/2012")
+ts_range <- period_range("2010Q2", "2014Q2")
+p1 <- as.period_range("2011/2012")
 commands <- c("regts:::convert_range_selector(p1, ts_range)",
               "convert_range_selector_alt(p1, ts_range)"
 )

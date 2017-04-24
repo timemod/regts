@@ -4,41 +4,41 @@
 \alias{start_period/end_period}
 \alias{start_period}
 \alias{end_period}
-\alias{start_period.regperiod_range}
+\alias{start_period.period_range}
 \alias{start_period.ts}
-\alias{end_period.regperiod_range}
+\alias{end_period.period_range}
 \alias{end_period.ts}
 \title{Returns the start or end period of a timeseries object or a
-\code{\link{regperiod_range}}}
+\code{\link{period_range}}}
 \usage{
 start_period(x)
 
 end_period(x)
 
-\method{start_period}{regperiod_range}(x)
+\method{start_period}{period_range}(x)
 
 \method{start_period}{ts}(x)
 
-\method{end_period}{regperiod_range}(x)
+\method{end_period}{period_range}(x)
 
 \method{end_period}{ts}(x)
 }
 \arguments{
-\item{x}{a \code{regts} or \code{regperiod_range} object}
+\item{x}{a \code{regts} or \code{period_range} object}
 }
 \value{
-A \code{regperiod} object representing the first or last period of
+A \code{period} object representing the first or last period of
 the range. The return value can be \code{NULL} if argument \code{x} is a
-\code{regperiod_range} with no lower or upper boundary.
+\code{period_range} with no lower or upper boundary.
 }
 \description{
 This function returns the start or end period of a
 timeseries object (a \code{\link{regts}} or \code{\link[stats]{ts}})
-or a \code{regperiod_range}.
+or a \code{period_range}.
 }
 \examples{
 # start and end period of a range
-range <- regperiod_range("2010Q4", "2011Q3")
+range <- period_range("2010Q4", "2011Q3")
 start_period(range)
 end_period(range)
 

@@ -64,8 +64,8 @@ na_trim <- function (x, method = c("both", "first","last"),
     } else {
         sel <- 1 : max(elem)
     }
-    per <- start_period(get_regperiod_range(x)) + sel[1] - 1
-    period <- regperiod_range(per, per + length(sel) - 1)
+    per <- start_period(get_period_range(x)) + sel[1] - 1
+    period <- period_range(per, per + length(sel) - 1)
 
     return(x[period,])
 

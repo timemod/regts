@@ -14,7 +14,7 @@ void agg_gr_rel(NumericMatrix::Column column_old,
 List agg_gr(NumericMatrix ts_old, const int freq_new,
             const std::string &method) {
 
-    PeriodRange per_old = get_period_range(ts_old);
+    PeriodRange per_old = get_prd_range(ts_old);
     PeriodRange per_new;
     per_new.freq = freq_new;
     int rep = ((int) per_old.freq) / ((int) freq_new);
@@ -54,7 +54,7 @@ List agg_gr(NumericMatrix ts_old, const int freq_new,
 
     List result(2);
     result[0] = data;
-    result[1] = per_new.get_regperiod_range();
+    result[1] = per_new.get_period_range();
     return (result);
 }
 

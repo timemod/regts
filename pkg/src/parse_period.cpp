@@ -12,21 +12,21 @@ static void parse_single_period(const std::string &period_text,
                                 double &subperiods, double &freq);
 
 // [[Rcpp::export]]
-NumericVector parse_regperiod(const std::string &period_text, double frequency) {
+NumericVector parse_rperiod(const std::string &period_text, double frequency) {
 
     double per, f;
     parse_single_period(period_text, frequency, per, f);
 
     NumericVector result(1);
     result[0] = per;
-    result.attr("class") = "regperiod";
+    result.attr("class") = "period";
     result.attr("frequency") = f;
 	return result;
 }
 
 
 // [[Rcpp::export]]
-NumericVector parse_regperiod_range(const std::string &period_text,
+NumericVector parse_rperiod_range(const std::string &period_text,
                                     double frequency) {
 
     double p1, p2, f;
@@ -73,7 +73,7 @@ NumericVector parse_regperiod_range(const std::string &period_text,
     result[0] = p1;
     result[1] = p2;
     result[2] = f;
-    result.attr("class") = "regperiod_range";
+    result.attr("class") = "period_range";
 	return result;
 }
 

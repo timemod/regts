@@ -1,48 +1,48 @@
-#' Create a \code{regperiod} object based on a string or an integer.
+#' Create a \code{period} object based on a string or an integer.
 #'
 #' Possible string formats are for example \code{"2010Q2"},
 #' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
 #'
 #' @param x a single string or integer
-#' @param frequency frequency of the regperiod object.
-#' Argument \code{frequency} is mandatory if a general regperiod format
+#' @param frequency frequency of the period object.
+#' Argument \code{frequency} is mandatory if a general period format
 #' such as "2011-1" has been specified
-#' @return a \code{regperiod} object
+#' @return a \code{period} object
 #' @examples
-#' regperiod("2010Q3")
-#' regperiod("2010-4", frequency = 3)
-#' regperiod(2015)
+#' period("2010Q3")
+#' period("2010-4", frequency = 3)
+#' period(2015)
 #' @export
 #' @useDynLib regts
 #' @importFrom Rcpp sourceCpp
-regperiod <- function(x, frequency = NA) {
+period <- function(x, frequency = NA) {
   if (is.numeric(x)) {
     x <- as.character(x)
   }
-  return (parse_regperiod(x, frequency))
+  return (parse_rperiod(x, frequency))
 }
 
-#' Test if an object is a regperiod.
+#' Test if an object is a period.
 #'
 #' @param x any R object
-#' @return \code{TRUE} if the object is a \code{\link{regperiod}}
+#' @return \code{TRUE} if the object is a \code{\link{period}}
 #' @examples
-#' p <- regperiod("2016Q1")
-#' is.regperiod(p)
-#' is.regperiod("2016Q1")
+#' p <- period("2016Q1")
+#' is.period(p)
+#' is.period("2016Q1")
 #' @export
-is.regperiod <- function(x) {
-  return (inherits(x, "regperiod"))
+is.period <- function(x) {
+  return (inherits(x, "period"))
 }
 
 # binary operators (arithmetic and logical)
 #' @export
-Ops.regperiod <- function(e1, e2) {
+Ops.period <- function(e1, e2) {
   if (.Generic %in% c("==", "!=", "<", ">", "<=", ">=")) {
     # logical operator
-    if (is.regperiod(e1) && is.regperiod(e2) &&
+    if (is.period(e1) && is.period(e2) &&
         (attr(e1, 'frequency') != attr(e2, 'frequency'))) {
-      # if e1 and e2 are both regperiods with a different frequency,
+      # if e1 and e2 are both periods with a different frequency,
       # the operators == and != are meaningful, but comparison
       # operators such as > do not make sense.
       if (.Generic %in% c("==", "!=")) {
@@ -55,17 +55,17 @@ Ops.regperiod <- function(e1, e2) {
   } else if (.Generic %in% c("+", "-")) {
     # arithmetic operator + or -
     retval <- NextMethod(.Generic)
-    if (is.regperiod(e1) && is.regperiod(e2)) {
+    if (is.period(e1) && is.period(e2)) {
       if (attr(e1, 'frequency') != attr(e2, 'frequency')) {
-        stop(paste("Arithmetic operations on regperiods with different",
+        stop(paste("Arithmetic operations on periods with different",
                    "frequencies are not allowed"))
       }
       if (.Generic == "-") {
-        # if the second operand is also a regperiod, then the result
+        # if the second operand is also a period, then the result
         # is an ordinary number.
         retval <- as.numeric(retval)
       } else {
-        stop("Arithmetic operation + on two regperiods is not allowed")
+        stop("Arithmetic operation + on two periods is not allowed")
       }
 
     }
@@ -77,7 +77,7 @@ Ops.regperiod <- function(e1, e2) {
 }
 
 #' @export
-as.character.regperiod <- function(x, ...) {
+as.character.period <- function(x, ...) {
   freq <- frequency(x)
   if (freq == 1) {
     return (as.character(as.numeric(x)))
@@ -93,16 +93,16 @@ as.character.regperiod <- function(x, ...) {
   }
 }
 
-#' Returns the frequency of a \link{regperiod} object
+#' Returns the frequency of a \link{period} object
 #'
-#' @param x a \code{regperiod}
+#' @param x a \code{period}
 #' @param ... additional arguments for future methods
-#' @return the frequency of the \code{regperiod}
+#' @return the frequency of the \code{period}
 #' @examples
-#' p <- regperiod("2016Q1")
+#' p <- period("2016Q1")
 #' freq <- frequency(p)
 #' @export
-frequency.regperiod <- function(x, ...) {
+frequency.period <- function(x, ...) {
   return (attr(x, "frequency"))
 }
 
@@ -116,86 +116,86 @@ get_subperiod__ <- function(x) {
   return (as.numeric(x) %% frequency(x) + 1)
 }
 
-#' Returns the year of a \code{\link{regperiod}}
-#' @param x a \code{regperiod}
+#' Returns the year of a \code{\link{period}}
+#' @param x a \code{period}
 #' @return the year
 #' @examples
-#' get_year(regperiod("2010Q3"))
+#' get_year(period("2010Q3"))
 #' @seealso \code{\link{get_subperiod}}
 #' @export
 get_year <- function(x) {
-  if (!is.regperiod(x)) {
-    stop("Argument x is not a regperiod")
+  if (!is.period(x)) {
+    stop("Argument x is not a period")
   }
   return (get_year__(x))
 }
 
-#' Returns the subperiod of a \code{\link{regperiod}}
+#' Returns the subperiod of a \code{\link{period}}
 #'
 #' This function returns the subperiod within a year.
-#' For example, for \code{regperiod} \code{2011Q3} the function
+#' For example, for \code{period} \code{2011Q3} the function
 #' returns 3.
-#' @param x a \code{regperiod}
-#' @return the subperiod of a \code{regperiod}
+#' @param x a \code{period}
+#' @return the subperiod of a \code{period}
 #' @examples
-#' get_subperiod(regperiod("2010Q3"))
+#' get_subperiod(period("2010Q3"))
 #' @seealso \code{\link{get_year}}
 #' @export
 get_subperiod <- function(x) {
-  if (!is.regperiod(x)) {
-    stop("Argument x is not a regperiod")
+  if (!is.period(x)) {
+    stop("Argument x is not a period")
   }
   return (get_subperiod__(x))
 }
 
 #' @export
-print.regperiod <- function(x, ...) {
+print.period <- function(x, ...) {
   print(as.character(x))
 }
 
-#' Coerce an R object to a regperiod
+#' Coerce an R object to a period
 #'
 #' @param x any R object
-#' @param frequency the frequency of the regperiod. This argument is mandatory
+#' @param frequency the frequency of the period. This argument is mandatory
 #' if the frequency cannot be detected automatically.
 #' @param ... object passed to methods
-#' @return a \link{regperiod}
+#' @return a \link{period}
 #' @examples
-#' as.regperiod("2010Q3")
-#' as.regperiod(2010)
+#' as.period("2010Q3")
+#' as.period(2010)
 #' @export
-as.regperiod <- function(x, ...) UseMethod("as.regperiod")
+as.period <- function(x, ...) UseMethod("as.period")
 
 #' @export
-as.regperiod.regperiod <- function(x, ...) {
+as.period.period <- function(x, ...) {
   return (x)
 }
 
-#' @describeIn as.regperiod Coerce a character string to a \code{regperiod}
+#' @describeIn as.period Coerce a character string to a \code{period}
 #' @export
-as.regperiod.character <- function(x, frequency = NA, ...) {
-  return (regperiod(x, frequency = frequency, ...))
+as.period.character <- function(x, frequency = NA, ...) {
+  return (period(x, frequency = frequency, ...))
 }
 
-#' @describeIn as.regperiod Coerce a numerical value string to a \code{regperiod}
+#' @describeIn as.period Coerce a numerical value string to a \code{period}
 #' @export
-as.regperiod.numeric <- function(x, frequency = NA, ...) {
+as.period.numeric <- function(x, frequency = NA, ...) {
   if (all.equal(x, as.integer(x)) == TRUE) {
     if (is.na(frequency) || frequency == 1) {
-      return (create_regperiod(as.numeric(x) , 1))
+      return (create_period(as.numeric(x) , 1))
     }
   } else if (is.na(frequency)) {
     stop("Argument frequency should be specified")
   }
   year <- floor(x)
   subp <- floor(frequency * (x %% 1))
-  return (create_regperiod(year * frequency + subp , frequency))
+  return (create_period(year * frequency + subp , frequency))
 }
 
-# Create a regperiod object based on the number of subperiods after Christ.
+# Create a period object based on the number of subperiods after Christ.
 # Internal function.
-create_regperiod <- function(subperiod_count, frequency) {
-  return (structure(subperiod_count, class = "regperiod",
+create_period <- function(subperiod_count, frequency) {
+  return (structure(subperiod_count, class = "period",
                     frequency = frequency))
 }
 
@@ -204,7 +204,7 @@ create_regperiod <- function(subperiod_count, frequency) {
 # OF DATA FRAMES to TS
 
 # Checks if character or numerical values can be converted to a
-# regperiod_range with a specific frequency
+# period_range with a specific frequency
 # INPUT
 # x a character or numeric vector
 # freq frequency (or NA: the period text should have either the
@@ -213,7 +213,7 @@ create_regperiod <- function(subperiod_count, frequency) {
 # RETURN
 # a logical vector with element equal to \code{TRUE} is the
 # corresponding element in \code{x} can be converted to a
-# regperiod_range
+# period_range
 is_period_text <- function(x, frequency = NA) {
   if (is.numeric(x)) {
     x <- as.character(x)

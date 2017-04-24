@@ -13,10 +13,10 @@ test_that("multivariate timeseries, is_na = all", {
     rtsNA <- regts(dataNA, start = "2017Q1", names = c("a", "b", "c"))
 
     data <- matrix(1:6, ncol = 3)
-    period <- regperiod_range("2017Q2/2017Q3")
-    rts <- regts(data, period = period, names = c("a", "b", "c"))
+    prd <- period_range("2017Q2/2017Q3")
+    rts <- regts(data, period = prd, names = c("a", "b", "c"))
 
-    rtsNA[period] <- rts
+    rtsNA[prd] <- rts
     rts1 <- rtsNA["2017Q1/2017Q3"]
     rts2 <- rtsNA["2017Q2/2018Q1"]
 
@@ -33,10 +33,10 @@ test_that("multivariate timeseries, is_na = any", {
     rtsNA <- regts(dataNA, start = "2017Q1", names = c("a", "b", "c"))
 
     data <- matrix(c(1,2,NA,3,4,NA,NA,6,7), ncol = 3)
-    period <- regperiod_range("2017Q1/2017Q3")
-    rts <- regts(data, period = period, names = c("a", "b", "c"))
+    prd <- period_range("2017Q1/2017Q3")
+    rts <- regts(data, period = prd, names = c("a", "b", "c"))
 
-    rtsNA[period] <- rts
+    rtsNA[prd] <- rts
     rts1 <- rtsNA["2017Q2/2017Q4"]
     rts2 <- rtsNA["2017Q2/2017Q2"]
 
@@ -59,8 +59,8 @@ test_that("preserve labels", {
                    labels = c("label_a", "label_b", "label_c"))
 
     data <- matrix(c(1,2,NA,3,4,NA,NA,6,NA), ncol = 3)
-    period <- regperiod_range("2017Q1/2017Q3")
-    rts <- regts(data, period = period, names = c("a", "b", "c"),
+    prd <- period_range("2017Q1/2017Q3")
+    rts <- regts(data, period = prd, names = c("a", "b", "c"),
                  labels = c("label_a", "label_b", "label_c"))
 
     rts1 <- na_trim(rts)
