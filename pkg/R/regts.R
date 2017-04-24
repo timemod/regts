@@ -78,7 +78,7 @@ regts <- function(data, start, end, period, frequency = NA,
     stop("Arguments 'start' and 'period' exclude each other!")
   }
   if (missing(start) && missing(end) && missing(period)) {
-    start = regts:::period("1")
+    start <- create_period(1, 1)
   }
 
   if (!missing(period)) {
