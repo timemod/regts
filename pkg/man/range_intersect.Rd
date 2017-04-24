@@ -26,5 +26,5 @@ range2 <- period_range("2017Q1", "2018Q2")
 range_intersect <- range_intersect(range1, range2)
 }
 \seealso{
-\code{\link{regrange_union}}
+\code{\link{range_union}}
 }
