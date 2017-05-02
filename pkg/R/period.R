@@ -2,7 +2,7 @@
 #'
 #' Possible string formats are for example \code{"2010Q2"},
 #' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
-#'
+#' The period may be prefixed with a \code{"T"} or \code{"Y"}.
 #' @param x a single string or integer
 #' @param frequency frequency of the period object.
 #' Argument \code{frequency} is mandatory if a general period format
