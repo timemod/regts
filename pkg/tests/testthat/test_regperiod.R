@@ -12,6 +12,25 @@ test_that("constructor period", {
     expect_identical(as.character(period("4 2001", frequency = 12)), "2001M4")
 })
 
+test_that("constructor period with T prefix", {
+  expect_identical(as.character(period("T2010 q 2")), "2010Q2")
+  expect_identical(as.character(period("t2010Q8")), "2011Q4")
+  expect_identical(as.character(period("t2012")), "2012")
+  expect_identical(as.character(period("t2001-4", frequency = 4)), "2001Q4")
+  expect_identical(as.character(period("t 2001 4", frequency = 12)), "2001M4")
+  expect_identical(as.character(period("T4 2001", frequency = 12)), "2001M4")
+})
+
+test_that("constructor period with Y prefix", {
+  expect_identical(as.character(period("Y2010 q 2")), "2010Q2")
+  expect_identical(as.character(period("y2010Q8")), "2011Q4")
+  expect_identical(as.character(period("J2012")), "2012")
+  expect_identical(as.character(period("j2001-4", frequency = 4)), "2001Q4")
+  expect_identical(as.character(period("j 2001 4", frequency = 12)), "2001M4")
+  expect_identical(as.character(period("j4 2", frequency = 12)), "4M2")
+  expect_identical(as.character(period("Y2 8", frequency = 4)), "3Q4")
+})
+
 test_that("Isis type periods", {
     expect_identical(period("2010.2q"), period("2010Q2"))
     expect_identical(period("may2010"), period("2010M5"))
@@ -57,7 +76,7 @@ test_that("arithmetic operators: only + and - allowed", {
     expect_identical(period("2010") - 4, period("2006"))
     expect_identical(period("2010m2") - 8, period("2009m6"))
     expect_identical(period("2010m2") - period("2009m6"), 8)
-    expect_identical(period("2010q2") + 4, 4 + period("2010q2"))	
+    expect_identical(period("2010q2") + 4, 4 + period("2010q2"))
 
     expect_error(period("2010Q1") * 2,
                  "Illegal arithmetic operation, only \\+ and \\- allowed")

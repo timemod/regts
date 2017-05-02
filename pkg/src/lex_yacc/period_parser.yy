@@ -37,6 +37,8 @@
 
 %token  YEAR_CHARACTER  /* year character (Y or J) */
 
+%token  TIME_CHARACTER  /* time character (T) */
+
 %token  SEP  /* separator (e.g. . or /)  */
 
 %token  MONTH_NAME  /* name of a month (e.g. may) */
@@ -48,38 +50,60 @@
 period:   posint
         | y_period
         | qm_period
-        | no_periodicity
+        | no_periodicity_1
+        | no_periodicity_2
         | month
 ;
 
-posint   : NUMBER      /* e.g. 2010  */
-	       {year = $1; freq = 1; subperiod = 1;}
+posint   : opt_t NUMBER      /* e.g. 2010  */
+	       {year = $2; freq = 1; subperiod = 1;}
 
-y_period : NUMBER YEAR_CHARACTER  /* e.g. 2010y */
-	       {year = $1; freq = 1; subperiod = 1;}
+y_period : opt_t NUMBER YEAR_CHARACTER  /* e.g. 2010y */
+	       {year = $2; freq = 1; subperiod = 1;}
+         | YEAR_CHARACTER NUMBER /* e.g. y2010 */
+	       {year = $2; freq = 1; subperiod = 1;}
 ;
 
 opt_sep  : SEP /* separator e.g. ., - */
          | /*empty */
 ;
 
-qm_period : NUMBER opt_sep NUMBER FREQ   /* e.g. 2010.1q */
-               {year = $1; subperiod = $3; freq = $4;}
-             | FREQ NUMBER opt_sep NUMBER /* e.g. q2 2010 */
+opt_t  : TIME_CHARACTER /* t */
+         | /*empty */
+;
+
+qm_period :   opt_t NUMBER opt_sep NUMBER FREQ  /* e.g. 2010.1q */
+               {year = $2; subperiod = $4; freq = $5;}
+            | YEAR_CHARACTER NUMBER opt_sep NUMBER FREQ  /* e.g. Y2010.1q */
+               {year = $2; subperiod = $4; freq = $5;}
+            | FREQ NUMBER opt_sep NUMBER /* e.g. q2 2010 */
                {year = $4; subperiod = $2; freq = $1;}
-             | NUMBER SEP FREQ NUMBER  /*e.g. 2010.q3 */
-               {year = $1; subperiod = $4; freq = $3;}
-             | NUMBER FREQ SEP NUMBER  /*e.g. 2q/2000 */
-               {year = $4; subperiod = $1; freq = $2;}
-             | NUMBER FREQ NUMBER  /*e.g. 1974m2 */
-               {year = $1; subperiod = $3; freq = $2;
+            | opt_t NUMBER SEP FREQ NUMBER  /*e.g. 2010.q3 */
+               {year = $2; subperiod = $5; freq = $4;}
+            | YEAR_CHARACTER NUMBER SEP FREQ NUMBER  /*e.g. Y2010.q3 */
+               {year = $2; subperiod = $5; freq = $4;}
+            | opt_t NUMBER FREQ SEP NUMBER  /*e.g. 2q/2000 */
+               {year = $5; subperiod = $2; freq = $3;}
+            | YEAR_CHARACTER NUMBER FREQ NUMBER  /*e.g. Y1974m2 */
+               {year = $2; subperiod = $4; freq = $3;}
+            | opt_t NUMBER FREQ NUMBER  /*e.g. 1974m2 */
+	        // This format is ambiguous: the first number can be a
+                // year or a subperiod. For the moment, assume the first 
+                // number is a year and the second number a subperiod with
+                // unknown periodicity
+               {year = $2; subperiod = $4; freq = $3;
                 check_year_subperiod(freq, year, subperiod);}
 ;
 
-no_periodicity : NUMBER opt_sep NUMBER   /* e.g. 2010/1 or 5/2010 */
-            // For the moment, assume the first number is a year and the
-             // second number a subperiod with unknown periodicity */
-               {year = $1; subperiod = $3;
+no_periodicity_1 : YEAR_CHARACTER NUMBER opt_sep NUMBER /* e.g. Y2010 3 */
+               {year = $2; subperiod = $4;}
+
+no_periodicity_2 : opt_t NUMBER opt_sep NUMBER   /* e.g. 2010/1 or 5/2010 */
+	       // This format is ambiguous: the first number can be a
+               // year or a subperiod. For the moment, assume the first 
+               // number is a year and the second number a subperiod with
+               // unknown periodicity
+               {year = $2; subperiod = $4;
                 if (!ISNA(given_freq)) {
                     check_year_subperiod(given_freq, year, subperiod);
                 };}

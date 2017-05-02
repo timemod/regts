@@ -19,6 +19,7 @@ a \code{period} object
 \description{
 Possible string formats are for example \code{"2010Q2"},
 \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
+The period may be prefixed with a \code{"T"} or \code{"Y"}.
 }
 \examples{
 period("2010Q3")
