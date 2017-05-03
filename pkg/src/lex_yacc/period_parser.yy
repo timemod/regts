@@ -133,7 +133,7 @@ static void check_year_subperiod(double freq, double &year, double &subp) {
     }
 }
 
-ParsedPeriod parse_period(const std::string &period_text, double frequency) {
+ParsedPeriod parse_period_text(const std::string &period_text, double frequency) {
 
     // initialise global variables
     year       = NA_REAL;
