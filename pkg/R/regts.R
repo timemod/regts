@@ -351,7 +351,7 @@ add_columns <- function(x, new_colnames) {
   new_columns <- matrix(NA, nrow = nrow(x), ncol = ncols)
   ret <- as.regts(ts.union(x, new_columns))
   colnames(ret) <- c(colnames(x), new_colnames)
-  lbls <- ts_labels(x)
+  lbls <- attr(x, "ts_labels")
   if (!is.null(lbls)) {
     ts_labels(ret) <- c(lbls, rep("", ncols))
   }
