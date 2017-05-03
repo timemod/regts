@@ -149,3 +149,22 @@ test_that("column selection in a timeseries with 1 row and labels", {
     expect_equal(regts1[, "c"], ref)
 })
 
+test_that("labels ok after renaming columns", {
+
+  regts1 <- regts(matrix(rep(1:10), ncol = 2), start = "2010Q4",
+                  names = c("A", "B"),
+                  labels = c("Timeseries a", "Timeseries b"))
+  colnames(regts1) <- tolower(colnames(regts1))
+
+  res <- c("Timeseries a", "Timeseries b")
+  names(res) <- c("a", "b")
+  expect_identical(ts_labels(regts1), res)
+
+  regts2 <- update_ts_labels(regts1, labels = c(b = "Variable b"))
+  res2 <- res
+  res2["b"] <- "Variable b"
+  expect_identical(ts_labels(regts2), res2)
+
+  sel <- regts1[, "b", drop = FALSE]
+  expect_identical(ts_labels(sel), res["b"])
+})
