@@ -195,7 +195,7 @@ as.period_range.character <- function(x, frequency = NA, ...) {
                       "as.period_range.character.",
                        "Only the first element is used."))
     }
-    return (parse_rperiod_range(x[1], frequency));
+    return (parse_period_range(x[1], frequency));
 }
 
 #' @export

@@ -19,7 +19,7 @@ period <- function(x, frequency = NA) {
   if (is.numeric(x)) {
     x <- as.character(x)
   }
-  return (parse_rperiod(x, frequency))
+  return (parse_period(x, frequency))
 }
 
 #' Test if an object is a period.

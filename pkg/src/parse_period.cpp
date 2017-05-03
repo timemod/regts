@@ -12,7 +12,7 @@ static void parse_single_period(const std::string &period_text,
                                 double &subperiods, double &freq);
 
 // [[Rcpp::export]]
-NumericVector parse_rperiod(const std::string &period_text, double frequency) {
+NumericVector parse_period(const std::string &period_text, double frequency) {
 
     double per, f;
     parse_single_period(period_text, frequency, per, f);
@@ -26,7 +26,7 @@ NumericVector parse_rperiod(const std::string &period_text, double frequency) {
 
 
 // [[Rcpp::export]]
-NumericVector parse_rperiod_range(const std::string &period_text,
+NumericVector parse_period_range(const std::string &period_text,
                                     double frequency) {
 
     double p1, p2, f;
@@ -83,7 +83,7 @@ static void parse_single_period(const std::string &period_text,
     
     subperiods = NA_REAL;
     freq       = NA_REAL;
-    ParsedPeriod per = parse_period(period_text, given_freq);
+    ParsedPeriod per = parse_period_text(period_text, given_freq);
 
     if (per.error) {
         Rf_error("Illegal period %s.", period_text.c_str());
@@ -112,7 +112,7 @@ LogicalVector is_period_text_(std::vector<std::string> strings,
      int n = strings.size();
      LogicalVector out(n);
      for (int i = 0; i < n; i++) {
-          ParsedPeriod per = parse_period(strings[i], given_freq);
+          ParsedPeriod per = parse_period_text(strings[i], given_freq);
           out[i] = !per.error;
           if (!per.error && !ISNA(given_freq) && !ISNA(per.freq)) {
               /* if the frequency has been specified, then 
