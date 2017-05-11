@@ -275,21 +275,8 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   # remove columns with empty names
   data <- data[which(!(get_strings(colnames(data)) == ""))]
 
-  # convert (by default) non numeric data (characters -> NA)
-  if (numeric){
-    # do not use function data.matrix, this is too slow
-    f <- function(x) {
-      if (is.numeric(x)) {
-        return(x)
-      } else {
-        return(as.numeric(x))
-      }
-    }
-    row_names <- rownames(data)
-    col_names <- colnames(data)
-    data <- suppressWarnings(as.data.frame(lapply(data, FUN = f)))
-    rownames(data) <- row_names
-    colnames(data) <- col_names
+  if (numeric) {
+    data <- numeric_data_frame(data)
   }
 
   datamat <- as.matrix(data)
