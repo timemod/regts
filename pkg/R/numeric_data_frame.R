@@ -19,24 +19,20 @@ numeric_data_frame <- function(x) {
   row_names <- rownames(x)
   col_names <- colnames(x)
 
-  #  get rid of factors
-  factor2char <- function(x) {
-    if (is.factor(x)) {
-      return(as.character(x))
-    } else {
+  #  get rid of factors, Dates etc.
+  convert_col <- function(x) {
+    if (is.numeric(x) | is.character(x) | is.logical(x)) {
       return(x)
+    } else {
+      return(as.character(x))
     }
   }
-
-  x <- as.data.frame(lapply(x, FUN = factor2char), stringsAsFactors = FALSE)
+  x <- as.data.frame(lapply(x, FUN = convert_col), stringsAsFactors = FALSE)
 
   to_numeric <- function(x) {
     if (is.numeric(x)) {
       return(x)
     } else {
-      if (is.factor(x)) {
-        x <- as.character(x)
-      }
       return(as.numeric(x))
     }
   }
