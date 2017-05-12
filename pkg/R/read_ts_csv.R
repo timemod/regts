@@ -103,7 +103,7 @@ read_ts_csv <- function(filename, columnwise, frequency = NA,
     skip <- 0
   }
 
-  if (missing(columnwise) || columnwise) {
+  if (missing(columnwise) || !columnwise) {
     first_line <- fread(filename, nrows = 1, skip = skip, header = FALSE,
                         data.table = FALSE, ...)
     is_period <- is_period_text(get_strings(first_line), frequency)
@@ -117,7 +117,7 @@ read_ts_csv <- function(filename, columnwise, frequency = NA,
   # the header
   if (columnwise) {
     df <- fread(filename, skip = skip, header = FALSE, data.table = FALSE,
-              ...)
+                ...)
   } else {
     nper <- length(is_period) - first_prd_col + 1
     colClasses <- c(rep("character", first_prd_col - 1),

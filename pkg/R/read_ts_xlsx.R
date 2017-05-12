@@ -95,8 +95,10 @@ read_ts_xlsx <- function(filename, columnwise, frequency = NA,
   }
 
   if (missing(columnwise)) {
-    # read the first line of the Excel sheet to determine if the
-    # first row contains a period
+    # Read the first line of the Excel sheet to determine if the
+    # first row contains a period. read_excel skips all columns
+    # without any value, thus we cannot compute yet where
+    # position of the first period column, as in read_ts_csv.
     first_line <- as.data.frame(read_excel(filename, skip = skip, n_max = 1,
                                            col_names = FALSE, ...))
     is_period <- is_period_text(get_strings(first_line), frequency)
