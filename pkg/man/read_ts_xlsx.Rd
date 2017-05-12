@@ -4,7 +4,7 @@
 \alias{read_ts_xlsx}
 \title{Reads timeseries from a sheet of an  xls(x) file}
 \usage{
-read_ts_xlsx(filename, columnwise = FALSE, frequency = NA, skiprow, skipcol,
+read_ts_xlsx(filename, columnwise, frequency = NA, skiprow, skipcol,
   labels = c("no", "after", "before"), ...)
 }
 \arguments{

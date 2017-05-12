@@ -120,8 +120,7 @@ read_ts_csv <- function(filename, columnwise, frequency = NA,
                 ...)
   } else {
     nper <- length(is_period) - first_prd_col + 1
-    colClasses <- c(rep("character", first_prd_col - 1),
-                    rep("numeric", nper))
+    colClasses <- c(rep("character", first_prd_col - 1), rep("numeric", nper))
     df <- fread(filename, skip = skip, header = TRUE, data.table = FALSE,
                 colClasses = colClasses, ...)
   }
