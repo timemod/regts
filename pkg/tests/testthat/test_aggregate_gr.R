@@ -43,8 +43,8 @@ agg_reldiff_2 <- function(x, method, nfrequency = 1) {
 }
 
 test_that("dif1s and dif1, quarterly to year, single timeseries", {
-    p         <- regperiod_range("2008Q2", "2013Q3")
-    ts_q      <- regts(rnorm(length_range(p)), start = start_period(p))
+    p         <- period_range("2008Q2", "2013Q3")
+    ts_q      <- regts(rnorm(nperiod(p)), start = start_period(p))
     ref <- agg_diff_1(ts_q) # the correct result
     expect_equal(agg_diff_2(ts_q, method = "dif1s"), ref);
     expect_equal(agg_diff_2(ts_q["2008Q4/"], method = "dif1"), ref);
@@ -52,16 +52,16 @@ test_that("dif1s and dif1, quarterly to year, single timeseries", {
 })
 
 test_that("pct and rel, quarterly to year, single timeseries", {
-    p         <- regperiod_range("2008Q2", "2013Q3")
-    ts_q      <- regts(rnorm(length_range(p)), start = start_period(p))
+    p         <- period_range("2008Q2", "2013Q3")
+    ts_q      <- regts(rnorm(nperiod(p)), start = start_period(p))
     ref <- agg_reldiff_1(ts_q) # the correct result
     expect_equal(agg_reldiff_2(ts_q, method = "rel"), ref);
     expect_equal(agg_reldiff_2(ts_q["2009Q1/"], method = "pct"), ref * 100);
 })
 
 test_that("dif1s and rel, monthly to quarterly, two timeseries", {
-    p <- regperiod_range("2010M11", "2011M11")
-    ts_m <- regts(matrix(rnorm(length_range(p) * 2), ncol = 2),
+    p <- period_range("2010M11", "2011M11")
+    ts_m <- regts(matrix(rnorm(nperiod(p) * 2), ncol = 2),
                  start = start_period(p), names = c("a", "b"),
                  labels = c("ts a", "ts b"))
     ref_abs <- agg_diff_1(ts_m, nfrequency = 4)
@@ -72,8 +72,8 @@ test_that("dif1s and rel, monthly to quarterly, two timeseries", {
 })
 
 test_that("dif1s and dif1, quarterly to year, single timeseries with NA values", {
-    p         <- regperiod_range("2009Q1", "2015Q4")
-    ts_q      <- regts(rnorm(length_range(p)), start = start_period(p))
+    p         <- period_range("2009Q1", "2015Q4")
+    ts_q      <- regts(rnorm(nperiod(p)), start = start_period(p))
     ts_q["2009Q1"] <- NA
     ts_q["2012Q2"] <- NA
     ts_q["2015Q4"] <- NA
@@ -85,8 +85,8 @@ test_that("dif1s and dif1, quarterly to year, single timeseries with NA values",
 
 test_that("dif1s and dif1, quarterly to year, single timeseries with Inf, -Inf or
           NaN values", {
-    p         <- regperiod_range("2009Q1", "2015Q4")
-    ts_q      <- regts(rnorm(length_range(p)), start = start_period(p))
+    p         <- period_range("2009Q1", "2015Q4")
+    ts_q      <- regts(rnorm(nperiod(p)), start = start_period(p))
     ts_q["2009Q1"] <- 1/0
     ts_q["2012Q2"] <- 0/0
     ts_q["2015Q4"] <- -1/0

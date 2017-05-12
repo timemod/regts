@@ -16,11 +16,15 @@ ts_labels(x) <- value
 should be equal to the number of columns. Specify \code{NULL} to remove all
 labels.}
 }
+\value{
+The retrieval function \code{ts_labels()} returns a named character
+vector: the names are the timeseries names (the column names) and the values
+the corresponding labels. The replacement method returns a \code{regts}
+object with labels.
+}
 \description{
 Retrieve or set labels for the timeseries. Timeseries labels
 can be used to give a description of the contents of the timeseries.
-The labels are stored in a named list: the names are the timeseries names
-(column names), and the values the corresponding label.
 }
 \section{Functions}{
 \itemize{

@@ -123,7 +123,7 @@ Instead of arguments `start` and `end` you can also specify argument `period`:
 ts_data <- regts(1:10, period = "2016Q1/2016Q4")
 ```
 Input for this period may be a character string as shown above, but also a 
-variable of type  `regperiod_range`. This type will be explained in section \ref{sec:regperiod}.
+variable of type  `period_range`. This type will be explained in section \ref{sec:period}.
 
 ## Multivariate timeseries \label{multits}
 Sometimes it is more convenient to combine several timeseries with the same 
@@ -338,20 +338,20 @@ rts["2011", "x"] <- 1         # update all quarters in 2011 in column "x"
 rts
 ```
 
-# `regperiod` and `regperiod_range`\label{sec:regperiod}
+# `period` and `period_range`\label{sec:period}
 
 When the same period is used several times, it is preferable to define a variable containing this period. Package `regts` defines special classes representing 
-periods: the `regperiod` class for a single period and the `regperiod_range` 
+periods: the `period` class for a single period and the `period_range` 
 class for a range of periods.
 
-## `regperiod`
+## `period`
 
-A `regperiod` object can be created with the `regperiod` function. 
+A `period` object can be created with the `period` function. 
 
 ```{r}
-prd1 <- regperiod("2016Q4")
+prd1 <- period("2016Q4")
 prd1
-prd2 <- regperiod("2015-2", frequency = 4)
+prd2 <- period("2015-2", frequency = 4)
 prd2
 ```
 
@@ -361,108 +361,108 @@ a month indicator or a half year. The `frequency` argument is required if you
 want to define a period with a frequency other than 1, 4 or 12, since there is 
 no special format for these frequencies.
 
-`regperiod` objects can be used as input for the `start` and `end` arguments of 
+`period` objects can be used as input for the `start` and `end` arguments of 
 the `regts` function.
 
 ```{r eval = TRUE}
 ts    <- regts(1:10, start = prd1)
 ```
 
-When printed a `regperiod` variable seems to be nothing more than a character 
+When printed a `period` variable seems to be nothing more than a character 
 string. With the `str` function we can show the internal representation of a 
-`regperiod` object:
+`period` object:
 
 ```{r}
-str(regperiod("2016Q4"))
+str(period("2016Q4"))
 ```
 
 The internal representation of period `2016Q4` is the number of quarters since 
 the beginning of the Christian era, starting with 0 (`8067 = 2016 * 4 + 3`).
 
-## `regperiod_range`
-There is also a `regperiod_range`, an object that represents an interval of 
+## `period_range`
+There is also a `period_range`, an object that represents an interval of 
 periods. Such a range can be created in the following ways:
 
 ```{r}
-range <- regperiod_range("2014Q4", "2017Q4")
+range <- period_range("2014Q4", "2017Q4")
 range
-regperiod_range("2014Q4/2017Q4")
+period_range("2014Q4/2017Q4")
 ```
 
 The lower or upper bound of the range may also be undetermined:
 
 ```{r}
-regperiod_range("2017Q1", NULL)      # No upper bound
+period_range("2017Q1", NULL)      # No upper bound
 ```
 
-A `regperiod_range` variable can be used in the `regts` function, specifying the 
-`period` argument:
+A `period_range` variable can be used in the `regts` function, specifying the 
+`prd-range` argument:
  
 ```{r}
-range1 <- regperiod_range("2016Q1", "2016Q3")
+range1 <- period_range("2016Q1", "2016Q3")
 rts <- regts(matrix(1:18, ncol = 3), period = range1, names = c("a", "b", "c"))
 rts
 ```
-The length of a range may be obtained by using the `length_range` function:
+The length of a `period_range` may be obtained by using the `nperiod` function:
 
 ```{r}
-length_range(range1)
+nperiod(range1)
 ```
 Functions `start_period` and `end_period` are used to retrieve the first and 
-last period in a `regperiod_range`:
+last period in a `period_range`:
 
 ```{r}
 start_period(range1)
 end_period(range1)
-range2 <- regperiod_range(start_period(range1)+1, end_period(range1)-1)
+range2 <- period_range(start_period(range1)+1, end_period(range1)-1)
 ts <- regts(data, period = range2)
 ```
 
 ## Shifting period(s)
-With operators `+` and `-` the period can be shifted. Some examples for `regperiod`: 
+With operators `+` and `-` the period can be shifted. Some examples for `period`: 
 
 ```{r}
-regperiod("2016Q4") + 1
-p1 <- regperiod("2015Q1")
+period("2016Q4") + 1
+p1 <- period("2015Q1")
 p1-5
 ```
 
-And for a `regperiod_range`:
+And for a `period_range`:
 
 ```{r}
-regperiod_range("2016Q4", "2017Q4") + 1
-regperiod_range(p1, p1+4)            # a `regperiod` as input
+period_range("2016Q4", "2017Q4") + 1
+period_range(p1, p1+4)            # a `period` as input
 ```
 
-Note that one of the operands must be numeric^[Command `regperiod("2015Q1") + regperiod("2015Q2")` results in an error message: 'Arithmetic operation on two 
-regperiods is not allowed.'].
+Note that one of the operands must be numeric^[Command `period("2015Q1") + period("2015Q2")` results in an error message: 'Arithmetic operation on two 
+periods is not allowed.'].
 
 
 ## Selecting and updating
 In section \ref{sec:periodselection} we have shown how periods can be selected 
-with a string. A `regperiod` can also be used to select or update a period of a 
+with a string. A `period` can also be used to select or update a period of a 
 timeseries object.  Consider the following (previously defined) timeseries:
 
 ```{r}
 rts
 ```
-Use a `regperiod` to select and update the timeseries.
+Use a `period` to select and update the timeseries.
 ```{r}
-prd1 <- regperiod("2016Q2")
+prd1 <- period("2016Q2")
 rts[prd1] 
 rts[prd1] <- 3
 rts
 ```
 
-A `regperiod_range` can be used to select and update multiple periods:
+A `period_range` can be used to select and update multiple periods:
 
 ```{r}
 # define a period and make selections
-range <- regperiod_range("2016Q2", "2016Q3")
+range <- period_range("2016Q2", "2016Q3")
 var <- rts[range]     
 rts[range, c("a", "b")]
 # define another period and create a new timeseries column
-smpl <- regperiod_range("2016Q1", "2017Q1")
+smpl <- period_range("2016Q1", "2017Q1")
 rts[smpl, "xx"] <- 2                
 rts
 ```
@@ -519,8 +519,8 @@ ts2 <- as.regts(df2, time_column = "periods")
 ts2
 ```
 
-Function `as.regts` uses the function `regperiod` to convert the 'period text' 
-(like `2015Q3`) to a `regperiod`.
+Function `as.regts` uses the function `period` to convert the 'period text' 
+(like `2015Q3`) to a `period`.
 This function can handle several period formats: `2016`, `2016Q4`, `2016.4q`,
 `2016/4Q`, `2016-4q`, `2016_q4`, ...
 where no distinction is made between 'q' and 'Q'.
@@ -535,7 +535,7 @@ ts <- as.regts(df, frequency = 4)
 
 If the data frame contains periods in another, non standard, format, it is 
 possible to specify your own function for the conversion of a text to a 
-`regperiod`. Use the `fun` argument, if necessary with extra arguments.
+`period`. Use the `fun` argument, if necessary with extra arguments.
 
 The reverse conversion from a `regts` to a `data frame` can be achieved with 
 function `as.data.frame`. Therefore the `as.data.frame` function has been 

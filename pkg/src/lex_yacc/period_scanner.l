@@ -37,6 +37,7 @@ DIGIT           [0-9]
 SEP             [./\-:_]
 FREQUENCY       [qmk]
 YEAR_CHAR       [yj]
+TIME_CHAR       [t]
 MONTH_NAME      [a-z]{3,}
 
 %%
@@ -45,13 +46,16 @@ MONTH_NAME      [a-z]{3,}
 
 {FREQUENCY}  {prlval = get_frequency(yytext); return FREQ;}
 
-{YEAR_CHAR}   {return YEAR_CHARACTER;}
-
 {SEP}         {return SEP;}
 
 {MONTH_NAME}  {prlval = get_month_number(yytext);
                int type = prlval > 0 ? MONTH_NAME : INVALID;
                return type;}
+
+{YEAR_CHAR}   {return YEAR_CHARACTER;}
+
+{TIME_CHAR}   {return TIME_CHARACTER;}
+
 
 [ \t]+        /* eat up white space */
 

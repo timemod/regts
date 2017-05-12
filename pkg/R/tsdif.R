@@ -135,8 +135,8 @@ calculate_difference <- function(common_names, x1, x2, tol, fun) {
     xx2 <- x2[, common_names, drop = FALSE]
 
     # Align the two timeseries objects using the union of their times.
-    p1 <- get_regperiod_range(xx1)
-    p2 <- get_regperiod_range(xx2)
+    p1 <- get_period_range(xx1)
+    p2 <- get_period_range(xx2)
     punion <- c(min(p1[1], p2[1]), max(p1[2], p2[2]), p1[3])
     xx1 <- window_regts(xx1, punion)
     xx2 <- window_regts(xx2, punion)

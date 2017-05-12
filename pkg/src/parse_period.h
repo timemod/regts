@@ -10,4 +10,4 @@ public:
     }
 };
 
-ParsedPeriod parse_period(const std::string &period_text, double frequency);
+ParsedPeriod parse_period_text(const std::string &period_text, double frequency);

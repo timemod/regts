@@ -48,18 +48,20 @@ extern int prdebug;
     NUMBER = 258,
     FREQ = 259,
     YEAR_CHARACTER = 260,
-    SEP = 261,
-    MONTH_NAME = 262,
-    INVALID = 263
+    TIME_CHARACTER = 261,
+    SEP = 262,
+    MONTH_NAME = 263,
+    INVALID = 264
   };
 #endif
 /* Tokens.  */
 #define NUMBER 258
 #define FREQ 259
 #define YEAR_CHARACTER 260
-#define SEP 261
-#define MONTH_NAME 262
-#define INVALID 263
+#define TIME_CHARACTER 261
+#define SEP 262
+#define MONTH_NAME 263
+#define INVALID 264
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

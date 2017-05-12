@@ -5,24 +5,24 @@ agg_gr <- function(ts_old, freq_new, method) {
     .Call('regts_agg_gr', PACKAGE = 'regts', ts_old, freq_new, method)
 }
 
-parse_regperiod <- function(period_text, frequency) {
-    .Call('regts_parse_regperiod', PACKAGE = 'regts', period_text, frequency)
+parse_period <- function(period_text, frequency) {
+    .Call('regts_parse_period', PACKAGE = 'regts', period_text, frequency)
 }
 
-parse_regperiod_range <- function(period_text, frequency) {
-    .Call('regts_parse_regperiod_range', PACKAGE = 'regts', period_text, frequency)
+parse_period_range <- function(period_text, frequency) {
+    .Call('regts_parse_period_range', PACKAGE = 'regts', period_text, frequency)
 }
 
 is_period_text_ <- function(strings, given_freq) {
     .Call('regts_is_period_text_', PACKAGE = 'regts', strings, given_freq)
 }
 
-#' Returns the \link{regperiod_range} of a timeseries.
+#' Returns the \link{period_range} of a timeseries.
 #'
 #' @param x a timeseries (\link{ts} or \link{regts})
-#' @return a \code{regperiod_range}
+#' @return a \code{period_range}
 #' @export
-get_regperiod_range <- function(x) {
-    .Call('regts_get_regperiod_range', PACKAGE = 'regts', x)
+get_period_range <- function(x) {
+    .Call('regts_get_period_range', PACKAGE = 'regts', x)
 }
 

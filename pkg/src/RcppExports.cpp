@@ -18,27 +18,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// parse_regperiod
-NumericVector parse_regperiod(const std::string& period_text, double frequency);
-RcppExport SEXP regts_parse_regperiod(SEXP period_textSEXP, SEXP frequencySEXP) {
+// parse_period
+NumericVector parse_period(const std::string& period_text, double frequency);
+RcppExport SEXP regts_parse_period(SEXP period_textSEXP, SEXP frequencySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::string& >::type period_text(period_textSEXP);
     Rcpp::traits::input_parameter< double >::type frequency(frequencySEXP);
-    rcpp_result_gen = Rcpp::wrap(parse_regperiod(period_text, frequency));
+    rcpp_result_gen = Rcpp::wrap(parse_period(period_text, frequency));
     return rcpp_result_gen;
 END_RCPP
 }
-// parse_regperiod_range
-NumericVector parse_regperiod_range(const std::string& period_text, double frequency);
-RcppExport SEXP regts_parse_regperiod_range(SEXP period_textSEXP, SEXP frequencySEXP) {
+// parse_period_range
+NumericVector parse_period_range(const std::string& period_text, double frequency);
+RcppExport SEXP regts_parse_period_range(SEXP period_textSEXP, SEXP frequencySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const std::string& >::type period_text(period_textSEXP);
     Rcpp::traits::input_parameter< double >::type frequency(frequencySEXP);
-    rcpp_result_gen = Rcpp::wrap(parse_regperiod_range(period_text, frequency));
+    rcpp_result_gen = Rcpp::wrap(parse_period_range(period_text, frequency));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -54,14 +54,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// get_regperiod_range
-NumericVector get_regperiod_range(const SEXP& x);
-RcppExport SEXP regts_get_regperiod_range(SEXP xSEXP) {
+// get_period_range
+NumericVector get_period_range(const SEXP& x);
+RcppExport SEXP regts_get_period_range(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const SEXP& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(get_regperiod_range(x));
+    rcpp_result_gen = Rcpp::wrap(get_period_range(x));
     return rcpp_result_gen;
 END_RCPP
 }

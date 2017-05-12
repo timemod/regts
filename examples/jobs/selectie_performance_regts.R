@@ -25,7 +25,7 @@ tm
 
 
 # selectie met vooral gedefinieerde periode
-p <- as.regperiod_range("2012Q1/2012Q2")
+p <- as.period_range("2012Q1/2012Q2")
 tm <- microbenchmark(regts1[p, 'ts_3400'], times = 1000)
 tm
 

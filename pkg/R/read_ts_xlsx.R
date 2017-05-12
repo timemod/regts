@@ -6,7 +6,7 @@
 #' The timeseries can be stored both rowwise or columnwise on the sheet.
 #' The function tries to find valid period texts on the sheet.
 #' Valid period texts should have the format recognized by function
-#' \code{\link{regperiod}}, for example \code{"2010Q2"},
+#' \code{\link{period}}, for example \code{"2010Q2"},
 #' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
 #' An integer value is considered as a period wih frequency year.
 #' In many cases, this function will read timeseries correctly.

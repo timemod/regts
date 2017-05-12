@@ -8,16 +8,16 @@
 #' will be coerced to a numeric matrix via \code{\link{data.matrix}}.
 #' (See also the description of the
 #' function \code{\link[stats]{ts}} of the \code{\link{stats}} package).
-#' @param start the starting period as a  \code{\link{regperiod}} object or a
-#' character string that can be converted to a \code{regperiod} object.
+#' @param start the starting period as a  \code{\link{period}} object or a
+#' character string that can be converted to a \code{period} object.
 #' If not specified, then the start period is calculated
 #' from argument \code{end} and the dimension of \code{data}
-#' @param end the end period as a  \link{regperiod} object or a character string
-#' that can be converted to a \code{regperiod} object. If not specified, then
+#' @param end the end period as a  \link{period} object or a character string
+#' that can be converted to a \code{period} object. If not specified, then
 #' the end period is calculated from argument \code{start} and
 #' the dimension of \code{data}
-#' @param period the period range as a \code{\link{regperiod_range}} object or a
-#' character string that can be converted to a \code{regperiod_range} object.
+#' @param period the period range as a \code{\link{period_range}} object or a
+#' character string that can be converted to a \code{period_range} object.
 #' This argument replaces arguments \code{start} and \code{end}.
 #' @param frequency the frequency of the timeseries. This argument should only be
 #' specified if the start, end or period argument is specified with a general
@@ -40,7 +40,7 @@
 #'              labels = paste("Timeseries", c("a", "b", "c")))
 #'
 #'# multivariate timeseries with period
-#' range <- regperiod_range("2016Q1", "2017Q4")
+#' range <- period_range("2016Q1", "2017Q4")
 #' ts4 <- regts(matrix(1:16, ncol = 2), period = range, names = c("a", "b"))
 #'
 #' # create a half-yearly timeseries; because argument end is specified the
@@ -61,7 +61,7 @@
 #' timeseries objects and create a multivariate \code{regts}.
 #'
 #' Information about the time period of the timeseries can be obtained
-#' with the functions \code{\link{get_regperiod_range}},
+#' with the functions \code{\link{get_period_range}},
 #' \code{\link{start_period}} and \code{\link{end_period}}.
 #'
 #' See also the description of the functions for handling labels
@@ -73,17 +73,17 @@
 regts <- function(data, start, end, period, frequency = NA,
                   names = colnames(data), labels = NULL) {
 
-  # CHECK THE PERIOD
+  # Check the periodrange
   if (!missing(period) && !missing(start)) {
     stop("Arguments 'start' and 'period' exclude each other!")
   }
   if (missing(start) && missing(end) && missing(period)) {
-    start = regperiod("1")
+    start <- create_period(1, 1)
   }
 
   if (!missing(period)) {
-    if (!is.regperiod_range(period)) {
-      period <- as.regperiod_range(period)
+    if (!is.period_range(period)) {
+      period <- as.period_range(period)
     }
     start <- start_period(period)
     end <- end_period(period)
@@ -99,11 +99,11 @@ regts <- function(data, start, end, period, frequency = NA,
     }
   } else {
     if (!missing(start)) {
-      start <- as.regperiod(start, frequency)
+      start <- as.period(start, frequency)
       freq <- frequency(start)
     }
     if (!missing(end)) {
-      end <- as.regperiod(end, frequency)
+      end <- as.period(end, frequency)
       if (missing(start)) {
         freq <- frequency(end)
       } else if (frequency(end) != freq) {
@@ -205,7 +205,7 @@ is.regts <- function(x) {
 #' By default they are converted to numeric. This can be changed by setting
 #' \code{numeric = FALSE}.
 #' @param fun a function for converting values in the time column to
-#' \code{\link{regperiod}} objects
+#' \code{\link{period}} objects
 #' @param ... arguments passed to \code{fun}
 #' @return a \code{regts} object
 #' @seealso \code{\link{regts}}, \code{\link{is.regts}},
@@ -256,7 +256,7 @@ as.regts.ts <- function(x, ...) {
 #' \code{\link{regts}}
 #' @export
 as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
-                                fun = regperiod, ...) {
+                                fun = period, ...) {
 
   # extract time column(s) and data from the input data frame,
   # and convert to a matrix. data are converted to numeric if necessary
@@ -275,26 +275,13 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   # remove columns with empty names
   data <- data[which(!(get_strings(colnames(data)) == ""))]
 
-  # convert (by default) non numeric data (characters -> NA)
-  if (numeric){
-    # do not use function data.matrix, this is too slow
-    f <- function(x) {
-      if (is.numeric(x)) {
-        return(x)
-      } else {
-        return(as.numeric(x))
-      }
-    }
-    row_names <- rownames(data)
-    col_names <- colnames(data)
-    data <- suppressWarnings(as.data.frame(lapply(data, FUN = f)))
-    rownames(data) <- row_names
-    colnames(data) <- col_names
+  if (numeric) {
+    data <- numeric_data_frame(data)
   }
 
   datamat <- as.matrix(data)
 
-  # convert the contents of the time column to a list of regperiods
+  # convert the contents of the time column to a list of periods
   times <- lapply(as.character(times), FUN = fun, ...)
 
   # check that all frequencies are equal
@@ -310,14 +297,14 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   if (identical(times, times[1]:times[nrow(datamat)])) {
     # normal regular timeseries, no missing periods and periods
     # are ordered synchronically
-    ret <- regts(datamat, start = create_regperiod(times[1], freq))
+    ret <- regts(datamat, start = create_period(times[1], freq))
   } else {
     # irregular timeseries in dataframe (missing periods or
     # unorderered time index)
     subp_min <- min(times)
     subp_max <- max(times)
     per_count <- subp_max - subp_min + 1
-    pmin <- create_regperiod(subp_min, frequency = freq)
+    pmin <- create_period(subp_min, frequency = freq)
     mat <- matrix(NA, nrow = per_count, ncol = ncol(datamat))
     colnames(mat) <- colnames(datamat)
     ret <- regts(mat, start = pmin)
@@ -351,7 +338,7 @@ add_columns <- function(x, new_colnames) {
   new_columns <- matrix(NA, nrow = nrow(x), ncol = ncols)
   ret <- as.regts(ts.union(x, new_columns))
   colnames(ret) <- c(colnames(x), new_colnames)
-  lbls <- ts_labels(x)
+  lbls <- attr(x, "ts_labels")
   if (!is.null(lbls)) {
     ts_labels(ret) <- c(lbls, rep("", ncols))
   }
@@ -376,20 +363,20 @@ add_columns <- function(x, new_colnames) {
     }
   }
 
-  if (!missing(i) && (is.character(i) || inherits(i, "regperiod") ||
-                      inherits(i, "regperiod_range"))) {
+  if (!missing(i) && (is.character(i) || inherits(i, "period") ||
+                      inherits(i, "period_range"))) {
 
-    # call C++ function get_regperiod_range
-    ts_range <- get_regperiod_range(x)
+    # call C++ function get_period_range
+    ts_range <- get_period_range(x)
 
-    sel_range <- convert_selection_range(as.regperiod_range(i), ts_range)
+    sel_range <- convert_selection_range(as.period_range(i), ts_range)
     if (sel_range[1] < ts_range[1] || sel_range[2] > ts_range[2]) {
       ts_range <- c(min(sel_range[1], ts_range[1]),
                     max(sel_range[2], ts_range[2]), ts_range[3])
       x <- window_regts(x, ts_range)
     }
     i <- seq(sel_range[1] - ts_range[1] + 1,
-             length.out = length_range__(sel_range))
+             length.out = nperiod__(sel_range))
     # if argument j is missing, then we have to add an empty
     # column selection. x[i] does not return the same as x[i, ].
     if (missing(j) && is.mts(x)) {
@@ -424,14 +411,14 @@ add_columns <- function(x, new_colnames) {
     return (ret)
   } else {
     # row selection present
-    if (is.character(i) || inherits(i, "regperiod") ||
-        inherits(i, "regperiod_range")) {
+    if (is.character(i) || inherits(i, "period") ||
+        inherits(i, "period_range")) {
       # first select columns
       if (!missing(j)) {
         x <- x[, j, drop = drop]
       }
-      # the row selector is a regperiod_range. Use window_regts
-      return (window_regts(x, as.regperiod_range(i)))
+      # the row selector is a period_range. Use window_regts
+      return (window_regts(x, as.period_range(i)))
     } else  {
       # numeric / logical row selection: the result is a  matrix or vector
       # (no longer a ts)
@@ -440,7 +427,7 @@ add_columns <- function(x, new_colnames) {
   }
 }
 
-# This function converts regperiod_range object sel_range so that it is a valid
+# This function converts period_range object sel_range so that it is a valid
 # period selector for a timeseries with period range ts_range. This implies
 # that the frequency is made equal to the frequency of ts_range and that
 # NA values are replaced by the values of ts_range.
@@ -465,15 +452,15 @@ convert_selection_range <- function(sel_range, ts_range) {
 }
 
 window_regts <- function(x, sel_range) {
-  ts_range <- get_regperiod_range(x)
+  ts_range <- get_period_range(x)
   sel_range <- convert_selection_range(sel_range, ts_range)
-  nper_new <- length_range__(sel_range)
+  nper_new <- nperiod__(sel_range)
   if (nper_new < 0) {
     stop("Illegal selection")
   }
   shift <- sel_range[1] - ts_range[1]
   rmin <- max(1, 1 - shift)
-  rmax <- min(nper_new, length_range__(ts_range) - shift)
+  rmax <- min(nper_new, nperiod__(ts_range) - shift)
   if (is.matrix(x)) {
     data <- matrix(NA, nrow = nper_new, ncol = ncol(x))
     if (rmax >= rmin) {
