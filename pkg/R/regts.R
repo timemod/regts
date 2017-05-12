@@ -287,11 +287,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     }
     row_names <- rownames(data)
     col_names <- colnames(data)
-    t <- system.time(
     data <- suppressWarnings(as.data.frame(lapply(data, FUN = f)))
-    )
-    cat("t = \n")
-    print(t)
     rownames(data) <- row_names
     colnames(data) <- col_names
   }

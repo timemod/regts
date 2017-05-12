@@ -85,9 +85,8 @@
 #' @importFrom readxl read_excel
 #' @export
 read_ts_xlsx <- function(filename, columnwise, frequency = NA,
-                        skiprow, skipcol,
-                        labels = c("no", "after", "before"),
-                        ...) {
+                         skiprow, skipcol, labels = c("no", "after", "before"),
+                         ...) {
 
   if (!missing(skiprow)) {
     skip <- skiprow
@@ -95,20 +94,34 @@ read_ts_xlsx <- function(filename, columnwise, frequency = NA,
     skip <- 0
   }
 
-  t <- system.time(
-    df <- read_excel(filename, skip = skip, col_names = FALSE, ...)
-  )
-  cat("timing reading excel file\n")
-  print(t)
+  if (missing(columnwise)) {
+    # read the first line of the Excel sheet to determine if the
+    # first row contains a period
+    first_line <- as.data.frame(read_excel(filename, skip = skip, n_max = 1,
+                                           col_names = FALSE, ...))
+    is_period <- is_period_text(get_strings(first_line), frequency)
+    columnwise <- !any(is_period)
+  }
 
-  # read_excel sometimes creates a weird structure: convert to standard
-  # data frame
+  # read the data data frame. For rowwise timeseries, the time index is put in
+  # the header
+  if (columnwise) {
+    df <- read_excel(filename, skip = skip, col_names = FALSE, ...)
+  } else {
+    df <- read_excel(filename, skip = skip, col_names = TRUE, ...)
+  }
+
   df <- as.data.frame(df)
 
   if (!missing(skipcol) && skipcol > 0) {
     df <- df[ , -(1:skipcol), drop = FALSE]
   }
 
-  return(read_ts(df, columnwise = columnwise, frequency = frequency,
-                 labels = labels))
+  if (columnwise) {
+    return(read_ts(df, columnwise = columnwise, frequency = frequency,
+                   labels = labels))
+  } else {
+    return(read_ts_rowwise(df, frequency = frequency, labels = labels))
+  }
 }
+

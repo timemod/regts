@@ -37,5 +37,6 @@ read_ts_rowwise <- function(df, frequency,
 
   # here use numeric = FALSE, because here we already know that
   # the timeseries is numeric
-  return(as.regts(df, frequency = frequency, numeric = FALSE))
+  # TODO: for read_csv we do not need numeric = TRUE
+  return(as.regts(df, frequency = frequency, numeric = TRUE))
 }
