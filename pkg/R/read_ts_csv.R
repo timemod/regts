@@ -133,6 +133,9 @@ read_ts_csv <- function(filename, columnwise, frequency = NA,
     return(read_ts(df, columnwise = columnwise, frequency = frequency,
             labels = labels))
   } else {
-    return(read_ts_rowwise(df, frequency = frequency, labels = labels))
+    # use numeric = FALSE, because we already know that the timeseries
+    # are numeric (see code above)
+    return(read_ts_rowwise(df, frequency = frequency, labels = labels,
+                           numeric = FALSE))
   }
 }
