@@ -88,8 +88,7 @@
 #' frequency indicator (for example "2011-1")
 #' @param labels label option. See details.
 #' @param na_string Character vector of strings to use for missing values.
-#' By default, \code{read_ts_xlsx} treats blank cells and cells containing the
-#' text "NA" as missing data.
+#' By default, \code{read_ts_xlsx} treats blank cells as missing data.
 #' @param skiprow the number of rows to skip. Ignored in \code{range} is
 #' given.
 #' @param skipcol the number of columns to skip. Ignored if \code{range} is
@@ -104,8 +103,7 @@
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          columnwise, frequency = NA,
                          labels = c("no", "after", "before"),
-                         na_string = c("", "NA"),
-                         skiprow = 0, skipcol = 0,
+                         na_string = c(""), skiprow = 0, skipcol = 0,
                          n_max = Inf) {
 
   if (missing(range)) {

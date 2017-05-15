@@ -5,8 +5,8 @@
 \title{Reads timeseries from a sheet of an  xls(x) file}
 \usage{
 read_ts_xlsx(filename, sheet = NULL, range = NULL, columnwise,
-  frequency = NA, labels = c("no", "after", "before"), na_string = c("",
-  "NA"), skiprow = 0, skipcol = 0, n_max = Inf)
+  frequency = NA, labels = c("no", "after", "before"), na_string = c(""),
+  skiprow = 0, skipcol = 0, n_max = Inf)
 }
 \arguments{
 \item{filename}{a string with the filename}
@@ -34,8 +34,7 @@ frequency indicator (for example "2011-1")}
 \item{labels}{label option. See details.}
 
 \item{na_string}{Character vector of strings to use for missing values.
-By default, \code{read_ts_xlsx} treats blank cells and cells containing the
-text "NA" as missing data.}
+By default, \code{read_ts_xlsx} treats blank cells as missing data.}
 
 \item{skiprow}{the number of rows to skip. Ignored in \code{range} is
 given.}
