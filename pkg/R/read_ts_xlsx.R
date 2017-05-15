@@ -141,8 +141,10 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   if (columnwise) {
     df <- read_excel(filename, sheet, range = range, col_names = FALSE)
   } else {
-    # TODO: compute column types
-    df <- read_excel(filename, sheet, range = range, col_names = TRUE)
+    nper <- length(is_period) - first_prd_col + 1
+    col_types <- c(rep("text", first_prd_col - 1), rep("numeric", nper))
+    df <- read_excel(filename, sheet, range = range, col_names = TRUE,
+                     col_types = col_types, na = na_string)
   }
 
   # the next statement is necessary. Why?
@@ -152,6 +154,9 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     return(read_ts(df, columnwise = columnwise, frequency = frequency,
                    labels = labels))
   } else {
-    return(read_ts_rowwise(df, frequency = frequency, labels = labels))
+    # use numeric = FALSE, because we already know that the timeseries
+    # are numeric (see code above)
+    return(read_ts_rowwise(df, frequency = frequency, labels = labels,
+                           numeric = FALSE))
   }
 }
