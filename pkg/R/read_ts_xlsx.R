@@ -77,9 +77,8 @@
 #' @param  range	A cell range to read from, as described in
 #' \code{\link[readxl]{cell-specification}}. Includes typical Excel ranges
 #' like "B3:D87", possibly including the
-#' sheet name like "Budget!B2:G14", and more. Interpreted strictly, even
-#' if the range forces the inclusion of leading or trailing empty rows or
-#' columns. Takes precedence over skiprow, skipcol, n_max and sheet.
+#' sheet name like "Budget!B2:G14", and more.
+#' Takes precedence over skiprow, skipcol, n_max and sheet.
 #' @param columnwise a logical value: are the timeseries stored columnwise?
 #' If not specified, then \code{read_ts} tries to figure out itself if
 #' the timeseries are stored columnwise or rowwise
@@ -99,6 +98,7 @@
 #' @return a \code{regts} object
 #' @importFrom readxl read_excel
 #' @importFrom cellranger cell_limits
+#' @importFrom cellranger as.cell_limits
 #' @export
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          columnwise, frequency = NA,
@@ -112,6 +112,14 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     }
     range <- cell_limits(ul = c(skiprow + 1,     skipcol + 1),
                          lr = c(skiprow + n_max, NA))
+
+  } else {
+    range <- as.cell_limits(range)
+    # Replace NA values for the upper left cell.
+    # In read_ts_xlsx we do not skip leading empty rows or columns.
+    # Otherwise a problem occurs if we only read the first few rows
+    # of the sheet
+    range$ul <- ifelse(is.na(range$ul), 1, range$ul)
   }
 
   if (missing(columnwise) || !columnwise) {
@@ -122,12 +130,11 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     ul <- range$ul
     lr <- range$lr
     lr[1] <- ul[1]
-    range_first_row <- cell_limits(ul = ul, lr = lr)
+    range_first_row <- cell_limits(ul = ul, lr = lr, sheet = range$sheet)
     first_row <- read_excel(filename, sheet, range = range_first_row,
                             col_names = FALSE)
     # the next statement is necessary. Why?
     first_row <- as.data.frame(first_row)
-
     is_period <- is_period_text(get_strings(first_row), frequency)
     first_prd_col <- Position(function(x) {x}, is_period)
     if (missing(columnwise)) {
@@ -147,7 +154,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     ul <- range$ul
     lr <- range$lr
     lr[2] <- ul[2] + length(col_types) - 1
-    range_tmp <- cell_limits(ul = ul, lr = lr)
+    range_tmp <- cell_limits(ul = ul, lr = lr, sheet = range$sheet)
     df <- read_excel(filename, sheet, range = range_tmp, col_names = TRUE,
                      col_types = col_types, na = na_string)
   }

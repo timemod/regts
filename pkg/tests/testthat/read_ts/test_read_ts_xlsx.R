@@ -52,4 +52,11 @@ test_that("example2.xlsx is read correctly",  {
                           labels = "before")
 
   expect_identical(result3, correct_result_labels2)
+
+  result4 <- read_ts_xlsx(xlsx_file, range = "example2!B1:H6",  skipcol = 999)
+  expect_identical(result4, correct_result)
+
+  result5 <- read_ts_xlsx(xlsx_file, range = cellranger::cell_cols("B:H"),
+                          sheet = "example2", skipcol = 999)
+  expect_identical(result5, correct_result)
 })

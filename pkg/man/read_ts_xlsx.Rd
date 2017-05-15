@@ -19,9 +19,8 @@ defaults to the first sheet}
 \item{range}{A cell range to read from, as described in
 \code{\link[readxl]{cell-specification}}. Includes typical Excel ranges
 like "B3:D87", possibly including the
-sheet name like "Budget!B2:G14", and more. Interpreted strictly, even
-if the range forces the inclusion of leading or trailing empty rows or
-columns. Takes precedence over skiprow, skipcol, n_max and sheet.}
+sheet name like "Budget!B2:G14", and more.
+Takes precedence over skiprow, skipcol, n_max and sheet.}
 
 \item{columnwise}{a logical value: are the timeseries stored columnwise?
 If not specified, then \code{read_ts} tries to figure out itself if
