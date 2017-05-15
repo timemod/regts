@@ -119,10 +119,10 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     # first row contains a period. read_excel skips all columns
     # without any value, thus we cannot compute yet the
     # position of the first period column, as in read_ts_csv
-    ul1 <- range$ul
-    rl1 <- range$lr
-    rl1[1] <- ul1[1]
-    range_first_row <- cell_limits(ul = ul1, lr = rl1)
+    ul <- range$ul
+    lr <- range$lr
+    lr[1] <- ul[1]
+    range_first_row <- cell_limits(ul = ul, lr = lr)
     first_row <- read_excel(filename, sheet, range = range_first_row,
                             col_names = FALSE)
     # the next statement is necessary. Why?
@@ -143,7 +143,12 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   } else {
     nper <- length(is_period) - first_prd_col + 1
     col_types <- c(rep("text", first_prd_col - 1), rep("numeric", nper))
-    df <- read_excel(filename, sheet, range = range, col_names = TRUE,
+    # do not read more columns than the length of col_types
+    ul <- range$ul
+    lr <- range$lr
+    lr[2] <- ul[2] + length(col_types) - 1
+    range_tmp <- cell_limits(ul = ul, lr = lr)
+    df <- read_excel(filename, sheet, range = range_tmp, col_names = TRUE,
                      col_types = col_types, na = na_string)
   }
 
