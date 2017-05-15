@@ -4,11 +4,24 @@
 \alias{read_ts_xlsx}
 \title{Reads timeseries from a sheet of an  xls(x) file}
 \usage{
-read_ts_xlsx(filename, columnwise, frequency = NA, skiprow, skipcol,
-  labels = c("no", "after", "before"), ...)
+read_ts_xlsx(filename, sheet = NULL, range = NULL, columnwise,
+  frequency = NA, labels = c("no", "after", "before"), na_string = c("",
+  "NA"), skiprow = 0, skipcol = 0, n_max = Inf)
 }
 \arguments{
 \item{filename}{a string with the filename}
+
+\item{sheet}{Sheet to read. Either a string (the name of a sheet),
+or an integer (the position of the sheet). Ignored if the sheet is
+specified via range. If neither argument specifies the sheet,
+defaults to the first sheet}
+
+\item{range}{A cell range to read from, as described in
+\code{\link[readxl]{cell-specification}}. Includes typical Excel ranges
+like "B3:D87", possibly including the
+sheet name like "Budget!B2:G14", and more. Interpreted strictly, even
+if the range forces the inclusion of leading or trailing empty rows or
+columns. Takes precedence over skiprow, skipcol, n_max and sheet.}
 
 \item{columnwise}{a logical value: are the timeseries stored columnwise?
 If not specified, then \code{read_ts} tries to figure out itself if
@@ -18,14 +31,21 @@ the timeseries are stored columnwise or rowwise}
 This argument is mandatory if the file contains period texts without
 frequency indicator (for example "2011-1")}
 
-\item{skiprow}{the number of rows to skip}
-
-\item{skipcol}{the number of columns to skip}
-
 \item{labels}{label option. See details.}
 
-\item{...}{arguments passed to function \code{\link[readxl]{read_excel}}
-of package \code{readxl}}
+\item{na_string}{Character vector of strings to use for missing values.
+By default, \code{read_ts_xlsx} treats blank cells and cells containing the
+text "NA" as missing data.}
+
+\item{skiprow}{the number of rows to skip. Ignored in \code{range} is
+given.}
+
+\item{skipcol}{the number of columns to skip. Ignored if \code{range} is
+given.}
+
+\item{n_max}{Maximum number of data rows to read. Trailing empty rows are
+automatically skipped, so this is an upper bound on the number of rows in
+the returned tibble. Ignored if range is given.}
 }
 \value{
 a \code{regts} object
@@ -60,8 +80,8 @@ assumes that the timeseries are stored columnwise.
 \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=240}}
 \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 
-For columnwise timeseries, the first row that is not skipped (see
-argument \code{skiprow}) should contain the variable names.
+For columnwise timeseries, the first row that read (see
+argument \code{range} or \code{skiprow}) should contain the variable names.
 The periods can be in any column on the sheet.
 All columns to the left of the time column are ignored.
 There may be one or more rows between the column names and the rows
@@ -79,8 +99,8 @@ timeseries, since in that case the column names are the timeseries names.
 \if{html}{\figure{xlsschemarowwise.jpg}{options: width=260}}
 \if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
 
-For rowwise timeseries, the first row that is not skipped (see
-argument \code{skiprow}) should contain the periods.
+For rowwise timeseries, the first row that is read (see
+argument \code{range} and \code{skiprow}) should contain the periods.
 Columns for which the corresponding period is not a valid period
 are ignored. The timeseries names should be in the
 first column of the sheet. Otherwise, use argument \code{skipcol}

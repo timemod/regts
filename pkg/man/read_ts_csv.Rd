@@ -4,11 +4,11 @@
 \alias{read_ts_csv}
 \title{Reads timeseries from a csv file}
 \usage{
-read_ts_csv(filename, columnwise, frequency = NA, skiprow, skipcol,
+read_ts_csv(input, columnwise, frequency = NA, skiprow = 0, skipcol = 0,
   labels = c("no", "after", "before"), ...)
 }
 \arguments{
-\item{filename}{a string with the filename}
+\item{input}{a string with the filename}
 
 \item{columnwise}{a logical value: are the timeseries stored columnwise?
 If not specified, then \code{read_ts} tries to figure out itself if

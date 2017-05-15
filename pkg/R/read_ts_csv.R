@@ -77,7 +77,7 @@
 #' Argument \code{frequency} is mandatory if a general period format
 #' such as  \code{"2011-1"} has been used.
 #'
-#' @param filename  a string with the filename
+#' @param input  a string with the filename
 #' @param columnwise a logical value: are the timeseries stored columnwise?
 #' If not specified, then \code{read_ts} tries to figure out itself if
 #' the timeseries are stored columnwise or rowwise
@@ -92,36 +92,30 @@
 #' @return a \code{regts} object
 #' @importFrom data.table fread
 #' @export
-read_ts_csv <- function(filename, columnwise, frequency = NA,
-                        skiprow, skipcol,
+read_ts_csv <- function(input, columnwise, frequency = NA,
+                        skiprow = 0, skipcol = 0,
                         labels = c("no", "after", "before"),
                         ...) {
 
-  if (!missing(skiprow)) {
-    skip <- skiprow
-  } else {
-    skip <- 0
-  }
-
   if (missing(columnwise) || !columnwise) {
-    first_line <- fread(filename, nrows = 1, skip = skip, header = FALSE,
+    first_line <- fread(input, nrows = 1, skip = skiprow, header = FALSE,
                         data.table = FALSE, ...)
     is_period <- is_period_text(get_strings(first_line), frequency)
     first_prd_col <- Position(function(x) {x}, is_period)
     if (missing(columnwise)) {
-      columnwise <- is.na(first_prd_col)
+      columnwise <- is.na(first_prd_col) | first_prd_col <= skipcol
     }
   }
 
   # read the data data frame. For rowwise timeseries, the time index is put in
   # the header
   if (columnwise) {
-    df <- fread(filename, skip = skip, header = FALSE, data.table = FALSE,
+    df <- fread(input, skip = skiprow, header = FALSE, data.table = FALSE,
                 ...)
   } else {
     nper <- length(is_period) - first_prd_col + 1
     colClasses <- c(rep("character", first_prd_col - 1), rep("numeric", nper))
-    df <- fread(filename, skip = skip, header = TRUE, data.table = FALSE,
+    df <- fread(input, skip = skiprow, header = TRUE, data.table = FALSE,
                 colClasses = colClasses, ...)
   }
 
