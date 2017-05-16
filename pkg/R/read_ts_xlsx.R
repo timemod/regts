@@ -19,7 +19,7 @@
 #'
 #' If argument \code{columnwise} has not been specified, then
 #' function \code{read_ts_xlsx} searches for any valid period text in the first
-#' row after the skipped rows on the sheet. If a valid period was found, then
+#' row read. If a valid period was found, then
 #' \code{read_ts} assumes that the timeseries are stored rowwise. Otherwise it
 #' assumes that the timeseries are stored columnwise.
 #'
@@ -28,7 +28,7 @@
 #' \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=240}}
 #' \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 #'
-#' For columnwise timeseries, the first row that read (see
+#' For columnwise timeseries, the first row that was read (see
 #' argument \code{range} or \code{skiprow}) should contain the variable names.
 #' The periods can be in any column on the sheet.
 #' All columns to the left of the time column are ignored.
@@ -42,6 +42,10 @@
 #' should contain label information. If argument \code{use_colnames = TRUE},
 #' then the label option \code{"before"} is not allowed for columnwise
 #' timeseries, since in that case the column names are the timeseries names.
+#'
+#' By default, the function skips all leading empty rows and columns,
+#' just as \code{read_excel}. This behaviour can be overruled by specifying arguments
+#' \code{range}, \code{skiprow} or \code{skipcol}.
 #'
 #' \strong{rowwise timeseries}
 #'
@@ -82,7 +86,7 @@
 #' empty rows or columns.
 #' Takes precedence over skiprow, skipcol and sheet
 #' @param skiprow the number of rows to skip, inlcuding leading empty rows.
-#' Ignored in \code{range} is given. By default, all leading empty rows are
+#' Ignored if \code{range} is given. By default, all leading empty rows are
 #' skipped.
 #' @param skipcol the number of columns to skip, including empty columns.
 #' Ignored if \code{range} is given. By default, all leading empty columns are
@@ -110,32 +114,48 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     range <- cell_limits()
     range$ul[1] <- skiprow + 1
     range$ul[2] <- skipcol + 1
-  } else if (!is.null(range)) {
+  } else {
     range <- as.cell_limits(range)
   }
 
   if (missing(columnwise)) {
     # Read the first line(s) of the Excel sheet to determine if the
     # timeseries are stored rowwise or columnwise
-    if (!is.null(range)) {
+    if (!is.na(range$ul[1])) {
+      # first row specified
       ul <- range$ul
       lr <- range$lr
-      if (is.na(ul[1])) {
-        ul[1] <- 1
-      }
       lr[1] <- ul[1]
       range_first_row <- cell_limits(ul = ul, lr = lr, sheet = range$sheet)
+      first_row <- read_excel(filename, sheet, range = range_first_row,
+                              col_names = FALSE)
     } else {
-      range_first_row <- cell_limits(ul = c(1, 1), lr = c(1, NA))
+      MAX_NROWS = 100
+      rownr <- 0
+      while (rownr < MAX_NROWS) {
+        rownr <- rownr + 1
+        ul <- range$ul
+        lr <- range$lr
+        ul[1] <- rownr
+        lr[1] <- rownr
+        range_first_row <- cell_limits(ul = ul, lr = lr, sheet = range$sheet)
+        first_row <- read_excel(filename, sheet, range = range_first_row,
+                                col_names = FALSE)
+        if (ncol(first_row) > 0) {
+          break
+        }
+      }
+      if (ncol(first_row) == 0) {
+        stop(paste("The first", MAX_NROWS, "rows are all empty.\n",
+                   "Therefore we could not determine whether the timeseries",
+                   "are rowwise or columnwise.\n",
+                   "Please supply argument columnwise."))
+      }
     }
-    first_row <- read_excel(filename, sheet, range = range_first_row,
-                            col_names = FALSE)
-
-    # TODO: if the start row was not specify (ul1[1] == NA),
-    # then repeat reading rows until we find the first non-empty row
 
     # the next statement is necessary. Why?
     first_row <- as.data.frame(first_row)
+
     is_period <- is_period_text(get_strings(first_row), frequency)
     columnwise <- !any(is_period)
   }

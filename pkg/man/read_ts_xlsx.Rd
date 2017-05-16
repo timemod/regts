@@ -25,7 +25,7 @@ empty rows or columns.
 Takes precedence over skiprow, skipcol and sheet}
 
 \item{skiprow}{the number of rows to skip, inlcuding leading empty rows.
-Ignored in \code{range} is given. By default, all leading empty rows are
+Ignored if \code{range} is given. By default, all leading empty rows are
 skipped.}
 
 \item{skipcol}{the number of columns to skip, including empty columns.
@@ -69,7 +69,7 @@ and finally convert it to a \code{regts} by using function \code{as.regts}.
 \details{
 If argument \code{columnwise} has not been specified, then
 function \code{read_ts_xlsx} searches for any valid period text in the first
-row after the skipped rows on the sheet. If a valid period was found, then
+row read. If a valid period was found, then
 \code{read_ts} assumes that the timeseries are stored rowwise. Otherwise it
 assumes that the timeseries are stored columnwise.
 
@@ -78,7 +78,7 @@ assumes that the timeseries are stored columnwise.
 \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=240}}
 \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 
-For columnwise timeseries, the first row that read (see
+For columnwise timeseries, the first row that was read (see
 argument \code{range} or \code{skiprow}) should contain the variable names.
 The periods can be in any column on the sheet.
 All columns to the left of the time column are ignored.
@@ -91,6 +91,10 @@ the variable names. Now the row before the variable name columns
 should contain label information. If argument \code{use_colnames = TRUE},
 then the label option \code{"before"} is not allowed for columnwise
 timeseries, since in that case the column names are the timeseries names.
+
+By default, the function skips all leading empty rows and columns,
+just as \code{read_excel}. This behaviour can be overruled by specifying arguments
+\code{range}, \code{skiprow} or \code{skipcol}.
 
 \strong{rowwise timeseries}
 
