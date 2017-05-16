@@ -78,7 +78,15 @@
 #' \code{\link[readxl]{cell-specification}}. Includes typical Excel ranges
 #' like "B3:D87", possibly including the
 #' sheet name like "Budget!B2:G14", and more.
-#' Takes precedence over skiprow, skipcol, n_max and sheet.
+#' strictly, even if the range forces the inclusion of leading or trailing
+#' empty rows or columns.
+#' Takes precedence over skiprow, skipcol and sheet
+#' @param skiprow the number of rows to skip, inlcuding leading empty rows.
+#' Ignored in \code{range} is given. By default, all leading empty rows are
+#' skipped.
+#' @param skipcol the number of columns to skip, including empty columns.
+#' Ignored if \code{range} is given. By default, all leading empty columns are
+#' skipped.
 #' @param columnwise a logical value: are the timeseries stored columnwise?
 #' If not specified, then \code{read_ts} tries to figure out itself if
 #' the timeseries are stored columnwise or rowwise
@@ -88,75 +96,58 @@
 #' @param labels label option. See details.
 #' @param na_string Character vector of strings to use for missing values.
 #' By default, \code{read_ts_xlsx} treats blank cells as missing data.
-#' @param skiprow the number of rows to skip. Ignored in \code{range} is
-#' given.
-#' @param skipcol the number of columns to skip. Ignored if \code{range} is
-#' given.
-#' @param n_max Maximum number of data rows to read. Trailing empty rows are
-#' automatically skipped, so this is an upper bound on the number of rows in
-#' the returned tibble. Ignored if range is given.
 #' @return a \code{regts} object
 #' @importFrom readxl read_excel
 #' @importFrom cellranger cell_limits
 #' @importFrom cellranger as.cell_limits
 #' @export
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
-                         columnwise, frequency = NA,
+                         skiprow = NA, skipcol = NA, columnwise, frequency = NA,
                          labels = c("no", "after", "before"),
-                         na_string = c(""), skiprow = 0, skipcol = 0,
-                         n_max = Inf) {
+                         na_string = c("")) {
 
   if (missing(range)) {
-    if (is.infinite(n_max)) {
-      n_max <- NA_integer_
-    }
-    range <- cell_limits(ul = c(skiprow + 1,     skipcol + 1),
-                         lr = c(skiprow + n_max, NA))
-
-  } else {
+    range <- cell_limits()
+    range$ul[1] <- skiprow + 1
+    range$ul[2] <- skipcol + 1
+  } else if (!is.null(range)) {
     range <- as.cell_limits(range)
-    # Replace NA values for the upper left cell.
-    # In read_ts_xlsx we do not skip leading empty rows or columns.
-    # Otherwise a problem occurs if we only read the first few rows
-    # of the sheet
-    range$ul <- ifelse(is.na(range$ul), 1, range$ul)
   }
 
-  if (missing(columnwise) || !columnwise) {
-    # Read the first line of the Excel sheet to determine if the
-    # first row contains a period. read_excel skips all columns
-    # without any value, thus we cannot compute yet the
-    # position of the first period column, as in read_ts_csv
-    ul <- range$ul
-    lr <- range$lr
-    lr[1] <- ul[1]
-    range_first_row <- cell_limits(ul = ul, lr = lr, sheet = range$sheet)
+  if (missing(columnwise)) {
+    # Read the first line(s) of the Excel sheet to determine if the
+    # timeseries are stored rowwise or columnwise
+    if (!is.null(range)) {
+      ul <- range$ul
+      lr <- range$lr
+      if (is.na(ul[1])) {
+        ul[1] <- 1
+      }
+      lr[1] <- ul[1]
+      range_first_row <- cell_limits(ul = ul, lr = lr, sheet = range$sheet)
+    } else {
+      range_first_row <- cell_limits(ul = c(1, 1), lr = c(1, NA))
+    }
     first_row <- read_excel(filename, sheet, range = range_first_row,
                             col_names = FALSE)
+
+    # TODO: if the start row was not specify (ul1[1] == NA),
+    # then repeat reading rows until we find the first non-empty row
+
     # the next statement is necessary. Why?
     first_row <- as.data.frame(first_row)
     is_period <- is_period_text(get_strings(first_row), frequency)
-    first_prd_col <- Position(function(x) {x}, is_period)
-    if (missing(columnwise)) {
-      columnwise <- is.na(first_prd_col) | first_prd_col <= range$ul[2]
-    }
+    columnwise <- !any(is_period)
   }
-
 
   # read the data data frame. For rowwise timeseries, the time index is put in
   # the header
   if (columnwise) {
-    df <- read_excel(filename, sheet, range = range, col_names = FALSE)
+    df <- read_excel(filename, sheet, range = range, col_names = FALSE,
+                     na = na_string)
   } else {
-    nper <- length(is_period) - first_prd_col + 1
-    col_types <- c(rep("text", first_prd_col - 1), rep("numeric", nper))
-    # do not read more columns than the length of col_types
-    ul <- range$ul
-    lr <- range$lr
-    lr[2] <- ul[2] + length(col_types) - 1
-    range_tmp <- cell_limits(ul = ul, lr = lr, sheet = range$sheet)
-    df <- read_excel(filename, sheet, range = range_tmp, col_names = TRUE,
-                     col_types = col_types, na = na_string)
+    df <- read_excel(filename, sheet, range = range, col_names = TRUE,
+                     na = na_string)
   }
 
   # the next statement is necessary. Why?
@@ -166,9 +157,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     return(read_ts(df, columnwise = columnwise, frequency = frequency,
                    labels = labels))
   } else {
-    # use numeric = FALSE, because we already know that the timeseries
-    # are numeric (see code above)
     return(read_ts_rowwise(df, frequency = frequency, labels = labels,
-                           numeric = FALSE))
+                           numeric = TRUE))
   }
 }

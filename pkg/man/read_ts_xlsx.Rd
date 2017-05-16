@@ -4,9 +4,9 @@
 \alias{read_ts_xlsx}
 \title{Reads timeseries from a sheet of an  xls(x) file}
 \usage{
-read_ts_xlsx(filename, sheet = NULL, range = NULL, columnwise,
-  frequency = NA, labels = c("no", "after", "before"), na_string = c(""),
-  skiprow = 0, skipcol = 0, n_max = Inf)
+read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = NA,
+  skipcol = NA, columnwise, frequency = NA, labels = c("no", "after",
+  "before"), na_string = c(""))
 }
 \arguments{
 \item{filename}{a string with the filename}
@@ -20,7 +20,17 @@ defaults to the first sheet}
 \code{\link[readxl]{cell-specification}}. Includes typical Excel ranges
 like "B3:D87", possibly including the
 sheet name like "Budget!B2:G14", and more.
-Takes precedence over skiprow, skipcol, n_max and sheet.}
+strictly, even if the range forces the inclusion of leading or trailing
+empty rows or columns.
+Takes precedence over skiprow, skipcol and sheet}
+
+\item{skiprow}{the number of rows to skip, inlcuding leading empty rows.
+Ignored in \code{range} is given. By default, all leading empty rows are
+skipped.}
+
+\item{skipcol}{the number of columns to skip, including empty columns.
+Ignored if \code{range} is given. By default, all leading empty columns are
+skipped.}
 
 \item{columnwise}{a logical value: are the timeseries stored columnwise?
 If not specified, then \code{read_ts} tries to figure out itself if
@@ -34,16 +44,6 @@ frequency indicator (for example "2011-1")}
 
 \item{na_string}{Character vector of strings to use for missing values.
 By default, \code{read_ts_xlsx} treats blank cells as missing data.}
-
-\item{skiprow}{the number of rows to skip. Ignored in \code{range} is
-given.}
-
-\item{skipcol}{the number of columns to skip. Ignored if \code{range} is
-given.}
-
-\item{n_max}{Maximum number of data rows to read. Trailing empty rows are
-automatically skipped, so this is an upper bound on the number of rows in
-the returned tibble. Ignored if range is given.}
 }
 \value{
 a \code{regts} object
