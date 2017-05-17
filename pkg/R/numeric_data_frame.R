@@ -71,10 +71,21 @@ numeric_data_frame <- function(x) {
     has_text <- as.data.frame(lapply(x_test, FUN = has_text_f))
     problem <- has_text & is.na(x2[, is_char])
     weird_texts <- x_test[problem]
-    weird_texts <- paste0("\"", weird_texts, "\"")
-    warning(paste0("NAs introduced by coercion\n",
-                  "The following texts could not be converted to numeric:\n",
-                  paste0(weird_texts, collapse = "\n")))
+    nweird <- length(weird_texts)
+    NWEIRD_MAX <- 10
+    nmax <- min(NWEIRD_MAX, nweird)
+    weird_texts <- paste0("\"", weird_texts[1:nmax], "\"")
+
+    if (nweird <= NWEIRD_MAX) {
+      warning(paste0("NAs introduced by coercion\n",
+                    "The following texts could not be converted to numeric:\n",
+                    paste0(weird_texts, collapse = "\n")))
+    } else {
+      warning(paste0("NAs introduced by coercion.\n",
+                     nweird, " texts could not be converte to numeric.\n",
+                     "The first ", NWEIRD_MAX, " texts that gave problems are:\n",
+                     paste0(weird_texts, collapse = "\n")))
+    }
   }
 
   # restore row and column names

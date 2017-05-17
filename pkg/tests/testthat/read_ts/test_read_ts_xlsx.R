@@ -52,4 +52,48 @@ test_that("example2.xlsx is read correctly",  {
                           labels = "before")
 
   expect_identical(result3, correct_result_labels2)
+
+  result4 <- read_ts_xlsx(xlsx_file, range = "example2!B1:H6",  skipcol = 999)
+  expect_identical(result4, correct_result)
+
+  result5 <- read_ts_xlsx(xlsx_file, range = cellranger::cell_cols("B:H"),
+                          sheet = "example2", skipcol = 999)
+  expect_identical(result5, correct_result)
+})
+
+test_that("example3.xlsx is read correctly (leading empty rows and columns are skipped)",  {
+
+  xlsx_file <- "xlsx/example3.xlsx"
+
+  result <- read_ts_xlsx(xlsx_file)
+  expect_identical(result, correct_result)
+
+  result2 <- read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", NA)))
+  expect_identical(result2, correct_result)
+
+  result3 <- read_ts_xlsx(xlsx_file, range = cellranger::cell_rows(c(2, NA)))
+  expect_identical(result2, correct_result)
+})
+
+test_that("example4.xlsx is read correctly (leading empty columns are skipped)",  {
+
+  xlsx_file <- "xlsx/example4.xlsx"
+
+  result <- read_ts_xlsx(xlsx_file, sheet = "example2")
+  expect_identical(result, correct_result)
+
+  result2 <- read_ts_xlsx(xlsx_file, range = cellranger::cell_limits(c(NA, 2),
+                                                                   sheet = "example2"))
+  expect_identical(result2, correct_result)
+})
+
+test_that("example5.xlsx is read correctly (leading empty are skipped)",  {
+  xlsx_file <- "xlsx/example5.xlsx"
+  result <- read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", NA)),
+                         sheet = "example2")
+  expect_identical(result, correct_result)
+
+  msg <- "The first 100 rows are all empty.\n Therefore we could not determine whether the timeseries are rowwise or columnwise.\n Please supply argument columnwise."
+  expect_error(read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", NA)),
+                         sheet = "Sheet3"), msg)
 })

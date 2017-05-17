@@ -15,7 +15,7 @@ ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b (EUR)")
 test_that("rowwise1.csv is read correctly",  {
   csv_file <- "csv/rowwise1.csv"
   result <- read_ts_csv(csv_file)
-  expect_identical(result, correct_result * 1)
+  expect_identical(result, correct_result)
 })
 
 test_that("rowwise2.csv is read correctly",  {
@@ -23,10 +23,10 @@ test_that("rowwise2.csv is read correctly",  {
   csv_file <- "csv/rowwise2.csv"
 
   result <- read_ts_csv(csv_file)
-  expect_identical(result, correct_result * 1)
+  expect_identical(result, correct_result)
 
   result2 <- read_ts_csv(csv_file, labels = "after")
-  expect_identical(result2, correct_result_labels * 1)
+  expect_identical(result2, correct_result_labels)
 })
 
 test_that("columnwise1.csv is read correctly",  {
@@ -90,17 +90,17 @@ test_that("example1.csv is read correctly",  {
   csv_file <- "csv/example1.csv"
 
   result <- read_ts_csv(csv_file, skiprow = 1)
-  expect_identical(result, correct_result)
+  expect_identical(result, correct_result * 1)
 
   result2 <- read_ts_csv(csv_file, skiprow = 1, labels = "after")
-  expect_identical(result2, correct_result_labels)
+  expect_identical(result2, correct_result_labels * 1)
 
   correct_result_labels2 <- correct_result[ , "b", drop = FALSE]
   colnames(correct_result_labels2) <- "(EUR)"
   ts_labels(correct_result_labels2) <- "b Timeseries b"
 
   result3 <- read_ts_csv(csv_file, skiprow = 1, labels = "before")
-  expect_identical(result3, correct_result_labels2)
+  expect_identical(result3, correct_result_labels2 * 1)
 })
 
 test_that("example2.csv is read correctly",  {

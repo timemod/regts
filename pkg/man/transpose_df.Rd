@@ -14,9 +14,12 @@ the column names of the transposed data frame. By default the
 row names of the original data frame are used as column names of the new data
  frame.}
 
-\item{label_column}{the name or the index of the column that contains
-the labels for the transposed data frame. By default no labels
-are created}
+\item{label_column}{a numeric or character vector with the
+indices or the names of the columns that contains
+the row labels. If this is a vector of
+length larger than 1, then the texts in the columns are combined
+to create single labels for the columns of the transposed data frame.
+By default labels are ignored.}
 }
 \value{
 the transposed data frame
