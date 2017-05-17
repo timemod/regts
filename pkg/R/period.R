@@ -234,13 +234,13 @@ min.period <- function(..., na.rm = FALSE){
   }
 
   # check frequencies
-  is_freq <- lapply(args, FUN = frequency)
-  if (length(unique(is_freq)) > 1){
+  freq <- lapply(args, FUN = frequency)
+  if (length(unique(freq)) > 1){
     stop("All periods must have the same frequency")
   }
 
   result <- NextMethod(.Generic)
-  return(regts:::create_period(result, is_freq[[1]]))
+  return(create_period(result, freq[[1]]))
 }
 
 # maximum of 2 or more periods
@@ -256,12 +256,12 @@ max.period <- function(..., na.rm = FALSE){
   }
 
   # check frequencies
-  is_freq <- lapply(args, FUN = frequency)
-  if (length(unique(is_freq)) > 1){
+  freq <- lapply(args, FUN = frequency)
+  if (length(unique(freq)) > 1){
     stop("All periods must have the same frequency")
   }
 
   result <- NextMethod(.Generic)
-  return(regts:::create_period(result, is_freq[[1]]))
+  return(create_period(result, freq[[1]]))
 }
 
