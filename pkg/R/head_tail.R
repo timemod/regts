@@ -1,61 +1,47 @@
-#' Printing head of a regts
+#' @export
+head.regts <- function(x, n = 6L, ...) {
+
+  first <- start_period(get_period_range(x))
+  last  <- end_period(get_period_range(x))
+  period <- period_range(first, min(first + n-1, last))
+
+  return(x[period, ])
+
+}
+
+#' @export
+tail.regts <- function(x, n = 6L, ...) {
+
+  first <- start_period(get_period_range(x))
+  last  <- end_period(get_period_range(x))
+  period <- period_range(max(first,last - n+1), last)
+
+  return(x[period, ])
+
+}
+
+#' Returns the topleft part of a regts.
 #'
-#' With this function the head of a regts can be printed. The generic function
-#' \code{\link{head}} is extended with parameters \code{method} and \code{size}.
-#' @param method if \code{first} then the first part of the timeseries is printed,
-#' otherwise (\code{last}) the last part of the timeseries is printed.
-#' @param size is the number of timeseries that are printed. Default = 10.
-#' @param ...	arguments passed to \code{\link{head}}.
+#' @param x a multivariate \code{\link{regts}}
+#' @param n a single integer. Length period for the resulting object.
+#' @param ncol a single integer. Number of columns in \code{\link{regts}}.
+#' By default only the first 10 columns are printed.
 #' @examples
 #' data <- regts(matrix(1:200, ncol = 20), start = "2010Q2",
 #'               names = paste0("abc", 1:20))
-#' head(data)
-#' head(data, method = "last", size = 5)
+#' topleft(data)
 #' @seealso
-#' \code{\link{tail.regts}}
-
+#' \code{\link{head}}, \code{\link{tail}}
 #' @export
-head.regts <- function(x, method = c("first","last"), size = 10, ...) {
+topleft <- function(x, n = 6L, ncol = 10L, ...) {
 
-  method <- match.arg(method)
+  first <- start_period(get_period_range(x))
+  last  <- end_period(get_period_range(x))
+  period <- period_range(first, min(first + n-1, last))
 
-  if (method == "first") {
-    x <- as.data.frame(x[,1:size])
-  }
-  else {
-    p <- max(NCOL(x)-size+1,0)
-    x <- as.data.frame(x[,p:NCOL(x)])
-  }
-  NextMethod("head", .Generic)
+  return(x[period, 1:ncol ])
+
 }
 
-#' Printing tail of a regts
-#'
-#' With this function the tail of a regts can be printed. The generic function
-#' \code{\link{tail}} is extended with parameters \code{method} and \code{size}.
-#' @param method if \code{first} then the first part of the timeseries is printed,
-#' otherwise (\code{last}) the last part of the timeseries is printed.
-#' @param size is the number of timeseries that are printed. Default = 10.
-#' @param ...	arguments passed to \code{\link{tail}}.
-#' @examples
-#' data <- regts(matrix(1:200, ncol = 20), start = "2010Q2",
-#'               names = paste0("abc", 1:20))
-#' tail(data)
-#' tail(data, method = "last", size = 5)
-#' @seealso
-#' \code{\link{head.regts}}
-#' @export
-tail.regts <- function(x, method = c("first","last"), size = 10, ...) {
 
-  method <- match.arg(method)
-
-  if (method == "first") {
-    x <- as.data.frame(x[,1:size])
-  }
-  else {
-    p <- max(NCOL(x)-size+1,0)
-    x <- as.data.frame(x[,p:NCOL(x)])
-  }
-  NextMethod("tail", .Generic)
-}
 

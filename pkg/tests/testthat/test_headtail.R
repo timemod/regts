@@ -1,25 +1,19 @@
-context("head & tail")
+context("head, tail & topleft")
 
-test_that("head for regts / df", {
+test_that("head, tail & topleft for regts", {
 
-	data <- regts(matrix(1:200, ncol = 20), start = "2010Q2",
+	data <- regts(matrix(1:200, ncol = 20), start = "2010Q1",
                   names = paste0("abc", 1:20))
-	df <- as.data.frame(data)
+	data2 <- as.regts(as.data.frame(data))
+	period1 <- period_range("2010Q1/2011Q2")
+	period2 <- period_range("2011Q1/2012Q2")
 
-	expect_identical(head(data), head(df[, 1:10]))
-	expect_identical(head(data, method = "last"), head(df[, 11:20]))
-	expect_identical(head(data, size = 6), head(df[, 1:6]))
-	expect_identical(head(data, size = 6, method = "last"), head(df[, 15:20]))
-})
+	expect_identical(head(data), head(data2))
+	expect_identical(head(data), tail(data[period1, ]))
+	expect_identical(head(data[period2, ]), tail(data))
 
-test_that("tail for regts / df", {
-
-	data <- regts(matrix(1:200, ncol = 20), start = "2010Q2",
-	              names = paste0("abc", 1:20))
-	df <- as.data.frame(data)
-
-	expect_identical(tail(data), tail(df[, 1:10]))
-	expect_identical(tail(data, method = "last"), tail(df[, 11:20]))
-	expect_identical(tail(data, size = 6), tail(df[, 1:6]))
-	expect_identical(tail(data, size = 6, method = "last"), tail(df[, 15:20]))
+  expect_identical(topleft(data), head(data[, 1:10 ]))
+  expect_identical(topleft(data), tail(data[period1, 1:10 ]))
+  expect_identical(topleft(data, ncol = 6), head(data[, 1:6 ]))
+  expect_identical(topleft(data, ncol = 5), topleft(data2, ncol = 5))
 })
