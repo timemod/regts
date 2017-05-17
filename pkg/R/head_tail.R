@@ -1,3 +1,4 @@
+#' @importFrom utils head
 #' @export
 head.regts <- function(x, n = 6L, ...) {
 
@@ -9,6 +10,7 @@ head.regts <- function(x, n = 6L, ...) {
 
 }
 
+#' @importFrom utils tail
 #' @export
 tail.regts <- function(x, n = 6L, ...) {
 
@@ -33,7 +35,7 @@ tail.regts <- function(x, n = 6L, ...) {
 #' @seealso
 #' \code{\link{head}}, \code{\link{tail}}
 #' @export
-topleft <- function(x, n = 6L, ncol = 10L, ...) {
+topleft <- function(x, n = 6L, ncol = 10L) {
 
   first <- start_period(get_period_range(x))
   last  <- end_period(get_period_range(x))
