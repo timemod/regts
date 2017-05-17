@@ -4,7 +4,7 @@
 \alias{topleft}
 \title{Returns the topleft part of a regts.}
 \usage{
-topleft(x, n = 6L, ncol = 10L, ...)
+topleft(x, n = 6L, ncol = 10L)
 }
 \arguments{
 \item{x}{a multivariate \code{\link{regts}}}
