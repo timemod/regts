@@ -220,3 +220,48 @@ is_period_text <- function(x, frequency = NA) {
   }
   return(is_period_text_(x, frequency))
 }
+
+# minimum of 2 or more periods
+#' @export
+min.period <- function(..., na.rm = FALSE){
+
+  args <- list(...)
+
+  # check if period
+  is_prd <- lapply(args, FUN = is.period)
+  if (!all(unlist(is_prd)))  {
+    stop("Inputs must all be periods")
+  }
+
+  # check frequencies
+  freq <- lapply(args, FUN = frequency)
+  if (length(unique(freq)) > 1){
+    stop("All periods must have the same frequency")
+  }
+
+  result <- NextMethod(.Generic)
+  return(create_period(result, freq[[1]]))
+}
+
+# maximum of 2 or more periods
+#' @export
+max.period <- function(..., na.rm = FALSE){
+
+  args <- list(...)
+
+  # check if period
+  is_prd <- lapply(args, FUN = is.period)
+  if (!all(unlist(is_prd)))  {
+    stop("Inputs must all be periods")
+  }
+
+  # check frequencies
+  freq <- lapply(args, FUN = frequency)
+  if (length(unique(freq)) > 1){
+    stop("All periods must have the same frequency")
+  }
+
+  result <- NextMethod(.Generic)
+  return(create_period(result, freq[[1]]))
+}
+
