@@ -19,7 +19,8 @@ Imports:
     Rcpp,
     Hmisc,
     data.table,
-    readxl
+    readxl,
+    cellranger
 Suggests:
     testthat,
     knitr,
