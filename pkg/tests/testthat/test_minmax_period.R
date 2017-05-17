@@ -9,7 +9,7 @@ test_that("min & max for period arguments", {
 	q3 <- period("1999Q3")
 
 	expect_identical(min(y1, y2), y1)
-	expect_identical(max(y1, y2), y2)
+	expect_identical(max(y1, y2), max(y2))
 	expect_identical(min(y1, y2), min(y2, y1))
 
 	expect_identical(min(q1, q3), min(q2, q3))
