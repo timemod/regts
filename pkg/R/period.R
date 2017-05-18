@@ -228,13 +228,13 @@ min.period <- function(..., na.rm = FALSE){
   args <- list(...)
 
   # check if period
-  is_prd <- lapply(args, FUN = is.period)
-  if (!all(unlist(is_prd)))  {
+  is_prd <- sapply(args, FUN = is.period)
+  if (!all(is_prd))  {
     stop("Inputs must all be periods")
   }
 
   # check frequencies
-  freq <- lapply(args, FUN = frequency)
+  freq <- sapply(args, FUN = frequency)
   if (length(unique(freq)) > 1){
     stop("All periods must have the same frequency")
   }
@@ -250,13 +250,13 @@ max.period <- function(..., na.rm = FALSE){
   args <- list(...)
 
   # check if period
-  is_prd <- lapply(args, FUN = is.period)
-  if (!all(unlist(is_prd)))  {
+  is_prd <- sapply(args, FUN = is.period)
+  if (!all(is_prd))  {
     stop("Inputs must all be periods")
   }
 
   # check frequencies
-  freq <- lapply(args, FUN = frequency)
+  freq <- sapply(args, FUN = frequency)
   if (length(unique(freq)) > 1){
     stop("All periods must have the same frequency")
   }
