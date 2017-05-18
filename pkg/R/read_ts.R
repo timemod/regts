@@ -6,7 +6,7 @@ read_ts <- function(df, columnwise, frequency = NA,
   labels <- match.arg(labels)
 
   # remove all columns with only NAs
-  all_na <- unlist(lapply(df, FUN = function(x) {!all(is.na(x))}))
+  all_na <- sapply(df, FUN = function(x) {!all(is.na(x))})
   df <- df[ , all_na, drop = FALSE]
 
   if (missing(columnwise)) {
@@ -17,7 +17,8 @@ read_ts <- function(df, columnwise, frequency = NA,
 
     # first convert the data frame to a character data frame,
     # otherwise the result of function t is sometimes incorrect
-    df <- as.data.frame(lapply(df, FUN = as.character), stringsAsFactors = FALSE)
+    df <- as.data.frame(lapply(df, FUN = as.character),
+                        stringsAsFactors = FALSE)
 
     # transpose
     df <- as.data.frame(t(df), stringsAsFactors = FALSE)

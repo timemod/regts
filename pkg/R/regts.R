@@ -285,7 +285,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   times <- lapply(as.character(times), FUN = fun, ...)
 
   # check that all frequencies are equal
-  frequencies <- unlist(lapply(times, FUN = frequency))
+  frequencies <- sapply(times, FUN = frequency)
   frequencies <- unique(frequencies)
   if (length(frequencies) > 1) {
     stop("The time column(s) contain different frequencies")
