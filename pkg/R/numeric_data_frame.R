@@ -62,7 +62,7 @@ numeric_data_frame <- function(x) {
 
     # print message about texts that could not be converted
 
-    is_char <- unlist(lapply(x, FUN = is.character))
+    is_char <- sapply(x, FUN = is.character)
     x_test <- x[, is_char]
     has_text_f <- function(x) {
       x <- trimws(x)
