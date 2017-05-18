@@ -20,9 +20,9 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
     labels <- match.arg(labels)
   }
 
-  df <- write_ts_df(x, rowwise, labels, labels_missing)
+  df_info <- write_ts_df(x, rowwise, labels, labels_missing)
 
-  fwrite(df, file, sep = sep, dec  = dec)
+  fwrite(df_info$df, file, sep = sep, dec  = dec)
 
   return(invisible(NULL))
 }
@@ -48,30 +48,55 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1", rowwise = TRUE,
     labels <- match.arg(labels)
   }
 
-  df <- write_ts_df(x, rowwise, labels, labels_missing)
+  df_info <- write_ts_df(x, rowwise, labels, labels_missing)
 
-  dft <<- df
-  print(df)
+  wb <- createWorkbook()
+  sheet  <- createSheet(wb, sheetName = sheet_name)
 
-  write.xlsx2(df, file, sheetName = sheet_name, row.names = FALSE)
+  if (rowwise) {
+    n_text_rows <- 1
+    n_text_cols <- 1 + as.integer(df_info$has_labels)
+    row_split <- 2
+    col_split <- 1 + n_text_cols
+  } else {
+    n_text_rows <- 1 + as.integer(df_info$has_labels)
+    n_text_cols <- 1
+    row_split <- 2 + as.integer(df_info$has_labels)
+    col_split <- 2
+  }
 
-  # TODO: nice formatting
-  # b <- createWorkbook()
-  # sheet  <- createSheet(wb, sheetName="data")
-  #
-  # # number format
+  right_align_style<- CellStyle(wb, alignment = Alignment(h = "ALIGN_RIGHT"))
+
+  # write the column headers, use right alignment for the numeric columns
+  # for columnwise timeseries with labels, also write the label row
+  column_headers <- as.data.frame(t(colnames(df_info$df)),
+                                  stringsAsFactors = FALSE)
+  if (!rowwise & df_info$has_labels) {
+    lbls <- as.character(df_info$df[1, , drop = FALSE])
+    column_headers <- rbind(column_headers, lbls, stringsAsFactors = FALSE)
+    df_info$df <- df_info$df[-1, , drop = FALSE]
+  }
+  col_style <- rep(list(right_align_style), ncol(column_headers) - n_text_cols)
+  names(col_style) <- seq(n_text_cols + 1, ncol(column_headers))
+  addDataFrame(column_headers, sheet, col.names = FALSE, row.names = FALSE,
+               colStyle = col_style)
+
+  # now write the data part
+
+  # TODO: number format
   # nf <- CellStyle(wb, dataFormat=DataFormat("0.000"))
   # dfColIndex <- rep(list(nf), dim(zoo1)[2])
   # names(dfColIndex) <- seq(1, dim(zoo1)[2], by = 1)
-  #
-  # # cell style for the column headers
-  # colNamesStyle <- CellStyle(wb, alignment = Alignment(h = "ALIGN_RIGHT"))
-  #
-  # # wegschrijven data
-  # addDataFrame(zoo1, sheet, colStyle = dfColIndex, colnamesStyle = colNamesStyle)
-  #
-  # autoSizeColumn(sheet, seq(1, dim(zoo1)[2] + 1))
-  # createFreezePane(sheet, 2, 2)
+  col_style <- NULL
+
+  addDataFrame(df_info$df, sheet, col.names = FALSE, row.names = FALSE,
+               startRow = n_text_rows + 1, colStyle = col_style)
+
+  autoSizeColumn(sheet, seq(1, dim(df_info$df)[2]))
+
+  createFreezePane(sheet, rowSplit = row_split, colSplit = col_split)
+
+  saveWorkbook(wb, file)
 
   return(invisible(NULL))
 }
@@ -104,23 +129,23 @@ write_ts_df <- function(x, rowwise, labels, labels_missing) {
     df <- transpose_df(df)
     names <- rownames(df)
     if (labels == "no") {
-      df <- cbind(names = names, df, stringsAsFactors = FALSE)
+      df <- cbind(name = names, df, stringsAsFactors = FALSE)
     } else if (labels == "after") {
-      df <- cbind(names = names, labels = lbls, df, stringsAsFactors = FALSE)
+      df <- cbind(name = names, label = lbls, df, stringsAsFactors = FALSE)
     } else if (labels == "before") {
-      df <- cbind(labels = lbls, names = names, df,stringsAsFactors = FALSE)
+      df <- cbind(label = lbls, name = names, df,stringsAsFactors = FALSE)
     }
   } else {
-    df <- cbind(period = rownames(df), df)
+    df <- cbind(period = rownames(df), df, stringsAsFactors = FALSE)
     if (labels == "after") {
-      df <- rbind(c(NA_character_, lbls), df, stringsAsFactors = FALSE)
+      df <- rbind(c("label", lbls), df, stringsAsFactors = FALSE)
     } else if (labels == "before") {
       stop("For columnwise timeseries labels option \"before\" is not allowed")
     }
   }
 
   rownames(df) <- NULL
-  return(df)
+  return(list(df = df,  has_labels = labels != "no"))
 }
 
 
