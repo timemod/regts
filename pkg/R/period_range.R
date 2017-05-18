@@ -40,46 +40,46 @@
 
 #' @export
 period_range <- function(p1, p2 = p1, frequency = NA) {
-    if (is.null(p1) && is.null(p2)) {
-        stop("At least one of the periods should not be NULL")
+  if (is.null(p1) && is.null(p2)) {
+    stop("At least one of the periods should not be NULL")
+  }
+  if (missing(p2)) {
+    # direct conversion, inputs "2016q1" and "2016q1/2017q1" are possible
+    return(as.period_range(p1, frequency))
+  } else if (!is.null(p1)) {
+    p1 <- as.period(p1, frequency)
+    freq1 <- attr(p1, 'frequency')
+  }
+  if (!is.null(p2)) {
+    p2 <- as.period(p2, frequency)
+    freq2 <- attr(p2, 'frequency')
+  }
+  if ((!(is.null(p1) || is.null(p2)))) {
+    if (freq1 != freq2) {
+      stop("The two periods have different frequency")
     }
-    if (missing(p2)) {
-        # direct conversion, inputs "2016q1" and "2016q1/2017q1" are possible
-        return(as.period_range(p1, frequency))
-    } else if (!is.null(p1)) {
-        p1 <- as.period(p1, frequency)
-        freq1 <- attr(p1, 'frequency')
+    if (p2 < p1) {
+      stop(paste0("The start period (", p1, ") is after the end period (", p2, ")"))
     }
-    if (!is.null(p2)) {
-        p2 <- as.period(p2, frequency)
-        freq2 <- attr(p2, 'frequency')
-    }
-    if ((!(is.null(p1) || is.null(p2)))) {
-        if (freq1 != freq2) {
-            stop("The two periods have different frequency")
-        }
-        if (p2 < p1) {
-            stop(paste0("The start period (", p1, ") is after the end period (", p2, ")"))
-        }
-    }
-    if (!is.null(p1)) {
-        freq <- freq1
-    } else {
-        freq <- freq2
-    }
+  }
+  if (!is.null(p1)) {
+    freq <- freq1
+  } else {
+    freq <- freq2
+  }
 
-    # convert periods to normal numbers
-    if (!is.null(p1)) {
-        p1 <- as.numeric(p1)
-    } else {
-        p1 <- NA_real_
-    }
-    if (!is.null(p2)) {
-        p2 <- as.numeric(p2)
-    } else {
-        p2 <- NA_real_
-    }
-    return (create_period_range(p1, p2, freq))
+  # convert periods to normal numbers
+  if (!is.null(p1)) {
+    p1 <- as.numeric(p1)
+  } else {
+    p1 <- NA_real_
+  }
+  if (!is.null(p2)) {
+    p2 <- as.numeric(p2)
+  } else {
+    p2 <- NA_real_
+  }
+  return (create_period_range(p1, p2, freq))
 }
 
 
@@ -93,62 +93,68 @@ period_range <- function(p1, p2 = p1, frequency = NA) {
 #' is.period_range("2016Q1/2017Q1")
 #' @export
 is.period_range <- function(x) {
-    return (inherits(x, "period_range"))
+  return (inherits(x, "period_range"))
 }
 
 # internal function to create a period_range from start, end
 # and frequency
 create_period_range <- function(start, end, frequency) {
-    return (structure(c(start, end, frequency), class = "period_range"))
+  return (structure(c(start, end, frequency), class = "period_range"))
 }
-
 
 # binary operators (arithmetic and logical)
 #' @export
 Ops.period_range <- function(e1, e2) {
-
-    if (.Generic %in% c("==", "!=", "<", ">", "<=", ">=")) {
-        # logical operator
-        if (is.period_range(e1) && is.period_range(e2)) {
-            if (.Generic == "==") {
-                return (all(e1 == e2))
-            } else if (.Generic == "!=") {
-                return (any(e1 != e2))
-            } else if (e1[3] != e2[3]) {
-                stop(paste("Logical operations '<, <=, >, >=' on period_ranges",
-                           "with different frequencies are not allowed"))
-            } else {
-                return (do.call(.Generic, list(e1[1], e2[1])) &&
-                        do.call(.Generic, list(e1[2], e2[2])))
-            }
+  if (.Generic %in% c("==", "!=", "<", ">", "<=", ">=")) {
+    # logical operator
+    if (is.period_range(e1) && is.period_range(e2)) {
+      if (.Generic == "==") {
+        return(identical(as.numeric(e1), as.numeric(e2)))
+      } else if (.Generic == "!=") {
+        return(!identical(as.numeric(e1), as.numeric(e2)))
+      } else if (e1[3] != e2[3]) {
+        stop(paste("Logical operations '<, <=, >, >=' on period_ranges",
+                   "with different frequencies are not allowed"))
+      } else {
+        if (is.na(e1[1]) && is.na(e2[1])) {
+          return(do.call(.Generic, list(e1[2], e2[2])))
+        } else if (is.na(e1[2] && is.na(e2[2]))) {
+          return(do.call(.Generic, list(e1[1], e2[1])))
+        } else if (any(is.na(e1)) || any(is.na(e2))) {
+          return(NA)
         } else {
-            stop(paste("Both operators must be period_ranges",
-                       "when using logical operators"))
+          return(do.call(.Generic, list(e1[1], e2[1])) &&
+                   do.call(.Generic, list(e1[2], e2[2])))
         }
-    } else if (.Generic %in% c("+", "-")) {
-        # arithmetic operator + or -
-        if (is.period_range(e1) && is.numeric(e2) && length(e2) == 1) {
-            if (e2 != as.integer(e2)) {
-                stop("Second operand must be an integer number")
-            }
-            # e1[ ] +/- e2
-            start_end <- do.call(.Generic, list(e1[1:2], e2))
-            retval <- create_period_range(start_end[1], start_end[2], e1[3])
-        } else if (is.numeric(e1) && length(e1) == 1 && is.period_range(e2)) {
-            if (e1 != as.integer(e1)) {
-                stop("First operand must be an integer number")
-            }
-            # e2[ ] +/- e1
-            start_end <- do.call(.Generic, list(e2[1:2], e1))
-            retval <- create_period_range(start_end[1], start_end[2], e2[3])
-        } else {
-            stop(paste("Arithmetic operators + and - only allowed on a",
-                       "combination of period_range and integer number"))
-        }
-        return(retval)
+      }
     } else {
-        stop("Illegal operation, only + and - or logical operators allowed")
+      stop(paste("Both operators must be period_ranges",
+                 "when using logical operators"))
     }
+  } else if (.Generic %in% c("+", "-")) {
+    # arithmetic operator + or -
+    if (is.period_range(e1) && is.numeric(e2) && length(e2) == 1) {
+      if (e2 != as.integer(e2)) {
+        stop("Second operand must be an integer number")
+      }
+      # e1[ ] +/- e2
+      start_end <- do.call(.Generic, list(e1[1:2], e2))
+      retval <- create_period_range(start_end[1], start_end[2], e1[3])
+    } else if (is.numeric(e1) && length(e1) == 1 && is.period_range(e2)) {
+      if (e1 != as.integer(e1)) {
+        stop("First operand must be an integer number")
+      }
+      # e2[ ] +/- e1
+      start_end <- do.call(.Generic, list(e2[1:2], e1))
+      retval <- create_period_range(start_end[1], start_end[2], e2[3])
+    } else {
+      stop(paste("Arithmetic operators + and - only allowed on a",
+                 "combination of period_range and integer number"))
+    }
+    return(retval)
+  } else {
+    stop("Illegal operation, only + and - or logical operators allowed")
+  }
 }
 
 
@@ -183,45 +189,45 @@ Ops.period_range <- function(e1, e2) {
 #' @return a \code{period_range}
 #' @export
 as.period_range <- function(x, frequency = NA, ...) {
-    UseMethod("as.period_range")
+  UseMethod("as.period_range")
 }
 
 #' @describeIn as.period_range Convert a character string to a
 #' period_range object
 #' @export
 as.period_range.character <- function(x, frequency = NA, ...) {
-    if (length(x) > 1) {
-        warning(paste("Vector with length > 1 passed to",
-                      "as.period_range.character.",
-                       "Only the first element is used."))
-    }
-    return (parse_period_range(x[1], frequency));
+  if (length(x) > 1) {
+    warning(paste("Vector with length > 1 passed to",
+                  "as.period_range.character.",
+                  "Only the first element is used."))
+  }
+  return (parse_period_range(x[1], frequency));
 }
 
 #' @export
 as.period_range.period_range <- function(x, ...) {
-    return (x)
+  return (x)
 }
 
 #' @describeIn as.period_range Convert a single \code{\link{period}} to a
 #' \link{period_range}.
 #' @export
 as.period_range.period <- function(x, ...) {
-    return (create_period_range(as.numeric(x), as.numeric(x), frequency(x)))
+  return (create_period_range(as.numeric(x), as.numeric(x), frequency(x)))
 }
 
 #' @export
 as.character.period_range <- function(x, ...) {
-    if (!is.na(x[1])) {
-        retval <- as.character.period(start_period(x))
-    } else {
-        retval <- ""
-    }
-    retval <- paste0(retval, "/")
-    if (!is.na(x[2])) {
-        retval <- paste0(retval, as.character.period(end_period(x)))
-    }
-    return (retval)
+  if (!is.na(x[1])) {
+    retval <- as.character.period(start_period(x))
+  } else {
+    retval <- ""
+  }
+  retval <- paste0(retval, "/")
+  if (!is.na(x[2])) {
+    retval <- paste0(retval, as.character.period(end_period(x)))
+  }
+  return (retval)
 }
 
 #' Returns the number of periods in a \code{\link{period_range}} object.
@@ -234,23 +240,23 @@ as.character.period_range <- function(x, ...) {
 #' nperiod(range)  # the result will be 6
 #' @export
 nperiod  <- function(x) {
-    if (!inherits(x, "period_range")) {
-        stop("Variable should be a period_range object")
-    }
-    if (is.na(x[1]) | is.na(x[2])) {
-        return (Inf)
-    }
-    return(nperiod__(x))
+  if (!inherits(x, "period_range")) {
+    stop("Variable should be a period_range object")
+  }
+  if (is.na(x[1]) | is.na(x[2])) {
+    return (Inf)
+  }
+  return(nperiod__(x))
 }
 
 nperiod__  <- function(x) {
-# Internal nperiod function, no check for NA's or variabletype
-    return (x[2] - x[1] + 1)
+  # Internal nperiod function, no check for NA's or variabletype
+  return (x[2] - x[1] + 1)
 }
 
 #' @export
 print.period_range <- function(x, ...) {
-    print(as.character(x))
+  print(as.character(x))
 }
 
 
