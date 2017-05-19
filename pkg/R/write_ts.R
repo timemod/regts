@@ -78,10 +78,12 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
     } else {
       sheet  <- createSheet(wb, sheetName = sheet_name)
     }
-  } else if (file.exists(file)) {
+  } else {
+    if (file.exists(file)) {
+      unlink(file)
+    }
     wb <- createWorkbook()
     sheet  <- createSheet(wb, sheetName = sheet_name)
-    unlink(file)
   }
 
   labels_missing <- missing(labels)
@@ -157,6 +159,10 @@ write_ts_df <- function(x, rowwise, labels, labels_missing) {
         labels <- "no"
       } else {
         labels <- "after"
+      }
+    } else {
+      if (is.null(lbls)) {
+        lbls <- rep("", NCOL(x))
       }
     }
   }
