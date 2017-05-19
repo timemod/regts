@@ -5,7 +5,7 @@
 \title{Reads timeseries from a sheet of an  xls(x) file}
 \usage{
 read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = NA,
-  skipcol = NA, columnwise, frequency = NA, labels = c("no", "after",
+  skipcol = NA, rowwise, frequency = NA, labels = c("no", "after",
   "before"), na_string = c(""))
 }
 \arguments{
@@ -32,9 +32,9 @@ skipped.}
 Ignored if \code{range} is given. By default, all leading empty columns are
 skipped.}
 
-\item{columnwise}{a logical value: are the timeseries stored columnwise?
+\item{rowwise}{a logical value: are the timeseries stored rowwise?
 If not specified, then \code{read_ts} tries to figure out itself if
-the timeseries are stored columnwise or rowwise}
+the timeseries are stored rowwise or columnwise}
 
 \item{frequency}{the frequency of the timeseries.
 This argument is mandatory if the file contains period texts without
@@ -67,11 +67,30 @@ then convert the data frame to a standard columnwise data frame
 and finally convert it to a \code{regts} by using function \code{as.regts}.
 }
 \details{
-If argument \code{columnwise} has not been specified, then
+If argument \code{rowwise} has not been specified, then
 function \code{read_ts_xlsx} searches for any valid period text in the first
 row read. If a valid period was found, then
 \code{read_ts} assumes that the timeseries are stored rowwise. Otherwise it
 assumes that the timeseries are stored columnwise.
+
+\strong{rowwise timeseries}
+
+\if{html}{\figure{xlsschemarowwise.jpg}{options: width=260}}
+\if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
+
+For rowwise timeseries, the first row that is read (see
+argument \code{range} and \code{skiprow}) should contain the periods.
+Columns for which the corresponding period is not a valid period
+are ignored. The timeseries names should be in the
+first column of the sheet. Otherwise, use argument \code{skipcol}
+to specify the number of columns to skip.
+There may be one or more columns between the column with variable names
+and the columns where the actual timeseries are stored.
+If argument \code{labels = "after"}  then the texts in these
+columns will be used to create timeseries labels. If \code{labels = "before"},
+the last column before the data is supposed to contain
+the variable names. The columns before the variable name column
+now should contain label information.
 
 \strong{columnwise timeseries}
 
@@ -96,27 +115,8 @@ By default, the function skips all leading empty rows and columns,
 just as \code{read_excel}. This behaviour can be overruled by specifying arguments
 \code{range}, \code{skiprow} or \code{skipcol}.
 
-\strong{rowwise timeseries}
-
-\if{html}{\figure{xlsschemarowwise.jpg}{options: width=260}}
-\if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
-
-For rowwise timeseries, the first row that is read (see
-argument \code{range} and \code{skiprow}) should contain the periods.
-Columns for which the corresponding period is not a valid period
-are ignored. The timeseries names should be in the
-first column of the sheet. Otherwise, use argument \code{skipcol}
-to specify the number of columns to skip.
-There may be one or more columns between the column with variable names
-and the columns where the actual timeseries are stored.
-If argument \code{labels = "after"}  then the texts in these
-columns will be used to create timeseries labels. If \code{labels = "before"},
-the last column before the data is supposed to contain
-the variable names. The columns before the variable name column
-now should contain label information.
-
 Sometimes it helps to supply information about the structure of
-the data on the sheet. Specify option  \code{columnwise} if you know
+the data on the sheet. Specify option  \code{rowwise} if you know
 that the timeseries are stored rowwise or columnwise. Specify
 argument \code{frequency} if you already know the frequency of the timeseries.
 Argument \code{frequency} is mandatory if a general period format

@@ -4,15 +4,15 @@
 \alias{read_ts_csv}
 \title{Reads timeseries from a csv file}
 \usage{
-read_ts_csv(filename, columnwise, frequency = NA, skiprow, skipcol,
+read_ts_csv(filename, rowwise, frequency = NA, skiprow, skipcol,
   labels = c("no", "after", "before"), ...)
 }
 \arguments{
 \item{filename}{a string with the filename}
 
-\item{columnwise}{a logical value: are the timeseries stored columnwise?
+\item{rowwise}{a logical value: are the timeseries stored rowwise?
 If not specified, then \code{read_ts} tries to figure out itself if
-the timeseries are stored columnwise or rowwise}
+the timeseries are stored rowwise or columnwise}
 
 \item{frequency}{the frequency of the timeseries.
 This argument is mandatory if the file contains a period texts without
@@ -56,25 +56,6 @@ row after the skipped rows. If a valid period was found, then
 \code{read_ts} assumes that the timeseries are stored rowwise. Otherwise it
 assumes that the timeseries are store columnwise.
 
-\strong{columnwise timeseries}
-
-\if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=200}}
-\if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
-
-For columnwise timeseries, the first row that is not skipped (see
-argument \code{skiprow}) should contain the variable names.
-The periods can be in any column.
-All columns to the left of the time column are ignored.
-There may be one or more rows between the column names and the rows
-where the actual timeseries are stored.
-If argument \code{labels = "after"}  then the texts in these
-rows will be used to create timeseries labels.
-the last row before the data is supposed to contain
-the variable names. Now the row before the variable name columns
-should contain label information. If argument \code{use_colnames = TRUE},
-then the label option \code{"before"} is not allowed for columnwise
-timeseries, since in that case the column names are the timeseries names.
-
 \strong{rowwise timeseries}
 
 \if{html}{\figure{xlsschemarowwise.jpg}{options: width=200}}
@@ -94,8 +75,27 @@ the last column before the data is supposed to contain
 the variable names. The columns before the variable name column
 now should contain label information.
 
+\strong{columnwise timeseries}
+
+\if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=200}}
+\if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
+
+For columnwise timeseries, the first row that is not skipped (see
+argument \code{skiprow}) should contain the variable names.
+The periods can be in any column.
+All columns to the left of the time column are ignored.
+There may be one or more rows between the column names and the rows
+where the actual timeseries are stored.
+If argument \code{labels = "after"}  then the texts in these
+rows will be used to create timeseries labels.
+the last row before the data is supposed to contain
+the variable names. Now the row before the variable name columns
+should contain label information. If argument \code{use_colnames = TRUE},
+then the label option \code{"before"} is not allowed for columnwise
+timeseries, since in that case the column names are the timeseries names.
+
 Sometimes it helps to supply information about the structure of
-the data in the file. Specify option  \code{columnwise} is you know
+the data in the file. Specify option  \code{rowwise} if you know
 that the timeseries ares stored rowwise or columnwise. Specify
 argument \code{frequency} is you already know the frequency of the timeseries.
 Argument \code{frequency} is mandatory if a general period format
