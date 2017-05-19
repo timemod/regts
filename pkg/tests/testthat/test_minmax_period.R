@@ -19,4 +19,5 @@ test_that("min & max for period arguments", {
 
 	expect_error(min(y1, q1), "All periods must have the same frequency")
 	expect_error(max(y1, "2010"), "Inputs must all be periods")
+	expect_error(sum(y1, "2010"), "sum is not supported for period objects")
 })
