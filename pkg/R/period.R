@@ -245,7 +245,7 @@ Summary.period <- function(..., na.rm = FALSE){
     return(create_period(result, freq[[1]]))
   }
   else {
-    stop(paste0(.Generic, "is not supported for period objects"))
+    stop(paste(.Generic, "is not supported for period objects"))
   }
 }
 
