@@ -4,8 +4,8 @@
 \alias{write_ts_xlsx}
 \title{Write timeseries to an xlsx file}
 \usage{
-write_ts_xlsx(x, file, sheet_name = "Sheet1", rowwise = TRUE,
-  labels = c("after", "before", "no"))
+write_ts_xlsx(x, file, sheet_name = "Sheet1", append_sheet = FALSE,
+  rowwise = TRUE, labels = c("after", "before", "no"))
 }
 \arguments{
 \item{x}{a \code{ts} or \code{regts} object}
@@ -14,8 +14,17 @@ write_ts_xlsx(x, file, sheet_name = "Sheet1", rowwise = TRUE,
 
 \item{sheet_name}{the sheet name}
 
+\item{append_sheet}{If \code{FALSE} (the default), then the original file,
+if it exists, is replaced with the new file. All original data is lost.
+If \code{TRUE}, then only data on the sheet with
+the specified sheetname is erased and replaced with new data.  If the sheet
+does not yet exist, then a new sheet is created and appended to the
+original file.}
+
+\item{rowwise}{a logical value: should the timeseries we written rowwise?}
+
 \item{labels}{should labels we written, and if so before the names or after
-the names? By default, labels are written after the names if present.}
+the names? By default, labels are written after the names if present}
 }
 \description{
 This function writes timeseries to an xlsx  file.

@@ -12,6 +12,8 @@ write_ts_csv(x, file, rowwise = TRUE, sep = ",", dec = ".",
 
 \item{file}{a \code{regts} object}
 
+\item{rowwise}{a logical value: should the timeseries we written rowwise?}
+
 \item{sep}{The separator between columns. Default is ",".}
 
 \item{dec}{The decimal separator, by default ".". Cannot be the same as sep.}

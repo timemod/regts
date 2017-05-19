@@ -5,6 +5,7 @@
 #' of package \code{data.table}.
 #' @param x a \code{ts} or \code{regts} object
 #' @param file a \code{regts} object
+#' @param rowwise a logical value: should the timeseries we written rowwise?
 #' @param sep The separator between columns. Default is ",".
 #' @param dec The decimal separator, by default ".". Cannot be the same as sep.
 #' @param labels should labels we written, and if so before the names or after
@@ -35,12 +36,53 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @param x a \code{ts} or \code{regts} object
 #' @param file a \code{regts} object
 #' @param sheet_name the sheet name
+#' @param append_sheet If \code{FALSE} (the default), then the original file,
+#' if it exists, is replaced with the new file. All original data is lost.
+#' If \code{TRUE}, then only data on the sheet with
+#' the specified sheetname is erased and replaced with new data.  If the sheet
+#' does not yet exist, then a new sheet is created and appended to the
+#' original file.
+#' @param rowwise a logical value: should the timeseries we written rowwise?
 #' @param labels should labels we written, and if so before the names or after
-#' the names? By default, labels are written after the names if present.
-#' @importFrom xlsx write.xlsx2
+#' the names? By default, labels are written after the names if present
+#' @importFrom xlsx loadWorkbook
+#' @importFrom xlsx getSheets
+#' @importFrom xlsx removeRow
+#' @importFrom xlsx createSheet
+#' @importFrom xlsx createWorkbook
+#' @importFrom xlsx CellStyle
+#' @importFrom xlsx Alignment
+#' @importFrom xlsx addDataFrame
+#' @importFrom xlsx saveWorkbook
+#' @importFrom xlsx createFreezePane
+#' @importFrom xlsx autoSizeColumn
+#' @importFrom xlsx removeRow
+#'
+#'
 #' @export
-write_ts_xlsx <- function(x, file, sheet_name = "Sheet1", rowwise = TRUE,
-                         labels = c("after", "before", "no")) {
+write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
+                          append_sheet = FALSE,
+                          rowwise = TRUE,
+                          labels = c("after", "before", "no")) {
+
+  if (!file.exists(file)) {
+    append_sheet <- FALSE
+  }
+
+  if (append_sheet) {
+    wb <- loadWorkbook(file)
+    sheets <- getSheets(wb)
+    if (sheet_name %in% names(sheets)) {
+      sheet <- sheets[[sheet_name]]
+      removeRow(sheet)
+    } else {
+      sheet  <- createSheet(wb, sheetName = sheet_name)
+    }
+  } else if (file.exists(file)) {
+    wb <- createWorkbook()
+    sheet  <- createSheet(wb, sheetName = sheet_name)
+    unlink(file)
+  }
 
   labels_missing <- missing(labels)
 
@@ -50,8 +92,6 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1", rowwise = TRUE,
 
   df_info <- write_ts_df(x, rowwise, labels, labels_missing)
 
-  wb <- createWorkbook()
-  sheet  <- createSheet(wb, sheetName = sheet_name)
 
   if (rowwise) {
     n_text_rows <- 1
@@ -65,7 +105,8 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1", rowwise = TRUE,
     col_split <- 2
   }
 
-  right_align_style<- CellStyle(wb, alignment = Alignment(h = "ALIGN_RIGHT"))
+  right_align_style <- CellStyle(wb, alignment = Alignment(horizontal =
+                                                             "ALIGN_RIGHT"))
 
   # write the column headers, use right alignment for the numeric columns
   # for columnwise timeseries with labels, also write the label row

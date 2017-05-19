@@ -5,6 +5,7 @@ x <-regts(matrix(1:9, ncol = 3), start = "2010Q2",
           labels = c("azalea", "boterbloem", "campanula"))
 print(x)
 
-write_ts_xlsx(x, file = "test2.xlsx")
+write_ts_xlsx(x, file = "test2.xlsx", append_sheet = TRUE)
 
-write_ts_xlsx(x, file = "test2_t.xlsx", rowwise = FALSE)
+write_ts_xlsx(x, file = "test2_t.xlsx", append_sheet = TRUE, 
+              rowwise = FALSE)
