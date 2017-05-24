@@ -63,8 +63,9 @@ read_ts_columnwise <- function(df, frequency = NA,
   # remove rows without period
   df <- df[is_period, , drop = FALSE]
 
-  #data_cols <- 2 : ncol(df)
-  #df[ , data_cols] <- numeric_data_frame(df[ , data_cols], dec = dec)
+  data_cols <- 2 : ncol(df)
+  df[ , data_cols] <- numeric_data_frame(df[ , data_cols, drop = FALSE],
+                                         dec = dec)
 
   # set numeric = FALSE, because we already know that df is numeric
   ret <- as.regts(df, time_column = 1, frequency = frequency, numeric = TRUE)
