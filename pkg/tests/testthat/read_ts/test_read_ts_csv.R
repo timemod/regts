@@ -122,3 +122,20 @@ test_that("example2.csv is read correctly",  {
   result3 <- read_ts_csv(csv_file, skipcol = 1, labels = "before")
   expect_identical(result3, correct_result_labels2)
 })
+
+test_that("example3.csv is read correctly",  {
+
+  csv_file <- "csv/example3.csv"
+
+  correct_result_tmp <- correct_result
+  correct_result_tmp["2010Q2", "a"] <- 1.25
+  correct_result_tmp["2010Q2", "b"] <- NA
+
+  msg <- paste("NAs introduced by coercion",
+               "The following texts could not be converted to numeric:\n",
+               "\"x,jan\"")
+  expect_warning({
+    result <- read_ts_csv(csv_file, skipcol = 1, sep = ";", dec = ",")
+  }, msg = msg)
+  expect_identical(result, correct_result_tmp)
+})

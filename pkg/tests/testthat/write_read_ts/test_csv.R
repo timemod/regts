@@ -20,7 +20,7 @@ test_that("ts with labels written correctly",  {
 
   file <- "csv/ts1_t.csv"
   write_ts_csv(ts1, file = file, rowwise = FALSE, sep = ";")
-  ts1_t_read <- read_ts_csv(file)
+  ts1_t_read <- read_ts_csv(file, sep = ";")
   expect_identical(ts1, ts1_t_read)
 })
 

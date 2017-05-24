@@ -175,8 +175,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   df <- as.data.frame(df)
 
   if (rowwise) {
-    return(read_ts_rowwise(df, frequency = frequency, labels = labels,
-                           numeric = TRUE))
+    return(read_ts_rowwise(df, frequency = frequency, labels = labels))
   } else {
     return(read_ts(df, rowwise = rowwise, frequency = frequency,
                    labels = labels))

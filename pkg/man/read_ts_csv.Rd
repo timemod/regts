@@ -4,8 +4,9 @@
 \alias{read_ts_csv}
 \title{Reads timeseries from a csv file}
 \usage{
-read_ts_csv(filename, rowwise, frequency = NA, skiprow, skipcol,
-  labels = c("no", "after", "before"), ...)
+read_ts_csv(filename, rowwise, frequency = NA, skiprow = 0, skipcol = 0,
+  labels = c("no", "after", "before"), sep = ",", dec = if (sep != ".")
+  "." else ",")
 }
 \arguments{
 \item{filename}{a string with the filename}
@@ -22,10 +23,12 @@ frequency indicator (for example "2011-1")}
 
 \item{skipcol}{the number of columns to skip}
 
-\item{labels}{label option. See details.}
+\item{labels}{label option. See details}
 
-\item{...}{arguments passed to function \code{\link[data.table]{fread}} of
-package \code{read.table}}
+\item{sep}{the separator between columns. The default is \code{,}.}
+
+\item{dec}{the decimal separator as in \code{base::read.csv}.
+If not "." (default) then usually ",".}
 }
 \value{
 a \code{regts} object

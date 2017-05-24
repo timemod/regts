@@ -86,16 +86,17 @@
 #' frequency indicator (for example "2011-1")
 #' @param skiprow the number of rows to skip
 #' @param skipcol the number of columns to skip
-#' @param labels label option. See details.
-#' @param ... arguments passed to function \code{\link[data.table]{fread}} of
-#' package \code{read.table}
+#' @param labels label option. See details
+#' @param sep the separator between columns. The default is \code{,}.
+#' @param dec the decimal separator as in \code{base::read.csv}.
+#' If not "." (default) then usually ",".
 #' @return a \code{regts} object
 #' @importFrom data.table fread
 #' @export
 read_ts_csv <- function(filename, rowwise, frequency = NA,
-                        skiprow, skipcol,
+                        skiprow = 0, skipcol = 0,
                         labels = c("no", "after", "before"),
-                        ...) {
+                        sep = ",", dec = if (sep != ".") "." else ",") {
 
   if (!missing(skiprow)) {
     skip <- skiprow
@@ -105,7 +106,7 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
 
   if (missing(rowwise) || rowwise) {
     first_line <- fread(filename, nrows = 1, skip = skip, header = FALSE,
-                        data.table = FALSE, ...)
+                        data.table = FALSE, sep = sep, dec = dec)
     is_period <- is_period_text(get_strings(first_line), frequency)
     first_prd_col <- Position(function(x) {x}, is_period)
     if (missing(rowwise)) {
@@ -119,11 +120,11 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
     nper <- length(is_period) - first_prd_col + 1
     colClasses <- c(rep("character", first_prd_col - 1), rep("numeric", nper))
     df <- fread(filename, skip = skip, header = TRUE, data.table = FALSE,
-                colClasses = colClasses, ...)
+                colClasses = colClasses, sep = sep, dec = dec)
 
   } else {
     df <- fread(filename, skip = skip, header = FALSE, data.table = FALSE,
-                ...)
+                sep = sep, dec = dec)
   }
 
   if (!missing(skipcol) && skipcol > 0) {
@@ -134,7 +135,7 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
     # use numeric = FALSE, because we already know that the timeseries
     # are numeric (see code above)
     return(read_ts_rowwise(df, frequency = frequency, labels = labels,
-                           numeric = FALSE))
+                           dec = dec))
   } else {
     return(read_ts(df, rowwise = rowwise, frequency = frequency,
                    labels = labels))

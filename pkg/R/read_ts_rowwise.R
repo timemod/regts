@@ -2,7 +2,7 @@
 # the time index in the column header.
 # is numeric = TRUE, then the timeseries are converted to numeric
 read_ts_rowwise <- function(df, frequency, labels = c("no", "after", "before"),
-                            numeric = TRUE) {
+                            dec = ".") {
 
   labels <- match.arg(labels)
 
@@ -29,11 +29,16 @@ read_ts_rowwise <- function(df, frequency, labels = c("no", "after", "before"),
     col_sel[label_cols] <- FALSE
     label_cols <- numeric(0)
   }
-  df <- df[, col_sel, drop = FALSE]
+  df <- df[ , col_sel, drop = FALSE]
 
+  # convert all data columns to numerical columns, taking the decimal separator
+  # into account
+  data_cols <- (max(c(name_col, label_cols)) + 1) : ncol(df)
+  df[ , data_cols] <- numeric_data_frame(df[ , data_cols], dec = dec)
 
   # transpose
   df <- transpose_df(df, colname_column = name_col, label_column = label_cols)
 
-  return(as.regts(df, frequency = frequency, numeric = numeric))
+  # set numeric = FALSE, because we already know that df is numeric
+  return(as.regts(df, frequency = frequency, numeric = FALSE))
 }

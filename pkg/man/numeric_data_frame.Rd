@@ -4,10 +4,12 @@
 \alias{numeric_data_frame}
 \title{Convert all non-numeric columns of a dataframe to numerical columns.}
 \usage{
-numeric_data_frame(x)
+numeric_data_frame(x, dec = ".")
 }
 \arguments{
 \item{x}{a data frame}
+
+\item{dec}{decimal separator in number strings. The default is \code{"."}.}
 }
 \description{
 This function converts all non-numeric columns of a data frame to

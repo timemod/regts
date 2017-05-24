@@ -6,18 +6,21 @@
 #' a numerical value, then this function gives a warning with a list
 #' of texts that could not be converted.
 #' @param x a data frame
+#' @param dec decimal separator in number strings. The default is \code{"."}
+# TODO: also handle thousand separator
 #' @examples
 #' df <- data.frame(a = c("1.123", "x", NA), b = c("1", "", "john"),
 #'                  c = 10 : 12)
 #' numeric_data_frame(df)
 #' @export
-numeric_data_frame <- function(x) {
+numeric_data_frame <- function(x, dec = ".") {
 
   # NOTE: we do not use function data.matrix, this is too slow
 
   # save row and column names
   row_names <- rownames(x)
   col_names <- colnames(x)
+
 
   #  get rid of factors, Dates etc.
   convert_col <- function(x) {
@@ -29,12 +32,29 @@ numeric_data_frame <- function(x) {
   }
   x <- as.data.frame(lapply(x, FUN = convert_col), stringsAsFactors = FALSE)
 
-  to_numeric <- function(x) {
+  to_numeric_1 <- function(x) {
     if (is.numeric(x)) {
       return(x)
     } else {
       return(as.numeric(x))
     }
+  }
+
+  to_numeric_2 <- function(x) {
+    if (is.numeric(x)) {
+      return(x)
+    } else if (is.character(x)) {
+        # TODO: also handle thousand separator / grouping separator
+        return(as.numeric(sub(dec, ".", x, fixed = TRUE)))
+    } else {
+      return(as.numeric(x))
+    }
+  }
+
+  if (dec != ".") {
+    to_numeric <- to_numeric_2
+  } else {
+    to_numeric <- to_numeric_1
   }
 
   warn_msg <- "NAs introduced by coercion"
@@ -47,6 +67,7 @@ numeric_data_frame <- function(x) {
       warning(msg)
     }
   }
+
 
   convert_cmd <- parse(text = paste("x2 <- as.data.frame(lapply(x,",
                                     "FUN = to_numeric),",
