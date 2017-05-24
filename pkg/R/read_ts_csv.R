@@ -137,7 +137,7 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
     return(read_ts_rowwise(df, frequency = frequency, labels = labels,
                            dec = dec))
   } else {
-    return(read_ts(df, rowwise = rowwise, frequency = frequency,
-                   labels = labels))
+    return(read_ts_columnwise(df, frequency = frequency, labels = labels,
+                             dec = dec))
   }
 }

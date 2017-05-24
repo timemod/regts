@@ -1,28 +1,14 @@
-# Internal function to read timeseries from a dataframe.
+# Internal function to read timeseries columnwise from a dataframe.
 # This function is used in function read_ts_csv and read_ts_xlsx
-read_ts <- function(df, rowwise, frequency = NA,
-                     labels = c("no", "after", "before")) {
+read_ts_columnwise <- function(df, frequency = NA,
+                               labels = c("no", "after", "before"),
+                               dec =  ".") {
 
   labels <- match.arg(labels)
 
   # remove all columns with only NAs
   all_na <- sapply(df, FUN = function(x) {!all(is.na(x))})
   df <- df[ , all_na, drop = FALSE]
-
-  if (missing(rowwise)) {
-    rowwise <- any(is_period_text(get_strings(df[1,]), frequency))
-  }
-
-  if (rowwise) {
-
-    # first convert the data frame to a character data frame,
-    # otherwise the result of function t is sometimes incorrect
-    df <- as.data.frame(lapply(df, FUN = as.character),
-                        stringsAsFactors = FALSE)
-
-    # transpose
-    df <- as.data.frame(t(df), stringsAsFactors = FALSE)
-  }
 
   period_info <- find_period_column_simple(df, frequency)
   time_column <- period_info$col_nr
@@ -77,7 +63,11 @@ read_ts <- function(df, rowwise, frequency = NA,
   # remove rows without period
   df <- df[is_period, , drop = FALSE]
 
-  ret <- as.regts(df, time_column = 1, frequency = frequency)
+  #data_cols <- 2 : ncol(df)
+  #df[ , data_cols] <- numeric_data_frame(df[ , data_cols], dec = dec)
+
+  # set numeric = FALSE, because we already know that df is numeric
+  ret <- as.regts(df, time_column = 1, frequency = frequency, numeric = TRUE)
   if (labels != "no" && any(labels != "")) {
     ts_labels(ret) <- labels
   }
