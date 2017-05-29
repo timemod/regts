@@ -14,10 +14,19 @@ numeric_matrix(x, dec = ".")
 \description{
 Returns the matrix obtained by converting all the variables in a data frame
 to numeric mode and then binding them together as the columns of a matrix.
-Factors and ordered factors are replaced by their internal codes.
-of texts that could not be converted. This implementation is
-significantly faster than the function \code{\link[base]{data.matrix}}
-of the base package.
+Factors are converted to characters.
+}
+\details{
+This function is similar to the function \code{\link[base]{data.matrix}}
+of the base package, except that:
+\itemize{
+\item it is possible to specify a decimal separator used to convert strings to
+numeric values
+\item factors are first converted to characters and then to numeric values
+\item if the data frame contains strings that cannot be converted
+to numerical values, then \code{numeric_matrix} gives a warning about
+the first 10 character strings that could not be succesfully converted.
+}
 }
 \examples{
 df <- data.frame(a = c("1.123", "x", NA), b = c("1", "", "john"),

@@ -2,10 +2,17 @@
 #'
 #' Returns the matrix obtained by converting all the variables in a data frame
 #' to numeric mode and then binding them together as the columns of a matrix.
-#' Factors and ordered factors are replaced by their internal codes.
-#' of texts that could not be converted. This implementation is
-#' significantly faster than the function \code{\link[base]{data.matrix}}
-#' of the base package.
+#' Factors are converted to characters.
+#'
+#' This function is similar to the function \code{\link[base]{data.matrix}}
+#' of the base package, except that:
+#' * it is possible to specify a decimal separator used to convert strings to
+#' numeric values
+#' * factors are first converted to characters and then to numeric values
+#' * if the data frame contains strings that cannot be converted
+#' to numerical values, then \code{numeric_matrix} gives a warning about
+#' the first 10 character strings that could not be succesfully converted.
+#' @md
 #' @param x a data frame
 #' @param dec decimal separator in number strings. The default is \code{"."}
 #' @examples
@@ -14,8 +21,6 @@
 #' numeric_matrix(df)
 #' @export
 numeric_matrix <- function(x, dec = ".") {
-
-  # NOTE: we do not use function data.matrix, this is too slow
 
   if (!is.data.frame(x)) {
     stop("Argument x is not a data frame")
@@ -51,8 +56,7 @@ numeric_matrix <- function(x, dec = ".") {
     if (is.numeric(x)) {
       return(x)
     } else if (is.character(x)) {
-        # TODO: also handle thousand separator / grouping separator
-        return(as.numeric(sub(dec, ".", x, fixed = TRUE)))
+      return(as.numeric(sub(dec, ".", x, fixed = TRUE)))
     } else {
       return(as.numeric(x))
     }

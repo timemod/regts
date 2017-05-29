@@ -253,7 +253,8 @@ as.regts.ts <- function(x, ...) {
 }
 
 #' @describeIn as.regts Convert a \code{\link{data.frame}} to a
-#' \code{\link{regts}}
+#' \code{\link{regts}}. The time should be stored in the row numbers
+#' of the matrix
 #' @export
 as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
                                 fun = period, ...) {
@@ -270,6 +271,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     }
     times <- x[[time_column]]
     data <- x[-time_column]
+    rownames(data) <- times
   }
 
   # remove columns with empty names
@@ -281,41 +283,13 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     datamat <- as.matrix(data)
   }
 
-  # convert the contents of the time column to a list of periods
-  times <- lapply(as.character(times), FUN = fun, ...)
+  # Use numeric == FALSE, because the data has already been converted
+  # to numeric when needed
+  ret <- as.regts.matrix(datamat, numeric = FALSE, fun = fun, ...)
 
-  # check that all frequencies are equal
-  frequencies <- sapply(times, FUN = frequency)
-  frequencies <- unique(frequencies)
-  if (length(frequencies) > 1) {
-    stop("The time column(s) contain different frequencies")
-  } else {
-    freq <- frequencies[1]
-  }
-
-  times <- unlist(times)
-  if (identical(times, times[1]:times[nrow(datamat)])) {
-    # normal regular timeseries, no missing periods and periods
-    # are ordered synchronically
-    ret <- regts(datamat, start = create_period(times[1], freq))
-  } else {
-    # irregular timeseries in dataframe (missing periods or
-    # unorderered time index)
-    subp_min <- min(times)
-    subp_max <- max(times)
-    per_count <- subp_max - subp_min + 1
-    pmin <- create_period(subp_min, frequency = freq)
-    mat <- matrix(NA, nrow = per_count, ncol = ncol(datamat))
-    colnames(mat) <- colnames(datamat)
-    ret <- regts(mat, start = pmin)
-    rows <- times - subp_min +1
-    ret[rows, ] <- datamat
-  }
-
-  # handle labels, use data because of empty names columns
+  # handle labels
   lbls <- Hmisc::label(data)
   if (!all(nchar(lbls, type = "bytes") == 0)) {
-
     ts_labels(ret) <- lbls
   }
 
@@ -328,12 +302,9 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
 as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
 
   times <- rownames(x)
-  datamat <- x
 
   # remove columns with empty names
-  datamat <- datamat[ , which(!(get_strings(colnames(datamat)) == "")),
-                     drop = FALSE]
-
+  datamat <- x[ , which(!(get_strings(colnames(x)) == "")), drop = FALSE]
 
   if (numeric && !is.numeric(datamat)) {
     datamat <- as.numeric(datamat)

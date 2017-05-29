@@ -47,7 +47,8 @@ Coerce an object to a \code{\link{regts}} timeseries object
 \code{\link{regts}}
 
 \item \code{data.frame}: Convert a \code{\link{data.frame}} to a
-\code{\link{regts}}
+\code{\link{regts}}. The time should be stored in the row numbers
+of the matrix
 
 \item \code{matrix}: Convert a \code{\link{matrix}} to a
 \code{\link{regts}}
