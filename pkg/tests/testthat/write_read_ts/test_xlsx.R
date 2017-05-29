@@ -13,7 +13,7 @@ ts1 <- cbind(a, b)
 ts1_lbls <- ts1
 ts_labels(ts1_lbls) <- paste(c("Timeseries"), colnames(ts1))
 
-test_that("ts with labels written correctly",  {
+test_that("ts without labels written correctly",  {
 
   file <- "xlsx/ts1.xlsx"
 
@@ -22,13 +22,20 @@ test_that("ts with labels written correctly",  {
 
   write_ts_xlsx(ts1, file, sheet_name = "ts1", labels = "after")
   write_ts_xlsx(ts1, file, sheet_name = "ts1_t",  rowwise = FALSE,
-                append_sheet = TRUE)
+                append = TRUE)
+
+  wb <- loadWorkbook(file)
+  write_ts_sheet(ts1 * 2, wb, sheet_name = "ts1_times_2",  rowwise = TRUE)
+  saveWorkbook(wb, file)
 
   ts1_read <- read_ts_xlsx(file, sheet = "ts1")
   expect_identical(ts1, ts1_read)
 
   ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t")
   expect_identical(ts1, ts1_t_read)
+
+  ts1_times_2_read <- read_ts_xlsx(file, sheet = "ts1_times_2")
+  expect_identical(ts1 * 2, ts1_times_2_read)
 })
 
 test_that("ts with labels written correctly",  {
@@ -36,9 +43,9 @@ test_that("ts with labels written correctly",  {
   file <- "xlsx/ts1_lbls.xlsx"
   file.copy("xlsx_org/ts1_lbls.xlsx", file)
 
-  write_ts_xlsx(ts1_lbls, file, sheet_name = "ts1", append_sheet = TRUE)
+  write_ts_xlsx(ts1_lbls, file, sheet_name = "ts1", append = TRUE)
   write_ts_xlsx(ts1_lbls, file, sheet_name = "ts1_t",  rowwise = FALSE,
-                append_sheet = TRUE)
+                append = TRUE)
 
   ts1_read <- read_ts_xlsx(file, sheet = "ts1", labels = "after")
   expect_identical(ts1_lbls, ts1_read)
