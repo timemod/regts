@@ -94,7 +94,14 @@ test_that("two univariate timeseries", {
         "Argument x2 \\(ts2\\[, \"a\", drop = FALSE\\]\\) is not a multivariate timeseries")
 })
 
-test_that("no column namessimple", {
+test_that("different frequencies", {
+  tsy <- regts(matrix(data = rep(1:9), nc = 3), start = "2008",
+               names = c("a", "b", "c"))
+  expect_error(tsdif(ts1, tsy),
+               "Timeseries x1 and x2 \\(ts1 and tsy\\) have different frequencies")
+})
+
+test_that("no column names simple", {
     x <- ts1
     y <- ts2[, 1:2]
     colnames(x) <- NULL
