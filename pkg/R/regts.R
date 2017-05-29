@@ -302,6 +302,9 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
 as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
 
   times <- rownames(x)
+  if (is.null(times)) {
+    times <- as.character(seq_len(nrow(x)))
+  }
 
   # remove columns with empty names
   datamat <- x[ , which(!(get_strings(colnames(x)) == "")), drop = FALSE]
