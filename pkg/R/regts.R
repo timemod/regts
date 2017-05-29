@@ -322,6 +322,55 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   return (ret)
 }
 
+#' @describeIn as.regts Convert a \code{\link{matrix}} to a
+#' \code{\link{regts}}
+#' @export
+as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
+
+  times <- rownames(x)
+  datamat <- x
+
+  # remove columns with empty names
+  datamat <- datamat[, which(!(get_strings(colnames(datamat)) == ""))]
+
+  if (numeric && !is.numeric(datamat)) {
+    datamat <- as.numeric(datamat)
+  }
+
+  # convert the contents of the time column to a list of periods
+  times <- lapply(as.character(times), FUN = fun, ...)
+
+  # check that all frequencies are equal
+  frequencies <- sapply(times, FUN = frequency)
+  frequencies <- unique(frequencies)
+  if (length(frequencies) > 1) {
+    stop("The time column(s) contain different frequencies")
+  } else {
+    freq <- frequencies[1]
+  }
+
+  times <- unlist(times)
+  if (identical(times, times[1]:times[nrow(datamat)])) {
+    # normal regular timeseries, no missing periods and periods
+    # are ordered synchronically
+    ret <- regts(datamat, start = create_period(times[1], freq))
+  } else {
+    # irregular timeseries in dataframe (missing periods or
+    # unorderered time index)
+    subp_min <- min(times)
+    subp_max <- max(times)
+    per_count <- subp_max - subp_min + 1
+    pmin <- create_period(subp_min, frequency = freq)
+    mat <- matrix(NA, nrow = per_count, ncol = ncol(datamat))
+    colnames(mat) <- colnames(datamat)
+    ret <- regts(mat, start = pmin)
+    rows <- times - subp_min +1
+    ret[rows, ] <- datamat
+  }
+
+  return (ret)
+}
+
 #' @describeIn as.regts Default method to convert an R object to a
 #' \code{\link{regts}}. This method first employs \code{\link[stats]{as.ts}}
 #' and then \code{\link{as.regts.ts}}

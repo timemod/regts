@@ -31,14 +31,28 @@ read_ts_rowwise <- function(df, frequency, labels = c("no", "after", "before"),
   }
   df <- df[ , col_sel, drop = FALSE]
 
+
+  data_cols <- (max(c(name_col, label_cols)) + 1) : ncol(df)
+
   # convert all data columns to numerical columns, taking the decimal separator
   # into account
-  data_cols <- (max(c(name_col, label_cols)) + 1) : ncol(df)
-  df[ , data_cols] <- numeric_data_frame(df[ , data_cols], dec = dec)
+  mat <- numeric_matrix(df[, data_cols], dec = dec)
+  names <- df[, name_col]
+  mat <- t(mat)
+  colnames(mat) <- names
 
-  # transpose
-  df <- transpose_df(df, colname_column = name_col, label_column = label_cols)
+  # convert the matrix to a regts, using numeric = FALSE, because we already
+  # know that df is numeric
+  ret <- as.regts(mat, frequency = frequency, numeric = FALSE)
 
-  # set numeric = FALSE, because we already know that df is numeric
-  return(as.regts(df, frequency = frequency, numeric = FALSE))
+  if (labels != "no" && length(label_cols) > 0) {
+    lbls <- df[, label_cols, drop = FALSE]
+    l <- lapply(lbls[names%in% colnames(ret), , drop = FALSE], get_strings)
+    l$names <- NULL
+    lbls <- do.call(paste, l)
+    lbls <- trimws(lbls)
+    ts_labels(ret) <- lbls
+  }
+
+  return(ret)
 }
