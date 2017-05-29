@@ -1,7 +1,7 @@
 #' Function for removing columns with NAs in (multivariate) regts
 #'
-#' This function removes columns with NA values from a multivariate regts.
-#' For multivariate regts a column will by default be regarded as NA if all elements
+#' This function removes columns with NA values from a (multivariate) regts.
+#' A column will by default be regarded as NA if all elements
 #' in the column are NA.  Specify \code{"any"} to change this behaviour.
 #' If all columns are removed the function returns NULL.
 #'

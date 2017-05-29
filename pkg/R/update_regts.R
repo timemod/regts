@@ -6,9 +6,7 @@
 #' The result is an updated multivariate regts object.
 #'
 #' @details
-#' The timeseries can be updated in four different ways:
-#'
-#' \code{replace} the first timeseries are replaced by the second timeseries
+#' The timeseries can be updated in three different ways:
 #'
 #' \code{tsupd} the first timeseries are updated with the second timeseries.
 #' The two timeseries must have the same frequency, but may have a different
@@ -28,8 +26,8 @@
 #' @param x1 the first timeseries (a multivariate \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
 #' @param x2 the second timeseries (a multivariate \code{regts} or \code{ts} object).
-#' @param method four different ways to update the timeseries.
-#' By default the timeseries are replaced. This behaviour can be changed by
+#' @param method three different ways to update the timeseries.
+#' By default the timeseries are updated. This behaviour can be changed by
 #' using one of the other methods. See details.
 #' @return an updated multivariate regts object.
 #'
@@ -46,7 +44,7 @@
 #'\code{\link{regts}}
 #'
 #' @export
-tsupdate <- function(x1, x2, method = c("replace", "tsupd", "tsupdna", "tsupdval")) {
+tsupdate <- function(x1, x2, method = c("tsupd", "tsupdna", "tsupdval")) {
 
   if (!is.mts(x1)) {
     stop(paste0("Argument x1 (", deparse(substitute(x1)),
@@ -66,11 +64,6 @@ tsupdate <- function(x1, x2, method = c("replace", "tsupd", "tsupdna", "tsupdval
 
   x1 <- as.regts(x1)
   x2 <- as.regts(x2)
-
-  # for method replace we're ready
-  if (method == "replace"){
-    return(x2)
-  }
 
   names1 <- colnames(x1)
   names2 <- colnames(x2)

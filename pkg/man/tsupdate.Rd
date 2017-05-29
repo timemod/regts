@@ -5,7 +5,7 @@
 \title{Updates a multivariate timeseries with another multivariate timeseries
 object}
 \usage{
-tsupdate(x1, x2, method = c("replace", "tsupd", "tsupdna", "tsupdval"))
+tsupdate(x1, x2, method = c("tsupd", "tsupdna", "tsupdval"))
 }
 \arguments{
 \item{x1}{the first timeseries (a multivariate \code{\link{regts}} or
@@ -13,8 +13,8 @@ tsupdate(x1, x2, method = c("replace", "tsupd", "tsupdna", "tsupdval"))
 
 \item{x2}{the second timeseries (a multivariate \code{regts} or \code{ts} object).}
 
-\item{method}{four different ways to update the timeseries.
-By default the timeseries are replaced. This behaviour can be changed by
+\item{method}{three different ways to update the timeseries.
+By default the timeseries are updated. This behaviour can be changed by
 using one of the other methods. See details.}
 }
 \value{
@@ -26,9 +26,7 @@ another multivariate (reg)ts object.
 The result is an updated multivariate regts object.
 }
 \details{
-The timeseries can be updated in four different ways:
-
-\code{replace} the first timeseries are replaced by the second timeseries
+The timeseries can be updated in three different ways:
 
 \code{tsupd} the first timeseries are updated with the second timeseries.
 The two timeseries must have the same frequency, but may have a different
