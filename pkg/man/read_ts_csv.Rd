@@ -5,7 +5,7 @@
 \title{Reads timeseries from a csv file}
 \usage{
 read_ts_csv(filename, rowwise, frequency = NA, skiprow = 0, skipcol = 0,
-  labels = c("no", "after", "before"), sep = ",", dec = if (sep != ".")
+  labels = c("no", "after", "before"), sep = "auto", dec = if (sep != ".")
   "." else ",")
 }
 \arguments{
@@ -25,7 +25,9 @@ frequency indicator (for example "2011-1")}
 
 \item{labels}{label option. See details}
 
-\item{sep}{the separator between columns. The default is \code{,}.}
+\item{sep}{the separator between columns. If not specified, then
+the separator is determined automatically by inspecting the
+first 30 lines of the csv file (see the details of function \code{\link[data.table]{fread}}).}
 
 \item{dec}{the decimal separator as in \code{base::read.csv}.
 If not "." (default) then usually ",".}

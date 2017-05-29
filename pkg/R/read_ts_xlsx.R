@@ -167,6 +167,9 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     df <- read_excel(filename, sheet, range = range, col_names = TRUE,
                      na = na_string)
   } else {
+    # we use argument col_names = FALSE, because otherwise read_excel generates
+    # dummy column names X__NR (NR is a number) for all columns with an empty
+    # header.
     df <- read_excel(filename, sheet, range = range, col_names = FALSE,
                      na = na_string)
   }

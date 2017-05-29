@@ -87,7 +87,9 @@
 #' @param skiprow the number of rows to skip
 #' @param skipcol the number of columns to skip
 #' @param labels label option. See details
-#' @param sep the separator between columns. The default is \code{,}.
+#' @param sep the separator between columns. If not specified, then
+#' the separator is determined automatically by inspecting the
+#' first 30 lines of the csv file (see the details of function \code{\link[data.table]{fread}}).
 #' @param dec the decimal separator as in \code{base::read.csv}.
 #' If not "." (default) then usually ",".
 #' @return a \code{regts} object
@@ -96,7 +98,7 @@
 read_ts_csv <- function(filename, rowwise, frequency = NA,
                         skiprow = 0, skipcol = 0,
                         labels = c("no", "after", "before"),
-                        sep = ",", dec = if (sep != ".") "." else ",") {
+                        sep = "auto", dec = if (sep != ".") "." else ",") {
 
   if (!missing(skiprow)) {
     skip <- skiprow
@@ -123,6 +125,9 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
                 colClasses = colClasses, sep = sep, dec = dec)
 
   } else {
+    # we use argument header = FALSE, because otherwise fread generates
+    # dummy column names VX (X is number) for all columns with an empty
+    # header.
     df <- fread(filename, skip = skip, header = FALSE, data.table = FALSE,
                 sep = sep, dec = dec)
   }

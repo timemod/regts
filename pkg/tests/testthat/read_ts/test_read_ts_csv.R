@@ -135,7 +135,7 @@ test_that("example3.csv is read correctly",  {
                "The following texts could not be converted to numeric:\n",
                "\"x,jan\"")
   expect_warning({
-    result <- read_ts_csv(csv_file, skipcol = 1, sep = ";", dec = ",")
+    result <- read_ts_csv(csv_file, skipcol = 1, dec = ",")
   }, msg = msg)
   expect_identical(result, correct_result_tmp)
 })
@@ -152,7 +152,7 @@ test_that("example4.csv is read correctly",  {
                "The following texts could not be converted to numeric:\n",
                "\"aap,x\"")
   expect_warning({
-    result <- read_ts_csv(csv_file, skiprow = 1, sep = ";", dec = ",")
+    result <- read_ts_csv(csv_file, skiprow = 1, dec = ",")
   }, msg = msg)
   expect_identical(result, correct_result_tmp)
 })
