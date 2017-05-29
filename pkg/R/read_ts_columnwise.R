@@ -63,12 +63,14 @@ read_ts_columnwise <- function(df, frequency = NA,
   # remove rows without period
   df <- df[is_period, , drop = FALSE]
 
-  data_cols <- 2 : ncol(df)
-  df[ , data_cols] <- numeric_data_frame(df[ , data_cols, drop = FALSE],
-                                         dec = dec)
+  # put time column in the row names, then the conversion of
+  # data frame to numeric is more efficient
+  rownames(df) <- df[, 1]
+  df <- df[, -1, drop = FALSE]
+  df <- numeric_data_frame(df, dec = dec)
 
   # set numeric = FALSE, because we already know that df is numeric
-  ret <- as.regts(df, time_column = 1, frequency = frequency, numeric = TRUE)
+  ret <- as.regts(df, frequency = frequency, numeric = TRUE)
   if (labels != "no" && any(labels != "")) {
     ts_labels(ret) <- labels
   }
