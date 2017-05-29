@@ -24,6 +24,25 @@
 #' \code{read_ts} assumes that the timeseries are stored rowwise. Otherwise it
 #' assumes that the timeseries are store columnwise.
 #'
+#' \strong{rowwise timeseries}
+#'
+#' \if{html}{\figure{xlsschemarowwise.jpg}{options: width=200}}
+#' \if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
+#'
+#' For rowwise timeseries, the first row that is not skipped (see
+#' argument \code{skiprow}) should contain the periods.
+#' Columns for which the corresponding period is not a valid period
+#' are ignored. The timeseries names should be in the first column.
+#' Otherwise use argument \code{skipcol} to specify the number of
+#' columns to skip.
+#' There may be one or more columns between the column with variable names
+#' and the columns where the actual timeseries are stored.
+#' If argument \code{labels = "after"}  then the texts in these
+#' columns will be used to create timeseries labels. If \code{labels = "before"},
+#' the last column before the data is supposed to contain
+#' the variable names. The columns before the variable name column
+#' now should contain label information.
+#'
 #'\strong{columnwise timeseries}
 #'
 #' \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=200}}
@@ -44,27 +63,8 @@
 #' then the label option \code{"before"} is not allowed for columnwise
 #' timeseries, since in that case the column names are the timeseries names.
 #'
-#' \strong{rowwise timeseries}
-#'
-#' \if{html}{\figure{xlsschemarowwise.jpg}{options: width=200}}
-#' \if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
-#'
-#' For rowwise timeseries, the first row that is not skipped (see
-#' argument \code{skiprow}) should contain the periods.
-#' Columns for which the corresponding period is not a valid period
-#' are ignored. The timeseries names should be in the first column.
-#' Otherwise use argument \code{skipcol} to specify the number of
-#' columns to skip.
-#' There may be one or more columns between the column with variable names
-#' and the columns where the actual timeseries are stored.
-#' If argument \code{labels = "after"}  then the texts in these
-#' columns will be used to create timeseries labels. If \code{labels = "before"},
-#' the last column before the data is supposed to contain
-#' the variable names. The columns before the variable name column
-#' now should contain label information.
-#'
 #' Sometimes it helps to supply information about the structure of
-#' the data in the file. Specify option  \code{columnwise} is you know
+#' the data in the file. Specify option  \code{rowwise} if you know
 #' that the timeseries ares stored rowwise or columnwise. Specify
 #' argument \code{frequency} is you already know the frequency of the timeseries.
 #' Argument \code{frequency} is mandatory if a general period format
@@ -78,9 +78,9 @@
 #' such as  \code{"2011-1"} has been used.
 #'
 #' @param filename  a string with the filename
-#' @param columnwise a logical value: are the timeseries stored columnwise?
+#' @param rowwise a logical value: are the timeseries stored rowwise?
 #' If not specified, then \code{read_ts} tries to figure out itself if
-#' the timeseries are stored columnwise or rowwise
+#' the timeseries are stored rowwise or columnwise
 #' @param frequency the frequency of the timeseries.
 #' This argument is mandatory if the file contains a period texts without
 #' frequency indicator (for example "2011-1")
@@ -92,7 +92,7 @@
 #' @return a \code{regts} object
 #' @importFrom data.table fread
 #' @export
-read_ts_csv <- function(filename, columnwise, frequency = NA,
+read_ts_csv <- function(filename, rowwise, frequency = NA,
                         skiprow, skipcol,
                         labels = c("no", "after", "before"),
                         ...) {
@@ -103,39 +103,40 @@ read_ts_csv <- function(filename, columnwise, frequency = NA,
     skip <- 0
   }
 
-  if (missing(columnwise) || !columnwise) {
+  if (missing(rowwise) || rowwise) {
     first_line <- fread(filename, nrows = 1, skip = skip, header = FALSE,
                         data.table = FALSE, ...)
     is_period <- is_period_text(get_strings(first_line), frequency)
     first_prd_col <- Position(function(x) {x}, is_period)
-    if (missing(columnwise)) {
-      columnwise <- is.na(first_prd_col)
+    if (missing(rowwise)) {
+      rowwise <- !is.na(first_prd_col)
     }
   }
 
   # read the data data frame. For rowwise timeseries, the time index is put in
   # the header
-  if (columnwise) {
-    df <- fread(filename, skip = skip, header = FALSE, data.table = FALSE,
-                ...)
-  } else {
+  if (rowwise) {
     nper <- length(is_period) - first_prd_col + 1
     colClasses <- c(rep("character", first_prd_col - 1), rep("numeric", nper))
     df <- fread(filename, skip = skip, header = TRUE, data.table = FALSE,
                 colClasses = colClasses, ...)
+
+  } else {
+    df <- fread(filename, skip = skip, header = FALSE, data.table = FALSE,
+                ...)
   }
 
   if (!missing(skipcol) && skipcol > 0) {
     df <- df[ , -(1:skipcol), drop = FALSE]
   }
 
-  if (columnwise) {
-    return(read_ts(df, columnwise = columnwise, frequency = frequency,
-            labels = labels))
-  } else {
+  if (rowwise) {
     # use numeric = FALSE, because we already know that the timeseries
     # are numeric (see code above)
     return(read_ts_rowwise(df, frequency = frequency, labels = labels,
                            numeric = FALSE))
+  } else {
+    return(read_ts(df, rowwise = rowwise, frequency = frequency,
+                   labels = labels))
   }
 }

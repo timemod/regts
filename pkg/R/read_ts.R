@@ -1,23 +1,24 @@
 # Internal function to read timeseries from a dataframe.
 # This function is used in function read_ts_csv and read_ts_xlsx
-read_ts <- function(df, columnwise, frequency = NA,
+read_ts <- function(df, rowwise, frequency = NA,
                      labels = c("no", "after", "before")) {
 
   labels <- match.arg(labels)
 
   # remove all columns with only NAs
-  all_na <- unlist(lapply(df, FUN = function(x) {!all(is.na(x))}))
+  all_na <- sapply(df, FUN = function(x) {!all(is.na(x))})
   df <- df[ , all_na, drop = FALSE]
 
-  if (missing(columnwise)) {
-    columnwise <- !any(is_period_text(get_strings(df[1,]), frequency))
+  if (missing(rowwise)) {
+    rowwise <- any(is_period_text(get_strings(df[1,]), frequency))
   }
 
-  if (!columnwise) {
+  if (rowwise) {
 
     # first convert the data frame to a character data frame,
     # otherwise the result of function t is sometimes incorrect
-    df <- as.data.frame(lapply(df, FUN = as.character), stringsAsFactors = FALSE)
+    df <- as.data.frame(lapply(df, FUN = as.character),
+                        stringsAsFactors = FALSE)
 
     # transpose
     df <- as.data.frame(t(df), stringsAsFactors = FALSE)
