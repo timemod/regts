@@ -2,7 +2,7 @@
 % Please edit documentation in R/numeric_matrix.R
 \name{numeric_matrix}
 \alias{numeric_matrix}
-\title{Convert all non-numeric columns of a dataframe to numerical columns.}
+\title{Convert a data frame to a numeric matrix.}
 \usage{
 numeric_matrix(x, dec = ".")
 }
@@ -12,14 +12,15 @@ numeric_matrix(x, dec = ".")
 \item{dec}{decimal separator in number strings. The default is \code{"."}}
 }
 \description{
-This function converts all non-numeric columns of a data frame to
-numerical columns. Integer columns are left unchanged. If the data frame
-contains character columns with texts that cannot be converted to
-a numerical value, then this function gives a warning with a list
-of texts that could not be converted.
+Returns the matrix obtained by converting all the variables in a data frame
+to numeric mode and then binding them together as the columns of a matrix.
+Factors and ordered factors are replaced by their internal codes.
+of texts that could not be converted. This implementation is
+significantly faster than the function \code{\link[base]{data.matrix}}
+of the base package.
 }
 \examples{
 df <- data.frame(a = c("1.123", "x", NA), b = c("1", "", "john"),
                  c = 10 : 12)
-numeric_data_frame(df)
+numeric_matrix(df)
 }

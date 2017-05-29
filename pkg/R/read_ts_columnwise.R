@@ -10,7 +10,7 @@ read_ts_columnwise <- function(df, frequency = NA,
   all_na <- sapply(df, FUN = function(x) {!all(is.na(x))})
   df <- df[ , all_na, drop = FALSE]
 
-  period_info <- find_period_column_simple(df, frequency)
+  period_info <- find_period_column(df, frequency)
   time_column <- period_info$col_nr
   is_period <- period_info$is_period
   first_data_row <- Position(function(x) {x}, is_period)
@@ -67,19 +67,19 @@ read_ts_columnwise <- function(df, frequency = NA,
   # data frame to numeric is more efficient
   rownames(df) <- df[, 1]
   df <- df[, -1, drop = FALSE]
-  df <- numeric_data_frame(df, dec = dec)
+  datamat <- numeric_matrix(df, dec = dec)
 
   # set numeric = FALSE, because we already know that df is numeric
-  ret <- as.regts(df, frequency = frequency, numeric = TRUE)
+  ret <- as.regts(datamat, frequency = frequency, numeric = FALSE)
+
   if (labels != "no" && any(labels != "")) {
     ts_labels(ret) <- labels
   }
 
   return(ret)
-
 }
 
-find_period_column_simple <- function(df, frequency) {
+find_period_column <- function(df, frequency) {
 
   for (i in 1:ncol(df)) {
     is_period <- is_period_text(get_strings(df[, i]), frequency)

@@ -51,7 +51,9 @@ read_ts_rowwise <- function(df, frequency, labels = c("no", "after", "before"),
     l$names <- NULL
     lbls <- do.call(paste, l)
     lbls <- trimws(lbls)
-    ts_labels(ret) <- lbls
+    if (any(labels != "")) {
+      ts_labels(ret) <- lbls
+    }
   }
 
   return(ret)

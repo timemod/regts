@@ -276,10 +276,10 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   data <- data[which(!(get_strings(colnames(data)) == ""))]
 
   if (numeric) {
-    data <- numeric_data_frame(data)
+    datamat <- numeric_matrix(data)
+  } else {
+    datamat <- as.matrix(data)
   }
-
-  datamat <- as.matrix(data)
 
   # convert the contents of the time column to a list of periods
   times <- lapply(as.character(times), FUN = fun, ...)
@@ -331,7 +331,9 @@ as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
   datamat <- x
 
   # remove columns with empty names
-  datamat <- datamat[, which(!(get_strings(colnames(datamat)) == ""))]
+  datamat <- datamat[ , which(!(get_strings(colnames(datamat)) == "")),
+                     drop = FALSE]
+
 
   if (numeric && !is.numeric(datamat)) {
     datamat <- as.numeric(datamat)

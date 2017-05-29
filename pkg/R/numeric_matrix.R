@@ -1,24 +1,32 @@
-#' Convert all non-numeric columns of a dataframe to numerical columns.
+#' Convert a data frame to a numeric matrix.
 #'
-#' This function converts all non-numeric columns of a data frame to
-#' numerical columns. Integer columns are left unchanged. If the data frame
-#' contains character columns with texts that cannot be converted to
-#' a numerical value, then this function gives a warning with a list
-#' of texts that could not be converted.
+#' Returns the matrix obtained by converting all the variables in a data frame
+#' to numeric mode and then binding them together as the columns of a matrix.
+#' Factors and ordered factors are replaced by their internal codes.
+#' of texts that could not be converted. This implementation is
+#' significantly faster than the function \code{\link[base]{data.matrix}}
+#' of the base package.
 #' @param x a data frame
 #' @param dec decimal separator in number strings. The default is \code{"."}
-# TODO: also handle thousand separator
 #' @examples
 #' df <- data.frame(a = c("1.123", "x", NA), b = c("1", "", "john"),
 #'                  c = 10 : 12)
-#' numeric_data_frame(df)
+#' numeric_matrix(df)
 #' @export
 numeric_matrix <- function(x, dec = ".") {
 
   # NOTE: we do not use function data.matrix, this is too slow
 
+  if (!is.data.frame(x)) {
+    stop("Argument x is not a data frame")
+  }
+
   # save row and column names
-  row_names <- rownames(x)
+  row_names <- if (.row_names_info(x) <= 0L) {
+                 NULL
+               } else {
+                  row.names(x)
+               }
   col_names <- colnames(x)
 
   #  get rid of factors, Dates etc.
@@ -105,6 +113,10 @@ numeric_matrix <- function(x, dec = ".") {
                      "The first ", NWEIRD_MAX, " texts that gave problems are:\n",
                      paste0(weird_texts, collapse = "\n")))
     }
+  }
+
+  if (!is.matrix(x2)) {
+    x2 <- matrix(x2, nrow = nrow(x), ncol = ncol(x))
   }
 
   # restore row and column names
