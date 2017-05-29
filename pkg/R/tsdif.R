@@ -66,59 +66,57 @@
 #'
 tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
 
-    if (!is.mts(x1)) {
-        stop(paste0("Argument x1 (", deparse(substitute(x1))),
+  if (!is.mts(x1)) {
+      stop(paste0("Argument x1 (", deparse(substitute(x1))),
                    ") is not a multivariate timeseries")
-    }
-    if (!is.mts(x2)) {
-        stop(paste0("Argument x2 (", deparse(substitute(x2))),
-             ") is not a multivariate timeseries")
-    }
+  }
+  if (!is.mts(x2)) {
+      stop(paste0("Argument x2 (", deparse(substitute(x2))),
+           ") is not a multivariate timeseries")
+  }
 
-    x1 <- as.regts(x1)
-    x2 <- as.regts(x2)
+  if (frequency(x1) != frequency(x2)) {
+      series_name1 <- deparse(substitute(x1))
+      series_name2 <- deparse(substitute(x2))
+      stop(paste0("Timeseries x1 and x2 (", series_name1, " and ", series_name2,
+                 ") have different frequencies"))
+  }
 
-    if (frequency(x1) != frequency(x2)) {
-        series_name1 <- deparse(substitute(x1))
-        series_name2 <- deparse(substitute(x2))
-        stop(paste("Timeseries x1 and x2 (", series_name1, "and", series_name2,
-                   "have different frequencies"))
-    }
+  x1 <- as.regts(x1)
+  x2 <- as.regts(x2)
 
-    names1 <- colnames(x1)
-    names2 <- colnames(x2)
+  names1 <- colnames(x1)
+  names2 <- colnames(x2)
 
-    # create colnames of x1 or x2 does not have colnames
-    if (is.null(names1)) {
-        names1 <- paste("column", 1 : ncol(x1))
-        colnames(x1) <- names1
-    }
-    if (is.null(names2)) {
-        names2 <- paste("column", 1 : ncol(x2))
-        colnames(x2) <- names2
-    }
+  # create colnames of x1 or x2 does not have colnames
+  if (is.null(names1)) {
+      names1 <- paste("column", 1 : ncol(x1))
+      colnames(x1) <- names1
+  }
+  if (is.null(names2)) {
+      names2 <- paste("column", 1 : ncol(x2))
+      colnames(x2) <- names2
+  }
 
-    common_names   <- intersect(names1, names2)
-    missing_names1 <- setdiff(names2, names1)
-    missing_names2 <- setdiff(names1, names2)
+  common_names   <- intersect(names1, names2)
+  missing_names1 <- setdiff(names2, names1)
+  missing_names2 <- setdiff(names1, names2)
+  dif <- calculate_difference(common_names, x1, x2, tol, fun)
+  if (!is.null(dif)) {
+      difnames <- colnames(dif)
+  } else {
+      difnames <- character(0)
+  }
 
-    dif <- calculate_difference(common_names, x1, x2, tol, fun)
-    if (!is.null(dif)) {
-        difnames <- colnames(dif)
-    } else {
-        difnames <- character(0)
-    }
-
-    retval <- list(equal          = length(missing_names1) == 0 &&
-                                    length(missing_names2) == 0 &&
-                                    length(difnames) == 0,
-                   difnames       = difnames,
-                   dif            = dif,
-                   missing_names1 = missing_names1,
-                   missing_names2 = missing_names2,
-                   tol            = tol)
-
-    return (retval)
+  retval <- list(equal          = length(missing_names1) == 0 &&
+                                  length(missing_names2) == 0 &&
+                                  length(difnames) == 0,
+                 difnames       = difnames,
+                 dif            = dif,
+                 missing_names1 = missing_names1,
+                 missing_names2 = missing_names2,
+                 tol            = tol)
+  return (retval)
 }
 
 # Calculate the difference for the common columns in x1 and x2,
@@ -126,42 +124,41 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
 # are smaller than tol, or if the two timeseries have no common columns
 calculate_difference <- function(common_names, x1, x2, tol, fun) {
 
-    var_count <- length(common_names)
-    if (var_count == 0) {
-        return (NULL)
-    }
+  var_count <- length(common_names)
+  if (var_count == 0) {
+      return (NULL)
+  }
+  xx1 <- x1[, common_names, drop = FALSE]
+  xx2 <- x2[, common_names, drop = FALSE]
 
-    xx1 <- x1[, common_names, drop = FALSE]
-    xx2 <- x2[, common_names, drop = FALSE]
+  # Align the two timeseries objects using the union of their times.
+  p1 <- get_period_range(xx1)
+  p2 <- get_period_range(xx2)
+  punion <- c(min(p1[1], p2[1]), max(p1[2], p2[2]), p1[3])
+  xx1 <- window_regts(xx1, punion)
+  xx2 <- window_regts(xx2, punion)
 
-    # Align the two timeseries objects using the union of their times.
-    p1 <- get_period_range(xx1)
-    p2 <- get_period_range(xx2)
-    punion <- c(min(p1[1], p2[1]), max(p1[2], p2[2]), p1[3])
-    xx1 <- window_regts(xx1, punion)
-    xx2 <- window_regts(xx2, punion)
+  # If xx1 and xx2 are both NA, then replace NA with 0.
+  # Two NA values are always considered equal.
+  both_na <- is.na(xx1) & is.na(xx2)
+  xx1[both_na] <- 0
+  xx2[both_na] <- 0
 
-    # If xx1 and xx2 are both NA, then replace NA with 0.
-    # Two NA values are always considered equal.
-    both_na <- is.na(xx1) & is.na(xx2)
-    xx1[both_na] <- 0
-    xx2[both_na] <- 0
+  dif <- fun(xx1, xx2)
+  colnames(dif) <- common_names
 
-    dif <- fun(xx1, xx2)
-    colnames(dif) <- common_names
+  sel <- apply(dif, FUN = max, MARGIN = 2) > tol
+  sel[is.na(sel)] <- TRUE
+  if (any(sel)) {
+      dif <- dif[, sel, drop = FALSE]
+  } else {
+      dif <- NULL
+  }
 
-    sel <- apply(dif, FUN = max, MARGIN = 2) > tol
-    sel[is.na(sel)] <- TRUE
-    if (any(sel)) {
-        dif <- dif[, sel, drop = FALSE]
-    } else {
-        dif <- NULL
-    }
-
-    if (!is.null(dif)) {
-        # sort columns of dif
-        dif <- dif[, sort(colnames(dif)), drop = FALSE]
-    }
+  if (!is.null(dif)) {
+      # sort columns of dif
+      dif <- dif[, sort(colnames(dif)), drop = FALSE]
+  }
 }
 
 #' Calculates the 'convergence difference'
@@ -189,7 +186,7 @@ calculate_difference <- function(common_names, x1, x2, tol, fun) {
 #'
 #' @export
 cvgdif <- function(x1, x2) {
-    x_abs = abs(x2)
-    dif <- abs(x1 - x2) / ifelse(x_abs < 1, 1, x_abs)
-    return(dif)
+  x_abs = abs(x2)
+  dif <- abs(x1 - x2) / ifelse(x_abs < 1, 1, x_abs)
+  return(dif)
 }

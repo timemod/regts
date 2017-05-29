@@ -3,9 +3,9 @@
 \name{tsupdate}
 \alias{tsupdate}
 \title{Updates a multivariate timeseries with another multivariate timeseries
-objects}
+object}
 \usage{
-tsupdate(x1, x2, method = c("tsupd", "tsupdna", "replace", "tsupdval"))
+tsupdate(x1, x2, method = c("replace", "tsupd", "tsupdna", "tsupdval"))
 }
 \arguments{
 \item{x1}{the first timeseries (a multivariate \code{\link{regts}} or
@@ -13,43 +13,46 @@ tsupdate(x1, x2, method = c("tsupd", "tsupdna", "replace", "tsupdval"))
 
 \item{x2}{the second timeseries (a multivariate \code{regts} or \code{ts} object).}
 
-\item{tol}{difference tolerance (by default zero). Differences smaller
-than tol are ignored.}
-
-\item{fun}{function to compute differences. This function should accept
-two arguments (two numbers) for which the difference is computed.
-By default the absolute difference is computed. A useful function for
-computing differences is \code{\link{cvgdif}}, which computes relative differences
-if the absolute value of \code{x2} is larger than 1.}
+\item{method}{four different ways to update the timeseries.
+By default the timeseries are replaced. This behaviour can be changed by
+using one of the other methods. See details.}
 }
 \value{
-a list with the following components
+an updated multivariate regts object.
 }
 \description{
-This function can be used to update a multivariate regts object with
-another multivariate regts object.
-The result is the updated multivariate regts.
+This function can be used to update a multivariate (reg)ts object with
+another multivariate (reg)ts object.
+The result is an updated multivariate regts object.
 }
 \details{
-This function calculates the difference between common columns
-of two multivariate timeseries objects \code{x1} and \code{x2}.
+The timeseries can be updated in four different ways:
+
+\code{replace} the first timeseries are replaced by the second timeseries
+
+\code{tsupd} the first timeseries are updated with the second timeseries.
 The two timeseries must have the same frequency, but may have a different
-period range. The difference is computed for the union of the two
-period ranges (for the non-overlapping periods the result will be
-\code{NA}). Two \code{NA} values are considered to be equal.
+period range. The update is computed for the union of the two period ranges
+(for the non-overlapping periods the result will be \code{NA}).
+
+\code{tsupdna} if method \code{tsupdna} is selected instead of \code{tsupd},
+only NA values in the first timeseries will be updated
+
+\code{tsupdval} if method \code{tsupdval} is selected instead of \code{tsupd},
+the values in the first timeseries are only replaced with valid (i.e. non-NA)
+values from the second timeseries.
+
+These methods are only employed at the common columns in both timeseries.
+The non overlapping columns in both timeseries are added to the result.
 }
 \examples{
 library(regts)
 
-# create two timeseries x1 and x2
-x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2002",
+x1 <- regts(matrix(data = rep(1:9), nc = 3), period = "2000/2002",
             names = c("a", "b", "c"))
-x2 <- regts(matrix(data = rep(2), nc = 3), period = "2000/2001",
+x2 <- regts(matrix(data = rep(10:15), nc = 3), period = "2000/2001",
             names = c("a", "c", "d"))
-x1 <- regts(matrix(data = rep(1:127), nc = 3), start = "2000",
-           names = c("a", "b", "c"))
-x2 <- x1 + 0.001
-colnames(x2) <- c("a", "b", "d")
+tsupdate(x1, x2, method = "tsupd")
 
 }
 \seealso{
