@@ -19,8 +19,8 @@ test_that("ts with labels written correctly",  {
   expect_identical(ts1, ts1_read)
 
   file <- "csv/ts1_t.csv"
-  write_ts_csv(ts1, file = file, rowwise = FALSE, sep = ";")
-  ts1_t_read <- read_ts_csv(file)
+  write_ts_csv(ts1, file = file, rowwise = FALSE, sep = ";", dec = ",")
+  ts1_t_read <- read_ts_csv(file, dec = ",")
   expect_identical(ts1, ts1_t_read)
 })
 

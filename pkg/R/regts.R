@@ -253,7 +253,8 @@ as.regts.ts <- function(x, ...) {
 }
 
 #' @describeIn as.regts Convert a \code{\link{data.frame}} to a
-#' \code{\link{regts}}
+#' \code{\link{regts}}. The time should be stored in the row numbers
+#' of the matrix
 #' @export
 as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
                                 fun = period, ...) {
@@ -270,16 +271,47 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     }
     times <- x[[time_column]]
     data <- x[-time_column]
+    rownames(data) <- times
   }
 
   # remove columns with empty names
   data <- data[which(!(get_strings(colnames(data)) == ""))]
 
   if (numeric) {
-    data <- numeric_data_frame(data)
+    datamat <- numeric_matrix(data)
+  } else {
+    datamat <- as.matrix(data)
   }
 
-  datamat <- as.matrix(data)
+  # Use numeric == FALSE, because the data has already been converted
+  # to numeric when needed
+  ret <- as.regts.matrix(datamat, numeric = FALSE, fun = fun, ...)
+
+  # handle labels
+  lbls <- Hmisc::label(data)
+  if (!all(nchar(lbls, type = "bytes") == 0)) {
+    ts_labels(ret) <- lbls
+  }
+
+  return (ret)
+}
+
+#' @describeIn as.regts Convert a \code{\link{matrix}} to a
+#' \code{\link{regts}}
+#' @export
+as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
+
+  times <- rownames(x)
+  if (is.null(times)) {
+    times <- as.character(seq_len(nrow(x)))
+  }
+
+  # remove columns with empty names
+  datamat <- x[ , which(!(get_strings(colnames(x)) == "")), drop = FALSE]
+
+  if (numeric && !is.numeric(datamat)) {
+    datamat <- as.numeric(datamat)
+  }
 
   # convert the contents of the time column to a list of periods
   times <- lapply(as.character(times), FUN = fun, ...)
@@ -310,13 +342,6 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     ret <- regts(mat, start = pmin)
     rows <- times - subp_min +1
     ret[rows, ] <- datamat
-  }
-
-  # handle labels, use data because of empty names columns
-  lbls <- Hmisc::label(data)
-  if (!all(nchar(lbls, type = "bytes") == 0)) {
-
-    ts_labels(ret) <- lbls
   }
 
   return (ret)

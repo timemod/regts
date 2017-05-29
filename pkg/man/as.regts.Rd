@@ -4,6 +4,7 @@
 \alias{as.regts}
 \alias{as.regts.ts}
 \alias{as.regts.data.frame}
+\alias{as.regts.matrix}
 \alias{as.regts.default}
 \title{Coerce an object to a \code{\link{regts}} timeseries object}
 \usage{
@@ -13,6 +14,8 @@ as.regts(x, ...)
 
 \method{as.regts}{data.frame}(x, time_column = 0, numeric = TRUE,
   fun = period, ...)
+
+\method{as.regts}{matrix}(x, numeric = TRUE, fun = period, ...)
 
 \method{as.regts}{default}(x, ...)
 }
@@ -44,6 +47,10 @@ Coerce an object to a \code{\link{regts}} timeseries object
 \code{\link{regts}}
 
 \item \code{data.frame}: Convert a \code{\link{data.frame}} to a
+\code{\link{regts}}. The time should be stored in the row numbers
+of the matrix
+
+\item \code{matrix}: Convert a \code{\link{matrix}} to a
 \code{\link{regts}}
 
 \item \code{default}: Default method to convert an R object to a

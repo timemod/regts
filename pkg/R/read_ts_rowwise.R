@@ -2,7 +2,7 @@
 # the time index in the column header.
 # is numeric = TRUE, then the timeseries are converted to numeric
 read_ts_rowwise <- function(df, frequency, labels = c("no", "after", "before"),
-                            numeric = TRUE) {
+                            dec = ".") {
 
   labels <- match.arg(labels)
 
@@ -29,11 +29,32 @@ read_ts_rowwise <- function(df, frequency, labels = c("no", "after", "before"),
     col_sel[label_cols] <- FALSE
     label_cols <- numeric(0)
   }
-  df <- df[, col_sel, drop = FALSE]
+  df <- df[ , col_sel, drop = FALSE]
 
 
-  # transpose
-  df <- transpose_df(df, colname_column = name_col, label_column = label_cols)
+  data_cols <- (max(c(name_col, label_cols)) + 1) : ncol(df)
 
-  return(as.regts(df, frequency = frequency, numeric = numeric))
+  # convert all data columns to numerical columns, taking the decimal separator
+  # into account
+  mat <- numeric_matrix(df[, data_cols], dec = dec)
+  names <- df[, name_col]
+  mat <- t(mat)
+  colnames(mat) <- names
+
+  # convert the matrix to a regts, using numeric = FALSE, because we already
+  # know that df is numeric
+  ret <- as.regts(mat, frequency = frequency, numeric = FALSE)
+
+  if (labels != "no" && length(label_cols) > 0) {
+    lbls <- df[, label_cols, drop = FALSE]
+    l <- lapply(lbls[names%in% colnames(ret), , drop = FALSE], get_strings)
+    l$names <- NULL
+    lbls <- do.call(paste, l)
+    lbls <- trimws(lbls)
+    if (any(labels != "")) {
+      ts_labels(ret) <- lbls
+    }
+  }
+
+  return(ret)
 }
