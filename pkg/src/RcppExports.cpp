@@ -65,3 +65,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+
+static const R_CallMethodDef CallEntries[] = {
+    {"regts_agg_gr", (DL_FUNC) &regts_agg_gr, 3},
+    {"regts_parse_period", (DL_FUNC) &regts_parse_period, 2},
+    {"regts_parse_period_range", (DL_FUNC) &regts_parse_period_range, 2},
+    {"regts_is_period_text_", (DL_FUNC) &regts_is_period_text_, 2},
+    {"regts_get_period_range", (DL_FUNC) &regts_get_period_range, 1},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_regts(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}
