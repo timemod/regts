@@ -25,7 +25,8 @@ test_that("ts without labels written correctly",  {
                 append = TRUE)
 
   wb <- loadWorkbook(file)
-  write_ts_sheet(ts1 * 2, wb, sheet_name = "ts1_times_2",  rowwise = TRUE)
+  sheet <- createSheet(wb, "ts1_times_2")
+  write_ts_sheet(ts1 * 2, sheet,  rowwise = TRUE)
   saveWorkbook(wb, file)
 
   ts1_read <- read_ts_xlsx(file, sheet = "ts1")

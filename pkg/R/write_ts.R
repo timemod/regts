@@ -30,19 +30,32 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 
 #' Functions for writing timeseries to an xlsx file
 #'
-#' These functions can be used to write timeseries to an xlsx file.
-#' The function employ package  \code{\link[xlsx]{write.xlsx}} for
+#' These functions can be used to write timeseries to a sheet of an
+#' xlsx file. \code{write_ts_xlsx} creates or opens an Excel workbook
+#' (depending on argument \code{append}) and writes the timeseries to
+#' a sheet with a specified name.
+#' \code{write_ts_sheet} writes timeseries to a \code{\link[xlsx]{Sheet}}
+#' object.
+#'
+#' The functions employ package  \code{\link[xlsx]{write.xlsx}} for
 #' writing the Excel file.
+#'
+#' If you want to write multiple timeseries objects to different
+#' sheets, you can use \code{write_ts_xlsx} with argument
+#' \code{append = TRUE}, or \code{write_ts_sheet}. The latter approach
+#' is more efficient.
+#'
 #' @param x a \code{ts} or \code{regts} object
 #' @param file the filename of the output file
+#' @param sheet_name the sheet name
+#' @param sheet a \code{\link[xlsx]{Sheet}} object (see the documentation
+#' of package \code{xlsx})
 #' @param append If \code{FALSE} (the default), then the original file,
 #' if it exists, is replaced with the new file. All original data is lost.
 #' If \code{TRUE}, then only data on the sheet with
 #' the specified sheet name is erased and replaced with new data.  If the sheet
 #' does not yet exist, then a new sheet is created and appended to the
 #' original file.
-#' @param wb a workbook object as returned by \code{createWorkbook}
-#' or \code{loadWorkbook}.
 #' @param rowwise a logical value: should the timeseries we written rowwise?
 #' @param labels should labels we written, and if so before the names or after
 #' the names? By default, labels are written after the names if present
@@ -59,7 +72,27 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @importFrom xlsx autoSizeColumn
 #' @importFrom xlsx removeRow
 #'
+#' @describeIn write_ts_xlsx Write timeseries to an Excel workbook
+#' @examples
+#' # create two timeseries objects
+#' ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
+#'              labels = c("Timeseries a", "Timeseries b"),
+#'              start = "2017Q2")
 #'
+#' # write timeseries ts1 to an Excel file
+#' write_ts_xlsx(ts1, file = "ts1.xlsx", sheet_name = "ts1", labels = "after")
+#'
+#' # write two sheets using write_ts_sheet
+#' wb <- createWorkbook()
+#' sheet <- createSheet(wb, "ts1")
+#' write_ts_sheet(ts1, sheet, labels = "after")
+#' sheet <- createSheet(wb, "ts1_times_100")
+#' write_ts_sheet(ts1 * 100, sheet = sheet, labels = "after")
+#' saveWorkbook(wb, "timeseries.xlsx")
+#' \dontshow{
+#'    unlink("ts1.xlsx")
+#'    unlink("timeseries.xlsx")
+#' }
 #' @export
 write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           rowwise = TRUE, append = FALSE,
@@ -78,7 +111,18 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
     wb <- createWorkbook()
   }
 
-  write_ts_sheet_(x, wb, sheet_name = sheet_name, rowwise = rowwise,
+  nsheet <- wb$getNumberOfSheets()
+  if (nsheet > 0) {
+    sheets <- getSheets(wb)
+  }
+  if (nsheet > 0 && sheet_name %in% names(sheets)) {
+    sheet <- sheets[[sheet_name]]
+    removeRow(sheet)
+  } else {
+    sheet <- createSheet(wb, sheetName = sheet_name)
+  }
+
+  write_ts_sheet_(x, sheet, rowwise = rowwise,
                   labels = labels, labels_missing = missing(labels))
 
   saveWorkbook(wb, file)
@@ -86,29 +130,19 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   return(invisible(NULL))
 }
 
-#' @describeIn write_ts_xlsx Writes a timeseries to a sheet of an Excel workbook
+#' @describeIn write_ts_xlsx Writes a timeseries to a a \code{\link[xlsx]{Sheet}} object
 #' @export
-write_ts_sheet <- function(x, wb,  sheet_name = "Sheet1",
-                           rowwise = TRUE, labels = c("after", "before", "no")) {
+write_ts_sheet <- function(x, sheet,  rowwise = TRUE,
+                           labels = c("after", "before", "no")) {
 
-  write_ts_sheet_(x, wb, sheet_name = sheet_name, rowwise = rowwise,
-                  labels = labels, labels_missing = missing(labels))
+  write_ts_sheet_(x, sheet, rowwise = rowwise, labels = labels,
+                  labels_missing = missing(labels))
 
 }
 
 # internal function to write a timeseries object to a sheet of an Excel workbook
-write_ts_sheet_ <- function(x, wb, sheet_name, rowwise, labels, labels_missing) {
+write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing) {
 
-  nsheet <- wb$getNumberOfSheets()
-  if (nsheet > 0) {
-    sheets <- getSheets(wb)
-  }
-  if (nsheet > 0 && sheet_name %in% names(sheets)) {
-      sheet <- sheets[[sheet_name]]
-      removeRow(sheet)
-  } else {
-    sheet <- createSheet(wb, sheetName = sheet_name)
-  }
 
   df_info <- write_ts_df(x, rowwise, labels, labels_missing)
 
@@ -124,6 +158,7 @@ write_ts_sheet_ <- function(x, wb, sheet_name, rowwise, labels, labels_missing) 
     col_split <- 2
   }
 
+  wb <- sheet$getWorkbook()
   right_align_style <- CellStyle(wb, alignment = Alignment(horizontal =
                                                              "ALIGN_RIGHT"))
 
