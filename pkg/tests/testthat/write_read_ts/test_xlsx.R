@@ -1,7 +1,5 @@
 library(regts)
 library(testthat)
-library(xlsx)
-library(readxl)
 
 context("write_read_ts_xlsx")
 
@@ -59,10 +57,10 @@ test_that("ts with labels written correctly",  {
   sheetnames <- names(getSheets(wb))
   expect_identical(sheetnames, c("sheet_before", "ts1", "ts1_t", "sheet_after"))
 
-  df1 <- as.data.frame(read_excel(file, sheet = "sheet_before"))
+  df1 <- as.data.frame(readxl::read_excel(file, sheet = "sheet_before"))
   expect_equal(df1, data.frame(x = 10, y = 20))
 
-  df2 <- as.data.frame(read_excel(file, sheet = "sheet_after"))
+  df2 <- as.data.frame(readxl::read_excel(file, sheet = "sheet_after"))
   expect_equal(df2, data.frame(x = 1, y = 2))
 })
 
