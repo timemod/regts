@@ -5,8 +5,7 @@ context("period_range")
 test_that("constructor period_range", {
   expect_identical(as.character(period_range("2010 q 2", "2011Q3")),
                    "2010Q2/2011Q3")
-  expect_identical(as.character(period_range("2010M2")),
-                   "2010M2/2010M2")
+  expect_identical(as.character(period_range("2010M2")), "2010M2")
   expect_identical(as.character(period_range("2010q2", NULL)),
                    "2010Q2/")
   # "d1/d2" is an alternative way to ("d1","d2") to construct a period_range
@@ -29,8 +28,7 @@ test_that("constructor period_range", {
 test_that("as.period_range.character", {
   expect_identical(as.character(as.period_range("2010 q 2/2011Q3")),
                    "2010Q2/2011Q3")
-  expect_identical(as.character(as.period_range("2010M2")),
-                   "2010M2/2010M2")
+  expect_identical(as.character(as.period_range("2010M2")), "2010M2")
   expect_identical(as.character(as.period_range("2010q2/")),
                    "2010Q2/")
   expect_identical(as.character(as.period_range("2010q2 /  ")),

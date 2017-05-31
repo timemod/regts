@@ -29,6 +29,7 @@
 #' if the absolute value of \code{x2} is larger than 1.
 #' @return a list with the following components
 #'  \item{equal}{\code{TRUE} if \code{x1} and \code{x2} have the same column names
+#'               and period ranges,
 #'              and if all differences are smaller than or equal to \code{tol}}
 #'  \item{difnames}{The names of the common columns with differences
 #'                   larger than \code{tol}}
@@ -39,6 +40,12 @@
 #'                        in \code{x1}}
 #'  \item{missing_names2}{The names of columns present in \code{x1} but missing
 #'                        in \code{x2}}
+#'  \item{period_range1}{The period ranges of \code{x1} as a
+#'  \code{\link{period_range}} object}
+#'  \item{period_range2}{The period ranges of \code{x2} as a
+#'  \code{\link{period_range}} object}
+#'  \item{ranges_equal}{A logical indicating whether the period ranges of \code{x1}
+#'  and \code{x2} differ}
 #'  \item{tol}{The tolerance parameter}
 #' @examples
 #' library(regts)
@@ -101,7 +108,13 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
   common_names   <- intersect(names1, names2)
   missing_names1 <- setdiff(names2, names1)
   missing_names2 <- setdiff(names1, names2)
-  dif <- calculate_difference(common_names, x1, x2, tol, fun)
+
+  period_range1 <- get_period_range(x1)
+  period_range2 <- get_period_range(x2)
+  common_period <- range_intersect(period_range1, period_range2)
+  ranges_equal  <- period_range1 == period_range2
+
+  dif <- calculate_difference(common_names, common_period, x1, x2, tol, fun)
   if (!is.null(dif)) {
       difnames <- colnames(dif)
   } else {
@@ -110,11 +123,15 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
 
   retval <- list(equal          = length(missing_names1) == 0 &&
                                   length(missing_names2) == 0 &&
-                                  length(difnames) == 0,
+                                  length(difnames) == 0 &&
+                                  ranges_equal,
                  difnames       = difnames,
                  dif            = dif,
                  missing_names1 = missing_names1,
                  missing_names2 = missing_names2,
+                 period_range1  = period_range1,
+                 period_range2  = period_range2,
+                 ranges_equal   = ranges_equal,
                  tol            = tol)
   return (retval)
 }
@@ -122,21 +139,18 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
 # Calculate the difference for the common columns in x1 and x2,
 # and return a regts with the difference. Return NULL if the differences
 # are smaller than tol, or if the two timeseries have no common columns
-calculate_difference <- function(common_names, x1, x2, tol, fun) {
+# or periods
+calculate_difference <- function(common_names, common_period, x1, x2, tol, fun) {
 
   var_count <- length(common_names)
   if (var_count == 0) {
-      return (NULL)
+      return(NULL)
   }
-  xx1 <- x1[, common_names, drop = FALSE]
-  xx2 <- x2[, common_names, drop = FALSE]
-
-  # Align the two timeseries objects using the union of their times.
-  p1 <- get_period_range(xx1)
-  p2 <- get_period_range(xx2)
-  punion <- c(min(p1[1], p2[1]), max(p1[2], p2[2]), p1[3])
-  xx1 <- window_regts(xx1, punion)
-  xx2 <- window_regts(xx2, punion)
+  if (nperiod(common_period) == 0) {
+    return(NULL)
+  }
+  xx1 <- x1[common_period, common_names, drop = FALSE]
+  xx2 <- x2[common_period, common_names, drop = FALSE]
 
   # If xx1 and xx2 are both NA, then replace NA with 0.
   # Two NA values are always considered equal.

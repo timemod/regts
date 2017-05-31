@@ -25,6 +25,7 @@ if the absolute value of \code{x2} is larger than 1.}
 \value{
 a list with the following components
  \item{equal}{\code{TRUE} if \code{x1} and \code{x2} have the same column names
+              and period ranges,
              and if all differences are smaller than or equal to \code{tol}}
  \item{difnames}{The names of the common columns with differences
                   larger than \code{tol}}
@@ -35,6 +36,12 @@ a list with the following components
                        in \code{x1}}
  \item{missing_names2}{The names of columns present in \code{x1} but missing
                        in \code{x2}}
+ \item{period_range1}{The period ranges of \code{x1} as a
+ \code{\link{period_range}} object}
+ \item{period_range2}{The period ranges of \code{x2} as a
+ \code{\link{period_range}} object}
+ \item{ranges_equal}{A logical indicating whether the period ranges of \code{x1}
+ and \code{x2} differ}
  \item{tol}{The tolerance parameter}
 }
 \description{
