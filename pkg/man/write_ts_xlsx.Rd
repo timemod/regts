@@ -2,32 +2,79 @@
 % Please edit documentation in R/write_ts.R
 \name{write_ts_xlsx}
 \alias{write_ts_xlsx}
-\title{Write timeseries to an xlsx file}
+\alias{write_ts_sheet}
+\title{Functions for writing timeseries to an xlsx file}
 \usage{
-write_ts_xlsx(x, file, sheet_name = "Sheet1", append_sheet = FALSE,
-  rowwise = TRUE, labels = c("after", "before", "no"))
+write_ts_xlsx(x, file, sheet_name = "Sheet1", rowwise = TRUE,
+  append = FALSE, labels = c("after", "before", "no"))
+
+write_ts_sheet(x, sheet, rowwise = TRUE, labels = c("after", "before",
+  "no"))
 }
 \arguments{
 \item{x}{a \code{ts} or \code{regts} object}
 
-\item{file}{a \code{regts} object}
+\item{file}{the filename of the output file}
 
 \item{sheet_name}{the sheet name}
 
-\item{append_sheet}{If \code{FALSE} (the default), then the original file,
+\item{rowwise}{a logical value: should the timeseries we written rowwise?}
+
+\item{append}{If \code{FALSE} (the default), then the original file,
 if it exists, is replaced with the new file. All original data is lost.
 If \code{TRUE}, then only data on the sheet with
-the specified sheetname is erased and replaced with new data.  If the sheet
+the specified sheet name is erased and replaced with new data.  If the sheet
 does not yet exist, then a new sheet is created and appended to the
 original file.}
 
-\item{rowwise}{a logical value: should the timeseries we written rowwise?}
-
 \item{labels}{should labels we written, and if so before the names or after
 the names? By default, labels are written after the names if present}
+
+\item{sheet}{a \code{\link[xlsx]{Sheet}} object (see the documentation
+of package \code{xlsx})}
 }
 \description{
-This function writes timeseries to an xlsx  file.
-The xlsx file is actually written by function \code{\link[xlsx]{write.xlsx}}
-of package \code{data.table}.
+These functions can be used to write timeseries to a sheet of an
+xlsx file. \code{write_ts_xlsx} creates or opens an Excel workbook
+(depending on argument \code{append}) and writes the timeseries to
+a sheet with a specified name.
+\code{write_ts_sheet} writes timeseries to a \code{\link[xlsx]{Sheet}}
+object.
+}
+\details{
+The functions employ package  \code{\link[xlsx]{write.xlsx}} for
+writing the Excel file.
+
+If you want to write multiple timeseries objects to different
+sheets, you can use \code{write_ts_xlsx} with argument
+\code{append = TRUE}, or \code{write_ts_sheet}. The latter approach
+is more efficient.
+}
+\section{Functions}{
+\itemize{
+\item \code{write_ts_xlsx}: Write timeseries to an Excel workbook
+
+\item \code{write_ts_sheet}: Writes a timeseries to a a \code{\link[xlsx]{Sheet}} object
+}}
+
+\examples{
+# create two timeseries objects
+ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
+             labels = c("Timeseries a", "Timeseries b"),
+             start = "2017Q2")
+
+# write timeseries ts1 to an Excel file
+write_ts_xlsx(ts1, file = "ts1.xlsx", sheet_name = "ts1", labels = "after")
+
+# write two sheets using write_ts_sheet
+wb <- createWorkbook()
+sheet <- createSheet(wb, "ts1")
+write_ts_sheet(ts1, sheet, labels = "after")
+sheet <- createSheet(wb, "ts1_times_100")
+write_ts_sheet(ts1 * 100, sheet = sheet, labels = "after")
+saveWorkbook(wb, "timeseries.xlsx")
+\dontshow{
+   unlink("ts1.xlsx")
+   unlink("timeseries.xlsx")
+}
 }
