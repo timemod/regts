@@ -67,6 +67,10 @@ read_ts_columnwise <- function(df, frequency = NA,
   # data frame to numeric is more efficient
   rownames(df) <- df[, 1]
   df <- df[, -1, drop = FALSE]
+
+  # remove columns with empty names
+  df <- df[ , which(!(get_strings(colnames(df)) == "")), drop = FALSE]
+
   datamat <- numeric_matrix(df, dec = dec)
 
   # set numeric = FALSE, because we already know that df is numeric
