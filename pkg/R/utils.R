@@ -25,7 +25,7 @@ select_columns <- function(x, regex, drop = TRUE) {
   return (x[ , sel, drop = drop])
 }
 
-# converts an object to a character vector with stringd.
+# converts an object to a character vector with strings.
 # NAs are converted to ""
 get_strings <- function(x) {
   ret <- as.character(x)
