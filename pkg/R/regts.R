@@ -274,9 +274,6 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     rownames(data) <- times
   }
 
-  # remove columns with empty names
-  data <- data[which(!(get_strings(colnames(data)) == ""))]
-
   if (numeric) {
     datamat <- numeric_matrix(data)
   } else {
@@ -288,9 +285,11 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   ret <- as.regts.matrix(datamat, numeric = FALSE, fun = fun, ...)
 
   # handle labels
-  lbls <- Hmisc::label(data)
-  if (!all(nchar(lbls, type = "bytes") == 0)) {
-    ts_labels(ret) <- lbls
+  if (ncol(data) > 0) {
+    lbls <- Hmisc::label(data)
+    if (!all(nchar(lbls, type = "bytes") == 0)) {
+      ts_labels(ret) <- lbls
+    }
   }
 
   return (ret)
@@ -301,19 +300,21 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
 #' @export
 as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
 
+  if (nrow(x) == 0) {
+    stop("'regts' object must have one or more observations")
+  }
+
+  if (numeric && !is.numeric(x)) {
+    x <- as.numeric(x)
+  }
+
+  # convert the rownames to a list of periods
   times <- rownames(x)
   if (is.null(times)) {
-    times <- as.character(seq_len(nrow(x)))
+    times <- seq_len(nrow(x))
   }
 
-  # remove columns with empty names
-  datamat <- x[ , which(!(get_strings(colnames(x)) == "")), drop = FALSE]
-
-  if (numeric && !is.numeric(datamat)) {
-    datamat <- as.numeric(datamat)
-  }
-
-  # convert the contents of the time column to a list of periods
+  # create a list of regperiod objects
   times <- lapply(as.character(times), FUN = fun, ...)
 
   # check that all frequencies are equal
@@ -325,11 +326,13 @@ as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
     freq <- frequencies[1]
   }
 
-  times <- unlist(times)
-  if (identical(times, times[1]:times[nrow(datamat)])) {
+  # compute times as the number of subperiods since AD 0.
+  times <- as.integer(unlist(times))
+
+  if (identical(as.integer(times), times[1]:times[nrow(x)])) {
     # normal regular timeseries, no missing periods and periods
     # are ordered synchronically
-    ret <- regts(datamat, start = create_period(times[1], freq))
+    ret <- regts(x, start = create_period(times[1], freq))
   } else {
     # irregular timeseries in dataframe (missing periods or
     # unorderered time index)
@@ -337,11 +340,11 @@ as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
     subp_max <- max(times)
     per_count <- subp_max - subp_min + 1
     pmin <- create_period(subp_min, frequency = freq)
-    mat <- matrix(NA, nrow = per_count, ncol = ncol(datamat))
-    colnames(mat) <- colnames(datamat)
+    mat <- matrix(NA, nrow = per_count, ncol = ncol(x))
+    colnames(mat) <- colnames(x)
     ret <- regts(mat, start = pmin)
     rows <- times - subp_min +1
-    ret[rows, ] <- datamat
+    ret[rows, ] <- x
   }
 
   return (ret)

@@ -41,6 +41,9 @@ read_ts_rowwise <- function(df, frequency, labels = c("no", "after", "before"),
   mat <- t(mat)
   colnames(mat) <- names
 
+  # remove columns with empty names
+  mat <- mat[ , which(!(get_strings(colnames(mat)) == "")), drop = FALSE]
+
   # convert the matrix to a regts, using numeric = FALSE, because we already
   # know that df is numeric
   ret <- as.regts(mat, frequency = frequency, numeric = FALSE)
