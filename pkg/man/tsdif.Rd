@@ -31,6 +31,7 @@ a list with class "tsdif", with the following components
  \item{dif}{A \code{\link{regts}} with the computed differences,
  or \code{NULL} if there are no differences larger than \code{tol}.
  Only timeseries with differences larger than \code{tol} are included.}
+ \item{common_names}{the names of the common columns}
  \item{missing_names1}{The names of columns present in \code{x2} but missing
                        in \code{x1}}
  \item{missing_names2}{The names of columns present in \code{x1} but missing
@@ -39,6 +40,7 @@ a list with class "tsdif", with the following components
  \code{\link{period_range}} object}
  \item{period_range2}{The period ranges of \code{x2} as a
  \code{\link{period_range}} object}
+ \item{common_range}{The intersection of the period ranges }
  \item{ranges_equal}{A logical indicating whether the period ranges of
  \code{x1} and \code{x2} differ}
  \item{ts_names}{a character string giving the names of the two input

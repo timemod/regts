@@ -36,6 +36,7 @@
 #'  \item{dif}{A \code{\link{regts}} with the computed differences,
 #'  or \code{NULL} if there are no differences larger than \code{tol}.
 #'  Only timeseries with differences larger than \code{tol} are included.}
+#'  \item{common_names}{the names of the common columns}
 #'  \item{missing_names1}{The names of columns present in \code{x2} but missing
 #'                        in \code{x1}}
 #'  \item{missing_names2}{The names of columns present in \code{x1} but missing
@@ -44,6 +45,7 @@
 #'  \code{\link{period_range}} object}
 #'  \item{period_range2}{The period ranges of \code{x2} as a
 #'  \code{\link{period_range}} object}
+#'  \item{common_range}{The intersection of the period ranges }
 #'  \item{ranges_equal}{A logical indicating whether the period ranges of
 #'  \code{x1} and \code{x2} differ}
 #'  \item{ts_names}{a character string giving the names of the two input
@@ -110,18 +112,30 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
       colnames(x2) <- names2
   }
 
-  # TODO: check for duplicate column names. comparison is not meaningfull
-  # if there are duplicate column names.
-
   common_names   <- intersect(names1, names2)
   missing_names1 <- setdiff(names2, names1)
   missing_names2 <- setdiff(names1, names2)
   period_range1  <- get_period_range(x1)
   period_range2  <- get_period_range(x2)
-  common_period  <- range_intersect(period_range1, period_range2)
+  common_range   <- range_intersect(period_range1, period_range2)
   ranges_equal   <- period_range1 == period_range2
 
-  dif <- calculate_difference(common_names, common_period, x1, x2, tol, fun)
+  if (length(common_names) == 0) {
+    warning(paste("Timeseries", series_name1, "and", series_name2,
+                  "have no common columns"))
+  }
+  if (is.null(common_range)) {
+    warning(paste("Timeseries", series_name1, "and", series_name2,
+                  "have no common period range"))
+  }
+  if (anyDuplicated(names1)) {
+    stop(paste("Duplicate column names in timeseries", series_name1))
+  }
+  if (anyDuplicated(names2)) {
+    stop(paste("Duplicate column names in timeseries", series_name2))
+  }
+
+  dif <- calculate_difference(common_names, common_range, x1, x2, tol, fun)
   if (!is.null(dif)) {
       difnames <- colnames(dif)
   } else {
@@ -134,8 +148,10 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
                 ranges_equal,
               difnames       = difnames,
               dif            = dif,
+              common_names   = common_names,
               missing_names1 = missing_names1,
               missing_names2 = missing_names2,
+              common_range   = common_range,
               period_range1  = period_range1,
               period_range2  = period_range2,
               ranges_equal   = ranges_equal,
@@ -153,15 +169,15 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
 # Calculate the difference for the common columns in x1 and x2,
 # and return a regts with the difference. Return NULL if the differences
 # are smaller than tol, or if the two timeseries have no common columns
-calculate_difference <- function(common_names, common_period, x1, x2, tol, fun) {
+calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
 
   var_count <- length(common_names)
-  if (var_count == 0 || nperiod(common_period) == 0) {
+  if (var_count == 0 || is.null(common_range) || nperiod(common_range) == 0) {
       return (NULL)
   }
 
-  xx1 <- x1[common_period, common_names, drop = FALSE]
-  xx2 <- x2[common_period, common_names, drop = FALSE]
+  xx1 <- x1[common_range, common_names, drop = FALSE]
+  xx2 <- x2[common_range, common_names, drop = FALSE]
 
   # If xx1 and xx2 are both NA, then replace NA with 0.
   # Two NA values are always considered equal.
@@ -233,18 +249,25 @@ print.tsdif <- function(x, ...) {
       }
       cat("\n")
       if (!is.null(dif)) {
-        cat("Differences\n")
+        cat("Differences\n\n")
         print(dif)
         cat("Names of timeseries with differences:\n")
         print(difnames)
 
       } else {
-        if (tol == 0) {
+        if (is.null(common_range)) {
+          cat(paste0("No differences computed because the two timeseries\n",
+                    "have no overlapping period ranges\n"))
+        } else if (length(common_names) == 0) {
+          cat(paste("No differences computed because the two timeseries",
+                    "have no common columns\n"))
+        } else if (tol == 0) {
           cat("No differences found\n")
         } else {
           cat(paste("No differences larger than", tol, "found\n"))
         }
       }
+      cat("\n")
       if (length(missing_names1) > 0) {
         cat(paste("Missing timeseries in ", ts_names[1]), ":\n")
         print(missing_names1)
@@ -254,8 +277,8 @@ print.tsdif <- function(x, ...) {
         print(missing_names2)
       }
       if (!ranges_equal) {
-        cat("The two timeseries have different period ranges\n")
-        df <- data.frame(period = c(as.character(period_range1),
+        cat("The two timeseries have different period ranges:\n")
+        df <- data.frame(ranges = c(as.character(period_range1),
                                     as.character(period_range2)))
         rownames(df) <- ts_names
         print(df)
