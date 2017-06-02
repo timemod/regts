@@ -38,13 +38,13 @@
 #'             names = c("a", "b", "c"))
 #' x2 <- regts(matrix(data = rep(10:15), nc = 3), period = "2000/2001",
 #'             names = c("a", "c", "d"))
-#' tsupdate(x1, x2, method = "tsupd")
+#' ts_update(x1, x2, method = "tsupd")
 #'
 #' @seealso
 #'\code{\link{regts}}
 #'
 #' @export
-tsupdate <- function(x1, x2, method = c("tsupd", "tsupdna", "tsupdval")) {
+ts_update <- function(x1, x2, method = c("tsupd", "tsupdna", "tsupdval")) {
 
   if (!is.mts(x1)) {
     stop(paste0("Argument x1 (", deparse(substitute(x1)),
@@ -61,6 +61,8 @@ tsupdate <- function(x1, x2, method = c("tsupd", "tsupdna", "tsupdval")) {
     stop(paste0("Timeseries x1 and x2 (", series_name1, " and ", series_name2,
                ") have different frequencies"))
   }
+
+  method <- match.arg(method)
 
   x1 <- as.regts(x1)
   x2 <- as.regts(x2)
