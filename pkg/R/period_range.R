@@ -220,6 +220,9 @@ as.period_range.period <- function(x, ...) {
 as.character.period_range <- function(x, ...) {
   if (!is.na(x[1])) {
     retval <- as.character.period(start_period(x))
+    if (!is.na(x[2]) && x[2] == x[1]) {
+      return(retval)
+    }
   } else {
     retval <- ""
   }
