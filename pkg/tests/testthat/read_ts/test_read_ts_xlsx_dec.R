@@ -19,3 +19,9 @@ test_that("example5.xlsx is read correctly",  {
   expect_warning(result <- read_ts_xlsx(xlsx_file, labels = "after"), msg = msg)
   expect_identical(result, correct_result)
 })
+
+test_that("example7.xlsx is read correctly",  {
+  xlsx_file <- "xlsx/example7.xlsx"
+  expect_warning(result <- read_ts_xlsx(xlsx_file, labels = "after"), msg = msg)
+  expect_identical(result, correct_result)
+})

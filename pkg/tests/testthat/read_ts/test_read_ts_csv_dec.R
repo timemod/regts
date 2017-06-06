@@ -26,3 +26,18 @@ test_that("rowwise4.csv is read correctly",  {
                  msg = msg)
   expect_identical(result, correct_result)
 })
+
+test_that("columnwise4.csv is read correctly",  {
+  csv_file <- "csv/columnwise4.csv"
+  expect_warning(result <- read_ts_csv(csv_file, labels = "after"),
+                 msg = msg)
+  expect_identical(result, correct_result)
+})
+
+test_that("columnwise5.csv is read correctly",  {
+  csv_file <- "csv/columnwise5.csv"
+  expect_warning(result <- read_ts_csv(csv_file, labels = "after", sep = "#",
+                                       dec = ","),
+                 msg = msg)
+  expect_identical(result, correct_result)
+})
