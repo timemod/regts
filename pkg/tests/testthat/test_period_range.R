@@ -128,3 +128,9 @@ test_that("is.period_range",{
   expect_identical(r00_10, period_range("2000", "2010"))
 })
 
+test_that("frequency", {
+  expect_identical(frequency(period_range("2016Q1", "2018Q2")), 4)
+  expect_identical(frequency(period_range("2016M1", NULL)), 12)
+  expect_identical(frequency(period_range("2016", "2019")), 1)
+})
+

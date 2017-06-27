@@ -262,4 +262,17 @@ print.period_range <- function(x, ...) {
   print(as.character(x))
 }
 
+#' Returns the frequency of a \link{period_range} object
+#'
+#' @param x a \code{\link{period_range}}
+#' @param ... additional arguments for future methods
+#' @return the frequency of the \code{\link{period_range}}
+#' @examples
+#' p <- period_range("2016Q1", "2018Q2")
+#' freq <- frequency(p)
+#' @export
+frequency.period_range <- function(x, ...) {
+  return(x[3])
+}
+
 
