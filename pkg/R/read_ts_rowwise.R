@@ -36,7 +36,7 @@ read_ts_rowwise <- function(df, frequency, labels = c("no", "after", "before"),
 
   # convert all data columns to numerical columns, taking the decimal separator
   # into account
-  mat <- numeric_matrix(df[, data_cols], dec = dec)
+  mat <- numeric_matrix(df[, data_cols, drop = FALSE], dec = dec)
   names <- df[, name_col]
   mat <- t(mat)
   colnames(mat) <- names
