@@ -156,3 +156,27 @@ test_that("example4.csv is read correctly",  {
   }, msg = msg)
   expect_identical(result, correct_result_tmp)
 })
+
+test_that("rowwise5.csv is read correctly",  {
+  csv_file <- "csv/rowwise5.csv"
+  result <- read_ts_csv(csv_file)
+  expect_identical(result, correct_result["2010Q2", ])
+})
+
+test_that("rowwise6.csv is read correctly",  {
+  csv_file <- "csv/rowwise6.csv"
+  result <- read_ts_csv(csv_file, labels = "after")
+  expect_identical(result, correct_result_labels["2010Q2", "a", drop = FALSE])
+})
+
+test_that("columnwise6.csv is read correctly",  {
+  csv_file <- "csv/columnwise6.csv"
+  result <- read_ts_csv(csv_file, labels = "after")
+  expect_identical(result, correct_result_labels["2010Q2", ])
+})
+
+test_that("columnwise7.csv is read correctly",  {
+  csv_file <- "csv/columnwise7.csv"
+  result <- read_ts_csv(csv_file)
+  expect_identical(result, correct_result["2010Q2", "a", drop = FALSE])
+})
