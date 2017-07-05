@@ -8,15 +8,15 @@
 #' @details
 #' The timeseries can be updated in three different ways:
 #'
-#' \code{tsupd} the first timeseries are updated with the second timeseries.
+#' \code{upd} the first timeseries are updated with the second timeseries.
 #' The two timeseries must have the same frequency, but may have a different
 #' period range. The update is computed for the union of the two period ranges
 #' (for the non-overlapping periods the result will be \code{NA}).
 #'
-#' \code{tsupdna} if method \code{tsupdna} is selected instead of \code{tsupd},
+#' \code{updna} if method \code{updna} is selected instead of \code{upd},
 #' only NA values in the first timeseries will be updated
 #'
-#' \code{tsupdval} if method \code{tsupdval} is selected instead of \code{tsupd},
+#' \code{updval} if method \code{updval} is selected instead of \code{upd},
 #' the values in the first timeseries are only replaced with valid (i.e. non-NA)
 #' values from the second timeseries.
 #'
@@ -38,13 +38,13 @@
 #'             names = c("a", "b", "c"))
 #' x2 <- regts(matrix(data = rep(10:15), nc = 3), period = "2000/2001",
 #'             names = c("a", "c", "d"))
-#' ts_update(x1, x2, method = "tsupd")
+#' update_ts(x1, x2, method = "upd")
 #'
 #' @seealso
 #'\code{\link{regts}}
 #'
 #' @export
-ts_update <- function(x1, x2, method = c("tsupd", "tsupdna", "tsupdval")) {
+update_ts <- function(x1, x2, method = c("upd", "updna", "updval")) {
 
   if (!is.mts(x1)) {
     stop(paste0("Argument x1 (", deparse(substitute(x1)),
@@ -80,9 +80,9 @@ ts_update <- function(x1, x2, method = c("tsupd", "tsupdna", "tsupdval")) {
     colnames(x2) <- names2
   }
 
-  # for method tsupdval first remove all leading and trailing rows and all
+  # for method updval first remove all leading and trailing rows and all
   # columns from x2 with only NA
-  if (method == "tsupdval") {
+  if (method == "updval") {
     x2 <- na_trim(x2)
     x2 <- remove_na_columns(x2)
     names2 <- colnames(x2)
@@ -129,17 +129,18 @@ calculate_update <- function(x1, x2, common_names, p1, p2, method) {
   xx1 <- window_regts(xx1, punion)
   xx2 <- window_regts(xx2, punion)
 
-  if (method == "tsupd") {
+  if (method == "upd") {
     xx1[p2, ] <- xx2[p2, ]
 
-  } else if (method == "tsupdna") {
+  } else if (method == "updna") {
     na_xx1 <- is.na(xx1)
     xx1[na_xx1] <- xx2[na_xx1]
 
-  } else if (method == "tsupdval") {
+  } else if (method == "updval") {
     not_na_xx2 <- !is.na(xx2)
     xx1[not_na_xx2] <- xx2[not_na_xx2]
   }
+
 
   return(xx1)
 }

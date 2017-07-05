@@ -1,4 +1,4 @@
-context("ts_update regts with methods: replace, tsupd, tsupdna, tsupdval")
+context("update_ts regts with methods: upd, updna, updval")
 
 test_that("equal periods", {
 
@@ -7,12 +7,12 @@ test_that("equal periods", {
   x2 <- regts(matrix(data = rep(2), nc = 3), period = "2000/2003",
               names = c("a", "c", "d"))
 
-  u1 <- ts_update(x1, x2, "tsupd")
-  n1 <- ts_update(x1, x2, "tsupdna")
-  v1 <- ts_update(x1, x2, "tsupdval")
-  u2 <- ts_update(x2, x1, "tsupd")
-  n2 <- ts_update(x2, x1, "tsupdna")
-  v2 <- ts_update(x2, x1, "tsupdval")
+  u1 <- update_ts(x1, x2, "upd")
+  n1 <- update_ts(x1, x2, "updna")
+  v1 <- update_ts(x1, x2, "updval")
+  u2 <- update_ts(x2, x1, "upd")
+  n2 <- update_ts(x2, x1, "updna")
+  v2 <- update_ts(x2, x1, "updval")
 
   expect_identical(u1, n2)
   expect_identical(u2, n1)
@@ -31,12 +31,12 @@ test_that("equal periods, NA values in x1", {
   x1["2000", "a"] <- NA
   x1["2000/2001", "c"] <- NA
 
-  u1 <- ts_update(x1, x2, "tsupd")
-  n1 <- ts_update(x1, x2, "tsupdna")
-  v1 <- ts_update(x1, x2, "tsupdval")
-  u2 <- ts_update(x2, x1, "tsupd")
-  n2 <- ts_update(x2, x1, "tsupdna")
-  v2 <- ts_update(x2, x1, "tsupdval")
+  u1 <- update_ts(x1, x2, "upd")
+  n1 <- update_ts(x1, x2, "updna")
+  v1 <- update_ts(x1, x2, "updval")
+  u2 <- update_ts(x2, x1, "upd")
+  n2 <- update_ts(x2, x1, "updna")
+  v2 <- update_ts(x2, x1, "updval")
 
   expect_identical(u1, n2)
   # compare u2 ( = x1 + d)
@@ -61,12 +61,12 @@ test_that("equal periods, NA values in x2", {
   x2["2003", "d"] <- NA
   x2["2000/2001", "c"] <- NA
 
-  u1 <- ts_update(x1, x2, "tsupd")
-  n1 <- ts_update(x1, x2, "tsupdna")
-  v1 <- ts_update(x1, x2, "tsupdval")
-  u2 <- ts_update(x2, x1, "tsupd")
-  n2 <- ts_update(x2, x1, "tsupdna")
-  v2 <- ts_update(x2, x1, "tsupdval")
+  u1 <- update_ts(x1, x2, "upd")
+  n1 <- update_ts(x1, x2, "updna")
+  v1 <- update_ts(x1, x2, "updval")
+  u2 <- update_ts(x2, x1, "upd")
+  n2 <- update_ts(x2, x1, "updna")
+  v2 <- update_ts(x2, x1, "updval")
 
   # compare u1 ( = x2 + b)
   expect_identical(u1[, colnames(x2)], x2)
@@ -94,12 +94,12 @@ test_that("equal periods, NA values in x1 and x2", {
   x2["2000/2001", "c"] <- NA
   x2["2002", "d"] <- NA
 
-  u1 <- ts_update(x1, x2, "tsupd")
-  n1 <- ts_update(x1, x2, "tsupdna")
-  v1 <- ts_update(x1, x2, "tsupdval")
-  u2 <- ts_update(x2, x1, "tsupd")
-  n2 <- ts_update(x2, x1, "tsupdna")
-  v2 <- ts_update(x2, x1, "tsupdval")
+  u1 <- update_ts(x1, x2, "upd")
+  n1 <- update_ts(x1, x2, "updna")
+  v1 <- update_ts(x1, x2, "updval")
+  u2 <- update_ts(x2, x1, "upd")
+  n2 <- update_ts(x2, x1, "updna")
+  v2 <- update_ts(x2, x1, "updval")
 
   # compare u1 ( = x2 + b)
   expect_identical(u1[, colnames(x2)], x2)
@@ -121,12 +121,12 @@ test_that("overlapping periods, no NA values", {
   x2 <- regts(matrix(data = rep(2), nc = 3), period = "2002/2006",
               names = c("a", "c", "d"))
 
-  u1 <- ts_update(x1, x2, "tsupd")
-  n1 <- ts_update(x1, x2, "tsupdna")
-  v1 <- ts_update(x1, x2, "tsupdval")
-  u2 <- ts_update(x2, x1, "tsupd")
-  n2 <- ts_update(x2, x1, "tsupdna")
-  v2 <- ts_update(x2, x1, "tsupdval")
+  u1 <- update_ts(x1, x2, "upd")
+  n1 <- update_ts(x1, x2, "updna")
+  v1 <- update_ts(x1, x2, "updval")
+  u2 <- update_ts(x2, x1, "upd")
+  n2 <- update_ts(x2, x1, "updna")
+  v2 <- update_ts(x2, x1, "updval")
 
   expect_identical(u1, n2)
   expect_identical(u2, n1)
@@ -146,12 +146,12 @@ test_that("overlapping periods, NA values", {
   x2["2003/2006", "c"] <- NA
   x2["2004", "d"] <- NA
 
-  u1 <- ts_update(x1, x2, "tsupd")
-  n1 <- ts_update(x1, x2, "tsupdna")
-  v1 <- ts_update(x1, x2, "tsupdval")
-  u2 <- ts_update(x2, x1, "tsupd")
-  n2 <- ts_update(x2, x1, "tsupdna")
-  v2 <- ts_update(x2, x1, "tsupdval")
+  u1 <- update_ts(x1, x2, "upd")
+  n1 <- update_ts(x1, x2, "updna")
+  v1 <- update_ts(x1, x2, "updval")
+  u2 <- update_ts(x2, x1, "upd")
+  n2 <- update_ts(x2, x1, "updna")
+  v2 <- update_ts(x2, x1, "updval")
 
   # only element ["2003", "c"] is different between u1 and n2
   expect_identical(u1[, c("a","b","d")], n2[, c("a","b","d")])
@@ -170,12 +170,12 @@ test_that("period x1 encloses period x2, no NA values", {
   x2 <- regts(matrix(data = rep(2), nc = 3), period = "2002/2005",
               names = c("a", "c", "d"))
 
-  u1 <- ts_update(x1, x2, "tsupd")
-  n1 <- ts_update(x1, x2, "tsupdna")
-  v1 <- ts_update(x1, x2, "tsupdval")
-  u2 <- ts_update(x2, x1, "tsupd")
-  n2 <- ts_update(x2, x1, "tsupdna")
-  v2 <- ts_update(x2, x1, "tsupdval")
+  u1 <- update_ts(x1, x2, "upd")
+  n1 <- update_ts(x1, x2, "updna")
+  v1 <- update_ts(x1, x2, "updval")
+  u2 <- update_ts(x2, x1, "upd")
+  n2 <- update_ts(x2, x1, "updna")
+  v2 <- update_ts(x2, x1, "updval")
 
   expect_identical(u1, n2)
   expect_identical(u2, n1)
@@ -195,12 +195,12 @@ test_that("period x1 encloses period x2, NA values", {
 
   x2["2004", "d"] <- NA
 
-  u1 <- ts_update(x1, x2, "tsupd")
-  n1 <- ts_update(x1, x2, "tsupdna")
-  v1 <- ts_update(x1, x2, "tsupdval")
-  u2 <- ts_update(x2, x1, "tsupd")
-  n2 <- ts_update(x2, x1, "tsupdna")
-  v2 <- ts_update(x2, x1, "tsupdval")
+  u1 <- update_ts(x1, x2, "upd")
+  n1 <- update_ts(x1, x2, "updna")
+  v1 <- update_ts(x1, x2, "updval")
+  u2 <- update_ts(x2, x1, "upd")
+  n2 <- update_ts(x2, x1, "updna")
+  v2 <- update_ts(x2, x1, "updval")
 
   prd_v2 <- get_period_range(v2)
 
@@ -222,16 +222,16 @@ test_that("no overlapping periods, NA values", {
   x1[, "b"] <- NA
   x2["2006/2008", "c"] <- NA
 
-  u1 <- ts_update(x1, x2, "tsupd")
-  n1 <- ts_update(x1, x2, "tsupdna")
-  v1 <- ts_update(x1, x2, "tsupdval")
-  u2 <- ts_update(x2, x1, "tsupd")
-  n2 <- ts_update(x2, x1, "tsupdna")
-  v2 <- ts_update(x2, x1, "tsupdval")
+  u1 <- update_ts(x1, x2, "upd")
+  n1 <- update_ts(x1, x2, "updna")
+  v1 <- update_ts(x1, x2, "updval")
+  u2 <- update_ts(x2, x1, "upd")
+  n2 <- update_ts(x2, x1, "updna")
+  v2 <- update_ts(x2, x1, "updval")
 
   expect_identical(u1, u2)
   expect_identical(n1, n2)
-  # tsupdval removes leading/trailing rows and columns with only NA values
+  # updval removes leading/trailing rows and columns with only NA values
   prd_v2 <- get_period_range(v2)
   expect_identical(v1[prd_v2, colnames(v2)], v2 )
   v1 <- na_trim(v1)
@@ -251,12 +251,12 @@ test_that("no overlapping columns, NA values", {
   x1["2002", "b"] <- NA
   x2["2004/2005", "d"] <- NA
 
-  u1 <- ts_update(x1, x2, "tsupd")
-  n1 <- ts_update(x1, x2, "tsupdna")
-  v1 <- ts_update(x1, x2, "tsupdval")
-  u2 <- ts_update(x2, x1, "tsupd")
-  n2 <- ts_update(x2, x1, "tsupdna")
-  v2 <- ts_update(x2, x1, "tsupdval")
+  u1 <- update_ts(x1, x2, "upd")
+  n1 <- update_ts(x1, x2, "updna")
+  v1 <- update_ts(x1, x2, "updval")
+  u2 <- update_ts(x2, x1, "upd")
+  n2 <- update_ts(x2, x1, "updna")
+  v2 <- update_ts(x2, x1, "updval")
 
   expect_identical(u1, u2)
   expect_identical(n1, n2)
@@ -271,12 +271,12 @@ test_that("no column names", {
 
   x2 <- regts(matrix(data = rep(2), nc = 2), period = "2002/2005")
 
-  u1 <- ts_update(x1, x2, "tsupd")
-  n1 <- ts_update(x1, x2, "tsupdna")
-  v1 <- ts_update(x1, x2, "tsupdval")
-  u2 <- ts_update(x2, x1, "tsupd")
-  n2 <- ts_update(x2, x1, "tsupdna")
-  v2 <- ts_update(x2, x1, "tsupdval")
+  u1 <- update_ts(x1, x2, "upd")
+  n1 <- update_ts(x1, x2, "updna")
+  v1 <- update_ts(x1, x2, "updval")
+  u2 <- update_ts(x2, x1, "upd")
+  n2 <- update_ts(x2, x1, "updna")
+  v2 <- update_ts(x2, x1, "updval")
 
   expect_identical(u1, n2)
   expect_identical(u2, n1)
@@ -291,10 +291,10 @@ test_that("errors", {
   x2 <- regts(matrix(data = rep(2), nc = 3), period = "2002q1/2006q4",
               names = c("a", "c", "d"))
   nr <- 2
-  expect_error(ts_update(x1, nr, "replace"),
+  expect_error(update_ts(x1, nr, "replace"),
                "Argument x2 \\(nr\\) is not a multivariate timeseries")
 
-  expect_error(ts_update(x1, x2, "tsupd"),
+  expect_error(update_ts(x1, x2, "upd"),
                "Timeseries x1 and x2 \\(x1 and x2\\) have different frequencies")
 })
 
