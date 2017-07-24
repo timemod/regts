@@ -15,7 +15,7 @@
 #' ts_m <- regts(matrix(rnorm(20), ncol = 2), start = "2017.M1", names = c("a", "b"))
 #' aggregate_gr(ts_m, method = "rel", nfrequency = 4)
 #' @export
-#' @useDynLib regts
+#' @useDynLib regts, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 aggregate_gr <- function(x, method = c("dif1s", "dif1","pct","rel"), nfrequency = 1) {
     method <- match.arg(method)

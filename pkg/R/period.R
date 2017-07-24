@@ -13,7 +13,6 @@
 #' period("2010-4", frequency = 3)
 #' period(2015)
 #' @export
-#' @useDynLib regts
 #' @importFrom Rcpp sourceCpp
 period <- function(x, frequency = NA) {
   if (is.numeric(x)) {

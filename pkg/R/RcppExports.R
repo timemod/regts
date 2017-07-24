@@ -2,19 +2,19 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 agg_gr <- function(ts_old, freq_new, method) {
-    .Call('regts_agg_gr', PACKAGE = 'regts', ts_old, freq_new, method)
+    .Call(`_regts_agg_gr`, ts_old, freq_new, method)
 }
 
 parse_period <- function(period_text, frequency) {
-    .Call('regts_parse_period', PACKAGE = 'regts', period_text, frequency)
+    .Call(`_regts_parse_period`, period_text, frequency)
 }
 
 parse_period_range <- function(period_text, frequency) {
-    .Call('regts_parse_period_range', PACKAGE = 'regts', period_text, frequency)
+    .Call(`_regts_parse_period_range`, period_text, frequency)
 }
 
 is_period_text_ <- function(strings, given_freq) {
-    .Call('regts_is_period_text_', PACKAGE = 'regts', strings, given_freq)
+    .Call(`_regts_is_period_text_`, strings, given_freq)
 }
 
 #' Returns the \link{period_range} of a timeseries.
@@ -23,6 +23,6 @@ is_period_text_ <- function(strings, given_freq) {
 #' @return a \code{period_range}
 #' @export
 get_period_range <- function(x) {
-    .Call('regts_get_period_range', PACKAGE = 'regts', x)
+    .Call(`_regts_get_period_range`, x)
 }
 

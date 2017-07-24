@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // agg_gr
 List agg_gr(NumericMatrix ts_old, const int freq_new, const std::string& method);
-RcppExport SEXP regts_agg_gr(SEXP ts_oldSEXP, SEXP freq_newSEXP, SEXP methodSEXP) {
+RcppExport SEXP _regts_agg_gr(SEXP ts_oldSEXP, SEXP freq_newSEXP, SEXP methodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,7 +20,7 @@ END_RCPP
 }
 // parse_period
 NumericVector parse_period(const std::string& period_text, double frequency);
-RcppExport SEXP regts_parse_period(SEXP period_textSEXP, SEXP frequencySEXP) {
+RcppExport SEXP _regts_parse_period(SEXP period_textSEXP, SEXP frequencySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -32,7 +32,7 @@ END_RCPP
 }
 // parse_period_range
 NumericVector parse_period_range(const std::string& period_text, double frequency);
-RcppExport SEXP regts_parse_period_range(SEXP period_textSEXP, SEXP frequencySEXP) {
+RcppExport SEXP _regts_parse_period_range(SEXP period_textSEXP, SEXP frequencySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -44,7 +44,7 @@ END_RCPP
 }
 // is_period_text_
 LogicalVector is_period_text_(std::vector<std::string> strings, const double given_freq);
-RcppExport SEXP regts_is_period_text_(SEXP stringsSEXP, SEXP given_freqSEXP) {
+RcppExport SEXP _regts_is_period_text_(SEXP stringsSEXP, SEXP given_freqSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -56,7 +56,7 @@ END_RCPP
 }
 // get_period_range
 NumericVector get_period_range(const SEXP& x);
-RcppExport SEXP regts_get_period_range(SEXP xSEXP) {
+RcppExport SEXP _regts_get_period_range(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -67,11 +67,11 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"regts_agg_gr", (DL_FUNC) &regts_agg_gr, 3},
-    {"regts_parse_period", (DL_FUNC) &regts_parse_period, 2},
-    {"regts_parse_period_range", (DL_FUNC) &regts_parse_period_range, 2},
-    {"regts_is_period_text_", (DL_FUNC) &regts_is_period_text_, 2},
-    {"regts_get_period_range", (DL_FUNC) &regts_get_period_range, 1},
+    {"_regts_agg_gr", (DL_FUNC) &_regts_agg_gr, 3},
+    {"_regts_parse_period", (DL_FUNC) &_regts_parse_period, 2},
+    {"_regts_parse_period_range", (DL_FUNC) &_regts_parse_period_range, 2},
+    {"_regts_is_period_text_", (DL_FUNC) &_regts_is_period_text_, 2},
+    {"_regts_get_period_range", (DL_FUNC) &_regts_get_period_range, 1},
     {NULL, NULL, 0}
 };
 
