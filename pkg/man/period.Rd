@@ -23,6 +23,6 @@ The period may be prefixed with a \code{"T"} or \code{"Y"}.
 }
 \examples{
 period("2010Q3")
-period("2010-4", frequency = 3)
+period("2010-2", frequency = 3)
 period(2015)
 }

@@ -10,7 +10,7 @@
 #' @return a \code{period} object
 #' @examples
 #' period("2010Q3")
-#' period("2010-4", frequency = 3)
+#' period("2010-2", frequency = 3)
 #' period(2015)
 #' @export
 #' @importFrom Rcpp sourceCpp
