@@ -14,6 +14,9 @@ read_ts_columnwise <- function(df, frequency = NA,
   time_column <- period_info$col_nr
   is_period <- period_info$is_period
   first_data_row <- Position(function(x) {x}, is_period)
+  if (is.na(first_data_row)) {
+    stop("No periods found when reading columnwise timeseries")
+  }
 
   # compute the row with variable names. 0 means: column names
   # and the label rows
@@ -94,5 +97,5 @@ find_period_column <- function(df, frequency) {
     }
   }
 
-  stop("No periods found!")
+  stop("No periods found for columnwise timeseries!")
 }

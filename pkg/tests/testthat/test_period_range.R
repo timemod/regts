@@ -76,7 +76,7 @@ test_that("logical operators", {
 
   expect_false(period_range("2010Q2","2010Q4") < period_range("2010Q1","2010Q3"))
   expect_false(period_range("2010Q2","2010Q4") != period_range("2010Q2","2010Q4"))
-  expect_false(period_range("2010Q1","2010Q2") == period_range("2010Q4","2010Q5"))
+  expect_false(period_range("2010Q1","2010Q2") == period_range("2010Q3","2010Q3"))
 
   expect_true(period_range(NULL,"2010Q2") == period_range(NULL,"2010Q2"))
   expect_false(period_range(NULL,"2010Q2") != period_range(NULL,"2010Q2"))

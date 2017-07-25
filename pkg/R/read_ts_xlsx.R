@@ -165,18 +165,6 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   if (rowwise) {
     df <- read_excel(filename, sheet, range = range, col_names = TRUE,
                      na = na_string)
-    # Sometimes, in Excel files integer numbers are stored internally as
-    # for example "2010.0". The corresponding column name then becomes "2010.0".
-    # This is the case for the Excel files written by Isis with
-    # the "nice" method. Therefore we have to remove the redundant .0 in this situation.
-    if (is.na(frequency) || frequency == 1) {
-      cnames <- colnames(df)
-      psel <- is_period_text(cnames, frequency)
-      if (any(psel) && all(grepl("^\\d{1,4}(\\.0+)?$", cnames[psel]))) {
-        cnames[psel] <- gsub("\\.0+$", "", cnames[psel])
-        colnames(df) <- cnames
-      }
-    }
   } else {
     # we use argument col_names = FALSE, because otherwise read_excel generates
     # dummy column names X__NR (NR is a number) for all columns with an empty

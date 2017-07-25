@@ -42,7 +42,7 @@ MONTH_NAME      [a-z]{3,}
 
 %%
 
-{DIGIT}+     {prlval = atoi(yytext); return NUMBER;}
+{DIGIT}{1,4}     {prlval = atoi(yytext); return NUMBER;}
 
 {FREQUENCY}  {prlval = get_frequency(yytext); return FREQ;}
 

@@ -6,9 +6,22 @@ read_ts_rowwise <- function(df, frequency, labels = c("no", "after", "before"),
 
   labels <- match.arg(labels)
 
+  # Sometimes, in Exinteger numbers are stored internally as
+  # for example "2010.0". The corresponding column name then becomes "2010.0".
+  # This is the case for the Excel files written by Isis with
+  # the "nice" method. Therefore we have to remove the redundant .0 in this situation.
+  if (is.na(frequency) || frequency == 1) {
+    cnames <- colnames(df)
+    sel <- grep("^\\d{1,4}\\.0+$", cnames)
+    cnames[sel] <- gsub("\\.0+$", "", cnames[sel])
+    colnames(df) <- cnames
+  }
+
   is_period <- is_period_text(get_strings(colnames(df)), frequency)
   first_prd_col <- Position(function(x) {x}, is_period)
-
+  if (is.na(first_prd_col)) {
+    stop("No periods found when reading rowwise timeseries")
+  }
   if (labels == "before") {
     name_col <- first_prd_col - 1
     label_cols <- seq_len(name_col - 1)
