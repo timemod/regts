@@ -1,0 +1,11 @@
+a[2000y..2003y] := sqrt([1, 2, 3, 4]);
+b <- 2 * a;
+
+(* the Excel file written with the code below is "weird": the year numbers
+ * are written as numerical values in the xlsx file and are represented
+ * by the strings such as "2010.0". When the Excel file is read with
+ * readxl::read_excel, then the column names becaome "2010.0", "2001.0" etc.
+ * However, when this Excel file is opened and saved in Excel, then the
+ * problem disappears *)
+writetsxlsx("weird_isis.xlsx"; period = 2000y..2003y; dateformat = yearnum;
+            lowercase = TRUE);

@@ -156,7 +156,6 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 
     # the next statement is necessary. Why?
     first_row <- as.data.frame(first_row)
-
     is_period <- is_period_text(get_strings(first_row), frequency)
     rowwise <- any(is_period)
   }

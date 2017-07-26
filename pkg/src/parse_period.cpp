@@ -96,6 +96,11 @@ static void parse_single_period(const std::string &period_text,
                 return;
             }
 	        freq = given_freq;;
+            if (per.subperiod > freq) {
+                Rf_error("Subperiod of period %s is larger than the"
+                         " specified frequency %d", period_text.c_str(),
+                         (int) given_freq);
+            }
 	    } else if (!ISNA(given_freq) && per.freq != given_freq) {
 	        Rf_error("Specified frequency %d does not agree with actual "
                      "frequency in period %s.", (int) given_freq,
@@ -114,11 +119,20 @@ LogicalVector is_period_text_(std::vector<std::string> strings,
      for (int i = 0; i < n; i++) {
           ParsedPeriod per = parse_period_text(strings[i], given_freq);
           out[i] = !per.error;
-          if (!per.error && !ISNA(given_freq) && !ISNA(per.freq)) {
-              /* if the frequency has been specified, then 
-                 check if the given freq. agrees with
-                 the actual frequency */
-              out[i] = per.freq == given_freq;
+          if (per.error) {
+              continue;
+          }
+          if (!ISNA(given_freq)) {
+              if (ISNA(per.freq)) {
+                  per.freq = given_freq;
+              } else if (per.freq != given_freq) {
+                  /* the given frequency does not agree with the actual
+                   * frequency */
+                  out[i] = false;
+              }
+          }
+          if (!ISNA(per.freq) && per.subperiod > per.freq) {
+              out[i] = false;
           }
      }
      return out;
