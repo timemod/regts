@@ -6,7 +6,7 @@
 \usage{
 read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = NA,
   skipcol = NA, rowwise, frequency = NA, labels = c("no", "after",
-  "before"), na_string = c(""))
+  "before"), na_string = c(""), fun)
 }
 \arguments{
 \item{filename}{a string with the filename}
@@ -20,7 +20,7 @@ defaults to the first sheet}
 \code{\link[readxl]{cell-specification}}. Includes typical Excel ranges
 like "B3:D87", possibly including the
 sheet name like "Budget!B2:G14", and more.
-strictly, even if the range forces the inclusion of leading or trailing
+Strictly, even if the range forces the inclusion of leading or trailing
 empty rows or columns.
 Takes precedence over skiprow, skipcol and sheet}
 
@@ -44,6 +44,8 @@ frequency indicator (for example "2011-1")}
 
 \item{na_string}{Character vector of strings to use for missing values.
 By default, \code{read_ts_xlsx} treats blank cells as missing data.}
+
+\item{fun}{function to apply to the names of the timeseries}
 }
 \value{
 a \code{regts} object
@@ -121,4 +123,13 @@ that the timeseries are stored rowwise or columnwise. Specify
 argument \code{frequency} if you already know the frequency of the timeseries.
 Argument \code{frequency} is mandatory if a general period format
 such as  \code{"2011-1"} has been used.
+
+With \code{fun} a function can be applied to names of the timeseries,
+e.g. tolower.
+}
+\examples{
+library(regts)
+read_ts_xlsx("series.xlsx", skipcol = 2, na_string = c("", "NA"))
+read_ts_xlsx("data.xlsx", sheet = "Budget", labels = "after", fun = tolower)
+
 }

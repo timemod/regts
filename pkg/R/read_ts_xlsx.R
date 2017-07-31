@@ -74,6 +74,9 @@
 #' Argument \code{frequency} is mandatory if a general period format
 #' such as  \code{"2011-1"} has been used.
 #'
+#' With \code{fun} a function can be applied to names of the timeseries,
+#' e.g. tolower.
+#'
 #' @param filename  a string with the filename
 #' @param sheet Sheet to read. Either a string (the name of a sheet),
 #' or an integer (the position of the sheet). Ignored if the sheet is
@@ -83,7 +86,7 @@
 #' \code{\link[readxl]{cell-specification}}. Includes typical Excel ranges
 #' like "B3:D87", possibly including the
 #' sheet name like "Budget!B2:G14", and more.
-#' strictly, even if the range forces the inclusion of leading or trailing
+#' Strictly, even if the range forces the inclusion of leading or trailing
 #' empty rows or columns.
 #' Takes precedence over skiprow, skipcol and sheet
 #' @param skiprow the number of rows to skip, inlcuding leading empty rows.
@@ -101,7 +104,14 @@
 #' @param labels label option. See details.
 #' @param na_string Character vector of strings to use for missing values.
 #' By default, \code{read_ts_xlsx} treats blank cells as missing data.
+#' @param fun function to apply to the names of the timeseries
 #' @return a \code{regts} object
+#'
+#' @examples
+#' library(regts)
+#' read_ts_xlsx("series.xlsx", skipcol = 2, na_string = c("", "NA"))
+#' read_ts_xlsx("data.xlsx", sheet = "Budget", labels = "after", fun = tolower)
+#'
 #' @importFrom readxl read_excel
 #' @importFrom cellranger cell_limits
 #' @importFrom cellranger as.cell_limits
@@ -109,7 +119,7 @@
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          skiprow = NA, skipcol = NA, rowwise, frequency = NA,
                          labels = c("no", "after", "before"),
-                         na_string = c("")) {
+                         na_string = c(""), fun) {
 
   if (missing(range)) {
     range <- cell_limits()
@@ -177,8 +187,8 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   df <- as.data.frame(df)
 
   if (rowwise) {
-    return(read_ts_rowwise(df, frequency = frequency, labels = labels))
+    return(read_ts_rowwise(df, frequency = frequency, labels = labels, fun = fun))
   } else {
-    return(read_ts_columnwise(df, frequency = frequency, labels = labels))
+    return(read_ts_columnwise(df, frequency = frequency, labels = labels, fun = fun))
   }
 }

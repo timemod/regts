@@ -6,7 +6,7 @@
 \usage{
 read_ts_csv(filename, rowwise, frequency = NA, skiprow = 0, skipcol = 0,
   labels = c("no", "after", "before"), sep = "auto", dec = if (sep != ".")
-  "." else ",")
+  "." else ",", fun)
 }
 \arguments{
 \item{filename}{a string with the filename}
@@ -31,6 +31,8 @@ first 30 lines of the csv file (see the details of function \code{\link[data.tab
 
 \item{dec}{the decimal separator as in \code{base::read.csv}.
 If not "." (default) then usually ",".}
+
+\item{fun}{function to apply to the names of the timeseries}
 }
 \value{
 a \code{regts} object
@@ -59,7 +61,7 @@ If argument \code{columnwise} has not been specified, then
 function \code{read_ts_xlsx} searches for any valid period text in the first
 row after the skipped rows. If a valid period was found, then
 \code{read_ts} assumes that the timeseries are stored rowwise. Otherwise it
-assumes that the timeseries are store columnwise.
+assumes that the timeseries are stored columnwise.
 
 \strong{rowwise timeseries}
 
@@ -112,4 +114,13 @@ that the timeseries ares stored rowwise or columnwise. Specify
 argument \code{frequency} is you already know the frequency of the timeseries.
 Argument \code{frequency} is mandatory if a general period format
 such as  \code{"2011-1"} has been used.
+
+With \code{fun} a function can be applied to names of the timeseries,
+e.g. tolower.
+}
+\examples{
+library(regts)
+read_ts_csv("series.csv", sep = ";", dec = ",")
+read_ts_csv("data.csv", labels = "after", fun = tolower)
+
 }
