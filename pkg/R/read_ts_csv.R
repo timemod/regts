@@ -22,7 +22,7 @@
 #' function \code{read_ts_xlsx} searches for any valid period text in the first
 #' row after the skipped rows. If a valid period was found, then
 #' \code{read_ts} assumes that the timeseries are stored rowwise. Otherwise it
-#' assumes that the timeseries are store columnwise.
+#' assumes that the timeseries are stored columnwise.
 #'
 #' \strong{rowwise timeseries}
 #'
@@ -77,6 +77,9 @@
 #' Argument \code{frequency} is mandatory if a general period format
 #' such as  \code{"2011-1"} has been used.
 #'
+#' With \code{fun} a function can be applied to names of the timeseries,
+#' e.g. tolower.
+#'
 #' @param filename  a string with the filename
 #' @param rowwise a logical value: are the timeseries stored rowwise?
 #' If not specified, then \code{read_ts} tries to figure out itself if
@@ -92,13 +95,20 @@
 #' first 30 lines of the csv file (see the details of function \code{\link[data.table]{fread}}).
 #' @param dec the decimal separator as in \code{base::read.csv}.
 #' If not "." (default) then usually ",".
+#' @param fun function to apply to the names of the timeseries
 #' @return a \code{regts} object
+#'
+#' @examples
+#' library(regts)
+#' read_ts_csv("series.csv", sep = ";", dec = ",")
+#' read_ts_csv("data.csv", labels = "after", fun = tolower)
+#'
 #' @importFrom data.table fread
 #' @export
 read_ts_csv <- function(filename, rowwise, frequency = NA,
                         skiprow = 0, skipcol = 0,
                         labels = c("no", "after", "before"),
-                        sep = "auto", dec = if (sep != ".") "." else ",") {
+                        sep = "auto", dec = if (sep != ".") "." else ",", fun) {
 
   if (!missing(skiprow)) {
     skip <- skiprow
@@ -140,9 +150,9 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
     # use numeric = FALSE, because we already know that the timeseries
     # are numeric (see code above)
     return(read_ts_rowwise(df, frequency = frequency, labels = labels,
-                           dec = dec))
+                           dec = dec, fun = fun))
   } else {
     return(read_ts_columnwise(df, frequency = frequency, labels = labels,
-                             dec = dec))
+                             dec = dec, fun = fun))
   }
 }
