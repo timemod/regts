@@ -6,7 +6,7 @@
 \usage{
 read_ts_csv(filename, rowwise, frequency = NA, skiprow = 0, skipcol = 0,
   labels = c("no", "after", "before"), sep = "auto", dec = if (sep != ".")
-  "." else ",", fun)
+  "." else ",", name_fun)
 }
 \arguments{
 \item{filename}{a string with the filename}
@@ -32,7 +32,7 @@ first 30 lines of the csv file (see the details of function \code{\link[data.tab
 \item{dec}{the decimal separator as in \code{base::read.csv}.
 If not "." (default) then usually ",".}
 
-\item{fun}{function to apply to the names of the timeseries}
+\item{name_fun}{function to apply to the names of the timeseries}
 }
 \value{
 a \code{regts} object
@@ -115,12 +115,13 @@ argument \code{frequency} is you already know the frequency of the timeseries.
 Argument \code{frequency} is mandatory if a general period format
 such as  \code{"2011-1"} has been used.
 
-With \code{fun} a function can be applied to names of the timeseries,
-e.g. tolower.
+#' With \code{fun} a function can be applied to names of the timeseries,
+e.g. \code{\link{tolower}}
 }
 \examples{
-library(regts)
+\dontrun{
 read_ts_csv("series.csv", sep = ";", dec = ",")
-read_ts_csv("data.csv", labels = "after", fun = tolower)
+read_ts_csv("data.csv", labels = "after", name_fun = tolower)
+}
 
 }

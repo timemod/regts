@@ -77,8 +77,8 @@
 #' Argument \code{frequency} is mandatory if a general period format
 #' such as  \code{"2011-1"} has been used.
 #'
-#' With \code{fun} a function can be applied to names of the timeseries,
-#' e.g. tolower.
+#' #' With \code{fun} a function can be applied to names of the timeseries,
+#' e.g. \code{\link{tolower}}
 #'
 #' @param filename  a string with the filename
 #' @param rowwise a logical value: are the timeseries stored rowwise?
@@ -95,20 +95,22 @@
 #' first 30 lines of the csv file (see the details of function \code{\link[data.table]{fread}}).
 #' @param dec the decimal separator as in \code{base::read.csv}.
 #' If not "." (default) then usually ",".
-#' @param fun function to apply to the names of the timeseries
+#' @param name_fun function to apply to the names of the timeseries
 #' @return a \code{regts} object
 #'
 #' @examples
-#' library(regts)
+#' \dontrun{
 #' read_ts_csv("series.csv", sep = ";", dec = ",")
-#' read_ts_csv("data.csv", labels = "after", fun = tolower)
+#' read_ts_csv("data.csv", labels = "after", name_fun = tolower)
+#' }
 #'
 #' @importFrom data.table fread
 #' @export
 read_ts_csv <- function(filename, rowwise, frequency = NA,
                         skiprow = 0, skipcol = 0,
                         labels = c("no", "after", "before"),
-                        sep = "auto", dec = if (sep != ".") "." else ",", fun) {
+                        sep = "auto", dec = if (sep != ".") "." else ",",
+                        name_fun) {
 
   if (!missing(skiprow)) {
     skip <- skiprow
@@ -150,9 +152,9 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
     # use numeric = FALSE, because we already know that the timeseries
     # are numeric (see code above)
     return(read_ts_rowwise(df, frequency = frequency, labels = labels,
-                           dec = dec, fun = fun))
+                           dec = dec, name_fun = name_fun))
   } else {
     return(read_ts_columnwise(df, frequency = frequency, labels = labels,
-                             dec = dec, fun = fun))
+                             dec = dec, name_fun = name_fun))
   }
 }

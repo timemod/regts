@@ -2,7 +2,7 @@
 # the time index in the column header.
 # is numeric = TRUE, then the timeseries are converted to numeric
 read_ts_rowwise <- function(df, frequency, labels = c("no", "after", "before"),
-                            fun, dec = ".") {
+                            name_fun, dec = ".") {
 
   labels <- match.arg(labels)
 
@@ -73,11 +73,11 @@ read_ts_rowwise <- function(df, frequency, labels = c("no", "after", "before"),
   }
 
   # apply function to columnnames if given
-  if (!missing(fun)) {
-    if (!is.function(fun)) {
-      stop("argument fun is not a function")
+  if (!missing(name_fun)) {
+    if (!is.function(name_fun)) {
+      stop("argument name_fun is not a function")
     }
-    colnames(ret) <- fun(colnames(ret))
+    colnames(ret) <- name_fun(colnames(ret))
   }
 
   return(ret)

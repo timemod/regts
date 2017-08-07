@@ -101,6 +101,6 @@ test_that("example5.xlsx is read correctly (leading empty are skipped)",  {
 test_that("example8.xlsx is read correctly (names to lowercase)",  {
 
   xlsx_file <- "xlsx/example8.xlsx"
-  result <- read_ts_xlsx(xlsx_file, fun = tolower)
+  result <- read_ts_xlsx(xlsx_file, name_fun = tolower)
   expect_identical(result, correct_result)
 })
