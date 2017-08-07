@@ -2,7 +2,7 @@
 # This function is used in function read_ts_csv and read_ts_xlsx
 read_ts_columnwise <- function(df, frequency = NA,
                                labels = c("no", "after", "before"),
-                               fun, dec =  ".") {
+                               name_fun, dec =  ".") {
 
   labels <- match.arg(labels)
 
@@ -84,11 +84,11 @@ read_ts_columnwise <- function(df, frequency = NA,
   }
 
   # apply function to columnnames if given
-  if (!missing(fun)) {
-    if (!is.function(fun)) {
-      stop("argument fun is not a function")
+  if (!missing(name_fun)) {
+    if (!is.function(name_fun)) {
+      stop("argument name_fun is not a function")
     }
-    colnames(ret) <- fun(colnames(ret))
+    colnames(ret) <- name_fun(colnames(ret))
   }
 
   return(ret)

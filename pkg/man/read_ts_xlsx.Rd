@@ -6,7 +6,7 @@
 \usage{
 read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = NA,
   skipcol = NA, rowwise, frequency = NA, labels = c("no", "after",
-  "before"), na_string = c(""), fun)
+  "before"), na_string = c(""), name_fun)
 }
 \arguments{
 \item{filename}{a string with the filename}
@@ -45,7 +45,7 @@ frequency indicator (for example "2011-1")}
 \item{na_string}{Character vector of strings to use for missing values.
 By default, \code{read_ts_xlsx} treats blank cells as missing data.}
 
-\item{fun}{function to apply to the names of the timeseries}
+\item{name_fun}{function to apply to the names of the timeseries}
 }
 \value{
 a \code{regts} object
@@ -125,11 +125,13 @@ Argument \code{frequency} is mandatory if a general period format
 such as  \code{"2011-1"} has been used.
 
 With \code{fun} a function can be applied to names of the timeseries,
-e.g. tolower.
+e.g. \code{\link{tolower}}
 }
 \examples{
-library(regts)
+\dontrun{
 read_ts_xlsx("series.xlsx", skipcol = 2, na_string = c("", "NA"))
-read_ts_xlsx("data.xlsx", sheet = "Budget", labels = "after", fun = tolower)
+read_ts_xlsx("data.xlsx", sheet = "Budget", labels = "after",
+             name_fun = tolower)
+}
 
 }

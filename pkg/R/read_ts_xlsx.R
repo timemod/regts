@@ -75,7 +75,7 @@
 #' such as  \code{"2011-1"} has been used.
 #'
 #' With \code{fun} a function can be applied to names of the timeseries,
-#' e.g. tolower.
+#' e.g. \code{\link{tolower}}
 #'
 #' @param filename  a string with the filename
 #' @param sheet Sheet to read. Either a string (the name of a sheet),
@@ -104,13 +104,15 @@
 #' @param labels label option. See details.
 #' @param na_string Character vector of strings to use for missing values.
 #' By default, \code{read_ts_xlsx} treats blank cells as missing data.
-#' @param fun function to apply to the names of the timeseries
+#' @param name_fun function to apply to the names of the timeseries
 #' @return a \code{regts} object
 #'
 #' @examples
-#' library(regts)
+#' \dontrun{
 #' read_ts_xlsx("series.xlsx", skipcol = 2, na_string = c("", "NA"))
-#' read_ts_xlsx("data.xlsx", sheet = "Budget", labels = "after", fun = tolower)
+#' read_ts_xlsx("data.xlsx", sheet = "Budget", labels = "after",
+#'              name_fun = tolower)
+#' }
 #'
 #' @importFrom readxl read_excel
 #' @importFrom cellranger cell_limits
@@ -119,7 +121,7 @@
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          skiprow = NA, skipcol = NA, rowwise, frequency = NA,
                          labels = c("no", "after", "before"),
-                         na_string = c(""), fun) {
+                         na_string = c(""), name_fun) {
 
   if (missing(range)) {
     range <- cell_limits()
@@ -187,8 +189,10 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   df <- as.data.frame(df)
 
   if (rowwise) {
-    return(read_ts_rowwise(df, frequency = frequency, labels = labels, fun = fun))
+    return(read_ts_rowwise(df, frequency = frequency, labels = labels,
+                           name_fun = name_fun))
   } else {
-    return(read_ts_columnwise(df, frequency = frequency, labels = labels, fun = fun))
+    return(read_ts_columnwise(df, frequency = frequency, labels = labels,
+                              name_fun = name_fun))
   }
 }
