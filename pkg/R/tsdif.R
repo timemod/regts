@@ -191,7 +191,7 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
   dif <- fun(xx1, xx2)
   colnames(dif) <- common_names
 
-  sel <- abs(apply(dif, FUN = max, MARGIN = 2)) > tol
+  sel <- apply(abs(dif), FUN = max, MARGIN = 2) > tol
   sel[is.na(sel)] <- TRUE
   if (any(sel)) {
       dif <- dif[, sel, drop = FALSE]

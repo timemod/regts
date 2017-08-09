@@ -192,6 +192,22 @@ test_that("no overlapping periods", {
   expect_equal(res, res_correct2)
 })
 
+test_that("a combination of negative and positive differences", {
+  ts1 <- regts(matrix(data = rep(1:9), nc = 3), start = "2008Q4",
+             names = c("a", "b", "c"))
+  ts2 <- ts1
+  ts2[, "a"] <- ts1[, "a"] + c(-0.2, 0, 0.1)
+  dif_correct <- ts2[, "a", drop = FALSE] - ts1[, "a", drop = FALSE]
+  dif1 <- tsdif(ts2, ts1)
+  expect_equal(dif1$dif, dif_correct)
+  dif2 <- tsdif(ts1, ts2)
+  expect_equal(dif2$dif, -dif_correct)
+  dif3 <- tsdif(ts2, ts1, tol = 0.15)
+  expect_equal(dif3$dif, dif_correct)
+  dif4 <- tsdif(ts1, ts2, tol = 0.15)
+  expect_equal(dif3$dif, dif_correct)
+})
+
 
 
 
