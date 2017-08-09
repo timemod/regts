@@ -120,7 +120,7 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
 
   if (missing(rowwise) || rowwise) {
     first_line <- fread(filename, nrows = 1, skip = skip, header = FALSE,
-                        data.table = FALSE, sep = sep, dec = dec)
+                        data.table = FALSE, sep = sep, dec = dec, fill = TRUE)
     is_period <- is_period_text(get_strings(first_line), frequency)
     first_prd_col <- Position(function(x) {x}, is_period)
     if (missing(rowwise)) {
@@ -134,14 +134,15 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
     nper <- length(is_period) - first_prd_col + 1
     colClasses <- c(rep("character", first_prd_col - 1), rep("numeric", nper))
     df <- fread(filename, skip = skip, header = TRUE, data.table = FALSE,
-                colClasses = colClasses, sep = sep, dec = dec)
+                colClasses = colClasses, sep = sep, dec = dec,
+                fill = TRUE)
 
   } else {
     # we use argument header = FALSE, because otherwise fread generates
     # dummy column names VX (X is number) for all columns with an empty
     # header.
     df <- fread(filename, skip = skip, header = FALSE, data.table = FALSE,
-                sep = sep, dec = dec)
+                sep = sep, dec = dec, fill = TRUE)
   }
 
   if (!missing(skipcol) && skipcol > 0) {
