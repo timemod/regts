@@ -39,23 +39,16 @@ knitr::opts_chunk$set(collapse = FALSE, comment = "", prompt = TRUE)
 # Introduction
 
 When you start looking in R for timeseries you easily find several 
-classes and packages, class `ts` from the `stats` package and `zoo` being mentioned 
-most.
+classes and packages, class `ts` from the `stats` package and `zoo` being mentioned most.
 
-The function `ts` creates a regular timeseries object with class `ts`. This can 
-be a univariate or multivariate object. It has a start, an end, a frequency and 
-you can print, plot, extend and update it. But class `ts` has no easy way to deal 
-with fixed periods. 
+The function `ts` creates a regular timeseries object with class `ts`. This can be a univariate or multivariate object. It has a start, an end, a frequency and you can print, plot, extend and update it. But class `ts` has no easy way to deal with fixed periods. 
 
-`Regts` is a package defined for regular timeseries objects built on class `ts`, 
-but with features for easier selecting periods. The `regts` package defines a 
-class `regts` that is an extension to the `ts` class.
+`Regts` is a package defined for regular timeseries objects built on class `ts`, but with features for easier selecting periods. The `regts` package defines a class `regts` that is an extension to the `ts` class.
 Because of this the `regts` class benefits of all the functionality of `ts`.
 The period handling is much easier than in the `ts` class, particularly for 
 monthly, quarterly and annual timeseries.
 
-Package `xts` also facilitates period selection, but concentrates more on daily 
-(or weekly) based data. 
+Package `xts` also facilitates period selection, but concentrates more on daily (or weekly) based data. 
  
 Package `regts` provides some more extensions to package `ts`: 
 
@@ -124,7 +117,8 @@ Instead of arguments `start` and `end` you can also specify argument `period`:
 ts_data <- regts(1:10, period = "2016Q1/2016Q4")
 ```
 Input for this period may be a character string as shown above, but also a 
-variable of type  `period_range`. This type will be explained in section \ref{sec:period}.
+variable of type  `period_range`. This type will be explained in section 
+\ref{period}.
 
 ## Multivariate timeseries \label{multits}
 Sometimes it is more convenient to combine several timeseries with the same 
@@ -155,8 +149,7 @@ class(rts)
 Timeseries names are preferably valid R names (only include a-z, A-Z, _, 
 and 0-9 and start with a letter) and well chosen. In general they will be brief. 
 If more documentation is needed for a timeseries than just this (short) name, 
-optionally labels can be added
-(see also section [labels](#labels)).
+optionally labels can be added (see also section [labels](#labels)).
 
 
 ### Column selection and creation
@@ -248,7 +241,7 @@ rts[ ,2]               # result is a vector, column name "b" is lost
 ```
 
 \newpage
-# Period selection \label{sec:periodselection}
+# Period selection \label{periodselection}
 
 The package `regts` is specially designed for the selection of periods. Where 
 for a `ts` timeseries you have to use the `window` function:
@@ -300,7 +293,7 @@ rts1["2011Q2"] <- 2
 rts1["/2010Q3"] <- 99
 rts1
 ```
-\newpage
+
 The period of the timeseries can also be extended:
 ```{r}
 rts1["2009Q1/2009Q2"] <- rts1["2010Q3/2010Q4"]
@@ -308,7 +301,10 @@ rts1
 ```
 The missing quarters (`2009Q3` and `2009Q4`) are filled in with NA values.
 
-## Period selection for multivariate regts
+<!-- Special header: a bold line with some whitespace before, because we
+want no header in the table of contents -->
+&nbsp;  
+**Period selection for multivariate regts**
 
 Selecting a period for a multivariate regts is quite similar. You can select 
 one or more periods, or a combination of period(s) and columns:
@@ -339,218 +335,8 @@ rts["2011", "x"] <- 1         # update all quarters in 2011 in column "x"
 rts
 ```
 
-# `period` and `period_range`\label{sec:period}
-
-When the same period is used several times, it is preferable to define a variable containing this period. Package `regts` defines special classes representing 
-periods: the `period` class for a single period and the `period_range` 
-class for a range of periods.
-
-## `period`
-
-A `period` object can be created with the `period` function. 
-
-```{r}
-prd1 <- period("2016Q4")
-prd1
-prd2 <- period("2015-2", frequency = 4)
-prd2
-```
-
-In the second example the `frequency` has to be specified. `"2015-2"` is 
-ambiguous. Here "2" denotes the second quarter but it could also be for instance 
-a month indicator or a half year. The `frequency` argument is required if you 
-want to define a period with a frequency other than 1, 4 or 12, since there is 
-no special format for these frequencies.
-
-`period` objects can be used as input for the `start` and `end` arguments of 
-the `regts` function.
-
-```{r eval = TRUE}
-ts    <- regts(1:10, start = prd1)
-```
-
-When printed a `period` variable seems to be nothing more than a character 
-string. With the `str` function we can show the internal representation of a 
-`period` object:
-
-```{r}
-str(period("2016Q4"))
-```
-
-The internal representation of period `2016Q4` is the number of quarters since 
-the beginning of the Christian era, starting with 0 (`8067 = 2016 * 4 + 3`).
-
-## `period_range`
-There is also a `period_range`, an object that represents an interval of 
-periods. Such a range can be created in the following ways:
-
-```{r}
-range <- period_range("2014Q4", "2017Q4")
-range
-period_range("2014Q4/2017Q4")
-```
-
-The lower or upper bound of the range may also be undetermined:
-
-```{r}
-period_range("2017Q1", NULL)      # No upper bound
-```
-
-A `period_range` variable can be used in the `regts` function, specifying the 
-`prd-range` argument:
- 
-```{r}
-range1 <- period_range("2016Q1", "2016Q3")
-rts <- regts(matrix(1:18, ncol = 3), period = range1, names = c("a", "b", "c"))
-rts
-```
-The length of a `period_range` may be obtained by using the `nperiod` function:
-
-```{r}
-nperiod(range1)
-```
-Functions `start_period` and `end_period` are used to retrieve the first and 
-last period in a `period_range`:
-
-```{r}
-start_period(range1)
-end_period(range1)
-range2 <- period_range(start_period(range1)+1, end_period(range1)-1)
-ts <- regts(data, period = range2)
-```
-
-## Shifting period(s)
-With operators `+` and `-` the period can be shifted. Some examples for `period`: 
-
-```{r}
-period("2016Q4") + 1
-p1 <- period("2015Q1")
-p1-5
-```
-
-And for a `period_range`:
-
-```{r}
-period_range("2016Q4", "2017Q4") + 1
-period_range(p1, p1+4)            # a `period` as input
-```
-
-Note that one of the operands must be numeric^[Command `period("2015Q1") + period("2015Q2")` results in an error message: 'Arithmetic operation on two 
-periods is not allowed.'].
-
-
-## Selecting and updating
-In section \ref{sec:periodselection} we have shown how periods can be selected 
-with a string. A `period` can also be used to select or update a period of a 
-timeseries object.  Consider the following (previously defined) timeseries:
-
-```{r}
-rts
-```
-Use a `period` to select and update the timeseries.
-```{r}
-prd1 <- period("2016Q2")
-rts[prd1] 
-rts[prd1] <- 3
-rts
-```
-
-A `period_range` can be used to select and update multiple periods:
-
-```{r}
-# define a period and make selections
-range <- period_range("2016Q2", "2016Q3")
-var <- rts[range]     
-rts[range, c("a", "b")]
-# define another period and create a new timeseries column
-smpl <- period_range("2016Q1", "2017Q1")
-rts[smpl, "xx"] <- 2                
-rts
-```
-
-Note that because timeseries `xx` is created with an extended period, all 
-timeseries in (multivariate regts) object `rts` are extended.
 
 \newpage
-# Conversion between `data frame` and `regts` \label{dataframe}
-
-It is possible to use a (part of a) data frame as input data for a `regts`
-
-```{r}
-df  <- data.frame(a = 1:3, b = 4:6, c = 7:9)
-ts <- regts(df, start = "2017Q1")             # create a multivariate regts
-ts
-```
-
-The function `regts` uses the `data.matrix` function in the `base` package to 
-convert a data frame to a numeric matrix. By default the column names of the 
-data frame are used for the timeseries names.
-
-As with matrix input, it is also possible to specify names or add labels. This 
-is already described in section \ref{multits}. Labeling is discussed in section \ref{labels}.
-
-In the previous example we had to specify the period of the result timeseries.
-Sometimes the period is already contained in the data frame, e.g. in the 
-row names. Consider the following data frame:
-
-```{r}
-# data frame with period in row names
-df <- data.frame(a = 1:3, b = 4:6)
-rownames(df) <- c("2015Q3", "2015Q4", "2016Q1")
-df
-```
-
-The function `as.regts` can be used to convert a `data.frame` to a `regts`:
-
-```{r}
-ts <- as.regts(df)
-ts
-```
-
-Function `as.regts` assumes that the period is stored in the row names.
-If the periods are in a column of the data frame, then the `time_column` argument 
-can be used. You can specify the column name or number of the data frame in which 
-the period is stored. Specifying 0 means the period is contained in the row names 
-of the data frame.
-
-```{r}
-# data frame with period in column 'periods'
-df2 <- data.frame(periods = c("2015Q3", "2015Q4", "2016Q1"), a = 1:3, b = 4:6)
-ts2 <- as.regts(df2, time_column = "periods")
-ts2
-```
-
-Function `as.regts` uses the function `period` to convert the 'period text' 
-(like `2015Q3`) to a `period`.
-This function can handle several period formats: `2016`, `2016Q4`, `2016.4q`,
-`2016/4Q`, `2016-4q`, `2016_q4`, ...
-where no distinction is made between 'q' and 'Q'.
-
-If the period is ambiguous, use the frequency argument:
-```{r}
-# data frame with indicisive period in row names
-df <- data.frame(a = 1:3, b = 4:6)
-rownames(df) <- c("2015-3", "2015-4", "2016-1")
-ts <- as.regts(df, frequency = 4)
-```
-
-If the data frame contains periods in another, non standard, format, it is 
-possible to specify your own function for the conversion of a text to a 
-`period`. Use the `fun` argument, if necessary with extra arguments.
-
-The reverse conversion from a `regts` to a `data frame` can be achieved with 
-function `as.data.frame`. Therefore the `as.data.frame` function has been 
-extended for `regts` types:
-
-```{r}
-as.data.frame(ts)
-```
-
-The results look similar to `ts`. The timeseries names have become the data frame 
-column names and the periods show up in the row names. Of course the `classes` 
-are different.
-
-
 # Reading and writing timeseries 
 
 Some common used file types to store data in R are Rdata, csv or xls(x) files.
@@ -558,39 +344,41 @@ Inside R projects, preferably use Rdata files. Writing and reading R objects to
 and from Rdata files is easy and efficient.
 If data has to be exported, you can use for example csv or Excel files.
 
-## `.Rdata` file
-The `.Rdata` file, an R-readable binary file, is the most flexible type, multiple 
-objects can be stored. It is also possible to store the entire workspace.
-
-Data can be stored by the `save` function in the `base` package.
+## `.rds` file
+The `.rds` file, an R-readable binary file, is the most flexible file type
+A single object can be stored by the `saveRDS` function in the `base` package.
 
 ```{r}
-save(df, file = "output.Rdata")
+saveRDS(df, file = "output.rds")
 ```
+The `.rds` file extension is most often used.
 
-Data saved in an `.Rdata` file can be reloaded  by the `load` function. By default 
-they are loaded in the workspace. 
-All objects in the file are loaded. If you don't specify a path the current 
-working directory is used. 
+An object saved in such `.rds` file can be reloaded  by the `readRDS` function.
+(Possibly under a different name.)
 
 ```{r}
-load("output.Rdata")
+readRDS("output.rds")
 ```
-Note that existing objects with the same name are replaced.
+
+Besides these, functions `save` and `load` are available. They save and restore
+single and multiple objects. It is also possible to store the entire workspace.
+
 
 ## External files
 
-Functions for reading a csv or Excel file, typically return a `data frame`. 
-This type can easily be converted to a `regts`, as explained in section \ref{dataframe}.
-When storing a `regts` it is convenient to use a `data frame` as intermediate. 
-This way the period is also written to file (`write.csv(ts)` ignores the period 
-of the timeseries).
+Most functions in R for reading a csv or Excel file, return a `data frame`. 
+This type can easily be converted to a `regts`, as will be explained in section 
+\ref{dataframe}. 
+Convenience functions have been developed for reading timeseries (`regts`
+objects) from a csv or Excel file. Equivalent functions exist for writing 
+timeseries to a csv or Excel file.
 
-### Reading csv files
-The most convenient way to read a csv file, is to use the `read.csv` function or 
-another variant of the `read.table` function from the `utils` package (installed 
-by default). For large files, the function `fread` from package `data.table` is 
-suitable, because it is more efficient. 
+### Reading and writing csv files
+With the `read_ts_csv` function a `regts` variable can be read from a csv file.
+This function has several handy parameters to deal with separators, empty rows
+or columns and labels. In most cases it succeeds in finding the correct 
+frequency and determining how the timeseries are stored: rowwise or columnwise.
+If not, extra input parameters can be given.
 
 Consider the following csv file 
 
@@ -598,29 +386,17 @@ Consider the following csv file
 cat(readLines("test.csv"), sep = "\n")
 ```
 
-Note that quarter `2010Q4` is missing in the file.
+Notice that the periods are in the first column, the other columns contain the
+timeseries. The following command will do:
 
-When reading information from this `csv file` with function `read.csv` , use `stringsAsFactors = FALSE` to prevent that character data (such as variable names) 
-is converted to factors. The result of this function is a `data frame`:
-
-```{r}
-df <- read.csv("test.csv", stringsAsFactors = FALSE)
-df
-```
-
-Convert this data frame with the `as.regts` function.
-Since the period is to be found in the first column, we employ the `time_column` 
-argument.
 
 ```{r}
-series <- as.regts(df, time_column = 1)
-series
+read_ts_csv("test.csv")
 ```
 
-Since `regts` (&aacute;nd `ts`) objects always have a continuous period^[`regts` 
-and `ts` objects are regular timeseries. Packages `xts` and `zoo` provide also 
-irregularly spaced timeseries objects. Then periods can be missing.], the missing 
-quarters are filled with NA values. The `as.regts` function takes care of that. 
+The function has an argument `rowwise`. We could have used `rowwise = FALSE` to
+indicate that the timeseries are stored columnwise. But in this case is is not
+needed, the period column is recognised by the program.
 
 Sometimes the csv file is transposed, as in the following example:
 
@@ -628,73 +404,316 @@ Sometimes the csv file is transposed, as in the following example:
 cat(readLines("transpose.csv"), sep = "\n")
 ```
 
-Now the periods are in the first row (column headers), the next rows contain the timeseries. Since the periods are no valid names (valid names should start with 
-[a-z]), we use argument `check.names = FALSE`, to prevent that the column names 
-are prefixed with `X`.
+Now the periods are in the first row (column headers), the next rows contain the 
+timeseries. Note that `;` is the field separator and that quarter `2017Q3` is
+missing in the file.
 
-```{r, echo = -3}
-dft <- read.csv("transpose.csv", check.names = FALSE)
-```
-
-To convert this `data frame` to a `regts`, we first have to transpose it, since 
-function `as.regts` assumes that the timeseries are stored columnwise in the 
-data frame. Package `regts` contains a convenience function `transpose_df` for 
-transposing a data frame.
-With the `colname_column` argument it is possible to give the name or index of 
-the column that will be used as column names. By default the `row names` of the 
-original data frame are used. 
-
-```{r, echo = 1:2}
-df <- transpose_df(dft, colname_column = 1)
-df
-```
-
-Then the dataframe can be converted to a `regts` as usual.
-```{r}
-ts <- as.regts(df)
-```
-
-The file may be more complicated then the example shown above. Possibly there 
-are comments, extra rows or columns, or redundant information in the file. In 
-that case the data frame read must be converted to a standard format with the 
-variable names in the column names and the period in the row names. Use (negative) selection of rows and/or columns to get rid of unwanted information and the 
-function `transpose_df` in case of a transposed file. The result should look 
-something like the data frame printed above. This standardized data frame can 
-easily be converted to a regts.
-
-### Writing csv files
-The best way to store `regts` timeseries in a csv file is to first convert the 
-data to a `data frame` using the `as.data.frame` function. The period and names 
-of the `regts` automatically become the `rownames` and `colnames` of the 
-`data frame`.
-By doing so the period of the timeseries is also written to file.
 
 ```{r}
-rts <- regts(data, start = "2016Q1", names = c("a","b"))
-df <- as.data.frame(rts)
-df
-write.csv(df, "result.csv")
+read_ts_csv("transpose.csv", sep = ";")
 ```
 
-You may want to write the data in transposed form:
+Since `regts` (&aacute;nd `ts`) objects always have a continuous period^[`regts` 
+and `ts` objects are regular timeseries. Packages `xts` and `zoo` provide also 
+irregularly spaced timeseries objects. Then periods can be missing.], the missing 
+quarters are filled with NA values. 
+
+The timeseries names in this file are in uppercase. You can convert them while
+reading:
 
 ```{r}
-dft <- transpose_df(df)
-dft
-write.csv(dft, "result_transposed.csv")
+read_ts_csv("transpose.csv", sep = ";", name_fun = tolower)
 ```
 
+Files may be more complicated then the examples shown above. Possibly there 
+are comments, extra rows or columns, or redundant information in the file. 
+Most files will be read without problems. If necessary, use arguments `skiprow`
+and `skipcol`.
+
+
+Use function `write_ts_csv` to store a `regts` timeseries in a csv file.
+By default the timeseries are stored rowwise (i.e. the period is written in the
+first row). If labels are present, they are by default written after the names.
+
+```{r}
+rts <- regts(matrix(1:8, ncol = 2), start = "2016Q1", names = c("a","b"))
+write_ts_csv(rts, "result.csv")
+```
+
+You may want to write the data in transposed form, without labels:
+
+```{r}
+write_ts_csv(rts, "result_transposed.csv", rowwise = FALSE, labels = "no")
+```
+
+More information about labels can be found in section \ref{labels}.
 
 ### Reading and writing Excel files
-As explained in the subsections above, we use a data frame as an intermediate 
-object for reading and writing timeseries from and to csv files. The same 
-approach can be used for reading and writing Excel files.
+Special functions have been developed for `regts` objects
 
-There are several packages available for reading and writing Excel files: e.g. 
-`readxl` for reading, `WriteXLS` for writing and `xlsx` and `openxlsx` or 
-`XLConnect` for both, see the CRAN documentation. 
+* `read_ts_xlsx` (based on the `read_excel` function in package `readxl`) for 
+reading an Excel file, both for `xls` and `xlsx` format
 
-git@gitlab.cpb.nl:rvh/tijdreeksen-R.gi
+* `write_ts_xlsx` for writing an xlsx file
+
+Like the corresponding csv function, `read_ts_xlsx` has parameters for handling
+empty rows or columns, lables, orientation and frequency. Besides that you can
+specify a sheet, a range and how to recognise na-strings. Consider the next
+xlsx file:
+
+```{r echo = FALSE, comment=""}
+cat(readLines("series.csv"), sep = "\n")
+```
+
+When reading this file a `regts` object is returned:
+
+```{r}
+read_ts_xlsx("series.xlsx", skiprow = 2, name_fun = tolower, na_string = c("","NA"))
+```
+
+The function skips the first 2 lines, analyses where the period begins, converts
+the timeseries names to lowercase and recognises that empty cells and cells with
+text 'NA' are not available.
+
+Function `write_ts_xlsx` is used for writing a `regts` object to an xlsx file.
+It creates or opens an Excel workbook depending on argument `append`. Appending
+to a non existent file means creating the file. You can specify the sheetname 
+(by default Sheet1) and whether you want to write labels. An example:
+
+```{r}
+write_ts_xlsx(rts, "data.xlsx", sheet_name = "extra", append = TRUE)
+```
+
+In this case a sheet 'extra' is appended to the xlsx file.
+
+\newpage
+
+# Labels \label{labels}
+Each timeseries in a `regts` object can be equipped with a label, a way to 
+document each specific timeseries. Labels can be defined when the series are 
+created and they are preserved in most timeseries functions.
+
+```{r}
+t1 <- regts(data1, start = "2017Q1", names = c("child", "adult", "senior"),
+      labels = c("Age 0-17", "Age 18-65", "Age 65+"))
+t1
+```
+
+As you can see the labels are not shown automatically when the timeseries are 
+printed. With the `View` function you can view timeseries and their labels in 
+RStudio. The result looks like this:
+
+              child       adult       senior
+           Age 0-17   Age 18-65      Age 65+
+    2017Q1        1           6            3
+    2017Q2        3           4            0
+    2017Q3        2           8            9
+
+The labels can also be retrieved with the `ts_labels` function:
+
+```{r}
+ts_labels(t1)
+```
+
+In combination with the `<-` operator, the `ts_labels` command can be used to 
+assign labels to, or remove labels from an existing `regts`:
+
+```{r}
+tx <- regts(data, start = "2017Q1")
+ts_labels(tx) <- c("Trans X", "Label X")
+ts_labels(tx)
+ts_labels(tx) <- NULL       # remove all labels 
+ts_labels(tx)
+```
+
+For updating one or more timeseries labels in a regts object, the function 
+`update_ts_labels` is provided:
+
+```{r eval = TRUE}
+t1_update <- update_ts_labels(t1, labels = c(adult = "Age 18-67", senior = "Age 67+"))
+```
+```{r echo = FALSE}
+ts_labels(t1_update)
+```
+Argument `labels` is a named character vector with the column names as names 
+and the labels as values. 
+
+
+## Labels in files
+In this section we discuss how to read timeseries provided with labels from 
+a csv or xls(x) file, or how to write timeseries including labels to a file. 
+Also the situation is viewed where label information is available on a separate 
+file.
+
+### Reading timeseries with labels from a file
+It is easy to read timeseries with labels from a csv or xls(x) file, provided
+that the labels are placed before or after the timeseries names. Read the
+following Excel file including the labels:
+
+```{r echo = FALSE, comment=""}
+cat(readLines("tslabels.csv"), sep = "\n")
+```
+
+```{r}
+series <- read_ts_xlsx("tslabels.xlsx", labels = "after")
+```
+
+Now check the labels:
+
+```{r}
+ts_labels(series)
+```
+
+Labels and timeseries can also be stored columnwise:
+
+```{r echo = FALSE, comment=""}
+cat(readLines("testlabels.csv"), sep = "\n")
+```
+
+Read this file with result `tseries` and look at the labels:
+
+
+```{r}
+tseries <- read_ts_xlsx("testlabels.xlsx", labels = "after")
+ts_labels(tseries)
+```
+
+### Reading labels from a separate file
+
+Suppose we have a file with label information. This label file contains a list 
+of timeseries names and the corresponding labels:
+
+```{r echo = FALSE, comment=""}
+cat(readLines("label.csv"), sep = "\n")
+```
+
+There is also a `regts` object which contains two series: `c` and `b`.
+
+```{r}
+ts <- regts(matrix(1:4, ncol=2), names = c("c","b"), start = "2016")
+```
+
+We want to add some labels from this file to the timeseries using the function
+`update_ts_labels`. Input for this function is a named character vector
+containing the labels.
+
+The label file contains the labels for the two timeseries.
+Variable `dflabel` is read from the file as a `data frame` using function
+`read.csv`:
+
+
+```{r}
+dflabel <- read.csv("label.csv", stringsAsFactors = FALSE)
+dflabel
+```
+
+With the `dflabel` variable a named character vector `labels` is constructed.
+The names can be set with the `names` function:
+
+```{r}
+labels <- dflabel[[2]]
+names(labels) <- dflabel[[1]]
+labels
+```
+The variable `labels` contains more labels than necessary. Also the ordering 
+of the labels is not the same as in the  column names of the regts object. This 
+is not a problem, the function `update_ts_labels` takes care of all that:
+
+```{r}
+ts <- update_ts_labels(ts, labels)
+```
+
+This is the result ( of `view(ts)`):
+
+            c         b
+            label_c   label_b
+    2016          1         3
+    2017          2         4
+
+
+    
+### Writing timeseries with labels to file
+
+Functions `write_ts_csv` and `write_ts_xlsx` write timeseries to file 
+automatically including the labels. By default they are written after the names.
+Specify `labels = "before"` to write the labels before the names and specify
+`labels = "no"` to prevent the labels being written. An example:
+
+```{r}
+ts_data <- regts(matrix(1:8, ncol = 2), start = "2016Q1", end = "2016Q4",
+                 names = c("a", "b"), labels = c("Series_a", "Series_b"))
+write_ts_xlsx(ts_data, "result_label.xlsx", labels = "no")
+```
+
+## Labels when converting `data frame` to `regts` and vice versa
+
+Base R does not have facilities for adding labels to a data frame. However the 
+`Hmisc` package has introduced a function `label` for adding label attributes 
+to data frames columns and to retrieve them. 
+Package `regts` uses this function to preserve the labels, when converting a 
+`regts` object with labels to a `data frame` or vice versa. 
+
+Consider the following data frame:
+```{r}
+df <- data.frame(a = 1:3, b = 6:8, c = 10:12)
+rownames(df) <- c("2017", "2018", "2019")
+```
+
+Now add labels to the columns of the data frame. First load the library:
+```{r}
+library(Hmisc)
+label(df) <- list(a = "aap", b = "noot", c = "mies")
+```
+
+If you want to see the labels in the result, retrieve them with the `label` 
+function^[You can also view the whole data frame including labels with the 
+`View` function in Rstudio.].
+
+```{r}
+label(df)
+```
+
+When this data frame with labels is converted to a multivariate regts you can 
+display the labels as usual employing the `ts_labels` function:
+
+```{r}
+tt <- as.regts(df)
+ts_labels(tt)
+```
+
+Similarly, if a `regts` object with labels is converted to a data frame, then 
+the timeseries labels are used to create the label attributes of the data frame.
+
+```{r}
+ts_data <- regts(matrix(1:8, ncol = 2), start = "2016Q1", end = "2016Q4",
+                 names = c("a", "b"), labels = c("Series_a", "Series_b"))
+df1 <- as.data.frame(ts_data)
+label(df1)
+```
+
+## Labels when transposing a `data frame`
+
+Package `regts` disposes of a transpose function for a `data frame`, function
+`transpose_df`. If a data frame contains labels, then this `transpose_df`
+function puts the labels in the first column of the result data frame.
+(variable `df` in the next example is previously defined)
+
+```{r}
+df
+dft <- transpose_df(df)
+dft
+```
+
+Thus, by default, the resulting data frame will have not labels. However, if you 
+specify argument `label_column`, then the values in this column are used to 
+create labels:
+
+```{r collapse = TRUE}
+df2 <- transpose_df(dft, label_column = "labels")
+df2
+label(df2)
+```
+
 # Operators and functions for `regts`
 Since the `regts` class is an extension of the `ts` class all functionality 
 from this class is available.
@@ -730,8 +749,9 @@ diff(tx)
 plot(tx)
 ```
 
+&nbsp;  
+**Combining timeseries**
 
-## Combining timeseries
 As we have seen all functions that are available for `ts` are also available 
 for `regts`. The `cbind` function (an S3 generic function) is one of them: it 
 binds two or more objects with a common frequency. With the `cbind` function 
@@ -748,7 +768,7 @@ it is the `intersection`. An example:
 rt1 <- regts(1:4, start = "2016Q1")
 rt2 <- regts(1:4, start = "2016Q2")
 ```
-\newpage
+
 ```{r}
 cbind(rt1, rt2, union = TRUE)
 cbind(rt1, rt2, union = FALSE)
@@ -846,277 +866,14 @@ list3 <- within(list2, {
 do.call(cbind, list3)
 ```
 \longerpage[1]
-The elements `e` and `f` are repeated for the whole period and the value `TRUE` 
-is coerced to `numeric`. ^[You could also add a character variable, i.e. g <- "a". 
-Now the result will remain a `regts`, but all elements of the timeseries will be 
-coerced to character data, which is probably not what you want.]
-
-
-# Labels \label{labels}
-Each timeseries in a `regts` object can be equipped with a label, a way to 
-document each specific timeseries. Labels can be defined when the series are 
-created and they are preserved in most timeseries functions.
-
-```{r}
-t1 <- regts(data1, start = "2017Q1", names = c("child", "adult", "senior"),
-      labels = c("Age 0-17", "Age 18-65", "Age 65+"))
-t1
-```
-
-As you can see the labels are not shown automatically when the timeseries are 
-printed. With the `View` function you can view timeseries and their labels in 
-RStudio. The result looks like this:
-
-              child       adult       senior
-           Age 0-17   Age 18-65      Age 65+
-    2017Q1        1           6            3
-    2017Q2        3           4            0
-    2017Q3        2           8            9
-
-The labels can also be retrieved with the `ts_labels` function:
-
-```{r}
-ts_labels(t1)
-```
-
-In combination with the `<-` operator, the `ts_labels` command can be used to 
-assign labels to, or remove labels from an existing `regts`:
-
-```{r}
-tx <- regts(data, start = "2017Q1")
-ts_labels(tx) <- c("Trans X", "Label X")
-ts_labels(tx)
-ts_labels(tx) <- NULL       # remove all labels 
-ts_labels(tx)
-```
-
-For updating one or more timeseries labels in a regts object, the function `update_ts_labels` is provided:
-
-```{r eval = TRUE}
-t1_update <- update_ts_labels(t1, labels = c(adult = "Age 18-67", senior = "Age 67+"))
-```
-```{r echo = FALSE}
-ts_labels(t1_update)
-```
-Argument `labels` is a named character vector with the column names as names 
-and the labels as values. 
-
-## Labels when converting `regts` to `data frame` and vice versa
-
-Base R does not have facilities for adding labels to a data frame. However the 
-`Hmisc` package has introduced a function `label` for adding label attributes 
-to data frames columns and to retrieve them. 
-Package `regts` uses this function to preserve the labels, when converting a 
-`regts` object with labels to a `data frame` or vice versa. 
-
-Consider the following data frame:
-```{r}
-df <- data.frame(child = 1:3, adult = 6:8, senior = 10:12)
-rownames(df) <- c("2017", "2018", "2019")
-```
-
-Now add labels to the columns of the data frame. First load the library:
-```{r}
-library(Hmisc)
-label(df) <- list(child = "18-", adult = "18-67", senior = "67+")
-```
-
-If you want to see the labels in the result, retrieve them with the `label` 
-function^[You can also view the whole data frame including labels with the 
-`View` function in Rstudio.].
-
-```{r}
-label(df)
-```
-
-When this data frame with labels is converted to a multivariate regts you can 
-display the labels as usual employing the `ts_labels` function:
-
-```{r}
-tt <- as.regts(df)
-ts_labels(tt)
-```
-
-Similarly, if a `regts` object with labels is converted to a data frame, then the timeseries labels are used to create the label attributes of the data frame:
-
-
-## Labels when transposing a `data frame`
-
-If a data frame contains labels, then the `transpose_df` function puts the 
-labels in the first column of the result data frame.
-
-```{r}
-df
-dft <- transpose_df(df)
-dft
-```
-
-By default, the resulting data frame will have not labels. However, if you 
-specify argument `label_column` in function `transpose_df`, then the values 
-in this column are used to create labels:
-
-\newpage
-
-```{r collapse = TRUE}
-df2 <- transpose_df(dft, label_column = "labels")
-df2
-label(df2)
-```
-
-
-## Labels in files
-In this section we discuss how to read timeseries provided with labels from 
-a csv file, or how to write timeseries including labels to a file. Also the 
-situation is examined where label information is available on a separate file.
-
-### Reading timeseries with labels from a file
-If the timeseries are stored rowwise in a file, it is relatively easy to read 
-timeseries with labels.
-Consider the following csv file (the fields are separated by spaces):
-
-
-```{r echo = FALSE, comment=""}
-cat(readLines("tslabels.csv"), sep = "\n")
-```
-
-The first step is to read the csv file. To avoid checking period names in the 
-first row use argument `check.names`.
-Since the fields are separated by one or more spaces, argument `sep = ""` is used.
-
-```{r}
-df <- read.csv("tslabels.csv", stringsAsFactors = FALSE, check.names = FALSE, sep = "")
-df
-```
-Next the data frame has to be transposed. In the function `transpose_df` it is 
-possible to indicate which column contains the names and which column contains 
-the labels: use arguments `colname_column` and `label_column`. 
-
-```{r}
-dft <- transpose_df(df, colname_column = "name", label_column = "label")
-dft
-```
-Now we convert the data frame to a `regts` and check the labels:
-
-```{r}
-tsl <- as.regts(dft)
-ts_labels(tsl)
-```
-
-The timeseries can also be stored columnwise as in the following csv file:
-
-```{r echo = FALSE, comment=""}
-cat(readLines("testlabels.csv"), sep = "\n")
-```
-
-When reading the file we use argument `row.names = 1` to get the period, which 
-is in the first column, as row names.
-
-```{r}
-df <- read.csv("testlabels.csv", stringsAsFactors = FALSE, row.names = 1)
-df
-```
-We store the labels in a character variable and then remove the label row.
-
-```{r}
-labels <- as.character(df[1, ])
-labels
-df <- df[-1, ]
-df
-```
-A data frame column can contain only one type of data^[Different columns in a 
-data frame may contain different types of data.]. The label row in the data 
-frame has type character, so all data in data frame `df` are characters. 
-They have to be converted to numeric data. Function `as.regts` takes care of 
-that. 
-Finally the timeseries is created and the labels are assigned using the 
-`ts_labels` function:
-
-```{r}
-tsl <- as.regts(df)
-ts_labels(tsl) <- labels
-```
-
-\newpage
-### Separate label files
-
-Suppose we have a file with label information. This label file contains a list 
-of timeseries names and the corresponding labels:
-
-```{r echo = FALSE, comment=""}
-cat(readLines("label.csv"), sep = "\n")
-```
-
-There is also a `regts` object which contains two timeseries: `c` and `b`.
-
-```{r}
-ts <- regts(matrix(1:4, ncol=2), names = c("c","b"), start = "2016")
-```
-
-The label file contains the labels for the two timeseries.
-We want to add these labels to the timeseries. First the label file is read:
-
-```{r}
-dflabel <- read.csv("label.csv", stringsAsFactors = FALSE)
-dflabel
-```
-
-To update the timeseries labels the function `update_ts_labels` can be used.
-Input for the labels in this function is a named character vector. The label 
-vector is fetched from the `dflabel` data frame variable and the names can be 
-set with the `names` function:
-
-```{r}
-labels <- dflabel[[2]]
-names(labels) <- dflabel[[1]]
-labels
-```
-The variable `labels` contains more labels than necessary. Also the ordering 
-of the labels is not the same as in the  column names of the regts object. This 
-is not a problem, the function `update_ts_labels` takes care of all that:
-
-```{r}
-ts <- update_ts_labels(ts, labels)
-```
-
-This is the result ( of `view(ts)`):
-
-            c         b
-            label_c   label_b
-    2016          1         3
-    2017          2         4
-
-\newpage
-    
-### Writing timeseries with labels to file
-
-It is also possible to write timeseries together with the labels to a file. 
-The easiest way is to create a transposed data frame with labels. 
-
-```{r}
-ts_data <- regts(matrix(1:8, ncol = 2), start = "2016Q1", end = "2016Q4",
-                 names = c("a", "b"), labels = c("Series_a", "Series_b"))
-df  <- as.data.frame(ts_data)
-dft <- transpose_df(df)
-dft
-```
-
-This data frame can be written to file.
-```{r}
-write.csv(dft, "result_label.csv")
-```
+The elements `e` and `f` are repeated for the whole period and the value `TRUE` is coerced to `numeric`. ^[You could also add a character variable, i.e. g <- "a". Now the result will remain a `regts`, but all elements of the timeseries will be coerced to character data, which is probably not what you want.]
 
 
 # Differences between multivariate timeseries
-It can be quite tedious to compare two multivariate timeseries with a large 
-number of columns. 
-The function `tsdif` is specially designed to compare two multivariate timeseries 
-objects with the same frequency.
-The function calculates differences between columns with the same name, they do 
-not have to be in the same order.
-The actual function used to compute the differences can be specified, by default 
-absolute differences are computed.
-Also argument `tol` can be specified: all differences smaller than `tol` will be 
-ignored. By default `tol` is 0.
+Comparing two multivariate timeseries with a large number of columns can be quiet tedious, therefore function `tsdif` is created. It compares two multivariate timeseries objects which must have the same frequency.
+The function calculates differences between columns with the same name, they do not have to be in the same order.
+The actual function used to compute the differences can be specified, by default normal differences are computed.
+Also argument `tol` can be specified: all differences smaller than `tol` will be ignored. By default `tol` is 0.
 
 
 ```{r}
@@ -1129,50 +886,314 @@ rt2
 tsdif(rt1, rt2, tol = 1e-3)
 ``` 
 
-The result is a list with several components, starting with the result `equal`, 
-which is `TRUE` or `FALSE`. 
-The names of the common columns with differences larger than the tolerance `tol` 
-appear in `difnames`. 
-In this example `equal` is `FALSE`, because there are differences larger than 
-the tolerance between the "a" columns, which is shown at `difnames`. 
-Component `dif` is a `regts` with the computed differences of these columns. 
-If there are no differences `dif` becomes `NULL`. In this case the difference 
-between columns `a` is equal for all quarters: 0.01.
-In the `missing_names` variables the not common columns appear. In this example 
-there are no missing names. The tolerance argument `tol`, with value 0.001, is 
-an input argument and added for the sake of completeness.
+The function shows a limited report of the result, but it's result is a list with several components. Some of them are shown in the next example.
 
-In the previous example the two objects had the same column names. Now we discuss 
-an example where the column names are different.
-We create a new timeseries `rt3`, an extension of timeseries `rt1` with an extra 
-column:
+```{r}
+difvar <- tsdif(rt1, rt2, tol = 1e-3)
+difvar$equal
+difvar$difnames
+difvar$tol
+```
+
+In this exampl `equal` is `FALSE`, because there are differences larger than the tolerance `tol`. The names of the common columns with differences larger than the tolerance appear in `difnames`. Component `dif` is a `regts` with the computed differences of these columns. If there are no differences `dif` becomes `NULL`. In this case the difference between columns `a` is equal for all quarters: 0.01. The tolerance argument `tol` is actually an input argument but added to the list of components for the sake of completeness.
+
+In the previous example the two objects had the same column names. Now we look at an example where the column names are different. We create a new timeseries `rt3`, an extension of timeseries `rt1` with an extra column:
 
 ```{r}
 rt3 <- rt1
-rt3[, "d"] <-  regts(9:12, start = "2016Q1")
-tsdif(rt1, rt3, tol = 1e-3)
+rt3[, "d"] <- regts(9:12, start = "2016Q1")
+tsdif(rt1, rt3)
+tsdif(rt1, rt3)$missing_names1
 ```
-The `missing_names1` component contains the column names in the second timeseries 
-that are missing in the first timeseries, in this case variable `d`. There are no `missing_names2`.
 
-All computed differences are smaller than or equal to the tolerance factor, so 
-component `dif` is `NULL`. Component `equal` is still FALSE, because there are 
-missing names.
-The `equal` component is only `TRUE` if both component `dif` is `NULL` and there 
-are no missing names. 
-
-Let's compare two columns of regts objects `rt1` and `rt2`. Columns `b` differ 
-less than the tolerance factor and columns `c` are equal. Now the result is equal:
+The `missing_names1` component contains the column names in the second timeseries that are missing in the first timeseries, in this case variable `d`. There are no `missing_names2`.
 
 ```{r}
-
-dif_b <- tsdif(rt1[, c("b","c")], rt2[, c("c","b")], tol = 1e-5)   
-dif_b$equal
+tsdif(rt1, rt3)$equal
+tsdif(rt1, rt3)$dif
 ```
+
+All computed differences are smaller than or equal to the tolerance factor, so component `dif` is `NULL`. Component `equal` is `FALSE`; it is only `TRUE` if both component `dif` is `NULL` and there are no missing names.
+
+Let's compare two columns of regts objects `rt1` and `rt2`: columns `b` differ less than the tolerance factor and columns `c` are equal. Now the result is equal:
+
+```{r}
+dif_bc <- tsdif(rt1[, c("b","c")], rt2[, c("c","b")], tol = 1e-5)
+dif_bc$equal
+```
+
 As you can see the ordering of the columns makes no difference.
 
 
+
+# `period` and `period_range`\label{period}
+
+When the same period is used several times, it is preferable to define a variable 
+containing this period. This could be a textstring containing a period but 
+package `regts` also defines special classes representing 
+periods: the `period` class for a single period and the `period_range` 
+class for a range of periods. With these classes is it possible to manipulate the
+period or the period_range, as shown further on in this section. 
+
+## `period`
+
+A `period` object can be created with the `period` function. 
+
+```{r}
+prd1 <- period("2016Q4")
+prd1
+prd2 <- period("2015-2", frequency = 4)
+prd2
+```
+
+In the last example the `frequency` has to be specified. `"2015-2"` is 
+ambiguous. Here "2" denotes the second quarter but it could also be for instance 
+a month indicator or a half year. The `frequency` argument is required if you 
+want to define a period with a frequency other than 1, 4 or 12, since there is 
+no special format for these frequencies.
+
+Special functions have been designed for the `period` class e.g. to extract 
+a subperiod or the year:
+
+```{r}
+get_subperiod(prd1)
+get_year(prd2)
+```
+
+`period` objects can be used as input for the `start` and `end` arguments of 
+the `regts` function.
+
+```{r eval = TRUE}
+ts    <- regts(1:10, start = prd1)
+```
+
+When printed, a `period` variable seems to be nothing more than a character 
+string. With the `str` function we can show the internal representation of a 
+`period` object:
+
+```{r}
+str(period("2016Q4"))
+```
+
+The internal representation of period `2016Q4` is the number of quarters since 
+the beginning of the Christian era, starting with 0 (`8067 = 2016 * 4 + 3`).
+
+## `period_range`
+There is also a `period_range`, an object that represents an interval of 
+periods. Such a range can be created in the following ways:
+
+```{r}
+range <- period_range("2014Q4", "2017Q4")
+range
+period_range("2014Q4/2017Q4")
+```
+
+The lower or upper bound of the range may be undetermined:
+
+```{r}
+period_range("2017Q1", NULL)      # No upper bound
+```
+
+A `period_range` variable can be used in the `regts` function, specifying the 
+`period` argument:
+ 
+```{r}
+range1 <- period_range("2016Q1", "2016Q3")
+rts <- regts(matrix(1:18, ncol = 3), period = range1, names = c("a", "b", "c"))
+rts
+```
+A `period_range` variable can also be obtained from a timeseries:
+
+```{r}
+get_period_range(rts)
+```
+
+The length of a `period_range` can be determined by the `nperiod` function:
+
+```{r}
+nperiod(range1)
+```
+Functions `start_period` and `end_period` are used to retrieve the first and 
+last period in a `period_range`:
+
+```{r}
+start_period(range1)
+end_period(range1)
+range2 <- period_range(start_period(range1)+1, end_period(range1)-1)
+ts <- regts(data, period = range2)
+```
+
+## Shifting period(s)\label{shifting}
+With operators `+` and `-` the period can be shifted. Some examples for `period`: 
+
+```{r}
+period("2016Q4") + 1
+p1 <- period("2015Q1")
+p1-5
+```
+
+And for a `period_range`:
+
+```{r}
+period_range("2016Q4", "2017Q4") + 1
+period_range(p1, p1+4)            # a `period` as input
+```
+
+Note that one of the operands must be numeric^[Command `period("2015Q1") + period("2015Q2")` results in an error message: 'Arithmetic operation on two 
+periods is not allowed.'].
+
+
+# Selecting and updating
+In section \ref{periodselection} we have shown how periods can be selected 
+with a string. A `period` can also be used to select or update a period of a 
+timeseries object.  Consider the following (previously defined) timeseries:
+
+```{r}
+rts
+```
+Use a `period` to select and update the timeseries.
+```{r}
+prd1 <- period("2016Q2")
+rts[prd1] 
+rts[prd1] <- 3
+rts
+```
+
+A `period_range` can be used to select and update multiple periods:
+
+```{r}
+# define a period range and make selections
+range <- period_range("2016Q2", "2016Q3")
+var <- rts[range]     
+rts[range, c("a", "b")]
+# define another period range and create a new timeseries column
+smpl <- period_range("2016Q1", "2017Q1")
+rts[smpl, "xx"] <- 2                
+rts
+```
+
+Note that because timeseries `xx` is created with an extended period, all 
+timeseries in (multivariate regts) object `rts` are extended.
+
+&nbsp;  
+**Update function**
+
+It is also possible to use a multivariate timeseries to update another
+multivariate timeseries. The two timeseries must have the same frequency
+but their period ranges may be different (non overlapping periods will be set to
+NA). For the result timeseries the union of the ranges is taken. There are 
+three different methods to update the timeseries depending on how to deal with
+NA values. Possible methods for this function `update_ts` are:
+
+* `upd` use all of the second timeseries to update the first timeseries
+
+* `updna` only update NA values in the first timeseries
+
+* `updval` only use valid values in the second timeseries to update the first
+timeseries
+
+Of course only the common columns in both timeseries are updated. Extra columns
+in the second timeseries aer added to the result, depending on the method and 
+the content of that columns.
+
+Some examples:
+
+```{r}
+series1 <- regts(matrix(rep(1,6), ncol = 3), start = "2017Q1", names = c("a","b","c"))
+series2 <- regts(matrix(rep(2,4), ncol = 2), start = "2017Q1", names = c("a","d"))
+update_ts(series1, series2, method = "upd")
+series1[, "a"] <- NA
+series2[, "d"] <- NA
+update_ts(series1, series2, method = "updna")
+update_ts(series1, series2, method = "updval")
+```
+In the last result variable "d" is not included because it has no valid values.
+
+
+
+
+# Conversion between `data frame` and `regts` \label{dataframe}
+
+It is possible to use a (part of a) data frame as input data for a `regts`
+
+```{r}
+df  <- data.frame(a = 1:3, b = 4:6, c = 7:9)
+ts <- regts(df, start = "2017Q1")             # create a multivariate regts
+ts
+```
+
+The function `regts` uses the `data.matrix` function in the `base` package to 
+convert a data frame to a numeric matrix. By default the column names of the 
+data frame are used for the timeseries names.
+
+As with matrix input, it is also possible to specify names or add labels. This 
+is already described in section \ref{multits}. Labeling has been discussed in 
+section \ref{labels}.
+
+In the previous example we had to specify the period of the result timeseries.
+Sometimes the period is already contained in the data frame, e.g. in the 
+row names. Consider the following data frame:
+
+```{r}
+df <- data.frame(a = 1:3, b = 4:6)  # data frame with period in row names
+rownames(df) <- c("2015Q3", "2015Q4", "2016Q1")
+df
+```
+
+The function `as.regts` can be used to convert a `data.frame` to a `regts`:
+
+```{r}
+ts <- as.regts(df)
+ts
+```
+
+Function `as.regts` assumes that the period is stored in the row names.
+If the periods are in a column of the data frame, then the `time_column` argument 
+can be used. You can specify the column name or number of the data frame in which 
+the period is stored. Specifying 0 means the period is contained in the row names 
+of the data frame.
+
+```{r}
+# data frame with period in column 'periods'
+df2 <- data.frame(periods = c("2015Q3", "2015Q4", "2016Q1"), a = 1:3, b = 4:6)
+ts2 <- as.regts(df2, time_column = "periods")
+ts2
+```
+
+Function `as.regts` uses the function `period` to convert the 'period text' 
+(like `2015Q3`) to a `period`.
+This function can handle several period formats: `2016`, `2016Q4`, `2016.4q`,
+`2016/4Q`, `2016-4q`, `2016_q4`, ...
+where no distinction is made between 'q' and 'Q'.
+
+If the period is ambiguous, use the frequency argument:
+```{r}
+# data frame with indicisive period in row names
+df <- data.frame(a = 1:3, b = 4:6)
+rownames(df) <- c("2015-3", "2015-4", "2016-1")
+ts <- as.regts(df, frequency = 4)
+```
+
+If the data frame contains periods in another, non standard, format, it is 
+possible to specify your own function for the conversion of a text to a 
+`period`. Use the `fun` argument, if necessary with extra arguments.
+
+The reverse conversion from a `regts` to a `data frame` can be achieved with 
+function `as.data.frame`. Therefore the `as.data.frame` function has been 
+extended for `regts` types:
+
+```{r}
+as.data.frame(ts)
+```
+\longerpage[1]
+The results look similar to `ts`. The timeseries names have become the data frame column names and the periods show up in the row names. Of course the `classes` 
+are different.
+
+
 # Aggregate functions
+
+## Function `aggregate`
+
 The function `aggregate` can be used to convert a timeseries to a lower frequency. 
 For example to convert a monthly timeseries to a quarterly timeseries, or a 
 quarterly timeseries to a yearly timeseries.
@@ -1203,8 +1224,7 @@ quarters in 2018 are ignored. The `aggregate` function skips the incomplete
 years at the end.
 
 A special situation occurs when for instance a quarterly timeseries doesn't 
-start in the first 
-quarter:
+start in the first quarter:
 ```{r}
 regt2 <- regts(2:10, start = "2016Q2")
 regt2
@@ -1216,6 +1236,7 @@ Now the result is:
 
     regt2  Time Series: Start = 2017     End = 2017     Frequency = 1  [1] 26
 
+\longerpage[1]
 The quarters in 2017 add up to 26 as before. But now the information for 2016 
 is also not complete, and therefore ignored. This is what you would expect: 
 for `regts` objects the `aggregate` function skips all years for which not all 
@@ -1276,7 +1297,7 @@ aggregate_gr(xdif, method = "dif1s", nfrequency = 1)  # result is a yearly times
 aggregate_gr(xdif, method = "dif1")
 ```
 
-### The cumulative growth methods 
+## The cumulative growth methods 
 The so called growth timeseries require special methods, a simple averaging of 
 the subperiods in the high frequency observations will not return the correct 
 answer. 
