@@ -5,7 +5,7 @@
 \title{Calculates the differences between two multivariate timeseries
 objects}
 \usage{
-tsdif(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2))
+tsdif(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2))
 }
 \arguments{
 \item{x1}{the first timeseries (a multivariate \code{\link{regts}} or
@@ -13,12 +13,12 @@ tsdif(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2))
 
 \item{x2}{the second timeseries (a multivariate \code{regts} or \code{ts} object).}
 
-\item{tol}{difference tolerance (by default zero). Differences smaller
-than tol are ignored.}
+\item{tol}{difference tolerance (by default zero). Differences with absolute
+values smaller than tol are ignored.}
 
 \item{fun}{function to compute differences. This function should accept
 two arguments (two numbers) for which the difference is computed.
-By default the absolute difference is computed. A useful function for
+By default the normal difference (\eqn{x_1 - x_2}) is computed. A useful function for
 computing differences is \code{\link{cvgdif}}, which computes relative differences
 if the absolute value of \code{x2} is larger than 1.}
 }

@@ -21,11 +21,11 @@
 #' @param x1 the first timeseries (a multivariate \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
 #' @param x2 the second timeseries (a multivariate \code{regts} or \code{ts} object).
-#' @param tol difference tolerance (by default zero). Differences smaller
-#' than tol are ignored.
+#' @param tol difference tolerance (by default zero). Differences with absolute
+#' values smaller than tol are ignored.
 #' @param fun function to compute differences. This function should accept
 #' two arguments (two numbers) for which the difference is computed.
-#' By default the absolute difference is computed. A useful function for
+#' By default the normal difference (\eqn{x_1 - x_2}) is computed. A useful function for
 #' computing differences is \code{\link{cvgdif}}, which computes relative differences
 #' if the absolute value of \code{x2} is larger than 1.
 #' @return a list with class "tsdif", with the following components
@@ -78,7 +78,7 @@
 #' @seealso
 #'\code{\link{regts}}
 #'
-tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) abs(x1 - x2)) {
+tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
 
   if (!is.mts(x1)) {
       stop(paste0("Argument x1 (", deparse(substitute(x1))),
@@ -191,7 +191,7 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
   dif <- fun(xx1, xx2)
   colnames(dif) <- common_names
 
-  sel <- apply(dif, FUN = max, MARGIN = 2) > tol
+  sel <- apply(abs(dif), FUN = max, MARGIN = 2) > tol
   sel[is.na(sel)] <- TRUE
   if (any(sel)) {
       dif <- dif[, sel, drop = FALSE]
