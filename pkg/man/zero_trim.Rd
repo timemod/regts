@@ -20,7 +20,7 @@ A \code{regts} object in which leading and/or trailing zeros have been removed.
 This function removes leading or trailing zeros or both from a (multivariate)
 regts object.
 For multivariate regts a row will by default be regarded as 0 if all elements
-in the row are 0.  Specify \code{"any"} to change this behaviour.
+in the row are 0.
 }
 \examples{
 # remove only leading zeros
