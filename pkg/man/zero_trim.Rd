@@ -10,7 +10,7 @@ zero_trim(x, method = c("both", "first", "last"))
 \item{x}{a regts object}
 
 \item{method}{character with values \code{"both",} \code{"first"} or
-\code{"last"} to remove ze5ros at both ends (by default), just at the start
+\code{"last"} to remove zeros at both ends (by default), just at the start
 or just at the end.}
 }
 \value{

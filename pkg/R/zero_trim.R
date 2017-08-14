@@ -7,7 +7,7 @@
 #'
 #' @param x a regts object
 #' @param method character with values \code{"both",} \code{"first"} or
-#' \code{"last"} to remove ze5ros at both ends (by default), just at the start
+#' \code{"last"} to remove zeros at both ends (by default), just at the start
 #' or just at the end.
 #' @return A \code{regts} object in which leading and/or trailing zeros have been removed.
 #'
