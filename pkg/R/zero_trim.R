@@ -23,7 +23,7 @@
 #'
 #' data <- matrix(c(0, 3, 0, 0, 5, 6, 0, 7, 0), ncol = 3)
 #' rts <- regts(data, start = "2010Q1", names = c("a", "b", "c"))
-#' # remove leading NAs if all elements in the row are NA
+#' # remove leading zeros if all elements in the row are zero
 #' zero_trim(rts, method = "first")
 #' @export
 zero_trim <- function (x, method = c("both", "first","last")) {
