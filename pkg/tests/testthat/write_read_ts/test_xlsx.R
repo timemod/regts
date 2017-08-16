@@ -19,21 +19,25 @@ test_that("ts without labels written correctly",  {
   writeLines(c("Hello","World"), con = file)
 
   write_ts_xlsx(ts1, file, sheet_name = "ts1", labels = "after")
+
+  comments <- c("This is a transposed timeseries", "")
   write_ts_xlsx(ts1, file, sheet_name = "ts1_t",  rowwise = FALSE,
-                append = TRUE)
+                comments = comments, append = TRUE)
 
   wb <- loadWorkbook(file)
   sheet <- createSheet(wb, "ts1_times_2")
-  write_ts_sheet(ts1 * 2, sheet,  rowwise = TRUE)
+  comments <- data.frame(col1 = "Timeseries ts1",
+                         col2 = "(times 2)")
+  write_ts_sheet(ts1 * 2, sheet,  comments = comments, rowwise = TRUE)
   saveWorkbook(wb, file)
 
   ts1_read <- read_ts_xlsx(file, sheet = "ts1")
   expect_identical(ts1, ts1_read)
 
-  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t")
+  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", skiprow = 2)
   expect_identical(ts1, ts1_t_read)
 
-  ts1_times_2_read <- read_ts_xlsx(file, sheet = "ts1_times_2")
+  ts1_times_2_read <- read_ts_xlsx(file, sheet = "ts1_times_2", skiprow = 1)
   expect_identical(ts1 * 2, ts1_times_2_read)
 })
 
