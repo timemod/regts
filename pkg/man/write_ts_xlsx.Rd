@@ -6,10 +6,10 @@
 \title{Functions for writing timeseries to an xlsx file}
 \usage{
 write_ts_xlsx(x, file, sheet_name = "Sheet1", rowwise = TRUE,
-  append = FALSE, labels = c("after", "before", "no"))
+  append = FALSE, labels = c("after", "before", "no"), comments)
 
 write_ts_sheet(x, sheet, rowwise = TRUE, labels = c("after", "before",
-  "no"))
+  "no"), comments)
 }
 \arguments{
 \item{x}{a \code{ts} or \code{regts} object}
@@ -29,6 +29,10 @@ original file.}
 
 \item{labels}{should labels we written, and if so before the names or after
 the names? By default, labels are written after the names if present}
+
+\item{comments}{a character vector or data frame. The comments
+are written to the beginning of the sheet, before the timeseries data is
+written.}
 
 \item{sheet}{a \code{\link[xlsx]{Sheet}} object (see the documentation
 of package \code{xlsx})}
@@ -73,8 +77,15 @@ write_ts_sheet(ts1, sheet, labels = "after")
 sheet <- createSheet(wb, "ts1_times_100")
 write_ts_sheet(ts1 * 100, sheet = sheet, labels = "after")
 saveWorkbook(wb, "timeseries.xlsx")
+#
+# write a timeseries with comments
+comments <- c("Timeseries ts1 is created on the Central Bureau of Policy Analysis",
+              "using a random number generator")
+ write_ts_xlsx(ts1, file = "ts_comments.xlsx", sheet_name = "ts1",
+               comments = comments)
 \dontshow{
    unlink("ts1.xlsx")
    unlink("timeseries.xlsx")
+   unlink("ts_comments.xlsx")
 }
 }

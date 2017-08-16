@@ -59,6 +59,9 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @param rowwise a logical value: should the timeseries we written rowwise?
 #' @param labels should labels we written, and if so before the names or after
 #' the names? By default, labels are written after the names if present
+#' @param comments a character vector or data frame. The comments
+#' are written to the beginning of the sheet, before the timeseries data is
+#' written.
 #' @importFrom xlsx loadWorkbook
 #' @importFrom xlsx getSheets
 #' @importFrom xlsx removeRow
@@ -89,14 +92,21 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' sheet <- createSheet(wb, "ts1_times_100")
 #' write_ts_sheet(ts1 * 100, sheet = sheet, labels = "after")
 #' saveWorkbook(wb, "timeseries.xlsx")
+#' #
+#' # write a timeseries with comments
+#' comments <- c("Timeseries ts1 is created on the Central Bureau of Policy Analysis",
+#'               "using a random number generator")
+#'  write_ts_xlsx(ts1, file = "ts_comments.xlsx", sheet_name = "ts1",
+#'                comments = comments)
 #' \dontshow{
 #'    unlink("ts1.xlsx")
 #'    unlink("timeseries.xlsx")
+#'    unlink("ts_comments.xlsx")
 #' }
 #' @export
 write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           rowwise = TRUE, append = FALSE,
-                          labels = c("after", "before", "no")) {
+                          labels = c("after", "before", "no"), comments) {
 
   if (!file.exists(file)) {
     append <- FALSE
@@ -123,7 +133,7 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   }
 
   write_ts_sheet_(x, sheet, rowwise = rowwise,
-                  labels = labels, labels_missing = missing(labels))
+                  labels = labels, labels_missing = missing(labels), comments)
 
   saveWorkbook(wb, file)
 
@@ -133,16 +143,26 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 #' @describeIn write_ts_xlsx Writes a timeseries to a a \code{\link[xlsx]{Sheet}} object
 #' @export
 write_ts_sheet <- function(x, sheet,  rowwise = TRUE,
-                           labels = c("after", "before", "no")) {
+                           labels = c("after", "before", "no"),
+                           comments) {
 
   write_ts_sheet_(x, sheet, rowwise = rowwise, labels = labels,
-                  labels_missing = missing(labels))
+                  labels_missing = missing(labels), comments)
 
 }
 
 # internal function to write a timeseries object to a sheet of an Excel workbook
-write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing) {
+write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
+                            comments) {
 
+  # check for comments. The comments are actually written before the
+  # autoSizeColumns() command has been executed.
+  if (missing(comments)) {
+    n_comment_rows <- 0
+  } else {
+    comments <- as.data.frame(comments)
+    n_comment_rows <- nrow(comments)
+  }
 
   df_info <- write_ts_df(x, rowwise, labels, labels_missing)
 
@@ -157,6 +177,7 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing) {
     row_split <- 2 + as.integer(df_info$has_labels)
     col_split <- 2
   }
+  row_split <- row_split + n_comment_rows
 
   wb <- sheet$getWorkbook()
   right_align_style <- CellStyle(wb, alignment = Alignment(horizontal =
@@ -174,7 +195,7 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing) {
   col_style <- rep(list(right_align_style), ncol(column_headers) - n_text_cols)
   names(col_style) <- seq(n_text_cols + 1, ncol(column_headers))
   addDataFrame(column_headers, sheet, col.names = FALSE, row.names = FALSE,
-               colStyle = col_style)
+               colStyle = col_style, startRow = n_comment_rows + 1)
 
   # now write the data part
 
@@ -185,11 +206,17 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing) {
   col_style <- NULL
 
   addDataFrame(df_info$df, sheet, col.names = FALSE, row.names = FALSE,
-               startRow = n_text_rows + 1, colStyle = col_style)
+               startRow = n_text_rows + n_comment_rows + 1,
+               colStyle = col_style)
 
   autoSizeColumn(sheet, seq(1, dim(df_info$df)[2]))
 
+  if (!missing(comments)) {
+    addDataFrame(comments, sheet, col.names = FALSE, row.names = FALSE)
+  }
+
   createFreezePane(sheet, rowSplit = row_split, colSplit = col_split)
+
 
   return(invisible(NULL))
 }
