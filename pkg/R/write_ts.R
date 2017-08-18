@@ -59,6 +59,8 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @param rowwise a logical value: should the timeseries we written rowwise?
 #' @param labels should labels we written, and if so before the names or after
 #' the names? By default, labels are written after the names if present
+#' @param number_format a character value specifying the number format.
+#' For example, \code{"#.00"} corresponds to two decimal spaces.
 #' @param comments a character vector or data frame. The comments
 #' are written to the beginning of the sheet, before the timeseries data is
 #' written.
@@ -106,7 +108,8 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @export
 write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           rowwise = TRUE, append = FALSE,
-                          labels = c("after", "before", "no"), comments) {
+                          labels = c("after", "before", "no"), comments,
+                          number_format) {
 
   if (!file.exists(file)) {
     append <- FALSE
@@ -133,7 +136,8 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   }
 
   write_ts_sheet_(x, sheet, rowwise = rowwise,
-                  labels = labels, labels_missing = missing(labels), comments)
+                  labels = labels, labels_missing = missing(labels), comments,
+                  number_format)
 
   saveWorkbook(wb, file)
 
@@ -144,16 +148,16 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 #' @export
 write_ts_sheet <- function(x, sheet,  rowwise = TRUE,
                            labels = c("after", "before", "no"),
-                           comments) {
+                           comments, number_format) {
 
   write_ts_sheet_(x, sheet, rowwise = rowwise, labels = labels,
-                  labels_missing = missing(labels), comments)
+                  labels_missing = missing(labels), comments, number_format)
 
 }
 
 # internal function to write a timeseries object to a sheet of an Excel workbook
 write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
-                            comments) {
+                            comments, number_format) {
 
   # check for comments. The comments are actually written before the
   # autoSizeColumns() command has been executed.
@@ -199,11 +203,14 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
 
   # now write the data part
 
-  # TODO: number format
-  # nf <- CellStyle(wb, dataFormat=DataFormat("0.000"))
-  # dfColIndex <- rep(list(nf), dim(zoo1)[2])
-  # names(dfColIndex) <- seq(1, dim(zoo1)[2], by = 1)
-  col_style <- NULL
+  if (missing(number_format)) {
+    col_style <- NULL
+  } else {
+    cs <- CellStyle(wb, dataFormat = DataFormat(number_format))
+    ndata <- ncol(df_info$df)
+    col_style <- rep(list(cs), ndata)
+    names(col_style) <- seq(n_text_cols + 1, n_text_cols + ndata)
+  }
 
   addDataFrame(df_info$df, sheet, col.names = FALSE, row.names = FALSE,
                startRow = n_text_rows + n_comment_rows + 1,

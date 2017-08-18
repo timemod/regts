@@ -6,10 +6,11 @@
 \title{Functions for writing timeseries to an xlsx file}
 \usage{
 write_ts_xlsx(x, file, sheet_name = "Sheet1", rowwise = TRUE,
-  append = FALSE, labels = c("after", "before", "no"), comments)
+  append = FALSE, labels = c("after", "before", "no"), comments,
+  number_format)
 
 write_ts_sheet(x, sheet, rowwise = TRUE, labels = c("after", "before",
-  "no"), comments)
+  "no"), comments, number_format)
 }
 \arguments{
 \item{x}{a \code{ts} or \code{regts} object}
@@ -33,6 +34,9 @@ the names? By default, labels are written after the names if present}
 \item{comments}{a character vector or data frame. The comments
 are written to the beginning of the sheet, before the timeseries data is
 written.}
+
+\item{number_format}{a character value specifying the number format.
+For example, \code{"#.00"} corresponds to two decimal spaces.}
 
 \item{sheet}{a \code{\link[xlsx]{Sheet}} object (see the documentation
 of package \code{xlsx})}
