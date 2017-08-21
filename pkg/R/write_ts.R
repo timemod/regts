@@ -21,9 +21,14 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
     labels <- match.arg(labels)
   }
 
-  df_info <- write_ts_df(x, rowwise, labels, labels_missing)
+  dataframes  <- ts2df_(x, rowwise, labels, labels_missing)
+  data <- dataframes$data
+  column_headers <- dataframes$column_headers
+  has_labels <- dataframes$has_labels
 
-  fwrite(df_info$df, file, sep = sep, dec  = dec)
+  fwrite(column_headers, file, sep = sep, dec  = dec,
+         col.names = FALSE)
+  fwrite(data, file, sep = sep, dec  = dec, append = TRUE, col.names = FALSE)
 
   return(invisible(NULL))
 }
@@ -37,8 +42,8 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' \code{write_ts_sheet} writes timeseries to a \code{\link[xlsx]{Sheet}}
 #' object.
 #'
-#' The functions employ package  \code{\link[xlsx]{write.xlsx}} for
-#' writing the Excel file.
+#' The functions employ function \code{\link[xlsx]{addDataFrame}}
+#' from the \code{\link[xlsx]{xlsx}} package for writing the Excel file.
 #'
 #' If you want to write multiple timeseries objects to different
 #' sheets, you can use \code{write_ts_xlsx} with argument
@@ -59,6 +64,10 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @param rowwise a logical value: should the timeseries we written rowwise?
 #' @param labels should labels we written, and if so before the names or after
 #' the names? By default, labels are written after the names if present
+#' @param number_format a character value specifying the number format.
+#' For example, \code{"#.00"} corresponds to two decimal spaces.
+#' For details see the description of the function \code{\link[xlsx]{DataFormat}}
+#' in the \code{\link[xlsx]{xlsx}} package.
 #' @param comments a character vector or data frame. The comments
 #' are written to the beginning of the sheet, before the timeseries data is
 #' written.
@@ -74,6 +83,7 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @importFrom xlsx createFreezePane
 #' @importFrom xlsx autoSizeColumn
 #' @importFrom xlsx removeRow
+#' @importFrom xlsx DataFormat
 #'
 #' @describeIn write_ts_xlsx Write timeseries to an Excel workbook
 #' @examples
@@ -106,7 +116,8 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @export
 write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           rowwise = TRUE, append = FALSE,
-                          labels = c("after", "before", "no"), comments) {
+                          labels = c("after", "before", "no"), comments,
+                          number_format) {
 
   if (!file.exists(file)) {
     append <- FALSE
@@ -133,7 +144,8 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   }
 
   write_ts_sheet_(x, sheet, rowwise = rowwise,
-                  labels = labels, labels_missing = missing(labels), comments)
+                  labels = labels, labels_missing = missing(labels), comments,
+                  number_format)
 
   saveWorkbook(wb, file)
 
@@ -144,16 +156,16 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 #' @export
 write_ts_sheet <- function(x, sheet,  rowwise = TRUE,
                            labels = c("after", "before", "no"),
-                           comments) {
+                           comments, number_format) {
 
   write_ts_sheet_(x, sheet, rowwise = rowwise, labels = labels,
-                  labels_missing = missing(labels), comments)
+                  labels_missing = missing(labels), comments, number_format)
 
 }
 
 # internal function to write a timeseries object to a sheet of an Excel workbook
 write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
-                            comments) {
+                            comments, number_format) {
 
   # check for comments. The comments are actually written before the
   # autoSizeColumns() command has been executed.
@@ -164,34 +176,24 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
     n_comment_rows <- nrow(comments)
   }
 
-  df_info <- write_ts_df(x, rowwise, labels, labels_missing)
+  dataframes  <- ts2df_(x, rowwise, labels, labels_missing)
+  data <- dataframes$data
+  column_headers <- dataframes$column_headers
+  has_labels <- dataframes$has_labels
 
   if (rowwise) {
-    n_text_rows <- 1
-    n_text_cols <- 1 + as.integer(df_info$has_labels)
-    row_split <- 2
-    col_split <- 1 + n_text_cols
+    n_text_cols <- 1 + as.integer(has_labels)
   } else {
-    n_text_rows <- 1 + as.integer(df_info$has_labels)
     n_text_cols <- 1
-    row_split <- 2 + as.integer(df_info$has_labels)
-    col_split <- 2
   }
-  row_split <- row_split + n_comment_rows
+  n_text_rows <- nrow(column_headers)
+  row_split <- n_text_rows + 1 + n_comment_rows
+  col_split <- n_text_cols + 1
 
+  # Write the column headers. Use right alignment for the numeric columns
   wb <- sheet$getWorkbook()
   right_align_style <- CellStyle(wb, alignment = Alignment(horizontal =
                                                              "ALIGN_RIGHT"))
-
-  # write the column headers, use right alignment for the numeric columns
-  # for columnwise timeseries with labels, also write the label row
-  column_headers <- as.data.frame(t(colnames(df_info$df)),
-                                  stringsAsFactors = FALSE)
-  if (!rowwise & df_info$has_labels) {
-    lbls <- as.character(df_info$df[1, , drop = FALSE])
-    column_headers <- rbind(column_headers, lbls, stringsAsFactors = FALSE)
-    df_info$df <- df_info$df[-1, , drop = FALSE]
-  }
   col_style <- rep(list(right_align_style), ncol(column_headers) - n_text_cols)
   names(col_style) <- seq(n_text_cols + 1, ncol(column_headers))
   addDataFrame(column_headers, sheet, col.names = FALSE, row.names = FALSE,
@@ -199,17 +201,20 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
 
   # now write the data part
 
-  # TODO: number format
-  # nf <- CellStyle(wb, dataFormat=DataFormat("0.000"))
-  # dfColIndex <- rep(list(nf), dim(zoo1)[2])
-  # names(dfColIndex) <- seq(1, dim(zoo1)[2], by = 1)
-  col_style <- NULL
+  if (missing(number_format)) {
+    col_style <- NULL
+  } else {
+    cs <- CellStyle(wb, dataFormat = DataFormat(number_format))
+    ndata <- ncol(data)
+    col_style <- rep(list(cs), ndata)
+    names(col_style) <- seq(n_text_cols + 1, n_text_cols + ndata)
+  }
 
-  addDataFrame(df_info$df, sheet, col.names = FALSE, row.names = FALSE,
+  addDataFrame(data, sheet, col.names = FALSE, row.names = FALSE,
                startRow = n_text_rows + n_comment_rows + 1,
                colStyle = col_style)
 
-  autoSizeColumn(sheet, seq(1, dim(df_info$df)[2]))
+  autoSizeColumn(sheet, seq_len(ncol(data)))
 
   if (!missing(comments)) {
     addDataFrame(comments, sheet, col.names = FALSE, row.names = FALSE)
@@ -221,54 +226,75 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
   return(invisible(NULL))
 }
 
-# write timeseries to a data frame that can be written to a csv or excel file
-write_ts_df <- function(x, rowwise, labels, labels_missing) {
+# Internal function that converts a timeseries to a data frames that can be
+# written to a csv or excel file. The function returns a list with
+# three elements:
+#   data          : The data part of the timeseries (excluding column headers).
+#                   For rowwise timeseries data may include labels.
+#   column_headers: The column header, a data frame with one or two rows.
+#                   For columnwise timeseries with labels the first row
+#                   contains the label and the second row the variable names.
+#                   Otherwise column_headers has 1 row with periods (rowwise
+#                   timeseries) or names (columnwise timeseries)
+#   has_labels:     TRUE if the timeseries will be written with labels.
+#
+ts2df_ <- function(x, rowwise, label_option, labels_missing) {
 
   if (!is.ts(x)) {
     stop(paste("Argument x is not a timeseries object but a ", class(x)))
   }
 
-  if (labels_missing || labels != "no") {
+  # collect labels
+  if (labels_missing || label_option != "no") {
     lbls <- ts_labels(x)
     if (labels_missing) {
       if (is.null(lbls)) {
-        labels <- "no"
+        label_option <- "no"
       } else {
-        labels <- "after"
+        label_option <- "after"
       }
     } else {
       if (is.null(lbls)) {
         lbls <- rep("", NCOL(x))
       }
     }
+    has_labels = !is.null(lbls)
+  } else {
+    has_labels = FALSE
   }
 
   # remove the labels, we don't need them any more
   ts_labels(x) <- NULL
 
-  df <- as.data.frame(x)
+  data <- as.data.frame(x)
 
   if (rowwise) {
-    df <- transpose_df(df)
-    names <- rownames(df)
-    if (labels == "no") {
-      df <- cbind(name = names, df, stringsAsFactors = FALSE)
-    } else if (labels == "after") {
-      df <- cbind(name = names, label = lbls, df, stringsAsFactors = FALSE)
-    } else if (labels == "before") {
-      df <- cbind(label = lbls, name = names, df,stringsAsFactors = FALSE)
+    data <- transpose_df(data)
+    names <- rownames(data)
+    if (label_option == "no") {
+      data <- cbind(name = names, data, stringsAsFactors = FALSE)
+    } else if (label_option == "after") {
+      data <- cbind(name = names, label = lbls, data, stringsAsFactors = FALSE)
+    } else if (label_option == "before") {
+      data <- cbind(label = lbls, name = names, data, stringsAsFactors = FALSE)
     }
+    column_headers <- as.data.frame(t(colnames(data)), stringsAsFactors = FALSE)
   } else {
-    df <- cbind(period = rownames(df), df, stringsAsFactors = FALSE)
-    if (labels == "after") {
-      df <- rbind(c("label", lbls), df, stringsAsFactors = FALSE)
-    } else if (labels == "before") {
-      stop("For columnwise timeseries labels option \"before\" is not allowed")
+     # columnwise timeseries
+    data <- cbind(period = rownames(data), data, stringsAsFactors = FALSE)
+    column_headers <- as.data.frame(t(colnames(data)), stringsAsFactors = FALSE)
+    if (label_option == "after") {
+      column_headers <- rbind(c("label", lbls), column_headers,
+                                stringsAsFactors = FALSE)
+    } else if (label_option == "before") {
+        stop("For columnwise timeseries labels option \"before\" is not allowed")
     }
   }
 
-  rownames(df) <- NULL
-  return(list(df = df,  has_labels = labels != "no"))
+  rownames(data) <- NULL
+  colnames(data) <- NULL
+  return(list(data = data,  column_headers = column_headers,
+              has_labels = has_labels))
 }
 
 

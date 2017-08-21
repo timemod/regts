@@ -46,14 +46,17 @@ test_that("ts with labels written correctly",  {
   file <- "xlsx/ts1_lbls.xlsx"
   file.copy("xlsx_org/ts1_lbls.xlsx", file)
 
-  write_ts_xlsx(ts1_lbls, file, sheet_name = "ts1", append = TRUE)
+  write_ts_xlsx(ts1_lbls, file, sheet_name = "ts1", append = TRUE,
+                number_format = "00.00")
   write_ts_xlsx(ts1_lbls, file, sheet_name = "ts1_t",  rowwise = FALSE,
-                append = TRUE)
+                append = TRUE, number_format = "#.000")
 
   ts1_read <- read_ts_xlsx(file, sheet = "ts1", labels = "after")
+
   expect_identical(ts1_lbls, ts1_read)
 
-  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "after")
+  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "before")
+
   expect_identical(ts1_lbls, ts1_t_read)
 
   # check that all sheet names still exists
