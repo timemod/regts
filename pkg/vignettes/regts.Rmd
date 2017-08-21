@@ -23,7 +23,7 @@ linkcolor: blue
 ```{r echo = FALSE, message = FALSE}
 library(regts)
 library(Hmisc)
-#library(xlsx)
+library(readxl)
 data <- matrix(c(3,2,4,3,5,2,5,3), ncol = 2)
 data1 <- matrix(c(1,3,2,6,4,8,3,0,9), ncol = 3)
 
@@ -52,6 +52,7 @@ Package `xts` also facilitates period selection, but concentrates more on daily 
  
 Package `regts` provides some more extensions to package `ts`: 
 
+* functions for easily reading and writing timeseries to Excel and csv
 * the use of labels, a description of the timeseries
 * an easy way to convert a data frame to a timeseries object
 * a function to calculate differences between multiple timeseries
@@ -339,30 +340,31 @@ rts
 \newpage
 # Reading and writing timeseries 
 
-Some common used file types to store data in R are rds, csv or xls(x) files.
-Inside R projects, preferably use R data files, such as rds files. Writing and reading R objects to and from rds files is fast, easy and efficient.
+Some common used file types to store data in R are R data, csv or xls(x) files.
+Inside R projects, preferably use R data files. Writing and reading R objects to and from R data files is fast, easy and efficient.
 If data has to be exported, you can use for example csv or Excel files.
 
-## `.rds` file
-The `.rds` file, an R-readable binary file, is a flexible file type, you can 
-write any single R object. If you want to write more objects you can combine them in a list and write that list to the file. 
-Such an object can be stored by the `saveRDS` function in the `base` package.
+## Rds and RData file
+The main R data filetypes are `Rds` and `RData`. Both filetypes are R-readable binary files. 
+
+Rds stores a single R object. If you want to write more objects you can combine them in a list and write that list to the file. 
+An R object can be stored to a `Rds` file by the `saveRDS` function in the `base` package:
 
 ```{r}
 saveRDS(rts, file = "output.rds")
 ```
 The standard extension is `.rds`.
 
-An object saved in such a `.rds` file can be reloaded  by the `readRDS` function,
-possibly under a different name.
+An object saved in a `.rds` file can be reloaded  by the `readRDS` function,
+and you can assign the contents of an `.rds` file, possibly under a different name.
 
 ```{r}
 series <- readRDS("output.rds")
 ```
 The result is an R object.
 
-Another native R data type is Rdata. 
-Functions `save` and `load` are available to save and restore single or multiple objects to and from a Rdata file. Disadvantage is that the `load` function has no `return` variable. If multiple objects are written on a file it is not always clear what the result of this `load` function is.
+Another native R data type is `RData`. 
+Functions `save` and `load` are available to save and restore single or multiple objects to and from a RData file. When loading, the objects are restored with the same name they had when saved (the `load` function has no `return` variable). This can be annoying. Also it is not clear what the result of the `load` function is. 
 
 
 ## External files
@@ -403,13 +405,13 @@ missing in the file.
 
 
 ```{r}
-read_ts_csv("transpose.csv", sep = ";")
+read_ts_csv("transpose.csv")
 ```
+The `sep` argument is not needed, separator `;` (as well as `,` and `tab`) is recognised by the function. By default the separator is determined automatically.
 
 Since `regts` (&agrave;nd `ts`) objects always have a continuous period^[`regts` 
 and `ts` objects are regular timeseries. Packages `xts` and `zoo` provide also 
-irregularly spaced timeseries objects. Then periods can be missing.], the missing 
-quarters are filled with NA values. 
+irregularly spaced timeseries objects. Then periods can be missing.], the missing quarters are filled with NA values.
 
 The timeseries names in this file are in uppercase. You can convert them while
 reading:
@@ -418,13 +420,9 @@ reading:
 read_ts_csv("transpose.csv", name_fun = tolower)
 ```
 
-Notice that the `sep` argument is not needed, separator `;` (as well as others) is recognised by the function. By default the separator is determined automatically.
-
 Files may be more complicated then the examples shown above. Possibly there 
 are comments, extra rows or columns, or redundant information in the file. 
-Most files will be read without problems. If necessary, use arguments `skiprow`
-and `skipcol`.
-
+This usually does not cause problems: `read_ts_csv` can skip these redundant rows. If necessary, use arguments `skiprow` and `skipcol`.
 
 Use function `write_ts_csv` to store a `regts` timeseries in a csv file.
 By default the timeseries are stored rowwise (i.e. the period is written in the
@@ -449,7 +447,7 @@ Special functions have been developed for `regts` objects
 * `read_ts_xlsx` (employing the `read_excel` function in package `readxl`) for 
 reading an Excel file, both for `xls` and `xlsx` format
 
-* `write_ts_xlsx` for writing an xlsx file
+* `write_ts_xlsx` for writing an xlsx file employing package `xlsx`
 
 Like the corresponding csv function, `read_ts_xlsx` has arguments for skipping
 rows or columns, orientation and frequency. Besides that you can
@@ -482,20 +480,19 @@ write_ts_xlsx(rts, "data.xlsx", sheet_name = "extra", append = TRUE)
 In this case a sheet 'extra' is appended to the xlsx file.
 
 ### Problems when reading
-Sometimes data in a file needs to be processed before it can be converted to a timeseries. This happens for instance when text and numbers are mixed up or when the file contains weird information. 
+Sometimes data in a file needs to be processed before it can be converted to a timeseries. This happens when a file has a deviant format. 
 
-In that case try reading information as a `data frame` type. Most functions in R for reading a csv or Excel file return a `data frame`. Examples: `read.csv`, `read.csv2`, `read_xlsx`, `read.xlsx` or `read.table`.
+In that case try reading information as a `data frame` type. Most functions in R for reading a csv return a `data frame`. Examples: `read.csv`, `read.csv2` and `read.table` in package `utils`. Functions, `read_xls(x)` and `read_excel` in package `readxl` or `read.xlsx` (in package `xlsx`) for reading Excel files return some sort of `data frame`.
 
 The `data frame` can then be converted to a `regts`. This conversion is described in section \ref{dataframe}.
-In advance it may be necessary to do some processing (e.g. selecting and/or deleting (parts of) rows and columns).
+In advance it may be necessary to do some processing (e.g. selecting and/or deleting (parts of) rows and columns). You can find some examples in section \ref{deviant}.
 
 
 \newpage
 
 # Labels \label{labels}
-Each timeseries in a `regts` object can be equipped with a label, a way to 
-document each specific timeseries. Labels can be defined when the series are 
-created and they are preserved in most timeseries functions.
+A label is a way to document an object or the elements of an object. Labels in base R exist but only for objects. 
+In the `regts` package each timeseries in a `regts` object can be equipped with a label. Labels can be defined when the series are created and they are preserved in most timeseries functions.
 
 ```{r}
 t1 <- regts(data1, start = "2017Q1", names = c("child", "adult", "senior"),
@@ -542,6 +539,7 @@ ts_labels(t1_update)
 Argument `labels` is a named character vector with the column names as names 
 and the labels as values. 
 
+\newpage
 
 ## Labels in files
 In this section we discuss how to read timeseries provided with labels from 
@@ -607,7 +605,7 @@ Variable `dflabel` is read from the file as a `data frame` using function
 
 
 ```{r}
-dflabel <- read.csv("label.csv", stringsAsFactors = FALSE)
+dflabel <- read.csv("label.csv")
 dflabel
 ```
 
@@ -627,7 +625,7 @@ is not a problem, the function `update_ts_labels` takes care of all that:
 ts <- update_ts_labels(ts, labels)
 ```
 
-This is the result ( of `view(ts)`):
+This is the result ( of `View(ts)`):
 
             c         b
             label_c   label_b
@@ -820,14 +818,13 @@ multivariate timeseries. Function `update_ts` updates the columns of a timeserie
 Of course the two timeseries must have the same frequency
 but their period ranges may be different (non overlapping periods will be set to
 NA). For the result timeseries the union of the ranges is taken. There are 
-three different methods to update the timeseries depending on how to deal with
-NA values. Possible methods for this function `update_ts` are:
+three different methods to deal with NA values. Possible methods for this function `update_ts` are:
 
 \newpage
 
 * `upd` use all of the second timeseries to update the first timeseries
 
-* `updna` only update NA values in the first timeseries
+* `updna` only replace NA values in the first timeseries with values from the second timeseries
 
 * `updval` only use valid values in the second timeseries to update the first
 timeseries
@@ -841,13 +838,13 @@ Some examples:
 ```{r}
 series1 <- regts(matrix(rep(1,6), ncol = 3), start = "2017Q1", names = c("a","b","c"))
 series2 <- regts(matrix(rep(2,4), ncol = 2), start = "2017Q1", names = c("a","d"))
+series1["2017q2", "b"] <- NA
+series2[, "c"] <- NA
 update_ts(series1, series2, method = "upd")
-series1[, "a"] <- NA
-series2[, "d"] <- NA
 update_ts(series1, series2, method = "updna")
 update_ts(series1, series2, method = "updval")
 ```
-In the last result variable "d" is not included because it has no valid values.
+In the first result as much values as possible are updated. A difference between the second and the last result: variable "a" is left unchanged, because it is not "NA", or updated, because of valid values in the second series.
 
 
 
@@ -1064,7 +1061,7 @@ timeseries in (multivariate regts) object `rts` are extended.
 
 # Conversion between `regts` and `data frame` \label{dataframe}
 
-In R a data frame is a much-used type for storing data tables or vectors. So it is useful to take a closer look at this data type, regarding a `regts` object. For instance how can we convert a `data frame` object to a `regts` and vice versa. We also take a look at how to transpose a data frame. In between we discuss how to handle labels when doing all this.
+In R a data frame is a much-used type for storing data tables or vectors. It is therefore useful to convert a `data frame` object to a `regts` and vice versa. In this section we explain how this can be done. We also discuss how to handle labels. And we give an example how to read information from a deviant file.
 
 ## `data frame` to `regts`
 
@@ -1201,6 +1198,67 @@ df2 <- transpose_df(dft, label_column = "labels")
 df2
 label(df2)
 ```
+
+## Reading information from a deviant file: some examples \label{deviant}
+
+Suppose we have the following (simplified) file:
+
+```{r echo = FALSE, comment=""}
+cat(readLines("deviant.txt"), sep = "\n")
+```
+
+```{r}
+# read file and convert to data frame
+df <- read_excel("deviant.xlsx", col_names = FALSE)
+df <- as.data.frame(df)
+df
+```
+
+```{r}
+# select labels and remove label row
+labels <- c(rep(df[1,2], 2), rep(df[1,4], 2))
+df <- df[-1,]
+
+# set column names
+names <- c("", "unemp","unemp", "lb","lb")
+colnames(df) <- paste(df[1,], names, sep = "_")
+colnames(df)[1] <- "time"
+df
+
+# remove first row, convert to regts using the time column and add labels
+df <- df[-1,]
+rts <- as.regts(df, time_column = "time")
+ts_labels(rts) <- labels
+rts
+```
+
+And another file with extra comment lines in between:
+
+```{r echo = FALSE, comment=""}
+cat(readLines("deviantt.txt"), sep = "\n")
+```
+
+```{r}
+# read file and convert to data frame
+df <- read_excel("deviantt.xlsx")
+df <- as.data.frame(df)
+
+# remove comment rows (select rows with NA in first column)
+df <- df[which(is.na(df[1])), ]
+# construct lowercase rownames from columns kt and soort
+rownames(df) <- tolower(paste(df$kt, df$soort, sep = "."))
+df
+
+#  remove redundant columns 1 to 4
+df[1:4] <- NULL
+
+# transpose data frame and convert to regts
+dft <- transpose_df(df)
+dft
+rts <- as.regts(dft)
+```
+
+
 
 # Aggregate functions
 
