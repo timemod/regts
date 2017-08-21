@@ -55,7 +55,7 @@ test_that("ts with labels written correctly",  {
 
   expect_identical(ts1_lbls, ts1_read)
 
-  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "after")
+  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "before")
 
   expect_identical(ts1_lbls, ts1_t_read)
 
