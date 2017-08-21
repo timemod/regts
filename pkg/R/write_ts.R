@@ -182,18 +182,13 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
   has_labels <- dataframes$has_labels
 
   if (rowwise) {
-    n_text_rows <- 1
     n_text_cols <- 1 + as.integer(has_labels)
-    row_split <- 2
-    col_split <- 1 + n_text_cols
   } else {
-    n_text_rows <- 1 + as.integer(has_labels)
     n_text_cols <- 1
-    row_split <- 2 + as.integer(has_labels)
-    col_split <- 2
   }
-  row_split <- row_split + n_comment_rows
-
+  n_text_rows <- nrow(column_headers)
+  row_split <- n_text_rows + 1 + n_comment_rows
+  col_split <- n_text_cols + 1
 
   # Write the column headers. Use right alignment for the numeric columns
   wb <- sheet$getWorkbook()
@@ -231,9 +226,18 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
   return(invisible(NULL))
 }
 
-
-# Internal function that converts a timeseries to a data frame that can be
-# written to a csv or excel file.
+# Internal function that converts a timeseries to a data frames that can be
+# written to a csv or excel file. The function returns a list with
+# three elements:
+#   data          : The data part of the timeseries (excluding column headers).
+#                   For rowwise timeseries data may include labels.
+#   column_headers: The column header, a data frame with one or two rows.
+#                   For columnwise timeseries with labels the first row
+#                   contains the label and the second row the variable names.
+#                   Otherwise column_headers has 1 row with periods (rowwise
+#                   timeseries) or names (columnwise timeseries)
+#   has_labels:     TRUE if the timeseries will be written with labels.
+#
 ts2df_ <- function(x, rowwise, label_option, labels_missing) {
 
   if (!is.ts(x)) {
