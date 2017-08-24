@@ -484,8 +484,7 @@ Sometimes data in a file needs to be processed before it can be converted to a t
 
 In that case try reading information as a `data frame` type. Most functions in R for reading a csv return a `data frame`. Examples: `read.csv`, `read.csv2` and `read.table` in package `utils`. Functions, `read_xls(x)` and `read_excel` in package `readxl` or `read.xlsx` (in package `xlsx`) for reading Excel files return some sort of `data frame`.
 
-The `data frame` can then be converted to a `regts`. This conversion is described in section \ref{dataframe}.
-In advance it may be necessary to do some processing (e.g. selecting and/or deleting (parts of) rows and columns). You can find some examples in section \ref{deviant}.
+After some processing (e.g. selecting and/or deleting (parts of) rows and columns) the data frame can be converted to a `regts` as explained in section \ref{deviant}.
 
 
 \newpage
@@ -1199,63 +1198,51 @@ df2
 label(df2)
 ```
 
-## Reading information from a deviant file: some examples \label{deviant}
+## Example: reading timeseries from a deviant file\label{deviant}
+Sometimes it is not possible to use the common functions (`read_ts_csv` and `read_ts_xlsx`) for reading a timeseries from a file. The information in the file deviates too much. In that case try reading the information as a form of `data frame` and convert this data frame to a `regts` timeseries. An example file:
 
-Suppose we have the following (simplified) file:
 
 ```{r echo = FALSE, comment=""}
-cat(readLines("deviant.txt"), sep = "\n")
+cat(readLines("test.txt"), sep = "\n")
 ```
 
+Problem in this file are the extra comment lines with label information.
+Read this file with the `read_excel` function. The result of this function is a `tibble`, a special sort of data frame. 
 ```{r}
-# read file and convert to data frame
-df <- read_excel("deviant.xlsx", col_names = FALSE)
-df <- as.data.frame(df)
+df <- read_excel("test.xlsx")
 df
 ```
 
+Select rownumbers^[For selecting a single column by position from a `tibble`  `[[`  is used.] with proper labels (not NA) and then select the rows. Multiply the result, each label is used for 3 variables.
 ```{r}
-# select labels and remove label row
-labels <- c(rep(df[1,2], 2), rep(df[1,4], 2))
-df <- df[-1,]
+nr_labels <- which(!is.na(df[[1]]))
+labels <- df[[1]][nr_labels]
+labels
+labels <- rep(labels,each = 3)
+```
 
-# set column names
-names <- c("", "unemp","unemp", "lb","lb")
-colnames(df) <- paste(df[1,], names, sep = "_")
-colnames(df)[1] <- "time"
-df
+Remove comment rows by selecting rows with NA in first column
+```{r}
+df <- df[which(is.na(df[[1]])), ]
+```
 
-# remove first row, convert to regts using the time column and add labels
-df <- df[-1,]
-rts <- as.regts(df, time_column = "time")
+Next construct lowercase rownames from columns soort and kt
+```{r}
+df$names <- tolower(paste(df$soort, df$kt, sep = "_"))
+df$names
+```
+
+Now remove redundant columns 1 to 4 ('X__1', 'kt', 'soort' and 'type') and transpose the data frame with the `colname_column` argument to set the column names:
+```{r}
+df[1:4] <- NULL
+dft <- transpose_df(df, colname_column = "names")
+```
+
+Finally, convert to regts and add the labels.
+```{r}
+rts <- as.regts(dft)
 ts_labels(rts) <- labels
 rts
-```
-
-And another file with extra comment lines in between:
-
-```{r echo = FALSE, comment=""}
-cat(readLines("deviantt.txt"), sep = "\n")
-```
-
-```{r}
-# read file and convert to data frame
-df <- read_excel("deviantt.xlsx")
-df <- as.data.frame(df)
-
-# remove comment rows (select rows with NA in first column)
-df <- df[which(is.na(df[1])), ]
-# construct lowercase rownames from columns kt and soort
-rownames(df) <- tolower(paste(df$kt, df$soort, sep = "."))
-df
-
-#  remove redundant columns 1 to 4
-df[1:4] <- NULL
-
-# transpose data frame and convert to regts
-dft <- transpose_df(df)
-dft
-rts <- as.regts(dft)
 ```
 
 
