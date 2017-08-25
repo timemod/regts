@@ -31,10 +31,10 @@ test_that("file with labels with label option after written correctly",  {
   ts1_read <- read_ts_csv(file, labels = "after")
   expect_identical(ts1_lbls, ts1_read)
 
-  file <- "csv/ts1_lbls_after_t.csv"
+  file <- "csv/ts1_lbls_before_t.csv"
   write_ts_csv(ts1_lbls, file = file, rowwise = FALSE)
-  ts1_t_read <- read_ts_csv(file, labels = "after")
-  expect_identical(ts1_lbls, ts1_read)
+  ts1_t_read <- read_ts_csv(file, labels = "before")
+  expect_identical(ts1_lbls, ts1_t_read)
 })
 
 test_that("file with labels with label option before written correctly",  {

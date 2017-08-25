@@ -6,10 +6,11 @@
 \title{Functions for writing timeseries to an xlsx file}
 \usage{
 write_ts_xlsx(x, file, sheet_name = "Sheet1", rowwise = TRUE,
-  append = FALSE, labels = c("after", "before", "no"))
+  append = FALSE, labels = c("after", "before", "no"), comments,
+  number_format)
 
 write_ts_sheet(x, sheet, rowwise = TRUE, labels = c("after", "before",
-  "no"))
+  "no"), comments, number_format)
 }
 \arguments{
 \item{x}{a \code{ts} or \code{regts} object}
@@ -30,6 +31,15 @@ original file.}
 \item{labels}{should labels we written, and if so before the names or after
 the names? By default, labels are written after the names if present}
 
+\item{comments}{a character vector or data frame. The comments
+are written to the beginning of the sheet, before the timeseries data is
+written.}
+
+\item{number_format}{a character value specifying the number format.
+For example, \code{"#.00"} corresponds to two decimal spaces.
+For details see the description of the function \code{\link[xlsx]{DataFormat}}
+in the \code{\link[xlsx]{xlsx}} package.}
+
 \item{sheet}{a \code{\link[xlsx]{Sheet}} object (see the documentation
 of package \code{xlsx})}
 }
@@ -42,8 +52,8 @@ a sheet with a specified name.
 object.
 }
 \details{
-The functions employ package  \code{\link[xlsx]{write.xlsx}} for
-writing the Excel file.
+The functions employ function \code{\link[xlsx]{addDataFrame}}
+from the \code{\link[xlsx]{xlsx}} package for writing the Excel file.
 
 If you want to write multiple timeseries objects to different
 sheets, you can use \code{write_ts_xlsx} with argument
@@ -73,8 +83,15 @@ write_ts_sheet(ts1, sheet, labels = "after")
 sheet <- createSheet(wb, "ts1_times_100")
 write_ts_sheet(ts1 * 100, sheet = sheet, labels = "after")
 saveWorkbook(wb, "timeseries.xlsx")
+#
+# write a timeseries with comments
+comments <- c("Timeseries ts1 is created on the Central Bureau of Policy Analysis",
+              "using a random number generator")
+ write_ts_xlsx(ts1, file = "ts_comments.xlsx", sheet_name = "ts1",
+               comments = comments)
 \dontshow{
    unlink("ts1.xlsx")
    unlink("timeseries.xlsx")
+   unlink("ts_comments.xlsx")
 }
 }
