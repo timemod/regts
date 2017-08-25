@@ -1,0 +1,13 @@
+									kt 		soort 	type     2018   2019 2020 2021
+AOW heffing door beperkt indexeren
+                                    lasten 	Lh 		Fiscaal  3     	3    3    3
+									trans 	Lh 		Fiscaal  1     	1    1    1
+									kas 	Lh 		Fiscaal  1     	1    1    1
+Willekeurige afschrijving investeringen
+									lasten 	Inkh 	Fiscaal
+									trans 	Inkh 	Fiscaal  0     	0    0    0
+									kas 	Inkh 	Fiscaal -2.325
+Vervallen vrijstelling MRB auto's > 25jr
+									lasten 	Vb 		Fiscaal
+									trans 	Vb 		Fiscaal  0      0    0    0
+									kas 	Vb 		Fiscaal -7

@@ -1,5 +1,6 @@
-output.Rdata
+output.rds
 result.csv
 result_transposed.csv
-result_label.csv
+result_label.xlsx
 regts.pdf
+data.xlsx
