@@ -271,7 +271,6 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     }
     times <- x[[time_column]]
     data <- x[-time_column]
-    rownames(data) <- times
   }
 
   if (numeric) {
@@ -279,6 +278,8 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   } else {
     datamat <- as.matrix(data)
   }
+
+  rownames(datamat) <- times
 
   # Use numeric == FALSE, because the data has already been converted
   # to numeric when needed
