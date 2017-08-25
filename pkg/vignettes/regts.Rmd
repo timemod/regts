@@ -20,6 +20,7 @@ linkcolor: blue
 %
 \newcommand{\needlines}[1]{\Needspace{#1\baselineskip}}
 
+
 ```{r echo = FALSE, message = FALSE}
 library(regts)
 library(Hmisc)
@@ -30,6 +31,9 @@ data1 <- matrix(c(1,3,2,6,4,8,3,0,9), ncol = 3)
 # input/output chunks are separated
 # R inputlines start with >, outputlines with nothing
 knitr::opts_chunk$set(collapse = FALSE, comment = "", prompt = TRUE)
+
+# set options for page width = 100
+options(width = 100)
 
 ```
 \longerpage[1]
@@ -367,7 +371,7 @@ Another native R data type is `RData`.
 Functions `save` and `load` are available to save and restore single or multiple objects to and from a RData file. When loading, the objects are restored with the same name they had when saved (the `load` function has no `return` variable). This can be annoying. Also it is not clear what the result of the `load` function is. 
 
 
-## External files
+## External files \label{io}
 
 Package `regts` includes functions for easily reading and writing timeseries to and from csv or Excel files.
 
@@ -441,7 +445,7 @@ write_ts_csv(rts, "result_transposed.csv", rowwise = FALSE, sep = "&")
 
 \newpage
 
-### Reading and writing Excel files
+### Reading and writing Excel files 
 Special functions have been developed for `regts` objects
 
 * `read_ts_xlsx` (employing the `read_excel` function in package `readxl`) for 
@@ -479,7 +483,7 @@ write_ts_xlsx(rts, "data.xlsx", sheet_name = "extra", append = TRUE)
 
 In this case a sheet 'extra' is appended to the xlsx file.
 
-### Problems when reading
+### Problems when reading 
 Sometimes data in a file needs to be processed before it can be converted to a timeseries. This happens when a file has a deviant format. 
 
 In that case try reading information as a `data frame` type. Most functions in R for reading a csv return a `data frame`. Examples: `read.csv`, `read.csv2` and `read.table` in package `utils`. Functions, `read_xls(x)` and `read_excel` in package `readxl` or `read.xlsx` (in package `xlsx`) for reading Excel files return some sort of `data frame`.
@@ -538,7 +542,6 @@ ts_labels(t1_update)
 Argument `labels` is a named character vector with the column names as names 
 and the labels as values. 
 
-\newpage
 
 ## Labels in files
 In this section we discuss how to read timeseries provided with labels from 
@@ -652,7 +655,7 @@ Specify `labels = "before"` to write the labels before the names and specify
 How to handle labels when converting a `data frame` to a `regts` or vice versa and when transposing a `data frame` is described in section \ref{dataframe}.
 
 
-
+\newpage
 # Operators and functions for `regts`
 Since the `regts` class is an extension of the `ts` class all functionality 
 from this class is available.
@@ -710,6 +713,9 @@ rt2 <- regts(1:4, start = "2016Q2")
 
 ```{r}
 cbind(rt1, rt2, union = TRUE)
+```
+\newpage
+```{r}
 cbind(rt1, rt2, union = FALSE)
 ```
 For `union = TRUE` the result is padded with NA's if needed.
@@ -758,6 +764,7 @@ The result is a multivariate `regts`.
 The code is less transparent when the chain is evaluated using a multivariate 
 timeseries: 
 
+\longerpage[2]
 ```{r}
 xts <- regts(data, start = "2010Q2", names = c("a", "x"))
 xts[, "b"] <- xts[, "a"] + 1
@@ -1032,6 +1039,7 @@ timeseries object.  Consider the following (previously defined) timeseries:
 rts
 ```
 Use a `period` to select and modify the timeseries.
+\longerpage[2]
 ```{r}
 prd1 <- period("2016Q2")
 rts[prd1] 
@@ -1122,8 +1130,6 @@ If the data frame contains periods in another, non standard, format, it is possi
 
 The reverse conversion from a `regts` to a `data frame` can be achieved with function `as.data.frame`. The `as.data.frame` function has been extended for `regts` types. Variable `ts` has been previously defined:
 
-\newpage
-
 ```{r}
 as.data.frame(ts)
 ```
@@ -1180,8 +1186,12 @@ label(df1)
 
 Sometimes it can be necessary to transpose a `data frame`. Package `regts` includes a transpose function: `transpose_df`. Variable `df` in the next example is defined in the previous section.
 
+\longerpage[1]
 ```{r}
 df
+```
+
+```{r}
 dft <- transpose_df(df)
 dft
 ```
@@ -1198,35 +1208,40 @@ df2
 label(df2)
 ```
 
-## Example: reading timeseries from a deviant file\label{deviant}
-Sometimes it is not possible to use the common functions (`read_ts_csv` and `read_ts_xlsx`) for reading a timeseries from a file. The information in the file deviates too much. In that case try reading the information as a form of `data frame` and convert this data frame to a `regts` timeseries. An example file:
+## Example: reading timeseries from a deviant file \label{deviant}
+As discussed in section \ref{io} package `regts` provides functions for directly reading timeseries from csv or Excel files (`read_ts_csv` and `read_ts_xlsx`). However, sometimes these functions cannot be used, because the file has a deviant layout.In that case try reading the information as a form of data frame and convert this data frame to a `regts` timeseries. An example file:
 
 
 ```{r echo = FALSE, comment=""}
 cat(readLines("test.txt"), sep = "\n")
 ```
 
-Problem in this file are the extra comment lines with label information.
+The timeseries are stored rowwise, but there are extra comment lines with a description of the three variables below. We want to use these descriptions to create labels for the timeseries. If we didn't need them, there would be no problem, comment rows are normaly skipped when using functions `read_ts_csv` and `read_ts_xlsx`.
+A more serious problem is that there are no unique variable names. Therefore we want to combine columns 'soort' and 'kt' to create these names.
+
 Read this file with the `read_excel` function. The result of this function is a `tibble`, a special sort of data frame. 
 ```{r}
 df <- read_excel("test.xlsx")
 df
 ```
 
-Select rownumbers^[For selecting a single column by position from a `tibble`  `[[`  is used.] with proper labels (not NA) and then select the rows. Multiply the result, each label is used for 3 variables.
+For collecting the labels, select the rows^[For selecting a single column by position from a `tibble`  `[[`  is used.] with label information (not `NA`). 
 ```{r}
-nr_labels <- which(!is.na(df[[1]]))
-labels <- df[[1]][nr_labels]
+is_label_row <- !is.na(df[[1]])
+labels <- df[[1]][is_label_row]
 labels
+```
+Each label is used three times:
+```{r}
 labels <- rep(labels,each = 3)
 ```
 
-Remove comment rows by selecting rows with NA in first column
+Remove comment rows by selecting rows with `NA` in first column. This is the reverse of the selection we applied before.
 ```{r}
-df <- df[which(is.na(df[[1]])), ]
+df <- df[!is_label_row, ]
 ```
 
-Next construct lowercase rownames from columns soort and kt
+Next construct lowercase row names from columns soort and kt
 ```{r}
 df$names <- tolower(paste(df$soort, df$kt, sep = "_"))
 df$names
@@ -1239,6 +1254,7 @@ dft <- transpose_df(df, colname_column = "names")
 ```
 
 Finally, convert to regts and add the labels.
+\shorterpage[1]
 ```{r}
 rts <- as.regts(dft)
 ts_labels(rts) <- labels
