@@ -1,3 +1,6 @@
+library(testthat)
+library(regts)
+
 context("update_ts regts with methods: upd, updna, updval")
 
 test_that("equal periods", {
@@ -298,4 +301,36 @@ test_that("errors", {
                "Timeseries x1 and x2 \\(x1 and x2\\) have different frequencies")
 })
 
+test_that("labels", {
+
+  names1 <- c("a", "b", "c")
+  labels1 <- paste("Timeseries", names1)
+  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+            names = names1, labels = labels1)
+
+  names2 <- c("b", "c", "d")
+  labels2 <- paste("Variable", names2)
+  x2 <- regts(matrix(data = rep(2), nc = 3), period = "2000/2003",
+            names = names2, labels = labels2)
+  x2["2001", "c"] <- NA
+  x2[, "d"] <- NA
+
+  # first use standard updating
+  result <- update_ts(x1, x2)
+
+  expected_result <- x1
+  expected_result[, "d"] <- NA
+  expected_result[, c("b", "c")] <- 2
+  expected_result["2001", "c"] <- NA
+  expected_result <- update_ts_labels(expected_result, c(d = "Variable d"))
+  expect_identical(result, expected_result)
+
+  # now with method = updval
+  result2 <- update_ts(x1, x2, method  = "updval")
+
+  expected_result2 <- x1
+  expected_result2[, c("b", "c")] <- 2
+  expected_result2["2001", "c"] <- 1
+  expect_identical(result2, expected_result2)
+})
 

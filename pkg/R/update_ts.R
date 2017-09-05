@@ -101,6 +101,23 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval")) {
   update[p2, missing_names1] <- x2[p2, missing_names1]
   update[p1, missing_names2] <- x1[p1, missing_names2]
 
+  if (length(missing_names1) > 0) {
+    # add labels of missing_names1 in x2 to the result
+    lbls <- ts_labels(x2)
+    if (!is.null(lbls)) {
+      lbls <- lbls[missing_names1]
+      update <- update_ts_labels(update, lbls)
+    }
+  }
+  if (length(missing_names2) > 0) {
+    # add labels of missing_names2 in x1 to the result
+    lbls <- ts_labels(x1)
+    if (!is.null(lbls)) {
+      lbls <- lbls[missing_names2]
+      update <- update_ts_labels(update, lbls)
+    }
+  }
+
   # sort columns of update
   if (!is.null(update)) {
     update <- update[, sort(colnames(update)), drop = FALSE]
@@ -116,18 +133,13 @@ calculate_update <- function(x1, x2, common_names, p1, p2, method) {
 
   var_count <- length(common_names)
   if (var_count == 0) {
-      return (x1)
+    return(x1)
   }
 
-  xx1 <- x1[, common_names, drop = FALSE]
-  xx2 <- x2[, common_names, drop = FALSE]
-
-  # Align the two timeseries objects using the union of their times.
-  punion <- c(min(p1[1], p2[1]), max(p1[2], p2[2]), p1[3])
-
   # extend common regts to union of periods, fill non overlapping periods with NA
-  xx1 <- window_regts(xx1, punion)
-  xx2 <- window_regts(xx2, punion)
+  p_union <- range_union(p1, p2)
+  xx1 <- x1[p_union, common_names, drop = FALSE]
+  xx2 <- x2[p_union, common_names, drop = FALSE]
 
   if (method == "upd") {
     xx1[p2, ] <- xx2[p2, ]
