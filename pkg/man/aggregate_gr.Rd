@@ -2,7 +2,7 @@
 % Please edit documentation in R/aggregate_gr.R
 \name{aggregate_gr}
 \alias{aggregate_gr}
-\title{Converts timeseries with absolute or relative growth rates to a lower
+\title{Convert timeseries with absolute or relative growth rates to a lower
 frequency}
 \usage{
 aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"), nfrequency = 1)
@@ -21,7 +21,7 @@ the frequency of timeseries \code{x}}
 a \code{regts} with frequency \code{nfrequency}
 }
 \description{
-Converts timeseries with absolute or relative growth rates to a lower
+Convert timeseries with absolute or relative growth rates to a lower
 frequency
 }
 \examples{

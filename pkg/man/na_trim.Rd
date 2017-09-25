@@ -7,7 +7,7 @@
 na_trim(x, method = c("both", "first", "last"), is_na = c("all", "any"))
 }
 \arguments{
-\item{x}{a regts object}
+\item{x}{a \code{\link{regts}} object}
 
 \item{method}{character with values \code{"both",} \code{"first"} or
 \code{"last"} to remove NAs at both ends (by default), just at the start
@@ -20,7 +20,7 @@ if it has any \code{NA}s. For one dimensional regts objects this argument
 has no effect.}
 }
 \value{
-A \code{regts} object in which leading and/or trailing NAs have been removed.
+A \code{\link{regts}} object in which leading and/or trailing NAs have been removed.
 }
 \description{
 This function removes leading or trailing NAs or both from a (multivariate)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/period_range_utils.R
 \name{range_union}
 \alias{range_union}
-\title{Calculates the union of two period_range objects.}
+\title{Calculate the union of two \code{\link{period_range}} objects.}
 \usage{
 range_union(range1, range2)
 }
@@ -15,8 +15,8 @@ range_union(range1, range2)
 the union of \code{range1} and \code{range2}.
 }
 \description{
-This function calculates the union of two period_range objects
-The start and end periods of the period_range objects may not be NULL.
+This function calculates the union of two \code{\link{period_range}} objects
+The start and end periods of the period_range objects may not be \code{NULL}.
 }
 \examples{
 range1 <- period_range("2016Q1", "2017Q4")

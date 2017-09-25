@@ -2,12 +2,12 @@
 % Please edit documentation in R/numeric_matrix.R
 \name{numeric_matrix}
 \alias{numeric_matrix}
-\title{Convert a data frame to a numeric matrix.}
+\title{Convert a \code{\link[base]{data.frame}} to a numeric matrix.}
 \usage{
 numeric_matrix(x, dec = ".")
 }
 \arguments{
-\item{x}{a data frame}
+\item{x}{a \code{\link[base]{data.frame}}}
 
 \item{dec}{decimal separator in number strings. The default is \code{"."}}
 }

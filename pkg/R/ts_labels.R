@@ -9,7 +9,7 @@
 #'labels.
 #'@return The retrieval function \code{ts_labels()} returns a named character
 #'vector: the names are the timeseries names (the column names) and the values
-#'the corresponding labels. The replacement method returns a \code{regts}
+#'the corresponding labels. The replacement method returns a \code{\link{regts}}
 #'object with labels.
 #'@examples
 #'ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"))
@@ -49,9 +49,9 @@ ts_labels <- function(x) {
   return (x)
 }
 
-#' Update one or more timeseries labels in a multivariate \code{regts} object
+#' Update one or more timeseries labels in a multivariate \code{\link{regts}} object
 #'
-#' @param x a multivariate \code{\link{regts}} object
+#' @param x a multivariate \code{regts} object
 #' @param labels a named character vector. The names are the names
 #' of the timeseries (columns) whose label will be updated.
 #' Specify \code{NULL} to remove all labels.

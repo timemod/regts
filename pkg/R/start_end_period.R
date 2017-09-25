@@ -1,9 +1,9 @@
-#' Returns the start or end period of a timeseries object or a
-#' \code{\link{period_range}}
+#' Return the start or end period of a timeseries object or a
+#' \code{period_range}
 #'
 #' This function returns the start or end period of a
 #' timeseries object (a \code{\link{regts}} or \code{\link[stats]{ts}})
-#' or a \code{period_range}.
+#' or a \code{\link{period_range}}.
 #' @param x  a \code{regts} or \code{period_range} object
 #' @return A \code{period} object representing the first or last period of
 #' the range. The return value can be \code{NULL} if argument \code{x} is a

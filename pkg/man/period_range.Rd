@@ -2,18 +2,19 @@
 % Please edit documentation in R/period_range.R
 \name{period_range}
 \alias{period_range}
-\title{Create a \code{period_range} object.}
+\title{Create a \code{\link{period_range}} object.}
 \usage{
 period_range(p1, p2 = p1, frequency = NA)
 }
 \arguments{
 \item{p1}{the first period (a \code{period}, a character string
-that can be converted to a \code{period}, a \code{period_range},
-or \code{NULL}). If \code{p1}
+that can be converted to a \code{period}, a
+\code{period_range}, or \code{NULL}). If \code{p1}
 is \code{NULL}, the lower bound of the period range is undetermined.}
 
 \item{p2}{the last period (a \code{period}, a character string
-that can be converted to a \code{period}, or \code{NULL}). If \code{p2} is
+that can be converted to a \code{period}, or \code{NULL}).
+If \code{p2} is
 \code{NULL}, the upper bound of the period range is undetermined.}
 
 \item{frequency}{frequency of the period objects. This argument is mandatory
@@ -21,10 +22,10 @@ if argument \code{p1} or \code{p2} is a character with general period format
 without frequency indicator (e.g. \code{"2011-1"})}
 }
 \value{
-a \code{period_range} object
+a \code{\link{period_range}} object
 }
 \description{
-Create a \code{period_range} object from two \code{\link{period}} objects
+Create a \code{period_range} object from two \code{period} objects
 or two character strings that can be converted to \code{period} objects with
 function \code{\link{as.period}}. It is also possible to use one character
 string that can be converted to a \code{period_range} object with function

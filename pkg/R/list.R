@@ -3,7 +3,7 @@
 #' This function converts a \code{\link{regts}} to a list of univariate
 #' \code{regts} objects.
 #
-#' @param x a \code{regts} object
+#' @param x a \code{\link{regts} object}
 #' @param ... arguments passed to methods (not used in the default implementation)
 #' @return a list of univariate \code{regts} objects
 #' @examples

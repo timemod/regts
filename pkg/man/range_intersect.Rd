@@ -2,7 +2,7 @@
 % Please edit documentation in R/period_range_utils.R
 \name{range_intersect}
 \alias{range_intersect}
-\title{Calculates the intersection of two period_range objects.}
+\title{Calculate the intersection of two \code{\link{period_range}} objects.}
 \usage{
 range_intersect(range1, range2)
 }
@@ -13,12 +13,12 @@ range_intersect(range1, range2)
 }
 \value{
 the intersection of \code{range1} and \code{range2}.
-It returns NULL if there is no intersection
+It returns \code{NULL} if there is no intersection
 }
 \description{
-This function calculates the intersection of two period_range
+This function calculates the intersection of two \code{\link{period_range}}
 objects. The start and end periods of the period_range objects may
-not be NULL.
+not be \code{NULL}.
 }
 \examples{
 range1 <- period_range("2016Q1", "2017Q4")

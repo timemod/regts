@@ -14,7 +14,7 @@ zero_trim(x, method = c("both", "first", "last"))
 or just at the end.}
 }
 \value{
-A \code{regts} object in which leading and/or trailing zeros have been removed.
+A \code{\link{regts}} object in which leading and/or trailing zeros have been removed.
 }
 \description{
 This function removes leading or trailing zeros or both from a (multivariate)

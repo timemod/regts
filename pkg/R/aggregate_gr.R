@@ -1,4 +1,4 @@
-#' Converts timeseries with absolute or relative growth rates to a lower
+#' Convert timeseries with absolute or relative growth rates to a lower
 #' frequency
 #'
 #' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object

@@ -2,18 +2,18 @@
 % Please edit documentation in R/period.R
 \name{get_year}
 \alias{get_year}
-\title{Returns the year of a \code{\link{period}}}
+\title{Return the year of a \code{\link{period}}}
 \usage{
 get_year(x)
 }
 \arguments{
-\item{x}{a \code{period}}
+\item{x}{a \code{\link{period}}}
 }
 \value{
 the year
 }
 \description{
-Returns the year of a \code{\link{period}}
+Return the year of a \code{\link{period}}
 }
 \examples{
 get_year(period("2010Q3"))

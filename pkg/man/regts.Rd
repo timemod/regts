@@ -8,7 +8,8 @@ regts(data, start, end, period, frequency = NA, names = colnames(data),
   labels = NULL)
 }
 \arguments{
-\item{data}{a vector or matrix of the observed time-series values. A data frame
+\item{data}{a vector or matrix of the observed time-series values.
+A \code{\link[base]{data.frame}}
 will be coerced to a numeric matrix via \code{\link{data.matrix}}.
 (See also the description of the
 function \code{\link[stats]{ts}} of the \code{\link{stats}} package).}
@@ -18,9 +19,9 @@ character string that can be converted to a \code{period} object.
 If not specified, then the start period is calculated
 from argument \code{end} and the dimension of \code{data}}
 
-\item{end}{the end period as a  \link{period} object or a character string
-that can be converted to a \code{period} object. If not specified, then
-the end period is calculated from argument \code{start} and
+\item{end}{the end period as a  \code{\link{period}} object or a character
+string that can be converted to a \code{period} object. If not
+specified, then the end period is calculated from argument \code{start} and
 the dimension of \code{data}}
 
 \item{period}{the period range as a \code{\link{period_range}} object or a
@@ -32,7 +33,7 @@ specified if the start, end or period argument is specified with a general
 period format without period indicator, e.g. \code{"2011-3"}}
 
 \item{names}{a character vector with the column names for the series
-if \code{data} is a matrix or data frame. Defaults to the colnames of data.}
+if \code{data} is a matrix or data frame. Defaults to the column names of data.}
 
 \item{labels}{a character vector of labels (descriptions of the timeseries)}
 }
@@ -40,9 +41,9 @@ if \code{data} is a matrix or data frame. Defaults to the colnames of data.}
 a \code{regts} object
 }
 \description{
-The \code{regts} class is an extension of the \code{\link[stats]{ts}} class
-of the \link{stats} package. Working with \code{regts} makes it easier to
-select periods.
+The \code{regts} class is an extension of the \code{\link[stats]{ts}}
+class of the \link{stats} package. Working with \code{regts} makes it
+easier to select periods.
 }
 \examples{
 # univariate timeseries
@@ -70,10 +71,11 @@ The function \code{\link{is.regts}} can be used to test if an object is a
 
 The S3 generic \code{\link{as.regts}} can be used to coerce an R object to a
  \code{regts}. There are currently methods for \code{\link[stats]{ts}} and
- \code{\link{data.frame}}.
+ \code{\link[base]{data.frame}}.
 
 \code{\link{as.data.frame.regts}} and \code{\link{as.list.regts}} can be used
-to convert \code{regts} to a \code{\link{data.frame}} or a \code{\link{list}}.
+to convert \code{regts} to a \code{\link[base]{data.frame}} or a
+\code{\link[base]{list}}.
 
 Function \code{\link{cbind}} can be used to bind two or more
 timeseries objects and create a multivariate \code{regts}.

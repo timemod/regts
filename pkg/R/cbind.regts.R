@@ -13,9 +13,11 @@
 #' (the result is padded with \code{NA}s if necessary). If \code{FALSE},
 #' then the period range of the result is the intersection of the period ranges
 #' of the joined objects.
-#' @param suffixes Suffixes appended to the column names for overlapping
+#' @param suffixes Suffixes appended to the column names for all overlapping
 #' columns. This argument is obligatory if the timeseries have overlapping
-#' column names
+#' column names. Length suffixes must be equal to the number of joined timeseries
+#' or objects.
+#' have overlapping columns.
 #' @seealso \code{\link{as.list.regts}}
 #' @importFrom stats ts.union ts.intersect
 #' @examples
@@ -23,6 +25,9 @@
 #' b <- regts(matrix(11:15, nc = 1), start = "2011Q2")
 #' cbind(a, b)
 #' cbind(a, b, union = FALSE)
+#' x1 <- regts(matrix(1:27, nc = 3), start = "2008Q4", names = c("a", "b", "c"))
+#' x2 <- regts(matrix(1:27, nc = 3), start = "2008Q4", names = c("a", "c", "d"))
+#' cbind(x1, x2, suffixes = c("_1","_2"))
 #' @export
 cbind.regts <- function(..., union = TRUE, suffixes) {
 

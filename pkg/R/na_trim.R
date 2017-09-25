@@ -5,7 +5,7 @@
 #' For multivariate regts a row will by default be regarded as NA if all elements
 #' in the row are NA.  Specify \code{"any"} to change this behaviour.
 #'
-#' @param x a regts object
+#' @param x a \code{\link{regts}} object
 #' @param method character with values \code{"both",} \code{"first"} or
 #' \code{"last"} to remove NAs at both ends (by default), just at the start
 #' or just at the end.
@@ -14,7 +14,7 @@
 #' the row are \code{NA}. If \code{"any"} then a row will be regarded as \code{NA}
 #' if it has any \code{NA}s. For one dimensional regts objects this argument
 #' has no effect.
-#' @return A \code{regts} object in which leading and/or trailing NAs have been removed.
+#' @return A \code{\link{regts}} object in which leading and/or trailing NAs have been removed.
 #'
 #' @examples
 #' # remove only leading NAs

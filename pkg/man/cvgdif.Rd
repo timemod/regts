@@ -2,20 +2,20 @@
 % Please edit documentation in R/tsdif.R
 \name{cvgdif}
 \alias{cvgdif}
-\title{Calculates the 'convergence difference'}
+\title{Calculate the 'convergence difference'}
 \usage{
 cvgdif(x1, x2)
 }
 \arguments{
-\item{x1}{first number}
+\item{x1}{first numeric vector}
 
-\item{x2}{second number}
+\item{x2}{second numeric vector}
 }
 \value{
 the 'convergence difference' as described above
 }
 \description{
-\code{cvgdif} calculates the difference  between two numbers
+\code{cvgdif} calculates the difference  between two numeric vectors
 \eqn{x_1} and \eqn{x_2} according to \eqn{\frac{|x_1 - x_2|}{\max(|x_2|, 1)}}.
 This difference is equivalent to the convergence test employed in the
 package \code{isismdl}.

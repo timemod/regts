@@ -4,7 +4,7 @@
 \alias{as.period}
 \alias{as.period.character}
 \alias{as.period.numeric}
-\title{Coerce an R object to a period}
+\title{Coerce an R object to a \code{\link{period}}}
 \usage{
 as.period(x, ...)
 
@@ -21,10 +21,10 @@ as.period(x, ...)
 if the frequency cannot be detected automatically.}
 }
 \value{
-a \link{period}
+a \code{period}
 }
 \description{
-Coerce an R object to a period
+Coerce an R object to a \code{\link{period}}
 }
 \section{Methods (by class)}{
 \itemize{

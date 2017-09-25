@@ -1,6 +1,6 @@
-#' Transpose a \code{\link{data.frame}}
+#' Transpose a \code{data.frame}
 #'
-#' The function transposes a data frame. If the data frame contains
+#' The function transposes a \code{\link[base]{data.frame}}. If the data frame contains
 #' labels that have been set by the function \code{\link[Hmisc]{label}} of the
 #' package \code{Hmisc}, then the first column of the returned data frame will
 #' contain the labels. Conversely, you can specify the column that contains

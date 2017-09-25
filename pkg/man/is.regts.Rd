@@ -2,7 +2,7 @@
 % Please edit documentation in R/regts.R
 \name{is.regts}
 \alias{is.regts}
-\title{Tests whether an object is a \code{\link{regts}} timeseries object}
+\title{Test whether an object is a \code{\link{regts}} timeseries object}
 \usage{
 is.regts(x)
 }
@@ -13,7 +13,7 @@ is.regts(x)
 \code{TRUE} if \code{x} is a \code{regts}
 }
 \description{
-Tests whether an object is a \code{\link{regts}} timeseries object
+Test whether an object is a \code{\link{regts}} timeseries object
 }
 \examples{
 a <- regts(1:15, start = "2011Q2")

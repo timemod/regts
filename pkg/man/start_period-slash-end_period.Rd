@@ -8,8 +8,8 @@
 \alias{start_period.ts}
 \alias{end_period.period_range}
 \alias{end_period.ts}
-\title{Returns the start or end period of a timeseries object or a
-\code{\link{period_range}}}
+\title{Return the start or end period of a timeseries object or a
+\code{period_range}}
 \usage{
 start_period(x)
 
@@ -34,7 +34,7 @@ the range. The return value can be \code{NULL} if argument \code{x} is a
 \description{
 This function returns the start or end period of a
 timeseries object (a \code{\link{regts}} or \code{\link[stats]{ts}})
-or a \code{period_range}.
+or a \code{\link{period_range}}.
 }
 \examples{
 # start and end period of a range

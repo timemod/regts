@@ -2,7 +2,7 @@
 % Please edit documentation in R/tsdif.R
 \name{tsdif}
 \alias{tsdif}
-\title{Calculates the differences between two multivariate timeseries
+\title{Calculate the differences between two multivariate timeseries
 objects}
 \usage{
 tsdif(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2))
@@ -29,7 +29,7 @@ a list with class "tsdif", with the following components
              and if all differences are smaller than or equal to \code{tol}}
  \item{difnames}{The names of the timeseries with differences
                   larger than \code{tol}}
- \item{dif}{A \code{\link{regts}} with the computed differences,
+ \item{dif}{A \code{regts} with the computed differences,
  or \code{NULL} if there are no differences larger than \code{tol}.
  Only timeseries with differences larger than \code{tol} are included.}
  \item{common_names}{the names of the common columns}
@@ -40,7 +40,7 @@ a list with class "tsdif", with the following components
  \item{period_range1}{The period ranges of \code{x1} as a
  \code{\link{period_range}} object}
  \item{period_range2}{The period ranges of \code{x2} as a
- \code{\link{period_range}} object}
+ \code{period_range} object}
  \item{common_range}{The intersection of the period ranges }
  \item{ranges_equal}{A logical indicating whether the period ranges of
  \code{x1} and \code{x2} differ}

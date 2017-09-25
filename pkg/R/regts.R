@@ -1,10 +1,11 @@
 #' Create a \code{regts} timeseries object
 #'
-#' The \code{regts} class is an extension of the \code{\link[stats]{ts}} class
-#' of the \link{stats} package. Working with \code{regts} makes it easier to
-#' select periods.
+#' The \code{regts} class is an extension of the \code{\link[stats]{ts}}
+#' class of the \link{stats} package. Working with \code{regts} makes it
+#' easier to select periods.
 #'
-#' @param data a vector or matrix of the observed time-series values. A data frame
+#' @param data a vector or matrix of the observed time-series values.
+#' A \code{\link[base]{data.frame}}
 #' will be coerced to a numeric matrix via \code{\link{data.matrix}}.
 #' (See also the description of the
 #' function \code{\link[stats]{ts}} of the \code{\link{stats}} package).
@@ -12,9 +13,9 @@
 #' character string that can be converted to a \code{period} object.
 #' If not specified, then the start period is calculated
 #' from argument \code{end} and the dimension of \code{data}
-#' @param end the end period as a  \link{period} object or a character string
-#' that can be converted to a \code{period} object. If not specified, then
-#' the end period is calculated from argument \code{start} and
+#' @param end the end period as a  \code{\link{period}} object or a character
+#' string that can be converted to a \code{period} object. If not
+#' specified, then the end period is calculated from argument \code{start} and
 #' the dimension of \code{data}
 #' @param period the period range as a \code{\link{period_range}} object or a
 #' character string that can be converted to a \code{period_range} object.
@@ -24,7 +25,7 @@
 #' period format without period indicator, e.g. \code{"2011-3"}
 
 #' @param names a character vector with the column names for the series
-#' if \code{data} is a matrix or data frame. Defaults to the colnames of data.
+#' if \code{data} is a matrix or data frame. Defaults to the column names of data.
 #' @param labels a character vector of labels (descriptions of the timeseries)
 #' @return a \code{regts} object
 #' @examples
@@ -52,10 +53,11 @@
 #'
 #' The S3 generic \code{\link{as.regts}} can be used to coerce an R object to a
 #'  \code{regts}. There are currently methods for \code{\link[stats]{ts}} and
-#'  \code{\link{data.frame}}.
+#'  \code{\link[base]{data.frame}}.
 #'
 #' \code{\link{as.data.frame.regts}} and \code{\link{as.list.regts}} can be used
-#' to convert \code{regts} to a \code{\link{data.frame}} or a \code{\link{list}}.
+#' to convert \code{regts} to a \code{\link[base]{data.frame}} or a
+#' \code{\link[base]{list}}.
 #'
 #' Function \code{\link{cbind}} can be used to bind two or more
 #' timeseries objects and create a multivariate \code{regts}.
@@ -182,7 +184,7 @@ create_regts <- function(data, startp, endp, freq, labels) {
   return (data)
 }
 
-#' Tests whether an object is a \code{\link{regts}} timeseries object
+#' Test whether an object is a \code{\link{regts}} timeseries object
 #' @param x any R object
 #' @return \code{TRUE} if \code{x} is a \code{regts}
 #' @seealso
@@ -245,15 +247,15 @@ as.regts.regts <- function(x, ...) {
 }
 
 #' @describeIn as.regts Coerce a \code{\link[stats]{ts}} to a
-#' \code{\link{regts}}
+#' \code{regts}
 #' @export
 as.regts.ts <- function(x, ...) {
   class(x) <- c("regts", class(x))
   return (x)
 }
 
-#' @describeIn as.regts Convert a \code{\link{data.frame}} to a
-#' \code{\link{regts}}. The time should be stored in the row numbers
+#' @describeIn as.regts Convert a \code{\link[base]{data.frame}} to a
+#' \code{regts}. The time should be stored in the row numbers
 #' of the matrix
 #' @export
 as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
@@ -297,7 +299,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
 }
 
 #' @describeIn as.regts Convert a \code{\link{matrix}} to a
-#' \code{\link{regts}}
+#' \code{regts}
 #' @export
 as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
 
@@ -352,7 +354,7 @@ as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
 }
 
 #' @describeIn as.regts Default method to convert an R object to a
-#' \code{\link{regts}}. This method first employs \code{\link[stats]{as.ts}}
+#' \code{regts}. This method first employs \code{\link[stats]{as.ts}}
 #' and then \code{\link{as.regts.ts}}
 #' @importFrom stats as.ts
 #' @export

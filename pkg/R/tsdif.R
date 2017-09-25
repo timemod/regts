@@ -1,4 +1,4 @@
-#' Calculates the differences between two multivariate timeseries
+#' Calculate the differences between two multivariate timeseries
 #' objects
 #'
 #' This function can be used to compare two multivariate timeseries objects.
@@ -34,7 +34,7 @@
 #'              and if all differences are smaller than or equal to \code{tol}}
 #'  \item{difnames}{The names of the timeseries with differences
 #'                   larger than \code{tol}}
-#'  \item{dif}{A \code{\link{regts}} with the computed differences,
+#'  \item{dif}{A \code{regts} with the computed differences,
 #'  or \code{NULL} if there are no differences larger than \code{tol}.
 #'  Only timeseries with differences larger than \code{tol} are included.}
 #'  \item{common_names}{the names of the common columns}
@@ -45,7 +45,7 @@
 #'  \item{period_range1}{The period ranges of \code{x1} as a
 #'  \code{\link{period_range}} object}
 #'  \item{period_range2}{The period ranges of \code{x2} as a
-#'  \code{\link{period_range}} object}
+#'  \code{period_range} object}
 #'  \item{common_range}{The intersection of the period ranges }
 #'  \item{ranges_equal}{A logical indicating whether the period ranges of
 #'  \code{x1} and \code{x2} differ}
@@ -205,14 +205,14 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
   }
 }
 
-#' Calculates the 'convergence difference'
+#' Calculate the 'convergence difference'
 #'
-#' \code{cvgdif} calculates the difference  between two numbers
+#' \code{cvgdif} calculates the difference  between two numeric vectors
 #' \eqn{x_1} and \eqn{x_2} according to \eqn{\frac{|x_1 - x_2|}{\max(|x_2|, 1)}}.
 #' This difference is equivalent to the convergence test employed in the
 #' package \code{isismdl}.
-#' @param x1 first number
-#' @param x2 second number
+#' @param x1 first numeric vector
+#' @param x2 second numeric vector
 #' @return the 'convergence difference' as described above
 #'
 #'@seealso

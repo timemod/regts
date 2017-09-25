@@ -1,12 +1,12 @@
-#' Converts a \code{\link{regts}} to a \code{\link{data.frame}}
+#' Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}
 #'
 #' @details
 #' If the \code{regts} has labels, then the labels are added to the result
 #' dataframe using the function \code{\link[Hmisc]{label}}
 #' of package \code{Hmisc}.
-#' @param x a \code{regts}
+#' @param x a \code{\link{regts}}
 #' @param ... additional arguments to be passed to methods.
-#' @return A \code{data.frame}
+#' @return A \code{\link[base]{data.frame}}
 #' @export
 #' @examples
 #' ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),

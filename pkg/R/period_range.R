@@ -1,6 +1,6 @@
-#' Create a \code{period_range} object.
+#' Create a \code{\link{period_range}} object.
 #'
-#' Create a \code{period_range} object from two \code{\link{period}} objects
+#' Create a \code{period_range} object from two \code{period} objects
 #' or two character strings that can be converted to \code{period} objects with
 #' function \code{\link{as.period}}. It is also possible to use one character
 #' string that can be converted to a \code{period_range} object with function
@@ -10,16 +10,17 @@
 #' \code{"2012Q2"} to \code{"2016Q4"}.
 #'
 #' @param p1 the first period (a \code{period}, a character string
-#' that can be converted to a \code{period}, a \code{period_range},
-#' or \code{NULL}). If \code{p1}
+#' that can be converted to a \code{period}, a
+#' \code{period_range}, or \code{NULL}). If \code{p1}
 #' is \code{NULL}, the lower bound of the period range is undetermined.
 #' @param p2 the last period (a \code{period}, a character string
-#' that can be converted to a \code{period}, or \code{NULL}). If \code{p2} is
+#' that can be converted to a \code{period}, or \code{NULL}).
+#' If \code{p2} is
 #' \code{NULL}, the upper bound of the period range is undetermined.
 #' @param frequency frequency of the period objects. This argument is mandatory
 #' if argument \code{p1} or \code{p2} is a character with general period format
 #' without frequency indicator (e.g. \code{"2011-1"})
-#' @return a \code{period_range} object
+#' @return a \code{\link{period_range}} object
 #' @examples
 #' # create a period_range from 2010Q2 to 2016Q3
 #' period_range("2010Q2", "2016Q3")
@@ -83,10 +84,10 @@ period_range <- function(p1, p2 = p1, frequency = NA) {
 }
 
 
-#' Test if an object is a period_range.
+#' Test if an object is a \code{\link{period_range}}
 #'
 #' @param x any R object
-#' @return \code{TRUE} if the object is a \code{\link{period_range}}
+#' @return \code{TRUE} if the object is a \code{period_range}
 #' @examples
 #' range <- period_range("2016Q1/2017Q1")
 #' is.period_range(range)
@@ -169,7 +170,7 @@ Ops.period_range <- function(e1, e2) {
 #' @details
 #' \code{as.period_range.character} converts a character string to a
 #' period_range object. The format for the first and last period of
-#' the range are specied as in \code{\link{period}}. The two periods strings
+#' the range are specied as in \code{\link{period}}. The two period strings
 #' are separated by \code{"/"} (e.g. \code{"2010Q2/2016Q2"}).
 #' The first or last period may be omitted: in that case the period range
 #' has no lower of upper bound (e.g. \code{"2012Q3/"}). The \code{"/"}
@@ -186,14 +187,14 @@ Ops.period_range <- function(e1, e2) {
 #' p <- period("2010Q2")
 #' as.period_range(p)
 
-#' @return a \code{period_range}
+#' @return a \code{\link{period_range}}
 #' @export
 as.period_range <- function(x, frequency = NA, ...) {
   UseMethod("as.period_range")
 }
 
 #' @describeIn as.period_range Convert a character string to a
-#' period_range object
+#' \code{period_range} object
 #' @export
 as.period_range.character <- function(x, frequency = NA, ...) {
   if (length(x) > 1) {
@@ -210,7 +211,7 @@ as.period_range.period_range <- function(x, ...) {
 }
 
 #' @describeIn as.period_range Convert a single \code{\link{period}} to a
-#' \link{period_range}.
+#' \code{period_range}.
 #' @export
 as.period_range.period <- function(x, ...) {
   return (create_period_range(as.numeric(x), as.numeric(x), frequency(x)))
@@ -233,10 +234,10 @@ as.character.period_range <- function(x, ...) {
   return (retval)
 }
 
-#' Returns the number of periods in a \code{\link{period_range}} object.
+#' Return the number of periods in a \code{\link{period_range}} object.
 #'
 #' @param  x a \code{period_range}
-#' @return The number of periods in the range, or \code{Inf} is the
+#' @return The number of periods in the range, or \code{Inf} if the
 #' range is not bounded
 #' @examples
 #' range <- period_range("2010Q2", "2011Q3")
@@ -261,18 +262,3 @@ nperiod__  <- function(x) {
 print.period_range <- function(x, ...) {
   print(as.character(x))
 }
-
-#' Returns the frequency of a \link{period_range} object
-#'
-#' @param x a \code{\link{period_range}}
-#' @param ... additional arguments for future methods
-#' @return the frequency of the \code{\link{period_range}}
-#' @examples
-#' p <- period_range("2016Q1", "2018Q2")
-#' freq <- frequency(p)
-#' @export
-frequency.period_range <- function(x, ...) {
-  return(x[3])
-}
-
-

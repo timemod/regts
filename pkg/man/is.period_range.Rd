@@ -2,7 +2,7 @@
 % Please edit documentation in R/period_range.R
 \name{is.period_range}
 \alias{is.period_range}
-\title{Test if an object is a period_range.}
+\title{Test if an object is a \code{\link{period_range}}}
 \usage{
 is.period_range(x)
 }
@@ -10,10 +10,10 @@ is.period_range(x)
 \item{x}{any R object}
 }
 \value{
-\code{TRUE} if the object is a \code{\link{period_range}}
+\code{TRUE} if the object is a \code{period_range}
 }
 \description{
-Test if an object is a period_range.
+Test if an object is a \code{\link{period_range}}
 }
 \examples{
 range <- period_range("2016Q1/2017Q1")

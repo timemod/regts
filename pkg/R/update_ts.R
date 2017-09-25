@@ -1,9 +1,9 @@
-#' Updates a multivariate timeseries with another multivariate timeseries
+#' Update a multivariate timeseries with another multivariate timeseries
 #' object
 #'
 #' This function can be used to update a multivariate (reg)ts object with
 #' another multivariate (reg)ts object.
-#' The result is an updated multivariate regts object.
+#' The result is an updated multivariate \code{\link{regts}} object.
 #'
 #' @details
 #' The timeseries can be updated in three different ways:
@@ -29,7 +29,7 @@
 #' @param method three different ways to update the timeseries.
 #' By default the timeseries are updated. This behaviour can be changed by
 #' using one of the other methods. See details.
-#' @return an updated multivariate regts object.
+#' @return an updated multivariate \code{\link{regts}} object.
 #'
 #' @examples
 #' library(regts)

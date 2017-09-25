@@ -19,7 +19,7 @@ the column selection of object \code{x}
 }
 \description{
 This function selects columns of an R object with column names
-(for example a \code{\link{data.frame}}, \code{\link{matrix}},
+(for example a \code{\link[base]{data.frame}}, \code{\link[base]{matrix}},
 \code{\link[stats]{ts}} or \code{\link{regts}}).
 The columns with names matching a given regular expression are selected.
 }

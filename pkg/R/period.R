@@ -1,4 +1,4 @@
-#' Create a \code{period} object based on a string or an integer.
+#' Create a \code{\link{period}} object based on a string or an integer.
 #'
 #' Possible string formats are for example \code{"2010Q2"},
 #' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
@@ -21,10 +21,10 @@ period <- function(x, frequency = NA) {
   return (parse_period(x, frequency))
 }
 
-#' Test if an object is a period.
+#' Test if an object is a \code{\link{period}}
 #'
 #' @param x any R object
-#' @return \code{TRUE} if the object is a \code{\link{period}}
+#' @return \code{TRUE} if the object is a \code{\period}
 #' @examples
 #' p <- period("2016Q1")
 #' is.period(p)
@@ -92,18 +92,6 @@ as.character.period <- function(x, ...) {
   }
 }
 
-#' Returns the frequency of a \link{period} object
-#'
-#' @param x a \code{period}
-#' @param ... additional arguments for future methods
-#' @return the frequency of the \code{period}
-#' @examples
-#' p <- period("2016Q1")
-#' freq <- frequency(p)
-#' @export
-frequency.period <- function(x, ...) {
-  return (attr(x, "frequency"))
-}
 
 # internal function
 get_year__ <- function(x) {
@@ -115,8 +103,8 @@ get_subperiod__ <- function(x) {
   return (as.numeric(x) %% frequency(x) + 1)
 }
 
-#' Returns the year of a \code{\link{period}}
-#' @param x a \code{period}
+#' Return the year of a \code{\link{period}}
+#' @param x a \code{\link{period}}
 #' @return the year
 #' @examples
 #' get_year(period("2010Q3"))
@@ -129,7 +117,7 @@ get_year <- function(x) {
   return (get_year__(x))
 }
 
-#' Returns the subperiod of a \code{\link{period}}
+#' Return the subperiod of a \code{\link{period}}
 #'
 #' This function returns the subperiod within a year.
 #' For example, for \code{period} \code{2011Q3} the function
@@ -152,13 +140,13 @@ print.period <- function(x, ...) {
   print(as.character(x))
 }
 
-#' Coerce an R object to a period
+#' Coerce an R object to a \code{\link{period}}
 #'
 #' @param x any R object
 #' @param frequency the frequency of the period. This argument is mandatory
 #' if the frequency cannot be detected automatically.
 #' @param ... object passed to methods
-#' @return a \link{period}
+#' @return a \code{period}
 #' @examples
 #' as.period("2010Q3")
 #' as.period(2010)

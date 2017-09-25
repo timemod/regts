@@ -7,7 +7,7 @@
 \method{as.list}{regts}(x, ...)
 }
 \arguments{
-\item{x}{a \code{regts} object}
+\item{x}{a \code{\link{regts} object}}
 
 \item{...}{arguments passed to methods (not used in the default implementation)}
 }

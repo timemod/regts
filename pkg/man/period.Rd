@@ -2,7 +2,7 @@
 % Please edit documentation in R/period.R
 \name{period}
 \alias{period}
-\title{Create a \code{period} object based on a string or an integer.}
+\title{Create a \code{\link{period}} object based on a string or an integer.}
 \usage{
 period(x, frequency = NA)
 }

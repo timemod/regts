@@ -1,12 +1,12 @@
-#' Calculates the intersection of two period_range objects.
+#' Calculate the intersection of two \code{\link{period_range}} objects.
 #'
-#' This function calculates the intersection of two period_range
+#' This function calculates the intersection of two \code{\link{period_range}}
 #' objects. The start and end periods of the period_range objects may
-#' not be NULL.
+#' not be \code{NULL}.
 #' @param range1 a \code{period_range} object
 #' @param range2 another \code{period_range} object
 #' @return the intersection of \code{range1} and \code{range2}.
-#' It returns NULL if there is no intersection
+#' It returns \code{NULL} if there is no intersection
 #' @examples
 #' range1 <- period_range("2016Q1", "2017Q4")
 #' range2 <- period_range("2017Q1", "2018Q2")
@@ -30,10 +30,10 @@ range_intersect <- function(range1, range2) {
     }
 }
 
-#' Calculates the union of two period_range objects.
+#' Calculate the union of two \code{\link{period_range}} objects.
 #'
-#' This function calculates the union of two period_range objects
-#' The start and end periods of the period_range objects may not be NULL.
+#' This function calculates the union of two \code{\link{period_range}} objects
+#' The start and end periods of the period_range objects may not be \code{NULL}.
 #' @param range1 a \code{period_range} object
 #' @param range2 another \code{period_range} object
 #' @return the union of \code{range1} and \code{range2}.

@@ -23,7 +23,7 @@ e.g. \code{"2011-3"})}
 \item{...}{arguments passed to methods (not used in this package)}
 }
 \value{
-a \code{period_range}
+a \code{\link{period_range}}
 }
 \description{
 Coerce an R object to a \code{\link{period_range}}
@@ -31,7 +31,7 @@ Coerce an R object to a \code{\link{period_range}}
 \details{
 \code{as.period_range.character} converts a character string to a
 period_range object. The format for the first and last period of
-the range are specied as in \code{\link{period}}. The two periods strings
+the range are specied as in \code{\link{period}}. The two period strings
 are separated by \code{"/"} (e.g. \code{"2010Q2/2016Q2"}).
 The first or last period may be omitted: in that case the period range
 has no lower of upper bound (e.g. \code{"2012Q3/"}). The \code{"/"}
@@ -41,10 +41,10 @@ contains a single period.
 \section{Methods (by class)}{
 \itemize{
 \item \code{character}: Convert a character string to a
-period_range object
+\code{period_range} object
 
 \item \code{period}: Convert a single \code{\link{period}} to a
-\link{period_range}.
+\code{period_range}.
 }}
 
 \examples{
