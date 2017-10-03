@@ -506,11 +506,3 @@ window_regts <- function(x, sel_range) {
   return (create_regts(data, sel_range[1], sel_range[2], sel_range[3],
                        ts_labels(x)))
 }
-
-
-#' @export
-print.regts <- function(x, ...) {
-  # do not print ts_labels
-  ts_labels(x) <- NULL
-  NextMethod("print", .Generic)
-}
