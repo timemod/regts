@@ -7,26 +7,27 @@
 na_trim(x, method = c("both", "first", "last"), is_na = c("all", "any"))
 }
 \arguments{
-\item{x}{a regts object}
+\item{x}{a \code{\link{regts}} object}
 
-\item{method}{character with values \code{"both",} \code{"first"} or
+\item{method}{character string with values \code{"both",} \code{"first"} or
 \code{"last"} to remove NAs at both ends (by default), just at the start
 or just at the end.}
 
-\item{is_na}{character with values \code{"all"} or \code{"any"}. If \code{"all"}
-(default) then a row will be regarded as \code{NA} only if all elements in
-the row are \code{NA}. If \code{"any"} then a row will be regarded as \code{NA}
-if it has any \code{NA}s. For one dimensional regts objects this argument
-has no effect.}
+\item{is_na}{character string with values \code{"all"} or \code{"any"}.
+If \code{"all"} #' (default) then a row will be regarded as \code{NA} only if
+all elements in #' the row are \code{NA}. If \code{"any"} then a row will be
+regarded as \code{NA} #' if it has any \code{NA}s. For one dimensional regts
+objects this argument #' has no effect.}
 }
 \value{
-A \code{regts} object in which leading and/or trailing NAs have been removed.
+A \code{\link{regts}} object in which leading and/or trailing NAs have
+been removed.
 }
 \description{
 This function removes leading or trailing NAs or both from a (multivariate)
 regts object.
 For multivariate regts a row will by default be regarded as NA if all elements
-in the row are NA.  Specify \code{"any"} to change this behaviour.
+in the row are NA. Use argument \code{is.na = "any"} to change this behaviour.
 }
 \examples{
 # remove only leading NAs
@@ -44,4 +45,7 @@ rts <- regts(data, start = "2010Q1", names = c("a", "b", "c"))
 na_trim(rts, method = "first")
 # or remove rows if any NA occurs in that row
 na_trim(rts, is_na = "any")
+}
+\seealso{
+\code{\link{zero_trim}}
 }

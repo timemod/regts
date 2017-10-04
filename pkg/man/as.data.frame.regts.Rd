@@ -2,22 +2,24 @@
 % Please edit documentation in R/data.frame.R
 \name{as.data.frame.regts}
 \alias{as.data.frame.regts}
-\title{Converts a \code{\link{regts}} to a \code{\link{data.frame}}}
+\title{Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}}
 \usage{
 \method{as.data.frame}{regts}(x, ...)
 }
 \arguments{
-\item{x}{a \code{regts}}
+\item{x}{a \code{\link{regts}}}
 
 \item{...}{additional arguments to be passed to methods.}
 }
 \value{
-A \code{data.frame}
+A \code{\link[base]{data.frame}}
 }
 \description{
-Converts a \code{\link{regts}} to a \code{\link{data.frame}}
+Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}
 }
 \details{
+Unlike \code{\link{as.regts.ts}} this function adds row names with a period
+indicator.
 If the \code{regts} has labels, then the labels are added to the result
 dataframe using the function \code{\link[Hmisc]{label}}
 of package \code{Hmisc}.

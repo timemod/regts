@@ -3,18 +3,21 @@
 #' This function removes leading or trailing NAs or both from a (multivariate)
 #' regts object.
 #' For multivariate regts a row will by default be regarded as NA if all elements
-#' in the row are NA.  Specify \code{"any"} to change this behaviour.
+#' in the row are NA. Use argument \code{is.na = "any"} to change this behaviour.
 #'
-#' @param x a regts object
-#' @param method character with values \code{"both",} \code{"first"} or
+#' @param x a \code{\link{regts}} object
+#' @param method character string with values \code{"both",} \code{"first"} or
 #' \code{"last"} to remove NAs at both ends (by default), just at the start
 #' or just at the end.
-#' @param is_na character with values \code{"all"} or \code{"any"}. If \code{"all"}
-#' (default) then a row will be regarded as \code{NA} only if all elements in
-#' the row are \code{NA}. If \code{"any"} then a row will be regarded as \code{NA}
-#' if it has any \code{NA}s. For one dimensional regts objects this argument
-#' has no effect.
-#' @return A \code{regts} object in which leading and/or trailing NAs have been removed.
+#' @param is_na character string with values \code{"all"} or \code{"any"}.
+#' If \code{"all"} #' (default) then a row will be regarded as \code{NA} only if
+#' all elements in #' the row are \code{NA}. If \code{"any"} then a row will be
+#' regarded as \code{NA} #' if it has any \code{NA}s. For one dimensional regts
+#' objects this argument #' has no effect.
+#' @return A \code{\link{regts}} object in which leading and/or trailing NAs have
+#' been removed.
+#'
+#' @seealso \code{\link{zero_trim}}
 #'
 #' @examples
 #' # remove only leading NAs

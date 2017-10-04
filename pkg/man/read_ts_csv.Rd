@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_ts_csv.R
 \name{read_ts_csv}
 \alias{read_ts_csv}
-\title{Reads timeseries from a csv file}
+\title{Read timeseries from a csv file}
 \usage{
 read_ts_csv(filename, rowwise, frequency = NA, skiprow = 0, skipcol = 0,
   labels = c("no", "after", "before"), sep = "auto", dec = if (sep != ".")
@@ -12,14 +12,15 @@ read_ts_csv(filename, rowwise, frequency = NA, skiprow = 0, skipcol = 0,
 \item{filename}{a string with the filename}
 
 \item{rowwise}{a logical value: are the timeseries stored rowwise?
-If not specified, then \code{read_ts} tries to figure out itself if
+If not specified, then \code{read_ts_csv} tries to figure out itself if
 the timeseries are stored rowwise or columnwise}
 
 \item{frequency}{the frequency of the timeseries.
 This argument is mandatory if the file contains a period texts without
 frequency indicator (for example "2011-1")}
 
-\item{skiprow}{the number of rows to skip}
+\item{skiprow}{the number of rows to skip. If not specified comment rows are
+skipped. See details.}
 
 \item{skipcol}{the number of columns to skip}
 
@@ -27,7 +28,8 @@ frequency indicator (for example "2011-1")}
 
 \item{sep}{the separator between columns. If not specified, then
 the separator is determined automatically by inspecting the
-first 30 lines of the csv file (see the details of function \code{\link[data.table]{fread}}).}
+first 30 lines of the csv file (see the details of function
+\code{\link[data.table]{fread}}).}
 
 \item{dec}{the decimal separator as in \code{base::read.csv}.
 If not "." (default) then usually ",".}
@@ -50,17 +52,18 @@ An integer value is considered as a period wih frequency year.
 In many cases, this function will read timeseries correctly.
 However, \emph{you should always carefully check the results of this
 function}. If the result is not
-what you want, then you have read the data into a data frame
+what you want, then you have to read the data into a data frame
 (for example by using function \code{read.csv} or the function
 \code{fread} of package \code{data.table}),
 then convert the data frame to a standard columnwise data frame
-and finally convert it to a \code{regts} by using funtion \code{as.regts}.
+and finally convert it to a \code{\link{regts}} by using function
+\code{\link{as.regts}}.
 }
 \details{
-If argument \code{columnwise} has not been specified, then
-function \code{read_ts_xlsx} searches for any valid period text in the first
-row after the skipped rows. If a valid period was found, then
-\code{read_ts} assumes that the timeseries are stored rowwise. Otherwise it
+If argument \code{rowwise} has not been specified, then
+function \code{\link{read_ts_csv}} searches for any valid period text in the
+first row after the skipped rows. If a valid period was found, then
+\code{read_ts_csv} assumes that the timeseries are stored rowwise. Otherwise it
 assumes that the timeseries are stored columnwise.
 
 \strong{rowwise timeseries}
@@ -102,21 +105,22 @@ then the label option \code{"before"} is not allowed for columnwise
 timeseries, since in that case the column names are the timeseries names.
 
 Sometimes it helps to supply information about the structure of
-the data in the file. Specify option  \code{rowwise} if you know
-that the timeseries ares stored rowwise or columnwise. Specify
-argument \code{frequency} is you already know the frequency of the timeseries.
+the data on the csv file. Specify option  \code{rowwise} if you know
+that the timeseries are stored rowwise or columnwise. Specify
+argument \code{frequency} if you already know the frequency of the timeseries.
 Argument \code{frequency} is mandatory if a general period format
 such as  \code{"2011-1"} has been used.
 
-Sometimes it helps to supply information about the structure of
-the data on the csv file. Specify option  \code{columnwise} is you know
-that the timeseries ares stored rowwise or columnwise. Specify
-argument \code{frequency} is you already know the frequency of the timeseries.
-Argument \code{frequency} is mandatory if a general period format
-such as  \code{"2011-1"} has been used.
-
-#' With \code{fun} a function can be applied to names of the timeseries,
+With \code{name_fun} a function can be applied to names of the timeseries,
 e.g. \code{\link{tolower}}
+
+\strong{automatic row skip}
+
+If \code{skiprow = 0}, automatically all commencing rows with less columns
+are skipped (comment rows). After the number of columns are determined,
+a search for the first datarow based on this number of columns is started.
+All rows before this datarow are skipped.
+See the details in function \code{\link[data.table]{fread}}.
 }
 \examples{
 \dontrun{

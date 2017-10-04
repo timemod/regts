@@ -1,4 +1,4 @@
-#' Convert a data frame to a numeric matrix.
+#' Convert a \code{\link[base]{data.frame}} to a numeric matrix.
 #'
 #' Returns the matrix obtained by converting all the variables in a data frame
 #' to numeric mode and then binding them together as the columns of a matrix.
@@ -13,7 +13,7 @@
 #' to numerical values, then \code{numeric_matrix} gives a warning about
 #' the first 10 character strings that could not be succesfully converted.
 #' @md
-#' @param x a data frame
+#' @param x a \code{\link[base]{data.frame}}
 #' @param dec decimal separator in number strings. The default is \code{"."}
 #' @examples
 #' df <- data.frame(a = c("1.123", "x", NA), b = c("1", "", "john"),

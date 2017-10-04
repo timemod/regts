@@ -2,7 +2,7 @@
 % Please edit documentation in R/period.R
 \name{get_subperiod}
 \alias{get_subperiod}
-\title{Returns the subperiod of a \code{\link{period}}}
+\title{Return the subperiod of a \code{\link{period}}}
 \usage{
 get_subperiod(x)
 }

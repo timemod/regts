@@ -44,17 +44,17 @@ Coerce an object to a \code{\link{regts}} timeseries object
 \section{Methods (by class)}{
 \itemize{
 \item \code{ts}: Coerce a \code{\link[stats]{ts}} to a
-\code{\link{regts}}
+\code{regts}
 
-\item \code{data.frame}: Convert a \code{\link{data.frame}} to a
-\code{\link{regts}}. The time should be stored in the row numbers
+\item \code{data.frame}: Convert a \code{\link[base]{data.frame}} to a
+\code{regts}. The time should be stored in the row numbers
 of the matrix
 
 \item \code{matrix}: Convert a \code{\link{matrix}} to a
-\code{\link{regts}}
+\code{regts}
 
 \item \code{default}: Default method to convert an R object to a
-\code{\link{regts}}. This method first employs \code{\link[stats]{as.ts}}
+\code{regts}. This method first employs \code{\link[stats]{as.ts}}
 and then \code{\link{as.regts.ts}}
 }}
 

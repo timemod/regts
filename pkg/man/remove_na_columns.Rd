@@ -2,7 +2,7 @@
 % Please edit documentation in R/remove_na_columns.R
 \name{remove_na_columns}
 \alias{remove_na_columns}
-\title{Function for removing columns with NAs in (multivariate) regts}
+\title{Function for removing columns with NAs in a (multivariate) regts}
 \usage{
 remove_na_columns(x, is_na = c("all", "any"))
 }
@@ -18,10 +18,11 @@ will be regarded as \code{NA} if it has any \code{NA}s.}
 A \code{regts} object in which NA columns have been removed.
 }
 \description{
-This function removes columns with NA values from a (multivariate) regts.
+This function removes columns with NA values from a (multivariate)
+\code{\link{regts}}.
 A column will by default be regarded as NA if all elements
-in the column are NA.  Specify \code{"any"} to change this behaviour.
-If all columns are removed the function returns NULL.
+in the column are NA.  Specify argument \code{is.na = "any"} to change
+this behaviour. If all columns are removed the function returns \code{NULL}.
 }
 \examples{
 # remove columns with all NAs

@@ -2,7 +2,7 @@
 % Please edit documentation in R/period.R
 \name{is.period}
 \alias{is.period}
-\title{Test if an object is a period.}
+\title{Test if an object is a \code{\link{period}}}
 \usage{
 is.period(x)
 }
@@ -10,10 +10,10 @@ is.period(x)
 \item{x}{any R object}
 }
 \value{
-\code{TRUE} if the object is a \code{\link{period}}
+\code{TRUE} if the object is a \code{period}
 }
 \description{
-Test if an object is a period.
+Test if an object is a \code{\link{period}}
 }
 \examples{
 p <- period("2016Q1")

@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_ts_xlsx.R
 \name{read_ts_xlsx}
 \alias{read_ts_xlsx}
-\title{Reads timeseries from a sheet of an  xls(x) file}
+\title{Read timeseries from a sheet of an  xls(x) file}
 \usage{
 read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = NA,
   skipcol = NA, rowwise, frequency = NA, labels = c("no", "after",
@@ -24,7 +24,7 @@ Strictly, even if the range forces the inclusion of leading or trailing
 empty rows or columns.
 Takes precedence over skiprow, skipcol and sheet}
 
-\item{skiprow}{the number of rows to skip, inlcuding leading empty rows.
+\item{skiprow}{the number of rows to skip, including leading empty rows.
 Ignored if \code{range} is given. By default, all leading empty rows are
 skipped.}
 
@@ -33,7 +33,7 @@ Ignored if \code{range} is given. By default, all leading empty columns are
 skipped.}
 
 \item{rowwise}{a logical value: are the timeseries stored rowwise?
-If not specified, then \code{read_ts} tries to figure out itself if
+If not specified, then \code{read_ts_xlsx} tries to figure out itself if
 the timeseries are stored rowwise or columnwise}
 
 \item{frequency}{the frequency of the timeseries.
@@ -48,7 +48,7 @@ By default, \code{read_ts_xlsx} treats blank cells as missing data.}
 \item{name_fun}{function to apply to the names of the timeseries}
 }
 \value{
-a \code{regts} object
+a \code{\link{regts}} object
 }
 \description{
 This function attempts to read timeseries from an xls(x) file.
@@ -66,14 +66,15 @@ function}. If the result is not
 what you want, then you have to read the data into a data frame
 (for example by using function \code{read_excel} of package \code{readxl}),
 then convert the data frame to a standard columnwise data frame
-and finally convert it to a \code{regts} by using function \code{as.regts}.
+and finally convert it to a \code{\link{regts}} by using function
+\code{\link{as.regts}}.
 }
 \details{
 If argument \code{rowwise} has not been specified, then
 function \code{read_ts_xlsx} searches for any valid period text in the first
 row read. If a valid period was found, then
-\code{read_ts} assumes that the timeseries are stored rowwise. Otherwise it
-assumes that the timeseries are stored columnwise.
+\code{read_ts_xlsx} assumes that the timeseries are stored rowwise.
+Otherwise it assumes that the timeseries are stored columnwise.
 
 \strong{rowwise timeseries}
 
@@ -114,8 +115,8 @@ then the label option \code{"before"} is not allowed for columnwise
 timeseries, since in that case the column names are the timeseries names.
 
 By default, the function skips all leading empty rows and columns,
-just as \code{read_excel}. This behaviour can be overruled by specifying arguments
-\code{range}, \code{skiprow} or \code{skipcol}.
+just as \code{read_excel}. This behaviour can be overruled by specifying
+arguments \code{range}, \code{skiprow} or \code{skipcol}.
 
 Sometimes it helps to supply information about the structure of
 the data on the sheet. Specify option  \code{rowwise} if you know
@@ -124,7 +125,7 @@ argument \code{frequency} if you already know the frequency of the timeseries.
 Argument \code{frequency} is mandatory if a general period format
 such as  \code{"2011-1"} has been used.
 
-With \code{fun} a function can be applied to names of the timeseries,
+With \code{name_fun} a function can be applied to names of the timeseries,
 e.g. \code{\link{tolower}}
 }
 \examples{

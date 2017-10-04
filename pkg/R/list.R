@@ -3,7 +3,7 @@
 #' This function converts a \code{\link{regts}} to a list of univariate
 #' \code{regts} objects.
 #
-#' @param x a \code{regts} object
+#' @param x a \code{\link{regts} object}
 #' @param ... arguments passed to methods (not used in the default implementation)
 #' @return a list of univariate \code{regts} objects
 #' @examples
@@ -19,12 +19,9 @@
 #'    d <- lag(c)
 #'  })
 #'
-#'  # convert ts_list2 to a multivariate regts
+#'  # use functions \code{\link{do.call}} and \code{\link{cbind}} to convert
+#'  # the list of timeseries objects to a multivariate \code{regts}
 #'  regts2 <- do.call(cbind, ts_list2)
-#'
-#' @seealso The functions \code{\link{do.call}} and \code{\link{cbind}}
-#' can be used to convert the list of timeseries objects to a multivariate
-#' \code{regts} (see the example).
 #'
 #' @export
 as.list.regts <- function(x, ...) {

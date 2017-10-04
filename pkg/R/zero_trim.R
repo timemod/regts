@@ -6,10 +6,10 @@
 #' in the row are 0.
 #'
 #' @param x a regts object
-#' @param method character with values \code{"both",} \code{"first"} or
+#' @param method character string with values \code{"both",} \code{"first"} or
 #' \code{"last"} to remove zeros at both ends (by default), just at the start
 #' or just at the end.
-#' @return A \code{regts} object in which leading and/or trailing zeros have been removed.
+#' @return A \code{\link{regts}} object in which leading and/or trailing zeros have been removed.
 #'
 #' @examples
 #' # remove only leading zeros

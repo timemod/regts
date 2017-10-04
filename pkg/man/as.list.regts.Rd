@@ -7,7 +7,7 @@
 \method{as.list}{regts}(x, ...)
 }
 \arguments{
-\item{x}{a \code{regts} object}
+\item{x}{a \code{\link{regts} object}}
 
 \item{...}{arguments passed to methods (not used in the default implementation)}
 }
@@ -31,12 +31,8 @@ ts_list2 <- within (ts_list1, {
    d <- lag(c)
  })
 
- # convert ts_list2 to a multivariate regts
+ # use functions \\code{\\link{do.call}} and \\code{\\link{cbind}} to convert
+ # the list of timeseries objects to a multivariate \\code{regts}
  regts2 <- do.call(cbind, ts_list2)
 
-}
-\seealso{
-The functions \code{\link{do.call}} and \code{\link{cbind}}
-can be used to convert the list of timeseries objects to a multivariate
-\code{regts} (see the example).
 }

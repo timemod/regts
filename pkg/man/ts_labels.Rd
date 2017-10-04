@@ -19,7 +19,7 @@ labels.}
 \value{
 The retrieval function \code{ts_labels()} returns a named character
 vector: the names are the timeseries names (the column names) and the values
-the corresponding labels. The replacement method returns a \code{regts}
+the corresponding labels. The replacement method returns a \code{\link{regts}}
 object with labels.
 }
 \description{

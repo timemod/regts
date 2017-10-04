@@ -8,7 +8,7 @@ write_ts_csv(x, file, rowwise = TRUE, sep = ",", dec = ".",
   labels = c("after", "before", "no"))
 }
 \arguments{
-\item{x}{a \code{ts} or \code{regts} object}
+\item{x}{a \code{\link{ts}} or \code{\link{regts}} object}
 
 \item{file}{a \code{regts} object}
 
