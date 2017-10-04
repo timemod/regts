@@ -1,7 +1,7 @@
 #' printobj print the name, class and value of an object
 #'
 #' This function prints the name, class and value of its argument.
-#' The value is printed using the standard \code{\link{print}} functions.
+#' The value is printed using the standard \code{\link{print}} function.
 #' It returns the value of the argument invisbly
 #' @param  x an R object
 #' @param ... further arguments passed to \code{print}

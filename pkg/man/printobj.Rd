@@ -13,7 +13,7 @@ printobj(x, ...)
 }
 \description{
 This function prints the name, class and value of its argument.
-The value is printed using the standard \code{\link{print}} functions.
+The value is printed using the standard \code{\link{print}} function.
 It returns the value of the argument invisbly
 }
 \examples{
