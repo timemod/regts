@@ -29,8 +29,9 @@ character string that can be converted to a \code{period_range} object.
 This argument replaces arguments \code{start} and \code{end}.}
 
 \item{frequency}{the frequency of the timeseries. This argument should only be
-specified if the start, end or period argument is specified with a general
-period format without period indicator, e.g. \code{"2011-3"}}
+specified if the \code{start}, \code{end} or \code{period} argument is
+specified with a general period format without period indicator,
+e.g. \code{"2011-3"}}
 
 \item{names}{a character vector with the column names for the series
 if \code{data} is a matrix or data frame. Defaults to the column names of data.}

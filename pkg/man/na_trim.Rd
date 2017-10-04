@@ -9,11 +9,11 @@ na_trim(x, method = c("both", "first", "last"), is_na = c("all", "any"))
 \arguments{
 \item{x}{a \code{\link{regts}} object}
 
-\item{method}{character strings with values \code{"both",} \code{"first"} or
+\item{method}{character string with values \code{"both",} \code{"first"} or
 \code{"last"} to remove NAs at both ends (by default), just at the start
 or just at the end.}
 
-\item{is_na}{character strings with values \code{"all"} or \code{"any"}.
+\item{is_na}{character string with values \code{"all"} or \code{"any"}.
 If \code{"all"} #' (default) then a row will be regarded as \code{NA} only if
 all elements in #' the row are \code{NA}. If \code{"any"} then a row will be
 regarded as \code{NA} #' if it has any \code{NA}s. For one dimensional regts

@@ -21,8 +21,8 @@ A \code{regts} object in which NA columns have been removed.
 This function removes columns with NA values from a (multivariate)
 \code{\link{regts}}.
 A column will by default be regarded as NA if all elements
-in the column are NA.  Specify \code{"any"} to change this behaviour.
-If all columns are removed the function returns \code{NULL}.
+in the column are NA.  Specify argument \code{is.na = "any"} to change
+this behaviour. If all columns are removed the function returns \code{NULL}.
 }
 \examples{
 # remove columns with all NAs

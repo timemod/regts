@@ -62,7 +62,7 @@ period_range("2010Q2", NULL)
 #create a period_range for a timeseries with frequency 2 (half year)
 period_range("2010-2", "2016-2", frequency = 2)
 
-convert a period object to a period_range:
+#convert a period object to a period_range:
 p <- period("2010Q2")
 as.period_range(p)
 

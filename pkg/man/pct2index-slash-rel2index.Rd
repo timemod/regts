@@ -2,8 +2,7 @@
 % Please edit documentation in R/conversion_functions.R
 \name{pct2index/rel2index}
 \alias{pct2index/rel2index}
-\title{Calculate an index timeseries from a timeseries with relative or
-percentage changes.}
+\title{Calculate an index timeseries from a timeseries with relative or percentage changes.}
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}}}
 

@@ -27,7 +27,7 @@ tail.regts <- function(x, n = 6L, ...) {
 #' This function returns the topleft part of a \code{\link{regts}}. By default
 #' the first 10 columns for the first 6 periods.
 #'
-#' @param x a multivariate \code{regts}
+#' @param x a multivariate \code{regts} or \code{ts}
 #' @param n a single integer. Length period for the resulting object.
 #' @param ncol a single integer. Number of columns in \code{regts}.
 #' By default only the first 10 columns are printed.
@@ -40,11 +40,15 @@ tail.regts <- function(x, n = 6L, ...) {
 #' @export
 topleft <- function(x, n = 6L, ncol = 10L) {
 
+  if (!is.ts(x)) {
+    stop("Argument x is not a timeseries")
+  }
+
   first <- start_period(get_period_range(x))
   last  <- end_period(get_period_range(x))
   period <- period_range(first, min(first + n-1, last))
 
-  return(x[period, 1:ncol ])
+  return(x[period, 1:ncol, drop = FALSE ])
 
 }
 

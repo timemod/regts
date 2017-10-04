@@ -68,8 +68,6 @@ period ranges. Two \code{NA} values are considered to be equal.
 The function reports missing column names in one of the two objects,
 }
 \examples{
-library(regts)
-
 # create two timeseries x1 and x2
 x1 <- regts(matrix(data = rep(1:27), nc = 3), start = "2008Q4",
            names = c("a", "b", "c"))

@@ -1,8 +1,8 @@
-#' printobj print the name, class and value of an object
+#' Print the name, class and value of an object
 #'
 #' This function prints the name, class and value of its argument.
 #' The value is printed using the standard \code{\link{print}} function.
-#' It returns the value of the argument invisbly
+#' It returns the value of the argument invisibly
 #' @param  x an R object
 #' @param ... further arguments passed to \code{print}
 #' @export
@@ -43,7 +43,7 @@ print.regts <- function(x, ...) {
     rownames(print_mat) <- periods
     return(print(print_mat, ...))
   } else  if (f  == 4 || f == 12) {
-    # print.ts prints quartely and monthly timeseries nicely, therefore use the
+    # print.ts prints quarterly and monthly timeseries nicely, therefore use the
     # standard method for ts objects
     return(NextMethod(.Generic))
   } else {

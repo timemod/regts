@@ -1,5 +1,4 @@
-#' Calculate an index timeseries from a timeseries with relative or
-#' percentage changes.
+#' Calculate an index timeseries from a timeseries with relative or percentage changes.
 #'
 #' A timeseries of relative changes \eqn{x_t} is related to the original
 #' timeseries \eqn{X_t} by the relation \eqn{x_t = (X_t - X_{t-1}) / | X_{t-1}|}.

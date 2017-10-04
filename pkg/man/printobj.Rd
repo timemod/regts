@@ -2,7 +2,7 @@
 % Please edit documentation in R/print.R
 \name{printobj}
 \alias{printobj}
-\title{printobj print the name, class and value of an object}
+\title{Print the name, class and value of an object}
 \usage{
 printobj(x, ...)
 }
@@ -14,7 +14,7 @@ printobj(x, ...)
 \description{
 This function prints the name, class and value of its argument.
 The value is printed using the standard \code{\link{print}} function.
-It returns the value of the argument invisbly
+It returns the value of the argument invisibly
 }
 \examples{
 x <- regts(1:5, start = "2017Q2")

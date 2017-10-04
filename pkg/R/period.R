@@ -52,9 +52,7 @@ as.period.numeric <- function(x, frequency = NA, ...) {
     stop("Argument frequency should be specified")
   }
   year <- floor(x)
-  print(year)
   subp <- floor(frequency * (x %% 1))
-  print(subp)
   return (create_period(year * frequency + subp , frequency))
 }
 
