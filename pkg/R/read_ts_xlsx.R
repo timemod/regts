@@ -89,7 +89,7 @@
 #' Strictly, even if the range forces the inclusion of leading or trailing
 #' empty rows or columns.
 #' Takes precedence over skiprow, skipcol and sheet
-#' @param skiprow the number of rows to skip, inlcuding leading empty rows.
+#' @param skiprow the number of rows to skip, including leading empty rows.
 #' Ignored if \code{range} is given. By default, all leading empty rows are
 #' skipped.
 #' @param skipcol the number of columns to skip, including empty columns.

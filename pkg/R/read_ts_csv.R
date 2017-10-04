@@ -74,6 +74,14 @@
 #' With \code{name_fun} a function can be applied to names of the timeseries,
 #' e.g. \code{\link{tolower}}
 #'
+#' \strong{automatic row skip}
+#'
+#' If \code{skiprow = 0}, automatically all commencing rows with less columns
+#' are skipped (comment rows). After the number of columns are determined,
+#' a search for the first datarow based on this number of columns is started.
+#' All rows before this datarow are skipped.
+#' See the details in function \code{\link[data.table]{fread}}.
+#'
 #' @param filename  a string with the filename
 #' @param rowwise a logical value: are the timeseries stored rowwise?
 #' If not specified, then \code{read_ts_csv} tries to figure out itself if
@@ -81,7 +89,8 @@
 #' @param frequency the frequency of the timeseries.
 #' This argument is mandatory if the file contains a period texts without
 #' frequency indicator (for example "2011-1")
-#' @param skiprow the number of rows to skip
+#' @param skiprow the number of rows to skip. If not specified comment rows are
+#' skipped. See details.
 #' @param skipcol the number of columns to skip
 #' @param labels label option. See details
 #' @param sep the separator between columns. If not specified, then

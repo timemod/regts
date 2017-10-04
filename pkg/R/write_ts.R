@@ -92,6 +92,7 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' \item \code{write_ts_sheet}: writes a timeseries to a \code{Sheet} object
 #' }}
 #'
+#' @name write_ts_xlsx/write_ts_sheet
 #' @examples
 #' # create two timeseries objects
 #' ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
@@ -119,9 +120,8 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #'    unlink("timeseries.xlsx")
 #'    unlink("ts_comments.xlsx")
 #' }
-#' @name write_ts_xlsx/write_ts_sheet
 NULL
-
+#> NULL
 #'
 #' @rdname write_ts_xlsx/write_ts_sheet
 #' @export

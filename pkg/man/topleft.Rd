@@ -7,7 +7,7 @@
 topleft(x, n = 6L, ncol = 10L)
 }
 \arguments{
-\item{x}{a multivariate \code{regts}}
+\item{x}{a multivariate \code{regts} or \code{ts}}
 
 \item{n}{a single integer. Length period for the resulting object.}
 

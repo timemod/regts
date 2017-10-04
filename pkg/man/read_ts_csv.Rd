@@ -19,7 +19,8 @@ the timeseries are stored rowwise or columnwise}
 This argument is mandatory if the file contains a period texts without
 frequency indicator (for example "2011-1")}
 
-\item{skiprow}{the number of rows to skip}
+\item{skiprow}{the number of rows to skip. If not specified comment rows are
+skipped. See details.}
 
 \item{skipcol}{the number of columns to skip}
 
@@ -112,6 +113,14 @@ such as  \code{"2011-1"} has been used.
 
 With \code{name_fun} a function can be applied to names of the timeseries,
 e.g. \code{\link{tolower}}
+
+\strong{automatic row skip}
+
+If \code{skiprow = 0}, automatically all commencing rows with less columns
+are skipped (comment rows). After the number of columns are determined,
+a search for the first datarow based on this number of columns is started.
+All rows before this datarow are skipped.
+See the details in function \code{\link[data.table]{fread}}.
 }
 \examples{
 \dontrun{

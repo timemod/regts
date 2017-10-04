@@ -24,7 +24,7 @@ Strictly, even if the range forces the inclusion of leading or trailing
 empty rows or columns.
 Takes precedence over skiprow, skipcol and sheet}
 
-\item{skiprow}{the number of rows to skip, inlcuding leading empty rows.
+\item{skiprow}{the number of rows to skip, including leading empty rows.
 Ignored if \code{range} is given. By default, all leading empty rows are
 skipped.}
 

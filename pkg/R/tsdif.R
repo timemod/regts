@@ -55,8 +55,6 @@
 #'  \item{fun}{a character string specifying the supplied function \code{fun},
 #'  or \code{NULL} if \code{fun} has not been specified}
 #' @examples
-#' library(regts)
-#'
 #'# create two timeseries x1 and x2
 #'x1 <- regts(matrix(data = rep(1:27), nc = 3), start = "2008Q4",
 #'            names = c("a", "b", "c"))
