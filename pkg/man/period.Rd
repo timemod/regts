@@ -2,27 +2,36 @@
 % Please edit documentation in R/period.R
 \name{period}
 \alias{period}
-\title{Create a \code{\link{period}} object based on a string or an integer.}
+\alias{period}
+\alias{as.period}
+\title{Create a \code{\link{period}} object based on a character string or numeric.}
 \usage{
 period(x, frequency = NA)
+
+as.period(x, ...)
 }
 \arguments{
-\item{x}{a single string or integer}
+\item{x}{a character string or numeric}
 
 \item{frequency}{frequency of the period object.
 Argument \code{frequency} is mandatory if a general period format
-such as "2011-1" has been specified}
+such as \code{"2011-1"} has been specified}
 }
 \value{
 a \code{period} object
 }
 \description{
-Possible string formats are for example \code{"2010Q2"},
+Possible character string formats are for example \code{"2010Q2"},
 \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
 The period may be prefixed with a \code{"T"} or \code{"Y"}.
+Possible numeric formats are \code{2011} or \code{2011.25}
 }
 \examples{
 period("2010Q3")
 period("2010-2", frequency = 3)
 period(2015)
+period(2010.25, frequency = 4)
+
+as.period("2010Q3")
+as.period(2010)
 }

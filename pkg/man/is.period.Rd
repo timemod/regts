@@ -10,7 +10,7 @@ is.period(x)
 \item{x}{any R object}
 }
 \value{
-\code{TRUE} if the object is a \code{\period}
+\code{TRUE} if the object is a \code{period}
 }
 \description{
 Test if an object is a \code{\link{period}}

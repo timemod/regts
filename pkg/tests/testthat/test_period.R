@@ -34,6 +34,11 @@ test_that("constructor period with Y prefix", {
   expect_identical(as.character(period("Y2 3", frequency = 4)), "2Q3")
 })
 
+test_that("constructor period with numerical input", {
+  expect_identical(as.character(period(2010)), "2010")
+  expect_identical(as.character(period(2010.25, frequency = 4)), "2010Q2")
+})
+
 test_that("Isis type periods", {
   expect_identical(period("2010.2q"), period("2010Q2"))
   expect_identical(period("may2010"), period("2010M5"))

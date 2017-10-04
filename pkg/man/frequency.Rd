@@ -4,7 +4,7 @@
 \alias{frequency}
 \alias{frequency.period}
 \alias{frequency.period_range}
-\title{Return the frequency of a \code{\link{period}} or \code{\link{period_range}}}
+\title{Return the frequency of a \code{period} or \code{period_range}}
 \usage{
 \method{frequency}{period}(x, ...)
 
@@ -16,18 +16,24 @@
 \item{...}{additional arguments for future methods}
 }
 \value{
-the frequency of the \code{period} or the
-\code{period_range}
+the frequency of the \code{period} or the \code{period_range}
 }
 \description{
-Function returns the frequency of a \code{period} or a
+This is an extension to S3 generic function \code{\link[stats]{frequency}}.
+Function now also returns the frequency of a \code{period} or a
 \code{period_range}
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{period}: frequency of a \link{period} object
+
+\item \code{period_range}: frequency of a \link{period_range} object
+}}
+
 \examples{
 p <- period("2016Q1")
 freq <- frequency(p)
 
 p <- period_range("2016Q1", "2018Q2")
 freq <- frequency(p)#'
-
 }

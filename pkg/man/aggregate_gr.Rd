@@ -14,7 +14,7 @@ aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"), nfrequency = 1)
 or \code{"rel"}. Consult the Regts vignette for an explanation of
 these methods}
 
-\item{nfrequency}{the frequency of the result should be higher than
+\item{nfrequency}{the frequency of the result. This should be higher than
 the frequency of timeseries \code{x}}
 }
 \value{
@@ -25,9 +25,9 @@ Convert timeseries with absolute or relative growth rates to a lower
 frequency
 }
 \examples{
-ts_q <- regts(rnorm(10), start = "2016.Q1")
+ts_q <- regts(rnorm(10), start = "2016Q1")
 aggregate_gr(ts_q, method = "dif1s")
 
-ts_m <- regts(matrix(rnorm(20), ncol = 2), start = "2017.M1", names = c("a", "b"))
+ts_m <- regts(matrix(rnorm(20), ncol = 2), start = "2017M1", names = c("a", "b"))
 aggregate_gr(ts_m, method = "rel", nfrequency = 4)
 }

@@ -18,6 +18,8 @@ A \code{\link[base]{data.frame}}
 Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}
 }
 \details{
+Unlike \code{\link{as.regts.ts}} this function adds row names with a period
+indicator.
 If the \code{regts} has labels, then the labels are added to the result
 dataframe using the function \code{\link[Hmisc]{label}}
 of package \code{Hmisc}.

@@ -43,12 +43,6 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' \code{write_ts_sheet} writes timeseries to a \code{\link[xlsx]{Sheet}}
 #' object.
 #'
-#' \section{Functions}{
-#' \itemize{
-#' \item \code{write_ts_xlsx}: writes timeseries to an Excel workbook
-#' \item \code{write_ts_sheet}: writes a timeseries to a \code{Sheet} object
-#' }}
-#'
 #' The functions employ function \code{\link[xlsx]{addDataFrame}}
 #' from the \code{\link[xlsx]{xlsx}} package for writing the Excel file.
 #'
@@ -56,10 +50,6 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' sheets, you can use \code{write_ts_xlsx} with argument
 #' \code{append = TRUE}, or \code{write_ts_sheet}. The latter approach
 #' is more efficient.
-#'
-#' @name write_ts_xlsx/write_ts_sheet
-NULL
-#'
 #'
 #' @param x a \code{\link{ts}} or \code{\link{regts}} object
 #' @param file the filename of the output file
@@ -96,6 +86,12 @@ NULL
 #' @importFrom xlsx removeRow
 #' @importFrom xlsx DataFormat
 #'
+#' @section Functions:
+#' \itemize{
+#' \item \code{write_ts_xlsx}: writes timeseries to an Excel workbook
+#' \item \code{write_ts_sheet}: writes a timeseries to a \code{Sheet} object
+#' }}
+#'
 #' @examples
 #' # create two timeseries objects
 #' ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
@@ -123,8 +119,11 @@ NULL
 #'    unlink("timeseries.xlsx")
 #'    unlink("ts_comments.xlsx")
 #' }
+#' @name write_ts_xlsx/write_ts_sheet
+NULL
+
 #'
-#' @rdname write_ts_xlsx-slash-write_ts_sheet
+#' @rdname write_ts_xlsx/write_ts_sheet
 #' @export
 write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           rowwise = TRUE, append = FALSE,
@@ -164,7 +163,7 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   return(invisible(NULL))
 }
 
-#' @rdname write_ts_xlsx-slash-write_ts_sheet
+#' @rdname write_ts_xlsx/write_ts_sheet
 #' @export
 write_ts_sheet <- function(x, sheet,  rowwise = TRUE,
                            labels = c("after", "before", "no"),

@@ -19,12 +19,9 @@
 #'    d <- lag(c)
 #'  })
 #'
-#'  # convert ts_list2 to a multivariate regts
+#'  # use functions \code{\link{do.call}} and \code{\link{cbind}} to convert
+#'  # the list of timeseries objects to a multivariate \code{regts}
 #'  regts2 <- do.call(cbind, ts_list2)
-#'
-#' @seealso The functions \code{\link{do.call}} and \code{\link{cbind}}
-#' can be used to convert the list of timeseries objects to a multivariate
-#' \code{regts} (see the example).
 #'
 #' @export
 as.list.regts <- function(x, ...) {
