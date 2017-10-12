@@ -6,14 +6,6 @@
 #' \eqn{\tilde{X}_t = s X_t / X_{t^*}}, where \eqn{s} is the scale and
 #' \eqn{t^*} is the base period
 #'
-#' @section Functions:
-#' \itemize{
-#' \item \code{rel2index}: Calculates an index timeseries from a timeseries with
-#' relative changes
-#' \item \code{pct2index}: Calculates an index timeseries from a timeseries with
-#' percentage changes
-#' }
-#'
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}}
 #' @param base_period base period of the index timeseries (a \code{\link{period}}
 #' object or an object that can be coerced to a \code{period} object)
@@ -25,8 +17,9 @@
 #' print(rel2index(ts1, base_period = "2010Q3", scale = 1))
 #' @name pct2index/rel2index
 NULL
-#'
-#' @rdname pct2index/rel2index
+
+#' @describeIn pct2index-slash-rel2index Calculates an index timeseries from a
+#' timeseries with relative changes
 #' @export
 rel2index <- function(x, base_period = start_period(x) - 1, scale = 100) {
 
@@ -58,7 +51,8 @@ rel2index <- function(x, base_period = start_period(x) - 1, scale = 100) {
   }
 }
 
-#' @rdname pct2index/rel2index
+#' @describeIn pct2index-slash-rel2index Calculates an index timeseries from a
+#' timeseries with percentage changes
 #' @export
 pct2index <- function(x, base_period = start_period(x) - 1, scale = 100) {
   return(rel2index(x/100, base_period = base_period, scale = scale))

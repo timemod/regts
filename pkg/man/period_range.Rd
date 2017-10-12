@@ -2,13 +2,9 @@
 % Please edit documentation in R/period_range.R
 \name{period_range}
 \alias{period_range}
-\alias{period_range}
-\alias{as.period_range}
 \title{Return a \code{\link{period_range}} object.}
 \usage{
 period_range(p1, p2 = p1, frequency = NA)
-
-as.period_range(x, frequency = NA, ...)
 }
 \arguments{
 \item{p1}{the first period (a \code{period}, an object that can be coerced
@@ -22,8 +18,6 @@ If \code{p2} is \code{NULL}, the upper bound of the period range is undetermined
 \item{frequency}{frequency of the period objects. This argument is mandatory
 if argument \code{p1} or \code{p2} is a character with general period format
 without frequency indicator (e.g. \code{"2011-1"})}
-
-\item{x}{a character string or a \code{period}}
 }
 \value{
 a \code{period_range} object
@@ -58,16 +52,8 @@ period_range(p1, p1 + 5)
 
 # create a period_range from 2010Q2 with no upper bound
 period_range("2010Q2", NULL)
-
-#create a period_range for a timeseries with frequency 2 (half year)
-period_range("2010-2", "2016-2", frequency = 2)
-
-#convert a period object to a period_range:
-p <- period("2010Q2")
-as.period_range(p)
-
 }
 \seealso{
-\code{\link{period}}, \code{\link{nperiod}},
-\code{\link{start_period}}, \code{\link{end_period}}
+\code{\link{as.period_range}}, \code{\link{period}}, \code{\link{nperiod}},
+\code{\link{start_period}} and \code{\link{end_period}}
 }

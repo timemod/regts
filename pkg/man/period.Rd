@@ -2,13 +2,9 @@
 % Please edit documentation in R/period.R
 \name{period}
 \alias{period}
-\alias{period}
-\alias{as.period}
 \title{Create a \code{\link{period}} object based on a character string or numeric.}
 \usage{
 period(x, frequency = NA)
-
-as.period(x, ...)
 }
 \arguments{
 \item{x}{a character string or numeric}
@@ -24,14 +20,15 @@ a \code{period} object
 Possible character string formats are for example \code{"2010Q2"},
 \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
 The period may be prefixed with a \code{"T"} or \code{"Y"}.
-Possible numeric formats are \code{2011} or \code{2011.25}
+Possible numeric formats are for example \code{2011} or \code{2011.25}
+(the second quarter of 2011).
 }
 \examples{
 period("2010Q3")
 period("2010-2", frequency = 3)
 period(2015)
 period(2010.25, frequency = 4)
-
-as.period("2010Q3")
-as.period(2010)
+}
+\seealso{
+\code{\link{as.period}} and \code{\link{period_range}}
 }

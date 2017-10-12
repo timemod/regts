@@ -2,7 +2,17 @@
 % Please edit documentation in R/write_ts.R
 \name{write_ts_xlsx/write_ts_sheet}
 \alias{write_ts_xlsx/write_ts_sheet}
+\alias{write_ts_xlsx}
+\alias{write_ts_sheet}
 \title{Functions for writing timeseries to an xlsx file}
+\usage{
+write_ts_xlsx(x, file, sheet_name = "Sheet1", rowwise = TRUE,
+  append = FALSE, labels = c("after", "before", "no"), comments,
+  number_format)
+
+write_ts_sheet(x, sheet, rowwise = TRUE, labels = c("after", "before",
+  "no"), comments, number_format)
+}
 \arguments{
 \item{x}{a \code{\link{ts}} or \code{\link{regts}} object}
 
@@ -10,8 +20,7 @@
 
 \item{sheet_name}{the sheet name}
 
-\item{sheet}{a \code{\link[xlsx]{Sheet}} object (see the documentation
-of package \code{xlsx})}
+\item{rowwise}{a logical value: should the timeseries be written rowwise?}
 
 \item{append}{If \code{FALSE} (the default), then the original file,
 if it exists, is replaced with the new file. All original data is lost.
@@ -20,19 +29,20 @@ the specified sheet name is erased and replaced with new data.  If the sheet
 does not yet exist, then a new sheet is created and appended to the
 original file.}
 
-\item{rowwise}{a logical value: should the timeseries be written rowwise?}
-
 \item{labels}{should labels be written, and if so before or after
 the names? By default, labels are written after the names if present}
+
+\item{comments}{a character vector or data frame. The comments
+are written to the beginning of the sheet, before the timeseries data is
+written.}
 
 \item{number_format}{a character value specifying the number format.
 For example, \code{"#.00"} corresponds to two decimal spaces.
 For details see the description of the function \code{\link[xlsx]{DataFormat}}
 in the \code{\link[xlsx]{xlsx}} package.}
 
-\item{comments}{a character vector or data frame. The comments
-are written to the beginning of the sheet, before the timeseries data is
-written.}
+\item{sheet}{a \code{\link[xlsx]{Sheet}} object (see the documentation
+of package \code{xlsx})}
 }
 \description{
 These functions can be used to write timeseries to a sheet of an
@@ -51,6 +61,15 @@ sheets, you can use \code{write_ts_xlsx} with argument
 \code{append = TRUE}, or \code{write_ts_sheet}. The latter approach
 is more efficient.
 }
+\section{Functions}{
+\itemize{
+\item \code{write_ts_xlsx}: writes timeseries to an Excel
+workbook
+
+\item \code{write_ts_sheet}: writes a timeseries to a
+\code{Sheet} object
+}}
+
 \examples{
 # create two timeseries objects
 ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),

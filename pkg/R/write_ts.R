@@ -85,13 +85,6 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @importFrom xlsx autoSizeColumn
 #' @importFrom xlsx removeRow
 #' @importFrom xlsx DataFormat
-#'
-#' @section Functions:
-#' \itemize{
-#' \item \code{write_ts_xlsx}: writes timeseries to an Excel workbook
-#' \item \code{write_ts_sheet}: writes a timeseries to a \code{Sheet} object
-#' }}
-#'
 #' @name write_ts_xlsx/write_ts_sheet
 #' @examples
 #' # create two timeseries objects
@@ -121,9 +114,9 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #'    unlink("ts_comments.xlsx")
 #' }
 NULL
-#> NULL
-#'
-#' @rdname write_ts_xlsx/write_ts_sheet
+
+#' @describeIn write_ts_xlsx-slash-write_ts_sheet writes timeseries to an Excel
+#' workbook
 #' @export
 write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           rowwise = TRUE, append = FALSE,
@@ -163,7 +156,8 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   return(invisible(NULL))
 }
 
-#' @rdname write_ts_xlsx/write_ts_sheet
+#' @describeIn write_ts_xlsx-slash-write_ts_sheet writes a timeseries to a
+#' \code{Sheet} object
 #' @export
 write_ts_sheet <- function(x, sheet,  rowwise = TRUE,
                            labels = c("after", "before", "no"),

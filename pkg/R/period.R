@@ -3,47 +3,64 @@
 #' Possible character string formats are for example \code{"2010Q2"},
 #' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
 #' The period may be prefixed with a \code{"T"} or \code{"Y"}.
-#' Possible numeric formats are \code{2011} or \code{2011.25}
+#' Possible numeric formats are for example \code{2011} or \code{2011.25}
+#' (the second quarter of 2011).
 #' @param x a character string or numeric
 #' @param frequency frequency of the period object.
 #' Argument \code{frequency} is mandatory if a general period format
 #' such as \code{"2011-1"} has been specified
 #' @return a \code{period} object
-#'
-#' @name period
 #' @examples
 #' period("2010Q3")
 #' period("2010-2", frequency = 3)
 #' period(2015)
 #' period(2010.25, frequency = 4)
-#'
-#' as.period("2010Q3")
-#' as.period(2010)
 #' @importFrom Rcpp sourceCpp
-NULL
-
-#' @rdname period
+#' @seealso \code{\link{as.period}} and \code{\link{period_range}}
 #' @export
 period <- function(x, frequency = NA) {
-  return (as.period(x, frequency = frequency))
+  return(as.period(x, frequency = frequency))
 }
 
-#' @rdname period
+#' Coerce an R object to a \code{period} object if possible.
+#'
+#' This function can coerce a character string or numeric to a
+#' \code{period}. For details see the documentation of function \code{\link{period}}.
+#'
+#' @param x an R object
+#' @param frequency frequency of the period object.
+#' Argument \code{frequency} is mandatory if a general period format
+#' such as \code{"2011-1"} has been specified
+#' @param ... additional arguments to be passed to or from methods (cuyrrently
+#' not used in package \code{regts})
+#' @return a \code{period} object
+#' @examples
+#' as.period("2010Q3")
+#' as.period(2010)
 #' @export
+#' @seealso \code{\link{period}} and \code{\link{as.period_range}}
 as.period <- function(x, ...) UseMethod("as.period")
 
 #' @export
 as.period.period <- function(x, ...) {
-  return (x)
+  return(x)
 }
 
+#' @describeIn as.period Convert a character string to a \code{period}
 #' @export
 as.period.character <- function(x, frequency = NA, ...) {
-  return (parse_period(x, frequency = frequency))
+  if (length(x) != 1) {
+    stop("x should be a single character string")
+  }
+  return(parse_period(x, frequency = frequency))
 }
 
+#' @describeIn as.period Convert a numeric to a \code{period}
 #' @export
 as.period.numeric <- function(x, frequency = NA, ...) {
+  if (length(x) != 1) {
+    stop("x should be a numeric scalar")
+  }
   if (all.equal(x, as.integer(x)) == TRUE) {
     if (is.na(frequency) || frequency == 1) {
       return (create_period(as.numeric(x) , 1))
@@ -53,7 +70,7 @@ as.period.numeric <- function(x, frequency = NA, ...) {
   }
   year <- floor(x)
   subp <- floor(frequency * (x %% 1))
-  return (create_period(year * frequency + subp , frequency))
+  return(create_period(year * frequency + subp , frequency))
 }
 
 
@@ -67,7 +84,7 @@ as.period.numeric <- function(x, frequency = NA, ...) {
 #' is.period("2016Q1")
 #' @export
 is.period <- function(x) {
-  return (inherits(x, "period"))
+  return(inherits(x, "period"))
 }
 
 # binary operators (arithmetic and logical)

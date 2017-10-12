@@ -23,7 +23,6 @@
 #' @param p2 the last period (a \code{period}, an object that can be coerced
 #' to a \code{period} or \code{NULL}).
 #' If \code{p2} is \code{NULL}, the upper bound of the period range is undetermined.
-#' @param x a character string or a \code{period}
 #' @param frequency frequency of the period objects. This argument is mandatory
 #' if argument \code{p1} or \code{p2} is a character with general period format
 #' without frequency indicator (e.g. \code{"2011-1"})
@@ -41,19 +40,8 @@
 #'
 #' # create a period_range from 2010Q2 with no upper bound
 #' period_range("2010Q2", NULL)
-#'
-#' #create a period_range for a timeseries with frequency 2 (half year)
-#' period_range("2010-2", "2016-2", frequency = 2)
-#'
-#' #convert a period object to a period_range:
-#' p <- period("2010Q2")
-#' as.period_range(p)
-#'
-#' @seealso \code{\link{period}}, \code{\link{nperiod}},
-#' \code{\link{start_period}}, \code{\link{end_period}}
-NULL
-
-#' @rdname period_range
+#' @seealso \code{\link{as.period_range}}, \code{\link{period}}, \code{\link{nperiod}},
+#' \code{\link{start_period}} and \code{\link{end_period}}
 #' @export
 period_range <- function(p1, p2 = p1, frequency = NA) {
   if (is.null(p1) && is.null(p2)) {
@@ -98,12 +86,36 @@ period_range <- function(p1, p2 = p1, frequency = NA) {
   return (create_period_range(p1, p2, freq))
 }
 
-#' @rdname period_range
+
+#' Coerce an R object to a \code{period_range} object if possible.
+#'
+#' This function can coerce a character string to a
+#' \code{period_range}. For details see the documentation of function
+#' \code{\link{period_range}}.
+#'
+#' @param x an R object
+#' @param frequency frequency of the period object.
+#' Argument \code{frequency} is mandatory if a general period format
+#' such as \code{"2011-1"} has been specified
+#' @param ... additional arguments to be passed to or from methods (cuyrrently
+#' not used in package \code{regts})
+#' @return a \code{period_range} object
+#' @examples
+#' # create a period_range for a timeseries with frequency 2 (half year)
+#' period_range("2010-2", "2016-2", frequency = 2)
+#'
+#' # convert a period object to a period_range:
+#' p <- period("2010Q2")
+#' as.period_range(p)
+#' @export
+#' @seealso \code{\link{period_range}} and \code{\link{period}}
 #' @export
 as.period_range <- function(x, frequency = NA, ...) {
   UseMethod("as.period_range")
 }
 
+#' @describeIn as.period_range Convert a character string to a
+#' \code{period_range}
 #' @export
 as.period_range.character <- function(x, frequency = NA, ...) {
   if (length(x) > 1) {
@@ -119,6 +131,7 @@ as.period_range.period_range <- function(x, ...) {
   return (x)
 }
 
+#' @describeIn as.period_range Convert a \code{period} to a \code{period_range}
 #' @export
 as.period_range.period <- function(x, ...) {
   return (create_period_range(as.numeric(x), as.numeric(x), frequency(x)))
