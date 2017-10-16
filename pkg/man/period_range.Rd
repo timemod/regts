@@ -2,47 +2,57 @@
 % Please edit documentation in R/period_range.R
 \name{period_range}
 \alias{period_range}
-\title{Return a \code{\link{period_range}} object.}
+\alias{as.period_range}
+\title{Create a \code{\link{period_range}} object.}
 \usage{
 period_range(p1, p2 = p1, frequency = NA)
+
+as.period_range(x, frequency = NA, ...)
 }
 \arguments{
 \item{p1}{the first period (a \code{period}, an object that can be coerced
-to a \code{period} or a \code{period_range}, or \code{NULL}). If \code{p1}
-is \code{NULL}, the lower bound of the period range is undetermined.}
+to a \code{period}, or \code{NULL}). If \code{p1} is \code{NULL} the lower
+bound of the period range is undetermined. \code{p1} can also be
+a character string specifying a period range, for example
+\code{"2010Q2/2011Q3"}).}
 
 \item{p2}{the last period (a \code{period}, an object that can be coerced
-to a \code{period} or \code{NULL}).
+to a \code{period}, or \code{NULL}).
 If \code{p2} is \code{NULL}, the upper bound of the period range is undetermined.}
 
 \item{frequency}{frequency of the period objects. This argument is mandatory
 if argument \code{p1} or \code{p2} is a character with general period format
 without frequency indicator (e.g. \code{"2011-1"})}
+
+\item{x}{an R object}
+
+\item{...}{additional arguments to be passed to or from methods (cuyrrently
+not used in package \code{regts})}
 }
 \value{
 a \code{period_range} object
 }
 \description{
-Create a \code{period_range} object from two \code{period} objects
-or two character strings that can be converted to \code{period} objects with
-function \code{\link{period}}.
-}
-\details{
-It is also possible to convert one character string to a
-\code{period_range} object. The format for the first and last period of
-the range are specied as in \code{\link{period}}. The two period strings
-are separated by \code{"/"} (e.g. \code{"2010Q2/2016Q2"}).
-The first or last period may be omitted: in that case the period range
-has no lower of upper bound (e.g. \code{"2012Q3/"}). The \code{"/"}
-separator is also optional: if omitted, then the period range
-contains a single period.
-
-The \code{period_range} object is used to
-represent an interval of \code{period},  for example, a period from
-\code{"2012Q2"} to \code{"2016Q4"}.
+A \code{period_range} object represents an interval of periods,
+for example a period from \code{"2012Q2"} to \code{"2016Q4"}.
+Function \code{period_range}  creates a \code{period_range} from
+a single character string or from two R objects that can be
+coerced to \code{period} objects.
+\cr\cr
+It is also possible to create a \code{period_range} from
+a single string specifying a period range, for example
+\code{"2010Q2/2011Q3"}. For this format, the first and last
+period are separated by \code{"/"}. The first and last period
+are specified according to the same format recognized by function
+\code{\link{period}}. The first or last period may be omitted
+(e.g. \code{"2012Q3/"})), in that case the period range
+has no lower or upper bound.
+\cr\cr
+Function \code{as.period_range} coerces an R object to a \code{period_range}
+if possible.
 }
 \examples{
-# create a period_range from 2010Q2 to 2016Q3
+# two methods to create a period_range from 2010Q2 to 2016Q3
 period_range("2010Q2", "2016Q3")
 period_range("2010Q2/2016Q3")
 
@@ -52,8 +62,15 @@ period_range(p1, p1 + 5)
 
 # create a period_range from 2010Q2 with no upper bound
 period_range("2010Q2", NULL)
+
+# create a period_range for a timeseries with frequency 2 (half year)
+period_range("2010-2", "2016-2", frequency = 2)
+
+# convert a period object to a period_range with equal start and end period
+p <- period("2010Q2")
+as.period_range(p)
 }
 \seealso{
-\code{\link{as.period_range}}, \code{\link{period}}, \code{\link{nperiod}},
+\code{\link{period}}, \code{\link{nperiod}},
 \code{\link{start_period}} and \code{\link{end_period}}
 }

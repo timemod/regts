@@ -1,44 +1,43 @@
-#' Create a \code{\link{period}} object based on a character string or numeric.
+#' Create a \code{\link{period}} object
 #'
+#' Function \code{period} creates a \code{period} object
+#' based on a character string or numeric scalar.
 #' Possible character string formats are for example \code{"2010Q2"},
 #' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
-#' The period may be prefixed with a \code{"T"} or \code{"Y"}.
-#' Possible numeric formats are for example \code{2011} or \code{2011.25}
-#' (the second quarter of 2011).
-#' @param x a character string or numeric
-#' @param frequency frequency of the period object.
-#' Argument \code{frequency} is mandatory if a general period format
-#' such as \code{"2011-1"} has been specified
+#' The period may be prefixed with a \code{"T"} or \code{"Y"}. The string
+#' format is case insensitive, so \code{"t2010Q2"} is also a valid period
+#' format. Possible numeric formats are for example \code{2011} or
+#' \code{2011.25} (the second quarter of 2011).
+#' \cr\cr
+#' Function \code{as.period}
+#' coerces an R object to a \code{period} object if possible.
+#' @param x a character string or numeric scalar
+#' @param frequency frequency of the period. Argument \code{frequency} is
+#' mandatory if the frequency cannot be inferred from \code{x} (for example
+#' \code{"2011-2"} could be a quarter, month, etc.)
+#' @param ... additional arguments to be passed to or from methods (cuyrrently
+#' not used in package \code{regts})
 #' @return a \code{period} object
+#'
 #' @examples
 #' period("2010Q3")
 #' period("2010-2", frequency = 3)
 #' period(2015)
 #' period(2010.25, frequency = 4)
+#'
+#' # examples for as.period
+#' as.period("2010Q3")
+#' p <- period("2010M11")
+#' as.period(p)
 #' @importFrom Rcpp sourceCpp
-#' @seealso \code{\link{as.period}} and \code{\link{period_range}}
+#' @seealso \code{\link{period_range}}
 #' @export
 period <- function(x, frequency = NA) {
   return(as.period(x, frequency = frequency))
 }
 
-#' Coerce an R object to a \code{period} object if possible.
-#'
-#' This function can coerce a character string or numeric to a
-#' \code{period}. For details see the documentation of function \code{\link{period}}.
-#'
-#' @param x an R object
-#' @param frequency frequency of the period object.
-#' Argument \code{frequency} is mandatory if a general period format
-#' such as \code{"2011-1"} has been specified
-#' @param ... additional arguments to be passed to or from methods (cuyrrently
-#' not used in package \code{regts})
-#' @return a \code{period} object
-#' @examples
-#' as.period("2010Q3")
-#' as.period(2010)
+#' @rdname period
 #' @export
-#' @seealso \code{\link{period}} and \code{\link{as.period_range}}
 as.period <- function(x, ...) UseMethod("as.period")
 
 #' @export
@@ -46,7 +45,6 @@ as.period.period <- function(x, ...) {
   return(x)
 }
 
-#' @describeIn as.period Convert a character string to a \code{period}
 #' @export
 as.period.character <- function(x, frequency = NA, ...) {
   if (length(x) != 1) {
@@ -55,7 +53,6 @@ as.period.character <- function(x, frequency = NA, ...) {
   return(parse_period(x, frequency = frequency))
 }
 
-#' @describeIn as.period Convert a numeric to a \code{period}
 #' @export
 as.period.numeric <- function(x, frequency = NA, ...) {
   if (length(x) != 1) {
@@ -103,7 +100,7 @@ Ops.period <- function(e1, e2) {
         stop("Illegal logical operation, only == and != allowed")
       }
     }
-    return (NextMethod(.Generic))
+    return(NextMethod(.Generic))
   } else if (.Generic %in% c("+", "-")) {
     # arithmetic operator + or -
     retval <- NextMethod(.Generic)
@@ -141,19 +138,19 @@ as.character.period <- function(x, ...) {
     } else {
       freq_char <- "-"
     }
-    return (paste0(get_year__(x), freq_char, get_subperiod__(x)))
+    return(paste0(get_year__(x), freq_char, get_subperiod__(x)))
   }
 }
 
 
 # internal function
 get_year__ <- function(x) {
-  return (as.numeric(x) %/% frequency(x))
+  return(as.numeric(x) %/% frequency(x))
 }
 
 # internal function
 get_subperiod__ <- function(x) {
-  return (as.numeric(x) %% frequency(x) + 1)
+  return(as.numeric(x) %% frequency(x) + 1)
 }
 
 #' Return the year of a \code{\link{period}}
@@ -167,7 +164,7 @@ get_year <- function(x) {
   if (!is.period(x)) {
     stop("Argument x is not a period")
   }
-  return (get_year__(x))
+  return(get_year__(x))
 }
 
 #' Return the subperiod of a \code{\link{period}}
@@ -185,7 +182,7 @@ get_subperiod <- function(x) {
   if (!is.period(x)) {
     stop("Argument x is not a period")
   }
-  return (get_subperiod__(x))
+  return(get_subperiod__(x))
 }
 
 #' @export
@@ -198,7 +195,7 @@ print.period <- function(x, ...) {
 # Create a period object based on the number of subperiods after Christ.
 # Internal function.
 create_period <- function(subperiod_count, frequency) {
-  return (structure(subperiod_count, class = "period",
+  return(structure(subperiod_count, class = "period",
                     frequency = frequency))
 }
 

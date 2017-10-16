@@ -2,33 +2,50 @@
 % Please edit documentation in R/period.R
 \name{period}
 \alias{period}
-\title{Create a \code{\link{period}} object based on a character string or numeric.}
+\alias{as.period}
+\title{Create a \code{\link{period}} object}
 \usage{
 period(x, frequency = NA)
+
+as.period(x, ...)
 }
 \arguments{
-\item{x}{a character string or numeric}
+\item{x}{a character string or numeric scalar}
 
-\item{frequency}{frequency of the period object.
-Argument \code{frequency} is mandatory if a general period format
-such as \code{"2011-1"} has been specified}
+\item{frequency}{frequency of the period. Argument \code{frequency} is
+mandatory if the frequency cannot be inferred from \code{x} (for example
+\code{"2011-2"} could be a quarter, month, etc.)}
+
+\item{...}{additional arguments to be passed to or from methods (cuyrrently
+not used in package \code{regts})}
 }
 \value{
 a \code{period} object
 }
 \description{
+Function \code{period} creates a \code{period} object
+based on a character string or numeric scalar.
 Possible character string formats are for example \code{"2010Q2"},
 \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
-The period may be prefixed with a \code{"T"} or \code{"Y"}.
-Possible numeric formats are for example \code{2011} or \code{2011.25}
-(the second quarter of 2011).
+The period may be prefixed with a \code{"T"} or \code{"Y"}. The string
+format is case insensitive, so \code{"t2010Q2"} is also a valid period
+format. Possible numeric formats are for example \code{2011} or
+\code{2011.25} (the second quarter of 2011).
+\cr\cr
+Function \code{as.period}
+coerces an R object to a \code{period} object if possible.
 }
 \examples{
 period("2010Q3")
 period("2010-2", frequency = 3)
 period(2015)
 period(2010.25, frequency = 4)
+
+# examples for as.period
+as.period("2010Q3")
+p <- period("2010M11")
+as.period(p)
 }
 \seealso{
-\code{\link{as.period}} and \code{\link{period_range}}
+\code{\link{period_range}}
 }
