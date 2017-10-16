@@ -208,7 +208,36 @@ test_that("a combination of negative and positive differences", {
   expect_equal(dif3$dif, dif_correct)
 })
 
+test_that("NA, NaN, Inf and -Inf values", {
 
+  ts1 <- regts(matrix(data = rep(NA, 4), nc = 2), start = "2016",
+             names = c("a", "b"))
+  ts2 <- ts1 + 0.01
+  colnames(ts2) <- c("a", "b")
 
+  dif1 <- tsdif(ts2, ts1)
+  expect_equal(dif1$equal, TRUE)
 
+  tsN1 <- regts(matrix(data = rep(NaN, 4), nc = 2), start = "2016",
+               names = c("a", "b"))
+  tsN2 <- ts1 + 0.01
+  colnames(ts2) <- c("a", "b")
 
+  dif1 <- tsdif(tsN2, tsN1)
+  expect_equal(dif1$equal, TRUE)
+
+  ts1 <- regts(matrix(data = rep(1:4)/0, nc = 2), start = "2016",
+               names = c("a", "b"))
+  ts2 <- ts1 + 0.01
+  colnames(ts2) <- c("a", "b")
+
+  dif1 <- tsdif(ts2, ts1)
+  expect_equal(dif1$dif, tsN1)
+
+  ts1 <- regts(matrix(data = -rep(1:4)/0, nc = 2), start = "2016",
+               names = c("a", "b"))
+  ts2 <- ts1 + 0.01
+
+  dif1 <- tsdif(ts2, ts1)
+  expect_equal(dif1$dif, tsN1)
+})

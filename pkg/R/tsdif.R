@@ -180,11 +180,14 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
   xx1 <- x1[common_range, common_names, drop = FALSE]
   xx2 <- x2[common_range, common_names, drop = FALSE]
 
-  # If xx1 and xx2 are both NA, then replace NA with 0.
-  # Two NA values are always considered equal.
+  # If xx1 and xx2 are both NA or NaN, then replace NA or NaN with 0.
+  # Two NA or NaN values are always considered equal.
   both_na <- is.na(xx1) & is.na(xx2)
   xx1[both_na] <- 0
   xx2[both_na] <- 0
+  both_nan <- is.nan(xx1) & is.nan(xx2)
+  xx1[both_nan] <- 0
+  xx2[both_nan] <- 0
 
   dif <- fun(xx1, xx2)
   colnames(dif) <- common_names
