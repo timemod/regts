@@ -14,7 +14,8 @@
 #' of two multivariate timeseries objects \code{x1} and \code{x2}.
 #' The two timeseries must have the same frequency, but may have a different
 #' period range. The difference is computed for the intersection of the two
-#' period ranges. Two \code{NA} values are considered to be equal.
+#' period ranges. Two \code{NA} or two \code{NaN} values are considered to be
+#' equal. A \code{NA} value is not equal to a \code{NaN} value.
 #' The function reports missing column names in one of the two objects,
 #'
 #' @export
@@ -180,9 +181,13 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
   xx1 <- x1[common_range, common_names, drop = FALSE]
   xx2 <- x2[common_range, common_names, drop = FALSE]
 
-  # If xx1 and xx2 are both NA, then replace NA with 0.
-  # Two NA values are always considered equal.
-  both_na <- is.na(xx1) & is.na(xx2)
+  # If xx1 and xx2 are both NA or NaN, then replace NA or NaN with 0.
+  # Two NA or two NaN values are always considered equal.
+  both_nan <- is.nan(xx1) & is.nan(xx2)
+  xx1[both_nan] <- 0
+  xx2[both_nan] <- 0
+  # is.na(x) is TRUE for NA  AND  NaN !!
+  both_na <- is.na(xx1) & !is.nan(xx1) & is.na(xx2) & !is.nan(xx2)
   xx1[both_na] <- 0
   xx2[both_na] <- 0
 
