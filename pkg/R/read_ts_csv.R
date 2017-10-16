@@ -76,12 +76,13 @@
 #'
 #' \strong{automatic row skip}
 #'
-#' If \code{skiprow = 0}, automatically all commencing rows with less columns
-#' are skipped (comment rows). After the number of columns are determined,
-#' a search for the first datarow based on this number of columns is started.
-#' All rows before this datarow are skipped.
-#' See the details in function \code{\link[data.table]{fread}}.
-#'
+#' As explained before, the function \code{read_ts_csv}
+#' employs the function \code{fread} of the \code{data.table} package.
+#' If argument \code{skiprow} is 0, then
+#' \code{fread} automatically detects comment rows and skips them.
+#' These comment rows are detected because they have less columns
+#' than the number of columns in the remaining part of the file.
+#' See the details in the documentation function \code{\link[data.table]{fread}}.
 #' @param filename  a string with the filename
 #' @param rowwise a logical value: are the timeseries stored rowwise?
 #' If not specified, then \code{read_ts_csv} tries to figure out itself if
