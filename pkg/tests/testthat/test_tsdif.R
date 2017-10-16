@@ -244,14 +244,14 @@ test_that("NA, NaN, Inf and -Inf values", {
 
 test_that("test combinations of NA, NaN, Inf and proper values", {
 
-  ts1 <- regts(matrix(data = c(NA, NA, NA, NA, NaN, NaN), nc = 2), start = "2016",
-               names = c("a", "b"))
-  ts2 <- regts(matrix(data = c(NaN, NaN, rep(1:4)), nc = 2), start = "2016",
-               names = c("a", "b"))
+  ts1 <- regts(matrix(data = c(NA, NA, NA, NA, NaN, NaN), nc = 3), start = "2016",
+               names = c("a", "b", "c"))
+  ts2 <- regts(matrix(data = c(NaN, NaN, rep(1:4)), nc = 3), start = "2016",
+               names = c("a", "b", "c"))
 
-  res__dif <- create_tsdif(equal = FALSE, difnames = c("a", "b"),
+  res__dif <- create_tsdif(equal = FALSE, difnames = c("a", "b", "c"),
                              dif = ts1,
-                             common_names = c("a", "b"),
+                             common_names = c("a", "b", "c"),
                              missing_names1 = character(0),
                              missing_names2 = character(0),
                              common_range  = get_period_range(ts1),
