@@ -75,28 +75,23 @@ print_vec_year <- function(x, ...) {
   # we columns names for column 2 and further will be " + 2", "+ 3", etc.
   col_width <- max(4, col_width)
 
+  ny <- end_y - start_y + 1
+
   # number of columns for the output data
   ncol <- floor(width / (col_width + 1))
   ncol <- max(1, ncol)
+  ncol <- min(ncol, ny)
 
   # if the number of columns is 5 or more, then we use either 5 or 10 columns
-  if (ncol >= 5 && ncol < 10) {
-    ncol <- 5
-  } else if (ncol > 10) {
-    ncol <- 10
+  if (ncol < ny) {
+    if (ncol >= 5 && ncol < 10) {
+      ncol <- 5
+    } else if (ncol > 10) {
+      ncol <- 10
+    }
   }
 
-  ny <- end_y - start_y + 1
-
-  if (ny <= ncol) {
-    # single line, print all years above the numbers
-    x <- as.vector(x)
-    names(x) <- as.character(seq(from = start_y, to = end_y, by = 1))
-    print(x, ...)
-    return(invisible(x))
-  }
-
-  if (ncol == 5 || ncol == 10) {
+  if ((ncol == 5 || ncol == 10) && ny > ncol) {
     # fore decades and half-decades we want to start at the beginning
     # of a decade/half decade
     start_y_mat <- floor(start_y / ncol) * ncol
