@@ -1,10 +1,18 @@
-#' Calculate an index timeseries from a timeseries with relative or percentage changes.
+#' Calculate an index timeseries from a timeseries with relative or
+#' percentage changes.
 #'
-#' A timeseries of relative changes \eqn{x_t} is related to the original
-#' timeseries \eqn{X_t} by the relation \eqn{x_t = (X_t - X_{t-1}) / | X_{t-1}|}.
-#' Function \code{rel2index} computes the index series
-#' \eqn{\tilde{X}_t = s X_t / X_{t^*}}, where \eqn{s} is the scale and
-#' \eqn{t^*} is the base period
+#' The relative change of a timeseries \eqn{X_t}
+#' is defined as \eqn{x_t = (X_t - X_{t-1}) / | X_{t-1}|}.
+#' If we only know \eqn{x_t}, then it is not possible to reconstruct
+#' \eqn{X_t}, because the scale of \eqn{X_t} is unknown.
+#' However, it is possible to calculate the index series
+#' \eqn{\tilde{X}_t = s X_t / X_{t^*}}, where \eqn{s} is arbitrary scale and
+#' \eqn{t^*} is the base period.
+#' Function \code{rel2index} computes this index series.
+#' \cr\cr
+#' Similarly, function \code{pct2index} computes the index series
+#' for a timeseries of percentage changes, defined as
+#' \eqn{x_t = 100 (X_t - X_{t-1}) / | X_{t-1}|}.
 #'
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}}
 #' @param base_period base period of the index timeseries (a \code{\link{period}}

@@ -4,7 +4,8 @@
 \alias{pct2index/rel2index}
 \alias{rel2index}
 \alias{pct2index}
-\title{Calculate an index timeseries from a timeseries with relative or percentage changes.}
+\title{Calculate an index timeseries from a timeseries with relative or
+percentage changes.}
 \usage{
 rel2index(x, base_period = start_period(x) - 1, scale = 100)
 
@@ -19,11 +20,18 @@ object or an object that can be coerced to a \code{period} object)}
 \item{scale}{the value of the index series at the base period}
 }
 \description{
-A timeseries of relative changes \eqn{x_t} is related to the original
-timeseries \eqn{X_t} by the relation \eqn{x_t = (X_t - X_{t-1}) / | X_{t-1}|}.
-Function \code{rel2index} computes the index series
-\eqn{\tilde{X}_t = s X_t / X_{t^*}}, where \eqn{s} is the scale and
-\eqn{t^*} is the base period
+The relative change of a timeseries \eqn{X_t}
+is defined as \eqn{x_t = (X_t - X_{t-1}) / | X_{t-1}|}.
+If we only know \eqn{x_t}, then it is not possible to reconstruct
+\eqn{X_t}, because the scale of \eqn{X_t} is unknown.
+However, it is possible to calculate the index series
+\eqn{\tilde{X}_t = s X_t / X_{t^*}}, where \eqn{s} is arbitrary scale and
+\eqn{t^*} is the base period.
+Function \code{rel2index} computes this index series.
+\cr\cr
+Similarly, function \code{pct2index} computes the index series
+for a timeseries of percentage changes, defined as
+\eqn{x_t = 100 (X_t - X_{t-1}) / | X_{t-1}|}.
 }
 \section{Functions}{
 \itemize{
