@@ -2,19 +2,60 @@
 #'
 #' Function \code{period} creates a \code{period} object
 #' based on a character string or numeric scalar.
-#' Possible character string formats are for example \code{"2010Q2"},
-#' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
-#' The period may be prefixed with a \code{"T"} or \code{"Y"}. The string
-#' format is case insensitive, so \code{"t2010Q2"} is also a valid period
-#' format. Possible numeric formats are for example \code{2011} or
-#' \code{2011.25} (the second quarter of 2011).
+#' Possible character string formats are for example \code{"2017Q2"},
+#' \code{"2017M2"}, \code{"2017"} or \code{"2017-2"}.
+#' Possible numeric formats are for example \code{2017} or
+#' \code{2017.25} (the second quarter or the fourth month of 2017).
+#' See Details.
 #' \cr\cr
 #' Function \code{as.period}
 #' coerces an R object to a \code{period} object if possible.
+#'
+#' The function \code{period} accepts buth a character vector or
+#' a numeric scalar as arguments. The specific format is described below.
+#'
+#' \strong{string format}
+#'
+#' The format for yearly periods is for example \code{"2017"}
+#' or \code{"2017Y"} (the suffix \code{"Y"} is optional).
+#'
+#' The standard format format for quarterly periods is
+#' for example \code{"2017Q3"}. Alternatives formats
+#' such as \code{"2017 3Q"} and \code{"2017.3Q"}
+#' are also recognized. The separator between the year and the
+#' quarter can be a blank, a dot, as in the previous examples,
+#' but also a forward slash (\code{"/"}) and underscore (\code{"_"})
+#' are allowed.
+#'
+#' The format for monthly periods is similar as that of
+#' quarterly periods, exect that the \code{"Q"} is replaced by
+#' \code{"M"}.
+#'
+#' Periods with other frequencies than year, quarter and month can be specified
+#' as for example \code{"2017-2"}. Alternative
+#' separators (blank, dot, etc.) are possible. In this case argument
+#' \code{frequency} should be specified.
+#'
+#' The string format is case insensitive, and may be prefixed
+#' with \code{"Y"} or \code{"T"}. Thus for exampe \code{"t2017q3"}
+#' is also an allowed period string.
+#'
+
+#' \strong{numeric format}
+#'
+#' An integer number, such as \code{2017} specified a year,
+#' or the first subperiod in a year if argument \code{frequency} has been
+#' specified.
+#'
+#' If the numeric has a non-zero fractional part,
+#' then argument \code{frequency} is mandatory,
+#' For example, the numeric \code{2017.25}
+#' can specify the second quarter of 2017 or the fourth month of 2017.
+#'
 #' @param x a character string or numeric scalar
 #' @param frequency frequency of the period. Argument \code{frequency} is
 #' mandatory if the frequency cannot be inferred from \code{x} (for example
-#' \code{"2011-2"} could be a quarter, month, etc.)
+#' \code{"2017-2"} could be a quarter, month, etc.)
 #' @param ... additional arguments to be passed to or from methods (cuyrrently
 #' not used in package \code{regts})
 #' @return a \code{period} object
@@ -26,8 +67,8 @@
 #' period(2010.25, frequency = 4)
 #'
 #' # examples for as.period
-#' as.period("2010Q3")
-#' p <- period("2010M11")
+#' as.period("2010q3")
+#' p <- period("2010m11")
 #' as.period(p)
 #' @importFrom Rcpp sourceCpp
 #' @seealso \code{\link{period_range}}

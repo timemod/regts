@@ -34,22 +34,23 @@ a \code{period_range} object
 }
 \description{
 A \code{period_range} object represents an interval of periods,
-for example a period from \code{"2012Q2"} to \code{"2016Q4"}.
+for example a period from \code{"2017Q2"} to \code{"2019Q3"}.
 Function \code{period_range}  creates a \code{period_range} from
-a single character string or from two R objects that can be
-coerced to \code{period} objects.
-\cr\cr
-It is also possible to create a \code{period_range} from
-a single string specifying a period range, for example
-\code{"2010Q2/2011Q3"}. For this format, the first and last
-period are separated by \code{"/"}. The first and last period
-are specified according to the same format recognized by function
-\code{\link{period}}. The first or last period may be omitted
-(e.g. \code{"2012Q3/"})), in that case the period range
-has no lower or upper bound.
+a single character string (e.g. \code{"2017Q2/2019Q3"}, see Details)
+or from two R objects that can be coerced to \code{period} objects.
 \cr\cr
 Function \code{as.period_range} coerces an R object to a \code{period_range}
 if possible.
+}
+\details{
+It is possible to create a \code{period_range} from
+a single string specifying a period range, for example
+\code{"2017Q2/2019Q3"}. For this format, the first and last
+period are separated by \code{"/"}. The first and last period
+are specified according to the same format recognized by function
+\code{\link{period}}. The first or last period may be omitted
+(e.g. \code{"2017Q3/"})), in that case the period range
+has no lower or upper bound.
 }
 \examples{
 # two methods to create a period_range from 2010Q2 to 2016Q3

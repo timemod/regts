@@ -64,7 +64,8 @@ This function calculates the difference between common columns
 of two multivariate timeseries objects \code{x1} and \code{x2}.
 The two timeseries must have the same frequency, but may have a different
 period range. The difference is computed for the intersection of the two
-period ranges. Two \code{NA} values are considered to be equal.
+period ranges. Two \code{NA} or two \code{NaN} values are considered to be
+equal. A \code{NA} value is not equal to a \code{NaN} value.
 The function reports missing column names in one of the two objects,
 }
 \examples{
