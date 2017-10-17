@@ -208,7 +208,66 @@ test_that("a combination of negative and positive differences", {
   expect_equal(dif3$dif, dif_correct)
 })
 
+test_that("NA, NaN, Inf and -Inf values", {
+
+  ts1 <- regts(matrix(data = rep(NA, 4), nc = 2), start = "2016",
+             names = c("a", "b"))
+  ts2 <- ts1 + 0.01
+  colnames(ts2) <- c("a", "b")
+
+  dif1 <- tsdif(ts2, ts1)
+  expect_equal(dif1$equal, TRUE)
+
+  tsN1 <- regts(matrix(data = rep(NaN, 4), nc = 2), start = "2016",
+               names = c("a", "b"))
+  tsN2 <- tsN1 + 0.01
+  colnames(tsN2) <- c("a", "b")
+
+  dif1 <- tsdif(tsN2, tsN1)
+  expect_equal(dif1$equal, TRUE)
+
+  ts1 <- regts(matrix(data = rep(1:4)/0, nc = 2), start = "2016",
+               names = c("a", "b"))
+  ts2 <- ts1 + 0.01
+  colnames(ts2) <- c("a", "b")
+
+  dif1 <- tsdif(ts2, ts1)
+  expect_equal(dif1$dif, tsN1)
+
+  ts1 <- regts(matrix(data = -rep(1:4)/0, nc = 2), start = "2016",
+               names = c("a", "b"))
+  ts2 <- ts1 + 0.01
+
+  dif1 <- tsdif(ts2, ts1)
+  expect_equal(dif1$dif, tsN1)
+})
+
+test_that("test combinations of NA, NaN, Inf and proper values", {
+
+  ts1 <- regts(matrix(data = c(NA, NA, NA, NA, NaN, NaN), nc = 3), start = "2016",
+               names = c("a", "b", "c"))
+  ts2 <- regts(matrix(data = c(NaN, NaN, rep(1:4)), nc = 3), start = "2016",
+               names = c("a", "b", "c"))
+
+  res__dif <- create_tsdif(equal = FALSE, difnames = c("a", "b", "c"),
+                             dif = ts1,
+                             common_names = c("a", "b", "c"),
+                             missing_names1 = character(0),
+                             missing_names2 = character(0),
+                             common_range  = get_period_range(ts1),
+                             period_range1 = get_period_range(ts1),
+                             period_range2 = get_period_range(ts1),
+                             ranges_equal = TRUE,
+                             ts_names = c("ts1", "ts2"),
+                             tol = 0, fun = NULL )
+
+  dif1 <- tsdif(ts1, ts2)
+  expect_equal(dif1, res__dif )
 
 
-
-
+  tsInf <- regts(matrix(data = c(rep(1/0,2), rep(-1/0,2), rep(1/0,2), rep(-1/0,2)),
+                        nc = 2), start = "2016", names = c("a", "b"))
+  tsNA  <- regts(matrix(data = c(rep(NA, 4), rep(NaN, 4)),
+                        nc = 2), start = "2016", names = c("a", "b"))
+  expect_equal(tsdif(tsInf, tsNA)$dif, tsNA)
+})
