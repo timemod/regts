@@ -7,7 +7,7 @@
 #' \eqn{X_t}, because the scale of \eqn{X_t} is unknown.
 #' However, it is possible to calculate the index series
 #' \eqn{\tilde{X}_t = s X_t / X_{t^*}}, where \eqn{s} is arbitrary scale and
-#' \eqn{t^*} is the base period.
+#' \eqn{t^*} an arbitrary base period.
 #' Function \code{rel2index} computes this index series.
 #' \cr\cr
 #' Similarly, function \code{pct2index} computes the index series
@@ -23,7 +23,7 @@
 #' ts1 <- regts(abs(rnorm(10)), start = "2010Q2")
 #' print(rel2index(ts1))
 #' print(rel2index(ts1, base_period = "2010Q3", scale = 1))
-#' @name pct2index/rel2index
+#' @name rel2index/pct2index
 NULL
 
 #' @describeIn pct2index-slash-rel2index Calculates an index timeseries from a

@@ -29,7 +29,7 @@ Possible character string formats are for example \code{"2017Q2"},
 \code{"2017M2"}, \code{"2017"} or \code{"2017-2"}.
 Possible numeric formats are for example \code{2017} or
 \code{2017.25} (the second quarter or the fourth month of 2017).
-See details.
+See Details.
 \cr\cr
 Function \code{as.period}
 coerces an R object to a \code{period} object if possible.
