@@ -2,8 +2,15 @@
 % Please edit documentation in R/conversion_functions.R
 \name{rel2index/pct2index}
 \alias{rel2index/pct2index}
+\alias{rel2index}
+\alias{pct2index}
 \title{Calculate an index timeseries from a timeseries with relative or
 percentage changes.}
+\usage{
+rel2index(x, base_period = start_period(x) - 1, scale = 100)
+
+pct2index(x, base_period = start_period(x) - 1, scale = 100)
+}
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}}}
 
@@ -26,6 +33,15 @@ Similarly, function \code{pct2index} computes the index series
 for a timeseries of percentage changes, defined as
 \eqn{x_t = 100 (X_t - X_{t-1}) / | X_{t-1}|}.
 }
+\section{Functions}{
+\itemize{
+\item \code{rel2index}: Calculates an index timeseries from a
+timeseries with relative changes
+
+\item \code{pct2index}: Calculates an index timeseries from a
+timeseries with percentage changes
+}}
+
 \examples{
 ts1 <- regts(abs(rnorm(10)), start = "2010Q2")
 print(rel2index(ts1))

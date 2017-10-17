@@ -76,13 +76,19 @@
 #'
 #' \strong{automatic row skip}
 #'
-#' As explained before, the function \code{read_ts_csv}
-#' employs the function \code{fread} of the \code{data.table} package.
-#' If argument \code{skiprow} is 0, then
-#' \code{fread} automatically detects comment rows and skips them.
-#' These comment rows are detected because they have less columns
-#' than the number of columns in the remaining part of the file.
-#' See the details in the documentation function \code{\link[data.table]{fread}}.
+#' If \code{skiprow = 0}, then the first rows with less columns than
+#' the rest of the file are automatically skipped. These rows are assumed
+#' to be comment rows. This procedure is described in detail
+#' in the documentation of function
+#' \code{\link[data.table]{fread}} of the \code{data.table} package.
+#' Briefly, \code{fread} first determines the number of columns
+#' and then searches for the first data row based on this number of columns.
+#' All rows before this data row are skipped.
+#'
+#' If argument \code{fill} is \code{TRUE}, then all rows have the same
+#' number of columns, and automatic row skipping is therefore
+#' disabled.
+#'
 #' @param filename  a string with the filename
 #' @param rowwise a logical value: are the timeseries stored rowwise?
 #' If not specified, then \code{read_ts_csv} tries to figure out itself if
@@ -90,17 +96,22 @@
 #' @param frequency the frequency of the timeseries.
 #' This argument is mandatory if the file contains a period texts without
 #' frequency indicator (for example "2011-1")
-#' @param skiprow the number of rows to skip. If not specified comment rows are
-#' skipped. See details.
+#' @param skiprow the number of rows to skip.
+#' If 0 (default) and if argument \code{fill} is \code{FALSE},
+#' then comment rows are automatically skipped.
+#' See Details.
 #' @param skipcol the number of columns to skip
 #' @param labels label option. See details
 #' @param sep the separator between columns. If not specified, then
 #' the separator is determined automatically by inspecting the
 #' first 30 lines of the csv file (see the details of function
 #' \code{\link[data.table]{fread}}).
+#' @param fill logical (default is \code{FALSE}). If \code{TRUE} then in case
+#' the rows have unequal length, blank fields are implicitly filled.
 #' @param dec the decimal separator as in \code{base::read.csv}.
 #' If not "." (default) then usually ",".
-#' @param name_fun function to apply to the names of the timeseries
+
+#' @param name_fun function to apply to the names of the timese, tries
 #' @return a \code{regts} object
 #'
 #' @examples
@@ -114,7 +125,8 @@
 read_ts_csv <- function(filename, rowwise, frequency = NA,
                         skiprow = 0, skipcol = 0,
                         labels = c("no", "after", "before"),
-                        sep = "auto", dec = if (sep != ".") "." else ",",
+                        sep = "auto", fill = FALSE,
+                        dec = if (sep != ".") "." else ",",
                         name_fun) {
 
   if (!missing(skiprow)) {
@@ -125,7 +137,7 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
 
   if (missing(rowwise) || rowwise) {
     first_line <- fread(filename, nrows = 1, skip = skip, header = FALSE,
-                        data.table = FALSE, sep = sep, dec = dec, fill = TRUE)
+                        data.table = FALSE, sep = sep, dec = dec, fill = fill)
     is_period <- is_period_text(get_strings(first_line), frequency)
     first_prd_col <- Position(function(x) {x}, is_period)
     if (missing(rowwise)) {
@@ -140,14 +152,13 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
     colClasses <- c(rep("character", first_prd_col - 1), rep("numeric", nper))
     df <- fread(filename, skip = skip, header = TRUE, data.table = FALSE,
                 colClasses = colClasses, sep = sep, dec = dec,
-                fill = TRUE)
-
+                fill = fill)
   } else {
     # we use argument header = FALSE, because otherwise fread generates
     # dummy column names VX (X is number) for all columns with an empty
     # header.
     df <- fread(filename, skip = skip, header = FALSE, data.table = FALSE,
-                sep = sep, dec = dec, fill = TRUE)
+                sep = sep, dec = dec, fill = fill)
   }
 
   if (!missing(skipcol) && skipcol > 0) {

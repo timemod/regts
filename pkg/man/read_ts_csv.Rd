@@ -5,8 +5,8 @@
 \title{Read timeseries from a csv file}
 \usage{
 read_ts_csv(filename, rowwise, frequency = NA, skiprow = 0, skipcol = 0,
-  labels = c("no", "after", "before"), sep = "auto", dec = if (sep != ".")
-  "." else ",", name_fun)
+  labels = c("no", "after", "before"), sep = "auto", fill = FALSE,
+  dec = if (sep != ".") "." else ",", name_fun)
 }
 \arguments{
 \item{filename}{a string with the filename}
@@ -19,8 +19,10 @@ the timeseries are stored rowwise or columnwise}
 This argument is mandatory if the file contains a period texts without
 frequency indicator (for example "2011-1")}
 
-\item{skiprow}{the number of rows to skip. If not specified comment rows are
-skipped. See details.}
+\item{skiprow}{the number of rows to skip.
+If 0 (default) and if argument \code{fill} is \code{FALSE},
+then comment rows are automatically skipped.
+See Details.}
 
 \item{skipcol}{the number of columns to skip}
 
@@ -31,10 +33,13 @@ the separator is determined automatically by inspecting the
 first 30 lines of the csv file (see the details of function
 \code{\link[data.table]{fread}}).}
 
+\item{fill}{logical (default is \code{FALSE}). If \code{TRUE} then in case
+the rows have unequal length, blank fields are implicitly filled.}
+
 \item{dec}{the decimal separator as in \code{base::read.csv}.
 If not "." (default) then usually ",".}
 
-\item{name_fun}{function to apply to the names of the timeseries}
+\item{name_fun}{function to apply to the names of the timese, tries}
 }
 \value{
 a \code{regts} object
@@ -116,13 +121,18 @@ e.g. \code{\link{tolower}}
 
 \strong{automatic row skip}
 
-As explained before, the function \code{read_ts_csv}
-employs the function \code{fread} of the \code{data.table} package.
-If argument \code{skiprow} is 0, then
-\code{fread} automatically detects comment rows and skips them.
-These comment rows are detected because they have less columns
-than the number of columns in the remaining part of the file.
-See the details in the documentation function \code{\link[data.table]{fread}}.
+If \code{skiprow = 0}, then the first rows with less columns than
+the rest of the file are automatically skipped. These rows are assumed
+to be comment rows. This procedure is described in detail
+in the documentation of function
+\code{\link[data.table]{fread}} of the \code{data.table} package.
+Briefly, \code{fread} first determines the number of columns
+and then searches for the first data row based on this number of columns.
+All rows before this data row are skipped.
+
+If argument \code{fill} is \code{TRUE}, then all rows have the same
+number of columns, and automatic row skipping is therefore
+disabled.
 }
 \examples{
 \dontrun{

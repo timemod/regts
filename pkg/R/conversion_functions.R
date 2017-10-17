@@ -26,7 +26,7 @@
 #' @name rel2index/pct2index
 NULL
 
-#' @describeIn pct2index-slash-rel2index Calculates an index timeseries from a
+#' @describeIn rel2index-slash-pct2index Calculates an index timeseries from a
 #' timeseries with relative changes
 #' @export
 rel2index <- function(x, base_period = start_period(x) - 1, scale = 100) {
@@ -59,7 +59,7 @@ rel2index <- function(x, base_period = start_period(x) - 1, scale = 100) {
   }
 }
 
-#' @describeIn pct2index-slash-rel2index Calculates an index timeseries from a
+#' @describeIn rel2index-slash-pct2index Calculates an index timeseries from a
 #' timeseries with percentage changes
 #' @export
 pct2index <- function(x, base_period = start_period(x) - 1, scale = 100) {

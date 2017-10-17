@@ -169,6 +169,20 @@ test_that("rowwise6.csv is read correctly",  {
   expect_identical(result, correct_result_labels["2010Q2", "a", drop = FALSE])
 })
 
+test_that("comment rows are skipped (rowwise7.csv))",  {
+  csv_file <- "csv/rowwise7.csv"
+  result <- read_ts_csv(csv_file)
+  expect_identical(result, correct_result)
+})
+
+test_that("argument fill is working (rowwise8.csv))",  {
+  csv_file <- "csv/rowwise8.csv"
+  result <- read_ts_csv(csv_file, fill = TRUE)
+  correct_result_tmp <- correct_result
+  correct_result_tmp["2011q2", "a"] <- NA
+  expect_identical(result, correct_result_tmp)
+})
+
 test_that("columnwise6.csv is read correctly",  {
   csv_file <- "csv/columnwise6.csv"
   result <- read_ts_csv(csv_file, labels = "after")
