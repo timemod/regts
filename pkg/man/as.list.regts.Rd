@@ -31,8 +31,13 @@ ts_list2 <- within (ts_list1, {
    d <- lag(c)
  })
 
- # use functions \\code{\\link{do.call}} and \\code{\\link{cbind}} to convert
- # the list of timeseries objects to a multivariate \\code{regts}
- regts2 <- do.call(cbind, ts_list2)
+# use functions do.call and cbind to convert
+# the list of timeseries objects to a multivariate regts
+regts2 <- do.call(cbind, ts_list2)
 
+# transfer all timeseries in the list to the global environment
+list2env(ts_list2, .GlobalEnv)
+}
+\seealso{
+\code{\link[base]{list2env}} and  \code{\link{cbind.regts}}
 }
