@@ -1,18 +1,18 @@
-#' Calculate an index timeseries from a timeseries with relative or percentage changes.
+#' Calculate an index timeseries from a timeseries with relative or
+#' percentage changes.
 #'
-#' A timeseries of relative changes \eqn{x_t} is related to the original
-#' timeseries \eqn{X_t} by the relation \eqn{x_t = (X_t - X_{t-1}) / | X_{t-1}|}.
-#' Function \code{rel2index} computes the index series
-#' \eqn{\tilde{X}_t = s X_t / X_{t^*}}, where \eqn{s} is the scale and
-#' \eqn{t^*} is the base period
-#'
-#' @section Functions:
-#' \itemize{
-#' \item \code{rel2index}: Calculates an index timeseries from a timeseries with
-#' relative changes
-#' \item \code{pct2index}: Calculates an index timeseries from a timeseries with
-#' percentage changes
-#' }
+#' The relative change of a timeseries \eqn{X_t}
+#' is defined as \eqn{x_t = (X_t - X_{t-1}) / | X_{t-1}|}.
+#' If we only know \eqn{x_t}, then it is not possible to reconstruct
+#' \eqn{X_t}, because the scale of \eqn{X_t} is unknown.
+#' However, it is possible to calculate the index series
+#' \eqn{\tilde{X}_t = s X_t / X_{t^*}}, where \eqn{s} is arbitrary scale and
+#' \eqn{t^*} an arbitrary base period.
+#' Function \code{rel2index} computes this index series.
+#' \cr\cr
+#' Similarly, function \code{pct2index} computes the index series
+#' for a timeseries of percentage changes, defined as
+#' \eqn{x_t = 100 (X_t - X_{t-1}) / | X_{t-1}|}.
 #'
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}}
 #' @param base_period base period of the index timeseries (a \code{\link{period}}
@@ -23,10 +23,11 @@
 #' ts1 <- regts(abs(rnorm(10)), start = "2010Q2")
 #' print(rel2index(ts1))
 #' print(rel2index(ts1, base_period = "2010Q3", scale = 1))
-#' @name pct2index/rel2index
+#' @name rel2index/pct2index
 NULL
-#'
-#' @rdname pct2index/rel2index
+
+#' @describeIn rel2index-slash-pct2index Calculates an index timeseries from a
+#' timeseries with relative changes
 #' @export
 rel2index <- function(x, base_period = start_period(x) - 1, scale = 100) {
 
@@ -58,7 +59,8 @@ rel2index <- function(x, base_period = start_period(x) - 1, scale = 100) {
   }
 }
 
-#' @rdname pct2index/rel2index
+#' @describeIn rel2index-slash-pct2index Calculates an index timeseries from a
+#' timeseries with percentage changes
 #' @export
 pct2index <- function(x, base_period = start_period(x) - 1, scale = 100) {
   return(rel2index(x/100, base_period = base_period, scale = scale))

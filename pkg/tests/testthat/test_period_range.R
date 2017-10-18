@@ -23,6 +23,8 @@ test_that("constructor period_range", {
                "The start period \\(2010Q4\\) is after the end period \\(2010Q2\\)")
   expect_error(period_range(NULL, NULL),
                "At least one of the periods should not be NULL")
+  expect_error(as.character(period_range("2010Q4/2011Q3", "2010Q2")),
+               "Argument p2 should not be specified if p1 is a period range string")
 })
 
 test_that("as.period_range.character", {
@@ -48,6 +50,12 @@ test_that("as.period_range.period", {
   r2010 <- period_range("2010", "2010")
   expect_identical(as.period_range(prd), r2010)
 })
+
+test_that("as.period_range.numeric", {
+  r2010 <- period_range("2010")
+  expect_identical(as.period_range(2010), r2010)
+})
+
 
 test_that("as.character.period_range", {
   r00_10 <- period_range("2000", "2010")
