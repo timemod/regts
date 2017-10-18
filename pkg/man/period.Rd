@@ -16,7 +16,7 @@ as.period(x, ...)
 mandatory if the frequency cannot be inferred from \code{x} (for example
 \code{"2017-2"} could be a quarter, month, etc.)}
 
-\item{...}{additional arguments to be passed to or from methods (cuyrrently
+\item{...}{additional arguments to be passed to or from methods (currently
 not used in package \code{regts})}
 }
 \value{
@@ -35,7 +35,7 @@ Function \code{as.period}
 coerces an R object to a \code{period} object if possible.
 }
 \details{
-The function \code{period} accepts buth a character vector or
+The function \code{period} accepts a character string or
 a numeric scalar as arguments. The specific format is described below.
 
 \strong{string format}
@@ -44,15 +44,15 @@ The format for yearly periods is for example \code{"2017"}
 or \code{"2017Y"} (the suffix \code{"Y"} is optional).
 
 The standard format format for quarterly periods is
-for example \code{"2017Q3"}. Alternatives formats
+for example \code{"2017Q3"}. Alternative formats
 such as \code{"2017 3Q"} and \code{"2017.3Q"}
 are also recognized. The separator between the year and the
-quarter can be a blank, a dot, as in the previous examples,
+quarter can be a blank or a dot, as in the previous examples,
 but also a forward slash (\code{"/"}) and underscore (\code{"_"})
 are allowed.
 
 The format for monthly periods is similar as that of
-quarterly periods, exect that the \code{"Q"} is replaced by
+quarterly periods, except that the \code{"Q"} is replaced by
 \code{"M"}.
 
 Periods with other frequencies than year, quarter and month can be specified
@@ -66,7 +66,7 @@ is also an allowed period string.
 
 \strong{numeric format}
 
-An integer number, such as \code{2017} specified a year,
+An integer number, such as \code{2017} specifies a year,
 or the first subperiod in a year if argument \code{frequency} has been
 specified.
 

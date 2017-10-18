@@ -34,7 +34,8 @@ first 30 lines of the csv file (see the details of function
 \code{\link[data.table]{fread}}).}
 
 \item{fill}{logical (default is \code{FALSE}). If \code{TRUE} then in case
-the rows have unequal length, blank fields are implicitly filled.}
+the rows have unequal length, blank fields are implicitly filled
+with \code{NA}.}
 
 \item{dec}{the decimal separator as in \code{base::read.csv}.
 If not "." (default) then usually ",".}

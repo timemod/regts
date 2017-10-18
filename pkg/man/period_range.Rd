@@ -26,7 +26,7 @@ without frequency indicator (e.g. \code{"2011-1"})}
 
 \item{x}{an R object}
 
-\item{...}{additional arguments to be passed to or from methods (cuyrrently
+\item{...}{additional arguments to be passed to or from methods (currently
 not used in package \code{regts})}
 }
 \value{

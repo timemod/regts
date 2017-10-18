@@ -31,7 +31,7 @@
 #' @param frequency frequency of the period objects. This argument is mandatory
 #' if argument \code{p1} or \code{p2} is a character with general period format
 #' without frequency indicator (e.g. \code{"2011-1"})
-#' @param ... additional arguments to be passed to or from methods (cuyrrently
+#' @param ... additional arguments to be passed to or from methods (currently
 #' not used in package \code{regts})
 #' @return a \code{period_range} object
 #' @examples
