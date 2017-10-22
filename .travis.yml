@@ -2,7 +2,6 @@
 # travis config
 
 sudo: required
-dist: trusty
 warnings_are_errors: false
 
 language: r
