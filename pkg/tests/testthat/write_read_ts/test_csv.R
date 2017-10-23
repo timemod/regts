@@ -3,7 +3,7 @@ library(testthat)
 
 context("write_read_ts_csv")
 
-if (dir.exists("csv")) {
+if (!dir.exists("csv")) {
   stop(paste("directory csv does not exist", getwd()))
 }
 
