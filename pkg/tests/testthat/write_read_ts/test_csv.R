@@ -3,6 +3,10 @@ library(testthat)
 
 context("write_read_ts_csv")
 
+if (!dir.exists("csv")) {
+  stop("directory csv does not exist")
+}
+
 prd <- period_range("2010Q2/2011Q2")
 a <- regts(c(1, NA, NA, 5.25, 6), period =  prd)
 b <- 10 * a
