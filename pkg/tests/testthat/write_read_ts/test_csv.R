@@ -3,8 +3,8 @@ library(testthat)
 
 context("write_read_ts_csv")
 
-if (!dir.exists("csv")) {
-  stop("directory csv does not exist")
+if (dir.exists("csv")) {
+  stop(paste("directory csv does not exist", getwd()))
 }
 
 prd <- period_range("2010Q2/2011Q2")
