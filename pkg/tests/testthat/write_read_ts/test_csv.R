@@ -4,7 +4,9 @@ library(testthat)
 context("write_read_ts_csv")
 
 if (!dir.exists("csv")) {
-  stop(paste("directory csv does not exist", getwd()))
+  # this could is needed if we run the test with Travis CI,
+  # even though csv/.gitignore is part of the repo.
+  dir.create("csv")
 }
 
 prd <- period_range("2010Q2/2011Q2")

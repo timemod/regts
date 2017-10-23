@@ -3,6 +3,12 @@ library(testthat)
 
 context("write_read_ts_xlsx")
 
+if (!dir.exists("xlsx")) {
+  # this could is needed if we run the test with Travis CI,
+  # even though xlsx/.gitignore is part of the repo.
+  dir.create("xlsx")
+}
+
 prd <- period_range("2010Q2/2011Q2")
 a <- regts(c(1, NA, NA, 5.25, 6), period =  prd)
 b <- 10 * a
