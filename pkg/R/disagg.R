@@ -2,10 +2,16 @@
 #'
 #' This function converts an timeseries to a timeseries with higher frequency,
 #' for example a yearly timeseries to a quartely timeseries. Missing values
-#' are obtained by spline interpolation.
+#' are obtained by spline interpolation. This function employs function
+#' \code{\link[stats]{spline}} of the \code{stats} package
 #'
-#' This function employs function \code{\link[stats]{spline}} of the
-#' \code{stats} package
+#' For each individual timeseries, trailing and leading \code{NA} values are
+#' removed before interpolation. If the timeseries contains intermediate
+#' \code{NA} values, the the resulting timeseries is set to NA.
+#'
+#' For details about the different spline methods,
+#' consult the documentation of the \code{\link[stats]{spline}}
+#' function of the \code{stats} package.
 #'
 #' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object
 #' @param nfrequency the frequency of the result. This should be higher than
@@ -25,54 +31,87 @@ disagg <- function(x, nfrequency,
                    method = c("fmm", "periodic", "natural", "monoH.FC", "hyman"),
                    constraint = c("sum", "average", "last", "first")) {
 
+  method <- match.arg(method)
   constraint <- match.arg(constraint)
-
-  # make sure that x is a matrix
-  input_is_matrix <- is.matrix(x)
-
-  if (!input_is_matrix) {
-    dim(x) <- c(length(x), 1)
+  if (!is.numeric(x)) {
+    stop("The input timeseries is not a numeric timeseries")
   }
 
-  frac <- nfrequency / frequency(x)
+  old_frequency <- frequency(x)
+  if (nfrequency <= old_frequency) {
+    stop(sprintf("nfrequency (%d) is not larger than the input frequency (%d)",
+                 nfrequency, old_frequency))
+  } else if (nfrequency %% old_frequency) {
+    stop(sprintf(paste("nfrequency (%d) is not an integer multiple of the input",
+                       "frequency (%d)"), nfrequency, old_frequency))
+  }
+  frac <- nfrequency / old_frequency
+
 
   do_cumul <- constraint %in% c("sum", "average")
 
-  if (do_cumul) {
-    x[start_period(x) - 1] <- 0
-    x[] <- apply(x, MARGIN = 2, FUN = cumsum)
+  input_is_matrix <- is.matrix(x)
+  if (input_is_matrix) {
+    col_names <- colnames(x)
   }
 
-  p_start_inp <- start_period(x)
-
-  # spline interpolation
-  f_spline <- function(x, n) {
-    return(spline(x = seq_len(n), y = x, n = n * frac - 2)$y)
-  }
-  x_splined <- apply(x, MARGIN = 2, FUN = f_spline, n = nrow(x))
-
-  year <- get_year(p_start_inp)
-  subp_inp <- get_subperiod(p_start_inp)
-  if (constraint == "first") {
-    subp_out <- (subp_inp - 1) * frac + 1
-  } else {
-    subp_out <- subp_inp * frac
+  x <- na_trim(x)
+  if (is.null(x)) {
+    stop("Input timeseries contains only NA values")
   }
 
-  p_start_out <- period(year, frequency = nfrequency) + (subp_out - 1)
-  result <- regts(x_splined, start = p_start_out)
+  # internal function to disaggregate a single timeseries
+  disagg_uni <- function(x) {
 
-  if (!input_is_matrix) {
-    dim(result) <- NULL
-  }
+    x_trim <- na_trim(x)
 
-  if (do_cumul) {
-    result <- diff(result)
-    if (constraint == "average") {
-      result <- result * frac
+    if (is.null(x_trim)) {
+      x_trim <- x
+    }
+
+    if (do_cumul) {
+      x_trim[start_period(x_trim) - 1] <- 0
+      x_trim[] <- cumsum(x_trim)
+    }
+
+    p_start_inp <- start_period(x_trim)
+    year <- get_year(p_start_inp)
+    subp_inp <- get_subperiod(p_start_inp)
+    if (constraint == "first") {
+      subp_out <- (subp_inp - 1) * frac + 1
+    } else {
+      subp_out <- subp_inp * frac
+    }
+    p_start_out <- period(year, frequency = nfrequency) + (subp_out - 1)
+    n <- length(x_trim)
+    nres <- n * frac - 2
+    if (any(is.na(x_trim))) {
+      result <- rep(NA_real_, nres)
+    } else {
+      result  <- spline(x = seq_len(n), y = x_trim, n = nres)$y
+    }
+    result <- regts(result, start = p_start_out)
+    if (do_cumul) {
+      result <- diff(result)
+      if (constraint == "average") {
+        result <- result * frac
+      }
     }
     return(result)
-  } else {
-    return(result)
   }
+
+  l_input <- as.list(x)
+  l_splined <- lapply(l_input, FUN = disagg_uni)
+  result <- do.call(cbind, l_splined)
+
+  if (input_is_matrix && !is.matrix(result)) {
+    dim(result) <- c(length(result), 1)
+    colnames(result) <- col_names
+  }
+
+  return(result)
 }
+
+
+
+
