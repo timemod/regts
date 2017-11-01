@@ -98,6 +98,43 @@ test_that("example with NA values (2)", {
   expect_equal(xyz_m, expected_result)
 })
 
+test_that("example with NA values (3)", {
+  xy_q <- cbind(x = 3 * a_q, y = 3 * a_q)
+  xy_q[, "y"] <- NA
+  xy_q["2018Q1", "y"] <- 3
+  print(xy_q)
+  xy_m <- disagg(xy_q, nfrequency = 12, constraint = "last")
+  print(xy_m)
+  expected_result <- regts(matrix(c(3:18, rep(NA, 16)), ncol = 2),
+                           start = "2017M6", names = c("x", "y"))
+  expected_result["2018M3", "y"] <- 3
+  expect_equal(xy_m, expected_result)
+
+  xy_m_av <- disagg(xy_q, nfrequency = 12, constraint = "average")
+  expected_result_av <- regts(matrix(c(2:19, rep(NA, 18)), ncol = 2),
+                           start = "2017M4", names = c("x", "y"))
+  expected_result_av["2018M1/2018M3", "y"] <- 3
+  expect_equal(xy_m_av, expected_result_av)
+})
+
+test_that("single period", {
+  a <- regts(666, start = "2010Q2")
+  a_ref_last <- regts(666, start = "2010M6")
+  a_ref_sum <- regts(222, period = "2010M4/2010M6")
+  expect_identical(disagg(a, nfrequency = 12, constraint = "last"),
+                   a_ref_last)
+  expect_equal(disagg(a, nfrequency = 12, constraint = "sum"),
+                   a_ref_sum)
+
+  ab <- cbind(a = a, b = 2 * a)
+  ab_ref_last <- cbind(a =a_ref_last, b = 2 * a_ref_last)
+  ab_ref_sum <- cbind(a = a_ref_sum, b = 2 * a_ref_sum)
+  expect_identical(disagg(ab, nfrequency = 12, constraint = "last"),
+                   ab_ref_last)
+  expect_equal(disagg(ab, nfrequency = 12, constraint = "sum"),
+               ab_ref_sum)
+})
+
 test_that("errors", {
   msg <- "nfrequency \\(10\\) is not an integer multiple of the input frequency \\(4\\)"
   expect_error(disagg(ab_q, nfrequency = 10), msg)
@@ -108,7 +145,7 @@ test_that("errors", {
 })
 
 #
-# ts <- regts(1:1, start = "2010Q2")
+#
 # disagg(ts, nfrequency = 12, constraint = "last")
 # disagg(ts, nfrequency = 12, constraint = "average")
 
