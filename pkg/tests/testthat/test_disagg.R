@@ -143,9 +143,3 @@ test_that("errors", {
   msg <- "Input timeseries contains only NA values"
   expect_error(disagg(ab_q * NA, nfrequency = 12), msg)
 })
-
-#
-#
-# disagg(ts, nfrequency = 12, constraint = "last")
-# disagg(ts, nfrequency = 12, constraint = "average")
-
