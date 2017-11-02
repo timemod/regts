@@ -51,7 +51,7 @@ test_that("sum and average method", {
   expect_equal(ab_m[, "a"], a_ref)
 
   #print(ab_m[, "b"])
-  expect_equal_to_reference(ab_m[, "b"], "diagg_b_sum.rds")
+  expect_equal_to_reference(ab_m[, "b"], "disagg_b_sum.rds")
 
   b_q_agg <- aggregate(ab_m[, "b"], FUN = sum, nfrequency = 4)
   expect_equal(b_q, b_q_agg)
@@ -102,9 +102,7 @@ test_that("example with NA values (3)", {
   xy_q <- cbind(x = 3 * a_q, y = 3 * a_q)
   xy_q[, "y"] <- NA
   xy_q["2018Q1", "y"] <- 3
-  print(xy_q)
   xy_m <- disagg(xy_q, nfrequency = 12, constraint = "last")
-  print(xy_m)
   expected_result <- regts(matrix(c(3:18, rep(NA, 16)), ncol = 2),
                            start = "2017M6", names = c("x", "y"))
   expected_result["2018M3", "y"] <- 3

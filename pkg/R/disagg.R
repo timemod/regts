@@ -1,13 +1,13 @@
 #' Temporal disaggregation of time series using spline interpolation.
 #'
 #' This function converts an timeseries to a timeseries with higher frequency,
-#' for example a yearly timeseries to a quartely timeseries. Missing values
+#' for example a yearly timeseries to a quarterly timeseries. Missing values
 #' are obtained by spline interpolation. This function employs function
-#' \code{\link[stats]{spline}} of the \code{stats} package
+#' \code{\link[stats]{spline}} of the \code{stats} package.
 #'
 #' For each individual timeseries, trailing and leading \code{NA} values are
 #' removed before interpolation. If the timeseries contains intermediate
-#' \code{NA} values, the the resulting timeseries is set to NA.
+#' \code{NA} values,  the resulting timeseries is set to NA.
 #'
 #' For details about the different spline methods,
 #' consult the documentation of the \code{\link[stats]{spline}}
@@ -24,7 +24,7 @@
 #' \code{"first"}.
 #' Either the sum, the average, the first or the last value of the resulting
 #' high-frequency series should be equal to the corresponding
-#' low frequency value
+#' low-frequency value.
 #' @importFrom stats spline
 #' @export
 disagg <- function(x, nfrequency,
