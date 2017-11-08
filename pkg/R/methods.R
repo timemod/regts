@@ -51,6 +51,6 @@ t.regts <- function(x) {
   # ts.default always returns a matrix.
   # However, the regts class is not removed from the list
   # of classes. Therefore we have to first unregts the regts object.
-  x <- unregts(x)
+  x <- as.ts(x)
   return(NextMethod(.Generic))
 }
