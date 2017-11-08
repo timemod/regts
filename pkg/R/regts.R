@@ -265,6 +265,11 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   # extract time column(s) and data from the input data frame,
   # and convert to a matrix. data are converted to numeric if necessary
 
+  # x could be a subclass of a data frame, for example a data.table.
+  # Therefore use function as.data.frame to make sure that x is a normal
+  # data frame.
+  x <- as.data.frame(x)
+
   if (time_column == 0) {
     times <- rownames(x)
     data <- x
