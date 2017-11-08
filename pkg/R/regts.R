@@ -255,6 +255,13 @@ as.regts.ts <- function(x, ...) {
   return (x)
 }
 
+#' @export
+as.ts.regts <- function(x, ...) {
+  classes <- class(x)
+  class(x) <- classes[classes != "regts"]
+  return(x)
+}
+
 #' @describeIn as.regts Convert a \code{\link[base]{data.frame}} to a
 #' \code{regts}. The time should be stored in the row numbers
 #' of the matrix
