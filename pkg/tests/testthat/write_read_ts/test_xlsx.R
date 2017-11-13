@@ -77,4 +77,13 @@ test_that("ts with labels written correctly",  {
   expect_equal(df2, data.frame(x = 1, y = 2))
 })
 
+test_that("univariate timeseries", {
+  a_mat <- ts1_lbls[, "a", drop = FALSE]
+  write_ts_xlsx(a_mat, file = "xlsx/ts1_unimat.xlsx", rowwise = FALSE)
+  a <- ts1_lbls[, "a"]
+  write_ts_xlsx(a, file = "xlsx/ts1_univec.xlsx")
+  expect_identical(a_mat, read_ts_xlsx("xlsx/ts1_unimat.xlsx", labels = "before"))
+  expect_identical(a_mat, read_ts_xlsx("xlsx/ts1_univec.xlsx", labels = "after"))
+})
+
 

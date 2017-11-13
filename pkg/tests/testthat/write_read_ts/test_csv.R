@@ -69,6 +69,24 @@ test_that("file with labels with label option no written correctly",  {
   expect_identical(ts1, ts1_read)
 })
 
+test_that("univariate timeseries", {
+  a_mat <- ts1_lbls[, "a", drop = FALSE]
+  write_ts_csv(a_mat, file = "csv/ts1_unimat.csv", rowwise = FALSE)
+  a <- ts1_lbls[, "a"]
+  write_ts_csv(a, file = "csv/ts1_univec.csv")
+  expect_identical(a_mat, read_ts_csv("csv/ts1_unimat.csv", labels = "before"))
+  expect_identical(a_mat, read_ts_csv("csv/ts1_univec.csv", labels = "after"))
+})
+
+test_that("no column names", {
+  tmp <- ts1_lbls
+  colnames(tmp) <- NULL
+  write_ts_csv(tmp, file = "csv/ts1_no_colnames.csv")
+  expected_result <- tmp
+  colnames(expected_result) <- c("series1", "series2")
+  expect_identical(expected_result, read_ts_csv("csv/ts1_no_colnames.csv",
+                                                labels = "after"))
+})
 
 
 

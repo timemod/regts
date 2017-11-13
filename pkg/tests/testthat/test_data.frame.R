@@ -12,6 +12,9 @@ test_that("as.regts.data.frame for univariate quarterly timeseries", {
   df2 <- df[-1]
   rownames(df2) <- df[[1]]
   expect_identical(df2, as.data.frame(ts2))
+
+  a <- ts2[, 1, drop=TRUE]
+  expect_identical(df2, as.data.frame(a))
 })
 
 test_that("as.regts.data.frame for multivariate quarterly timeseries", {
