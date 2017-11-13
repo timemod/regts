@@ -17,17 +17,23 @@
 #' print(as.data.frame(ts))
 as.data.frame.regts <- function(x, ...) {
 
-    # convert the time index to a character vector with period texts
-    first_period <- start_period.ts(x)
-    times <- sapply(0 : (NROW(x) - 1),
-                    FUN = function(i) as.character(first_period + i))
+  if (!is.matrix(x)) {
+    x <- univec2unimat(x, deparse(substitute(x)))
+  }
 
-    ret <- as.data.frame.ts(x, row.names = times, ...)
+  # convert the time index to a character vector with period texts
+  first_period <- start_period.ts(x)
+  times <- sapply(0 : (NROW(x) - 1),
+                  FUN = function(i) as.character(first_period + i))
 
-    # handle labels
-    lbls <- ts_labels(x)
-    if (!is.null(lbls)) {
-        Hmisc::label(ret, self = FALSE) <- lbls
-    }
-    return(ret)
+  ret <- as.data.frame.ts(x, row.names = times, ...)
+
+
+
+  # handle labels
+  lbls <- ts_labels(x)
+  if (!is.null(lbls)) {
+    Hmisc::label(ret, self = FALSE) <- lbls
+  }
+  return(ret)
 }

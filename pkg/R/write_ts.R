@@ -21,6 +21,10 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
     labels <- match.arg(labels)
   }
 
+  if (!is.matrix(x)) {
+    x <- univec2unimat(x, deparse(substitute(x)))
+  }
+
   dataframes  <- ts2df_(x, rowwise, labels, labels_missing)
   data <- dataframes$data
   column_headers <- dataframes$column_headers
@@ -123,6 +127,10 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           labels = c("after", "before", "no"), comments,
                           number_format) {
 
+  if (!is.matrix(x)) {
+    x <- univec2unimat(x, deparse(substitute(x)))
+  }
+
   if (!file.exists(file)) {
     append <- FALSE
   }
@@ -162,6 +170,10 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 write_ts_sheet <- function(x, sheet,  rowwise = TRUE,
                            labels = c("after", "before", "no"),
                            comments, number_format) {
+
+  if (!is.matrix(x)) {
+    x <- univec2unimat(x, deparse(substitute(x)))
+  }
 
   write_ts_sheet_(x, sheet, rowwise = rowwise, labels = labels,
                   labels_missing = missing(labels), comments, number_format)
@@ -247,6 +259,10 @@ ts2df_ <- function(x, rowwise, label_option, labels_missing) {
 
   if (!is.ts(x)) {
     stop(paste("Argument x is not a timeseries object but a ", class(x)))
+  }
+
+  if (is.null(colnames(x))) {
+    colnames(x) <- paste0("series", 1:ncol(x))
   }
 
   # collect labels
