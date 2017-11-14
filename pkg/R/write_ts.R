@@ -207,6 +207,13 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
   row_split <- n_text_rows + 1 + n_comment_rows
   col_split <- n_text_cols + 1
 
+  # convert strings representing years to numeric
+  if (rowwise && frequency(x) == 1) {
+    col_sel <- - seq_len(n_text_cols)
+    column_headers[, col_sel] <-
+      as.data.frame(lapply(column_headers[, col_sel], FUN = as.numeric))
+  }
+
   # Write the column headers. Use right alignment for the numeric columns
   wb <- sheet$getWorkbook()
   right_align_style <- CellStyle(wb, alignment = Alignment(horizontal =
@@ -227,6 +234,10 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
     names(col_style) <- seq(n_text_cols + 1, n_text_cols + ndata)
   }
 
+  if (!rowwise && frequency(x) == 1) {
+    # convert strings representing years to numeric
+    data[1] <- as.numeric(data[[1]])
+  }
   addDataFrame(data, sheet, col.names = FALSE, row.names = FALSE,
                startRow = n_text_rows + n_comment_rows + 1,
                colStyle = col_style)
