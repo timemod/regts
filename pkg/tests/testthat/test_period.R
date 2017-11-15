@@ -60,7 +60,7 @@ test_that("errors", {
   expect_error(period("a2010M2"), "Illegal period a2010M2")
 
   expect_error(period("2010Q8"), "Illegal period 2010Q8")
-  expect_error(period("2010.0", frequency = 1), "Illegal period 2010.0")
+  expect_error(period("2010.0", frequency = 12), "Illegal period 2010.0")
   expect_error(period("6 q 2005"), "Illegal period 6 q 2005")
   expect_error(period("100000Q1"), "Illegal period 100000Q1")
 
@@ -148,6 +148,7 @@ test_that("regts:::is_period_text", {
   expect_true(regts:::is_period_text("2010-8"))
   expect_false(regts:::is_period_text("2010Q8"))
   expect_false(regts:::is_period_text("2010Q0"))
-  expect_false(regts:::is_period_text("2010.0"))
-  expect_false(regts:::is_period_text("2010.0", frequency = 1))
+  expect_true(regts:::is_period_text("2010.0"))
+  expect_true(regts:::is_period_text("2010.0", frequency = 1))
+  expect_false(regts:::is_period_text("2010.0", frequency = 4))
 })
