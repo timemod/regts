@@ -185,8 +185,9 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                      na = na_string)
   }
 
-  # the next statement is necessary. Why?
+  # convert df to a normal data frame (read_excel returns a tibble)
   df <- as.data.frame(df)
+
 
   if (rowwise) {
     return(read_ts_rowwise(df, frequency = frequency, labels = labels,

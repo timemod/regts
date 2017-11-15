@@ -97,6 +97,7 @@ qm_period :   opt_t NUMBER opt_sep NUMBER FREQ  /* e.g. 2010.1q */
 
 no_periodicity_1 : YEAR_CHARACTER NUMBER opt_sep NUMBER /* e.g. Y2010 3 */
                {year = $2; subperiod = $4;}
+;
 
 no_periodicity_2 : opt_t NUMBER opt_sep NUMBER   /* e.g. 2010/1 or 5/2010 */
 	       // This format is ambiguous: the first number can be a
@@ -104,6 +105,14 @@ no_periodicity_2 : opt_t NUMBER opt_sep NUMBER   /* e.g. 2010/1 or 5/2010 */
                // number is a year and the second number a subperiod with
                // unknown periodicity
                {year = $2; subperiod = $4;
+		if (subperiod == 0 && (ISNA(given_freq) || given_freq == 1)) {
+                   // 2010.0 interpret as an integer, 
+                   // this is a fix of the problem with read_excel
+                   freq = 1;
+		   subperiod = 1;
+                }
+			
+			
                 if (!ISNA(given_freq)) {
                     check_year_subperiod(given_freq, year, subperiod);
                 };}
