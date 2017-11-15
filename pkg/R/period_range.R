@@ -131,6 +131,37 @@ as.period_range.numeric <- function(x, frequency = NA, ...) {
   return(as.period_range(p1))
 }
 
+#' @export
+as.period_range.POSIXlt <- function(x, frequency = 12, ...) {
+  if (is.na(frequency)) {
+    # this situation could happen is as.period.Date is called from
+    # function period_range
+    frequency <- 12
+  }
+  return(period_range(as.period(x, frequency), frequency = frequency))
+}
+
+#' @export
+as.period_range.POSIXct <- function(x, frequency = 12, ...) {
+  if (is.na(frequency)) {
+    # this situation could happen is as.period.Date is called from
+    # function period_range
+    frequency <- 12
+  }
+  return(period_range(as.period(x, frequency), frequency = frequency))
+}
+
+#' @export
+as.period_range.Date <- function(x, frequency = 12, ...) {
+  if (is.na(frequency)) {
+    # this situation could happen is as.period.Date is called from
+    # function period_range
+    frequency <- 12
+  }
+  return(period_range(as.period(x, frequency), frequency = frequency))
+}
+
+
 #' Test if an object is a \code{\link{period_range}}
 #'
 #' @param x any R object

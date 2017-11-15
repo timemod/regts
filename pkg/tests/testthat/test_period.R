@@ -13,7 +13,13 @@ test_that("constructor period", {
   expect_identical(as.character(period("2001-4", frequency = 4)), "2001Q4")
   expect_identical(as.character(period("2001 4", frequency = 12)), "2001M4")
   expect_identical(as.character(period("4 2001", frequency = 12)), "2001M4")
+  d <- as.Date("2010-05-30")
+  expect_identical(as.character(period(d)), "2010M5")
+  expect_identical(as.character(period(d, frequency = 4)), "2010Q2")
+  expect_identical(as.character(period(as.POSIXct(d), frequency = 1)), "2010")
+  expect_identical(as.character(period(as.POSIXlt(d), frequency = 3)), "2010-2")
 })
+
 
 test_that("constructor period with T prefix", {
   expect_identical(as.character(period("T2010 q 2")), "2010Q2")

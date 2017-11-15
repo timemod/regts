@@ -10,7 +10,9 @@ period(x, frequency = NA)
 as.period(x, ...)
 }
 \arguments{
-\item{x}{a character string or numeric scalar}
+\item{x}{a character string, numeric scalar,
+\code{\link[base]{Date}}, \code{\link[base]{POSIXct}}
+or  \code{\link[base]{POSIXlt}}}
 
 \item{frequency}{frequency of the period. Argument \code{frequency} is
 mandatory if the frequency cannot be inferred from \code{x} (for example

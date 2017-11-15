@@ -52,7 +52,9 @@
 #' For example, the numeric \code{2017.25}
 #' can specify the second quarter of 2017 or the fourth month of 2017.
 #'
-#' @param x a character string or numeric scalar
+#' @param x a character string, numeric scalar,
+#' \code{\link[base]{Date}}, \code{\link[base]{POSIXct}}
+#' or  \code{\link[base]{POSIXlt}}
 #' @param frequency frequency of the period. Argument \code{frequency} is
 #' mandatory if the frequency cannot be inferred from \code{x} (for example
 #' \code{"2017-2"} could be a quarter, month, etc.)
@@ -109,6 +111,42 @@ as.period.numeric <- function(x, frequency = NA, ...) {
   year <- floor(x)
   subp <- floor(frequency * (x %% 1))
   return(create_period(year * frequency + subp , frequency))
+}
+
+#' @export
+as.period.Date <- function(x, frequency = 12, ...) {
+  return(as.period.POSIXlt(as.POSIXlt(x), frequency))
+}
+
+#' @export
+as.period.POSIXct <- function(x, frequency = 12, ...) {
+  return(as.period.POSIXlt(as.POSIXlt(x), frequency))
+}
+
+#' @export
+as.period.POSIXlt <- function(x, frequency = 12, ...) {
+
+  if (is.na(frequency)) {
+    # this situation could happen is as.period.POSIXlt is called from
+    # function period
+    frequency <- 12
+  }
+
+  year <- x$year + 1900
+  month <- x$mon + 1
+
+  if (frequency != 12) {
+    if (12 %% frequency != 0) {
+      # TODO: beter error message
+      stop("the specified frequency is no divisor of 12")
+    } else {
+      subperiod <- floor(month * frequency / 12 + 1)
+    }
+  } else {
+    subperiod <- month
+  }
+  subp_since_christ <- year * frequency + subperiod - 1
+  return(create_period(subp_since_christ, frequency))
 }
 
 
