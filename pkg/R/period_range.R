@@ -23,7 +23,6 @@
 #' bound of the period range is undetermined. \code{p1} can also be
 #' a character string specifying a period range, for example
 #' \code{"2010Q2/2011Q3"}).
-
 #' @param p2 the last period (a \code{period}, an object that can be coerced
 #' to a \code{period}, or \code{NULL}).
 #' If \code{p2} is \code{NULL}, the upper bound of the period range is undetermined.
@@ -52,6 +51,11 @@
 #' # convert a period object to a period_range with equal start and end period
 #' p <- period("2010Q2")
 #' as.period_range(p)
+#'
+#' # create a month range starting at the month 1000 days before
+#' # the current day and ending at the current month.
+#' today <- Sys.Date()
+#' period_range(today - 1000, today)
 #' @seealso \code{\link{period}}, \code{\link{nperiod}},
 #' \code{\link{start_period}} and \code{\link{end_period}}
 #' @export
@@ -132,32 +136,17 @@ as.period_range.numeric <- function(x, frequency = NA, ...) {
 }
 
 #' @export
-as.period_range.POSIXlt <- function(x, frequency = 12, ...) {
-  if (is.na(frequency)) {
-    # this situation could happen is as.period.Date is called from
-    # function period_range
-    frequency <- 12
-  }
+as.period_range.POSIXlt <- function(x, frequency = NA, ...) {
   return(period_range(as.period(x, frequency), frequency = frequency))
 }
 
 #' @export
-as.period_range.POSIXct <- function(x, frequency = 12, ...) {
-  if (is.na(frequency)) {
-    # this situation could happen is as.period.Date is called from
-    # function period_range
-    frequency <- 12
-  }
+as.period_range.POSIXct <- function(x, frequency = NA, ...) {
   return(period_range(as.period(x, frequency), frequency = frequency))
 }
 
 #' @export
-as.period_range.Date <- function(x, frequency = 12, ...) {
-  if (is.na(frequency)) {
-    # this situation could happen is as.period.Date is called from
-    # function period_range
-    frequency <- 12
-  }
+as.period_range.Date <- function(x, frequency = NA, ...) {
   return(period_range(as.period(x, frequency), frequency = frequency))
 }
 

@@ -40,7 +40,6 @@
 #' with \code{"Y"} or \code{"T"}. Thus for exampe \code{"t2017q3"}
 #' is also an allowed period string.
 #'
-
 #' \strong{numeric format}
 #'
 #' An integer number, such as \code{2017} specifies a year,
@@ -51,6 +50,14 @@
 #' then argument \code{frequency} is mandatory,
 #' For example, the numeric \code{2017.25}
 #' can specify the second quarter of 2017 or the fourth month of 2017.
+#'
+#' \strong{\code{Date}, \code{POSIXct} and \code{POSIXlt}}
+#'
+#' The function also accepts a \code{\link{Date}},
+#' \code{\link{POSIXct}} or \code{\link{POSIXlt}} argument.
+#' By default the function converts this object to a \code{period} with
+#' frequency month. It is possible to specify another output frequency,
+#' provided that this frequency is a divisor of 12.
 #'
 #' @param x a character string, numeric scalar,
 #' \code{\link[base]{Date}}, \code{\link[base]{POSIXct}}
@@ -72,6 +79,10 @@
 #' as.period("2010q3")
 #' p <- period("2010m11")
 #' as.period(p)
+#'
+#' # example with a Date object
+#' d <- Sys.Date()
+#' period(d)
 #' @importFrom Rcpp sourceCpp
 #' @seealso \code{\link{period_range}}
 #' @export
@@ -114,21 +125,19 @@ as.period.numeric <- function(x, frequency = NA, ...) {
 }
 
 #' @export
-as.period.Date <- function(x, frequency = 12, ...) {
+as.period.Date <- function(x, frequency = NA, ...) {
   return(as.period.POSIXlt(as.POSIXlt(x), frequency))
 }
 
 #' @export
-as.period.POSIXct <- function(x, frequency = 12, ...) {
+as.period.POSIXct <- function(x, frequency = NA, ...) {
   return(as.period.POSIXlt(as.POSIXlt(x), frequency))
 }
 
 #' @export
-as.period.POSIXlt <- function(x, frequency = 12, ...) {
+as.period.POSIXlt <- function(x, frequency = NA, ...) {
 
   if (is.na(frequency)) {
-    # this situation could happen is as.period.POSIXlt is called from
-    # function period
     frequency <- 12
   }
 
@@ -137,10 +146,9 @@ as.period.POSIXlt <- function(x, frequency = 12, ...) {
 
   if (frequency != 12) {
     if (12 %% frequency != 0) {
-      # TODO: beter error message
-      stop("the specified frequency is no divisor of 12")
+      stop(sprintf("12 is not divisibly by te specified frequency (%d)"))
     } else {
-      subperiod <- floor(month * frequency / 12 + 1)
+      subperiod <- floor((month - 1) * frequency / 12 + 1)
     }
   } else {
     subperiod <- month

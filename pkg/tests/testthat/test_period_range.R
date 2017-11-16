@@ -25,6 +25,13 @@ test_that("constructor period_range", {
                "At least one of the periods should not be NULL")
   expect_error(as.character(period_range("2010Q4/2011Q3", "2010Q2")),
                "Argument p2 should not be specified if p1 is a period range string")
+
+  d <- as.Date("2010-05-30")
+  expect_identical(as.character(period_range(d)), "2010M05")
+  expect_identical(as.character(period_range(d, d+100, frequency = 4)),
+                   "2010Q2/2010Q3")
+  expect_identical(as.character(period_range(d, NULL, frequency = 4)),
+                   "2010Q2/")
 })
 
 test_that("as.period_range.character", {

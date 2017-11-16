@@ -76,6 +76,14 @@ If the numeric has a non-zero fractional part,
 then argument \code{frequency} is mandatory,
 For example, the numeric \code{2017.25}
 can specify the second quarter of 2017 or the fourth month of 2017.
+
+\strong{\code{Date}, \code{POSIXct} and \code{POSIXlt}}
+
+The function also accepts a \code{\link{Date}},
+\code{\link{POSIXct}} or \code{\link{POSIXlt}} argument.
+By default the function converts this object to a \code{period} with
+frequency month. It is possible to specify another output frequency,
+provided that this frequency is a divisor of 12.
 }
 \examples{
 period("2010Q3")
@@ -87,6 +95,10 @@ period(2010.25, frequency = 4)
 as.period("2010q3")
 p <- period("2010m11")
 as.period(p)
+
+# example with a Date object
+d <- Sys.Date()
+period(d)
 }
 \seealso{
 \code{\link{period_range}}

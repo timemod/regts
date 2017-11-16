@@ -70,6 +70,11 @@ period_range("2010-2", "2016-2", frequency = 2)
 # convert a period object to a period_range with equal start and end period
 p <- period("2010Q2")
 as.period_range(p)
+
+# create a month range starting at the month 1000 days before
+# the current day and ending at the current month.
+today <- Sys.Date()
+period_range(today - 1000, today)
 }
 \seealso{
 \code{\link{period}}, \code{\link{nperiod}},
