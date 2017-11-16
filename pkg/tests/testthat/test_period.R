@@ -6,18 +6,19 @@ context("period")
 test_that("constructor period", {
   expect_identical(as.character(period("2010 q 2")), "2010Q2")
   expect_identical(as.character(period("9999Q3")), "9999Q3")
-  expect_identical(as.character(period("1m2")), "1M2")
+  expect_identical(as.character(period("1m2")), "1M02")
   expect_identical(as.character(period("2012")), "2012")
   expect_identical(as.character(period(2012)), "2012")
-  expect_identical(as.character(period("2012M3")), "2012M3")
+  expect_identical(as.character(period("2012M3")), "2012M03")
   expect_identical(as.character(period("2001-4", frequency = 4)), "2001Q4")
-  expect_identical(as.character(period("2001 4", frequency = 12)), "2001M4")
-  expect_identical(as.character(period("4 2001", frequency = 12)), "2001M4")
+  expect_identical(as.character(period("2001 4", frequency = 12)), "2001M04")
+  expect_identical(as.character(period("4 2001", frequency = 12)), "2001M04")
   d <- as.Date("2010-05-30")
-  expect_identical(as.character(period(d)), "2010M5")
+  expect_identical(as.character(period(d)), "2010M05")
   expect_identical(as.character(period(d, frequency = 4)), "2010Q2")
   expect_identical(as.character(period(as.POSIXct(d), frequency = 1)), "2010")
   expect_identical(as.character(period(as.POSIXlt(d), frequency = 3)), "2010-2")
+  expect_identical(as.character(period("2001-3", frequency = 9999)), "2001-0003")
 })
 
 
@@ -26,8 +27,8 @@ test_that("constructor period with T prefix", {
   expect_identical(as.character(period("t2011Q3")), "2011Q3")
   expect_identical(as.character(period("t2012")), "2012")
   expect_identical(as.character(period("t2001-4", frequency = 4)), "2001Q4")
-  expect_identical(as.character(period("t 2001 4", frequency = 12)), "2001M4")
-  expect_identical(as.character(period("T4 2001", frequency = 12)), "2001M4")
+  expect_identical(as.character(period("t 2001 4", frequency = 12)), "2001M04")
+  expect_identical(as.character(period("T4 2001", frequency = 12)), "2001M04")
 })
 
 test_that("constructor period with Y prefix", {
@@ -35,20 +36,20 @@ test_that("constructor period with Y prefix", {
   expect_identical(as.character(period("y2010Q3")), "2010Q3")
   expect_identical(as.character(period("J2012")), "2012")
   expect_identical(as.character(period("j2001-4", frequency = 4)), "2001Q4")
-  expect_identical(as.character(period("j 2001 4", frequency = 12)), "2001M4")
-  expect_identical(as.character(period("j4 2", frequency = 12)), "4M2")
+  expect_identical(as.character(period("j 2001 4", frequency = 12)), "2001M04")
+  expect_identical(as.character(period("j4 2", frequency = 12)), "4M02")
   expect_identical(as.character(period("Y2 3", frequency = 4)), "2Q3")
 })
 
 test_that("constructor period with numerical input", {
   expect_identical(as.character(period(2010)), "2010")
   expect_identical(as.character(period(2010.25, frequency = 4)), "2010Q2")
-  expect_identical(as.character(period(2010.25, frequency = 12)), "2010M4")
+  expect_identical(as.character(period(2010.25, frequency = 12)), "2010M04")
 })
 
 test_that("Isis type periods", {
   expect_identical(period("2010.2q"), period("2010Q2"))
-  expect_identical(period("may2010"), period("2010M5"))
+  expect_identical(period("may2010"), period("2010M05"))
   expect_identical(period("3 q 2005"), period("2005Q3"))
 
   expect_identical(period("2016Y"), period("2016"))

@@ -208,7 +208,7 @@ Ops.period <- function(e1, e2) {
 as.character.period <- function(x, ...) {
   freq <- frequency(x)
   if (freq == 1) {
-    return (as.character(as.numeric(x)))
+    return(as.character(as.numeric(x)))
   } else {
     if (freq == 4) {
       freq_char <- "Q"
@@ -217,7 +217,8 @@ as.character.period <- function(x, ...) {
     } else {
       freq_char <- "-"
     }
-    return(paste0(get_year__(x), freq_char, get_subperiod__(x)))
+    format <- sprintf("%%d%%s%%0%dd", ceiling(log10(freq)))
+    return(sprintf(format, get_year__(x), freq_char, get_subperiod__(x)))
   }
 }
 
