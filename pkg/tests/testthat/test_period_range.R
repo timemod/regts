@@ -5,14 +5,14 @@ context("period_range")
 test_that("constructor period_range", {
   expect_identical(as.character(period_range("2010 q 2", "2011Q3")),
                    "2010Q2/2011Q3")
-  expect_identical(as.character(period_range("2010M2")), "2010M2")
+  expect_identical(as.character(period_range("2010M02")), "2010M02")
   expect_identical(as.character(period_range("2010q2", NULL)),
                    "2010Q2/")
   # "d1/d2" is an alternative way to ("d1","d2") to construct a period_range
   expect_identical(period_range("2010 q 2", "2011Q3"),
                    period_range("2010Q2/2011Q3"))
   expect_identical(period_range("2010M2"),
-                   period_range("2010M2/2010M2"))
+                   period_range("2010M0002/2010M02"))
   expect_identical(period_range("2010q2", NULL),
                    period_range("2010Q2/"))
   expect_error(period_range("2001-4", "2014Q"),
@@ -25,12 +25,19 @@ test_that("constructor period_range", {
                "At least one of the periods should not be NULL")
   expect_error(as.character(period_range("2010Q4/2011Q3", "2010Q2")),
                "Argument p2 should not be specified if p1 is a period range string")
+
+  d <- as.Date("2010-05-30")
+  expect_identical(as.character(period_range(d)), "2010M05")
+  expect_identical(as.character(period_range(d, d+100, frequency = 4)),
+                   "2010Q2/2010Q3")
+  expect_identical(as.character(period_range(d, NULL, frequency = 4)),
+                   "2010Q2/")
 })
 
 test_that("as.period_range.character", {
   expect_identical(as.character(as.period_range("2010 q 2/2011Q3")),
                    "2010Q2/2011Q3")
-  expect_identical(as.character(as.period_range("2010M2")), "2010M2")
+  expect_identical(as.character(as.period_range("2010M2")), "2010M02")
   expect_identical(as.character(as.period_range("2010q2/")),
                    "2010Q2/")
   expect_identical(as.character(as.period_range("2010q2 /  ")),
