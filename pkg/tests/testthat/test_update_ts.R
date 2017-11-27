@@ -1,7 +1,7 @@
 library(testthat)
 library(regts)
 
-context("update_ts regts with methods: upd, updna, updval")
+context("update_ts regts with methods: upd, updna, updval and replace")
 
 test_that("equal periods", {
 
@@ -22,7 +22,7 @@ test_that("equal periods", {
   expect_identical(u2, n1)
   expect_identical(u1, v1)
   expect_identical(u2, v2)
-  expect_identical(r1, x1)
+  expect_identical(r1, u2)
 
 })
 
@@ -132,13 +132,17 @@ test_that("overlapping periods, no NA values", {
   u2 <- update_ts(x2, x1, "upd")
   n2 <- update_ts(x2, x1, "updna")
   v2 <- update_ts(x2, x1, "updval")
-  r1 <- update_ts(x2, x1, "replace")
+  r1 <- update_ts(x1, x2, "replace")
+  r2 <- update_ts(x2, x1, "replace")
 
   expect_identical(u1, n2)
   expect_identical(u2, n1)
   expect_identical(v1, n2)
   expect_identical(v2, n1)
-  expect_identical(r1, x1)
+  n2["2000/2001",c("a","c")] <- NA
+  expect_identical(r1, n2)
+  n1["2004/2006",c("a","c")] <- NA
+  expect_identical(r2, n1)
 
 })
 

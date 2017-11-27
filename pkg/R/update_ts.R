@@ -20,10 +20,10 @@
 #' the values in the first timeseries are only replaced with valid (i.e. non-NA)
 #' values from the second timeseries.
 #'
-#' \code{replace} if method \code{replace} is selected the first
-#' timeseries is replaced by the second timeseries
+#' \code{replace} if method \code{replace} is selected the values in the first
+#' timeseries are replaced by the values in the second timeseries for the whole period.
 #'
-#' The first three update methods are only employed at the common columns in
+#' The update methods are only employed at the common columns in
 #' both timeseries.
 #' The non overlapping columns in both timeseries are added to the result.
 #'
@@ -101,11 +101,6 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
 
   update <- calculate_update(x1, x2, common_names, p1, p2, method)
 
-  # if replace then ready
-  if (method == "replace") {
-    return (update)
-  }
-
   # update result with non common names
   update[p2, missing_names1] <- x2[p2, missing_names1]
   update[p1, missing_names2] <- x1[p1, missing_names2]
@@ -136,14 +131,9 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
 }
 
 
-# In case of methods upd, updna and updval calculate the update for the common
-# columns in x1 and x2 and return a regts for the union of periods
-# In case of replace just return x2
+# Calculate the update for the common columns in x1 and x2 and return a regts
+# for the union of periods
 calculate_update <- function(x1, x2, common_names, p1, p2, method) {
-
-  if (method == "replace") {
-    return(x2)
-  }
 
   var_count <- length(common_names)
   if (var_count == 0) {
@@ -165,6 +155,10 @@ calculate_update <- function(x1, x2, common_names, p1, p2, method) {
   } else if (method == "updval") {
     not_na_xx2 <- !is.na(xx2)
     xx1[not_na_xx2] <- xx2[not_na_xx2]
+
+  } else if (method == "replace") {
+    xx1[p_union] <- NA
+    xx1[p2, ] <- xx2[p2, ]
   }
 
   return(xx1)

@@ -40,10 +40,10 @@ only NA values in the first timeseries will be updated
 the values in the first timeseries are only replaced with valid (i.e. non-NA)
 values from the second timeseries.
 
-\code{replace} if method \code{replace} is selected the first
-timeseries is replaced by the second timeseries
+\code{replace} if method \code{replace} is selected the values in the first
+timeseries are replaced by the values in the second timeseries for the whole period.
 
-The first three update methods are only employed at the common columns in
+The update methods are only employed at the common columns in
 both timeseries.
 The non overlapping columns in both timeseries are added to the result.
 }
