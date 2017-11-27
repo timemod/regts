@@ -5,7 +5,7 @@
 \title{Update a multivariate timeseries with another multivariate timeseries
 object}
 \usage{
-update_ts(x1, x2, method = c("upd", "updna", "updval"))
+update_ts(x1, x2, method = c("upd", "updna", "updval", "replace"))
 }
 \arguments{
 \item{x1}{the first timeseries (a multivariate \code{\link{regts}} or
@@ -13,7 +13,7 @@ update_ts(x1, x2, method = c("upd", "updna", "updval"))
 
 \item{x2}{the second timeseries (a multivariate \code{regts} or \code{ts} object).}
 
-\item{method}{three different ways to update the timeseries.
+\item{method}{four different ways to update the timeseries.
 By default the timeseries are updated. This behaviour can be changed by
 using one of the other methods. See details.}
 }
@@ -26,7 +26,7 @@ another multivariate (reg)ts object.
 The result is an updated multivariate \code{\link{regts}} object.
 }
 \details{
-The timeseries can be updated in three different ways:
+The timeseries can be updated in four different ways:
 
 \code{upd} the first timeseries are updated with the second timeseries.
 The two timeseries must have the same frequency, but may have a different
@@ -40,8 +40,11 @@ only NA values in the first timeseries will be updated
 the values in the first timeseries are only replaced with valid (i.e. non-NA)
 values from the second timeseries.
 
-These methods are only employed at the common columns in both timeseries.
+\code{replace} if method \code{replace} is selected the values in the first
+timeseries are replaced by the values in the second timeseries for the whole period.
+
 The non overlapping columns in both timeseries are added to the result.
+The overlapping columns in both timeseries are updated with the different methods.
 }
 \examples{
 library(regts)

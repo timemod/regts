@@ -6,7 +6,7 @@
 #' The result is an updated multivariate \code{\link{regts}} object.
 #'
 #' @details
-#' The timeseries can be updated in three different ways:
+#' The timeseries can be updated in four different ways:
 #'
 #' \code{upd} the first timeseries are updated with the second timeseries.
 #' The two timeseries must have the same frequency, but may have a different
@@ -20,13 +20,16 @@
 #' the values in the first timeseries are only replaced with valid (i.e. non-NA)
 #' values from the second timeseries.
 #'
-#' These methods are only employed at the common columns in both timeseries.
+#' \code{replace} if method \code{replace} is selected the values in the first
+#' timeseries are replaced by the values in the second timeseries for the whole period.
+#'
 #' The non overlapping columns in both timeseries are added to the result.
+#' The overlapping columns in both timeseries are updated with the different methods.
 #'
 #' @param x1 the first timeseries (a multivariate \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
 #' @param x2 the second timeseries (a multivariate \code{regts} or \code{ts} object).
-#' @param method three different ways to update the timeseries.
+#' @param method four different ways to update the timeseries.
 #' By default the timeseries are updated. This behaviour can be changed by
 #' using one of the other methods. See details.
 #' @return an updated multivariate \code{\link{regts}} object.
@@ -44,7 +47,7 @@
 #'\code{\link{regts}}
 #'
 #' @export
-update_ts <- function(x1, x2, method = c("upd", "updna", "updval")) {
+update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
 
   if (!is.mts(x1)) {
     stop(paste0("Argument x1 (", deparse(substitute(x1)),
@@ -127,8 +130,8 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval")) {
 }
 
 
-# Calculate the update for the common columns in x1 and x2,
-# and return a regts for the union of periods
+# Calculate the update for the common columns in x1 and x2 and return a regts
+# for the union of periods
 calculate_update <- function(x1, x2, common_names, p1, p2, method) {
 
   var_count <- length(common_names)
@@ -141,7 +144,8 @@ calculate_update <- function(x1, x2, common_names, p1, p2, method) {
   xx1 <- x1[p_union, common_names, drop = FALSE]
   xx2 <- x2[p_union, common_names, drop = FALSE]
 
-  if (method == "upd") {
+  if (method == "upd" || method == "replace") {
+    if (method == "replace") xx1[] <- NA
     xx1[p2, ] <- xx2[p2, ]
 
   } else if (method == "updna") {
@@ -152,7 +156,6 @@ calculate_update <- function(x1, x2, common_names, p1, p2, method) {
     not_na_xx2 <- !is.na(xx2)
     xx1[not_na_xx2] <- xx2[not_na_xx2]
   }
-
 
   return(xx1)
 }
