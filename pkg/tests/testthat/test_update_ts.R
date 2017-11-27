@@ -16,11 +16,13 @@ test_that("equal periods", {
   u2 <- update_ts(x2, x1, "upd")
   n2 <- update_ts(x2, x1, "updna")
   v2 <- update_ts(x2, x1, "updval")
+  r1 <- update_ts(x2, x1, "replace")
 
   expect_identical(u1, n2)
   expect_identical(u2, n1)
   expect_identical(u1, v1)
   expect_identical(u2, v2)
+  expect_identical(r1, x1)
 
 })
 
@@ -130,11 +132,13 @@ test_that("overlapping periods, no NA values", {
   u2 <- update_ts(x2, x1, "upd")
   n2 <- update_ts(x2, x1, "updna")
   v2 <- update_ts(x2, x1, "updval")
+  r1 <- update_ts(x2, x1, "replace")
 
   expect_identical(u1, n2)
   expect_identical(u2, n1)
   expect_identical(v1, n2)
   expect_identical(v2, n1)
+  expect_identical(r1, x1)
 
 })
 

@@ -6,7 +6,7 @@
 #' The result is an updated multivariate \code{\link{regts}} object.
 #'
 #' @details
-#' The timeseries can be updated in three different ways:
+#' The timeseries can be updated in four different ways:
 #'
 #' \code{upd} the first timeseries are updated with the second timeseries.
 #' The two timeseries must have the same frequency, but may have a different
@@ -20,13 +20,17 @@
 #' the values in the first timeseries are only replaced with valid (i.e. non-NA)
 #' values from the second timeseries.
 #'
-#' These methods are only employed at the common columns in both timeseries.
+#' \code{replace} if method \code{replace} is selected the first
+#' timeseries is replaced by the second timeseries
+#'
+#' The first three update methods are only employed at the common columns in
+#' both timeseries.
 #' The non overlapping columns in both timeseries are added to the result.
 #'
 #' @param x1 the first timeseries (a multivariate \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
 #' @param x2 the second timeseries (a multivariate \code{regts} or \code{ts} object).
-#' @param method three different ways to update the timeseries.
+#' @param method four different ways to update the timeseries.
 #' By default the timeseries are updated. This behaviour can be changed by
 #' using one of the other methods. See details.
 #' @return an updated multivariate \code{\link{regts}} object.
@@ -44,7 +48,7 @@
 #'\code{\link{regts}}
 #'
 #' @export
-update_ts <- function(x1, x2, method = c("upd", "updna", "updval")) {
+update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
 
   if (!is.mts(x1)) {
     stop(paste0("Argument x1 (", deparse(substitute(x1)),
@@ -97,6 +101,11 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval")) {
 
   update <- calculate_update(x1, x2, common_names, p1, p2, method)
 
+  # if replace then ready
+  if (method == "replace") {
+    return (update)
+  }
+
   # update result with non common names
   update[p2, missing_names1] <- x2[p2, missing_names1]
   update[p1, missing_names2] <- x1[p1, missing_names2]
@@ -127,9 +136,14 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval")) {
 }
 
 
-# Calculate the update for the common columns in x1 and x2,
-# and return a regts for the union of periods
+# In case of methods upd, updna and updval calculate the update for the common
+# columns in x1 and x2 and return a regts for the union of periods
+# In case of replace just return x2
 calculate_update <- function(x1, x2, common_names, p1, p2, method) {
+
+  if (method == "replace") {
+    return(x2)
+  }
 
   var_count <- length(common_names)
   if (var_count == 0) {
@@ -152,7 +166,6 @@ calculate_update <- function(x1, x2, common_names, p1, p2, method) {
     not_na_xx2 <- !is.na(xx2)
     xx1[not_na_xx2] <- xx2[not_na_xx2]
   }
-
 
   return(xx1)
 }
