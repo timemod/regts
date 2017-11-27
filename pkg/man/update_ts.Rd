@@ -44,7 +44,7 @@ values from the second timeseries.
 timeseries are replaced by the values in the second timeseries for the whole period.
 
 The non overlapping columns in both timeseries are added to the result.
-The overlapping columns in both timeseries are updated with the different methods umns
+The overlapping columns in both timeseries are updated with the different methods.
 }
 \examples{
 library(regts)

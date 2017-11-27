@@ -24,8 +24,7 @@
 #' timeseries are replaced by the values in the second timeseries for the whole period.
 #'
 #' The non overlapping columns in both timeseries are added to the result.
-#' The overlapping columns in both timeseries are updated with the different methods umns
-
+#' The overlapping columns in both timeseries are updated with the different methods.
 #'
 #' @param x1 the first timeseries (a multivariate \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
