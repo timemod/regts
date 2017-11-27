@@ -23,9 +23,9 @@
 #' \code{replace} if method \code{replace} is selected the values in the first
 #' timeseries are replaced by the values in the second timeseries for the whole period.
 #'
-#' The update methods are only employed at the common columns in
-#' both timeseries.
 #' The non overlapping columns in both timeseries are added to the result.
+#' The overlapping columns in both timeseries are updated with the different methods umns
+
 #'
 #' @param x1 the first timeseries (a multivariate \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
@@ -145,7 +145,8 @@ calculate_update <- function(x1, x2, common_names, p1, p2, method) {
   xx1 <- x1[p_union, common_names, drop = FALSE]
   xx2 <- x2[p_union, common_names, drop = FALSE]
 
-  if (method == "upd") {
+  if (method == "upd" || method == "replace") {
+    if (method == "replace") xx1[] <- NA
     xx1[p2, ] <- xx2[p2, ]
 
   } else if (method == "updna") {
@@ -155,10 +156,6 @@ calculate_update <- function(x1, x2, common_names, p1, p2, method) {
   } else if (method == "updval") {
     not_na_xx2 <- !is.na(xx2)
     xx1[not_na_xx2] <- xx2[not_na_xx2]
-
-  } else if (method == "replace") {
-    xx1[p_union] <- NA
-    xx1[p2, ] <- xx2[p2, ]
   }
 
   return(xx1)
