@@ -54,7 +54,7 @@ test_that("sum and average method", {
   expect_equal(ab_m[, "a"], a_ref)
 
   #print(ab_m[, "b"])
-  expect_equal_to_reference(ab_m[, "b"], "disagg_b_sum.rds")
+  expect_known_output(ab_m[, "b"], file.path("expected_output/disagg_b_sum.rds"))
 
   b_q_agg <- aggregate(ab_m[, "b"], FUN = sum, nfrequency = 4)
   expect_equal(b_q, b_q_agg)
