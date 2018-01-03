@@ -32,10 +32,13 @@ test_that("last method, univariate and multivariate", {
                lag(b_ref, 2))
 
 
-  # test other methods
-  expect_equal(disagg(b_q, nfrequency = 12, constraint = "last",
-                      method = "natural"),
-               ab_m[, "b"])
+  # natural cubic spline, should give the same result for timeseries a
+  # but a different result for timeseries b (which is nonlinear)
+  expect_equal(disagg(a_q, nfrequency = 12, constraint = "last",
+                      method = "natural"), a_ref)
+
+  expect_false(isTRUE(all.equal(disagg(b_q, nfrequency = 12, constraint = "last",
+                      method = "natural"), b_ref)))
 })
 
 
@@ -140,4 +143,37 @@ test_that("errors", {
   expect_error(disagg(ab_q, nfrequency = 3), msg)
   msg <- "Input timeseries contains only NA values"
   expect_error(disagg(ab_q * NA, nfrequency = 12), msg)
+})
+
+test_that("year to quarter", {
+
+  y_per <- period_range("2017Y/2040Y")
+  n_y <- nperiod(y_per)
+  a_y <- regts(seq_len(n_y), period = y_per)
+  a_q <- disagg(a_y, nfrequency = 4, constraint = "last", method = "natural")
+
+  q_per <- period_range("2017Q4/2040Q4")
+  n_q <- nperiod(q_per) / 4
+  a_q_ref <- regts(seq(1, 24, by = 0.25), period = q_per)
+
+  expect_equal(a_q, a_q_ref)
+})
+
+test_that("year to month, sine series", {
+  y_per <- period_range("2017Y/2130Y")
+  n_y <- nperiod(y_per)
+  data <- 1 +  sin((seq_len(n_y) - 1) * 2 * pi / (n_y - 1))
+  a_y <- regts(data, period = y_per)
+
+  a_m <- disagg(a_y, nfrequency = 12, constraint = "first")
+
+  m_per <- period_range("2017M1/2130M1")
+  n_m <- nperiod(m_per)
+  data <- 1 +  sin((seq_len(n_m) - 1) * 2 * pi / (n_m - 1))
+  a_m_ref <- regts(data, period = m_per)
+
+  expect_equal(a_m, a_m_ref)
+
+  expect_equal(a_y, aggregate(a_m["2017M1/2130M12"], nfrequency = 1,
+                              FUN = function(x) {x[1]}))
 })

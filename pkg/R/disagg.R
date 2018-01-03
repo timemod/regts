@@ -84,11 +84,12 @@ disagg <- function(x, nfrequency,
     }
     p_start_out <- period(year, frequency = nfrequency) + (subp_out - 1)
     n <- length(x_trim)
-    nres <- n * frac - 2
+    nres <- (n - 1) * frac + 1
     if (any(is.na(x_trim))) {
       result <- rep(NA_real_, nres)
     } else {
-      result  <- spline(x = seq_len(n), y = x_trim, n = nres)$y
+      result  <- spline(x = seq_len(n), y = x_trim, n = nres,
+                        method = method)$y
     }
     result <- regts(result, start = p_start_out)
     if (do_cumul) {
