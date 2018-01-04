@@ -31,7 +31,7 @@ help:
 	@echo "   check     - Run R CMD check $(PKGDIR)"
 	@echo "   syntax    - check syntax .cpp files"
 	@echo "   document  - run roxygen to generate Rd files and make pdf Reference manual"
-	@echo "   mkpkg     - builds source package and checks with --as-cran"
+	@echo "   mkpkg     - builds source package, add to drat and checks with --as-cran"
 	@echo "   bin       - builds binary package in ./tmp"
 	@echo "   install   - install package in .libPaths()[1]"
 	@echo "   installv  - install package with vignettes in .libPaths()[1]"
@@ -102,13 +102,18 @@ endif
 # build source package for submission to CRAN
 # after building do a check as CRAN does it
 mkpkg: cleanx syntax install_deps
-	R CMD build $(PKG)
+ifeq ($(OSTYPE), windows) 
+	@echo Please run mkpkg on Linux or MAC OSX
+else
+	R CMD build $(PKGDIR)
 	R CMD check --as-cran $(RCHECKARG) $(PKGTAR)
 	@cp -nv $(PKGTAR) archive
 	@echo "Today                           : $(TODAY)"
 	@echo "Checked package description date: $(PKGDATE)"
 # 	@Rscript -e 'cat("Installed version date          :",packageDescription("nleqslv", fields="Date"))'
 	@echo ""
+	./drat.sh --pkg=$(PKGTAR)
+endif
 
 bin: install_deps
 	-@rm -rf tmp
