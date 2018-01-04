@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/robvanharrevelt/regts.svg?branch=master)](https://travis-ci.org/robvanharrevelt/regts)
+[![Build Status](https://travis-ci.org/timemod/regts.svg?branch=master)](https://travis-ci.org/timemod/regts)
 
 ## regts
 
