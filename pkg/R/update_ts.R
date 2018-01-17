@@ -1,9 +1,8 @@
-#' Update a multivariate timeseries with another univariate or multivariate
-#' timeseries object
+#' Update a timeseries with another timeseries object
 #'
-#' This function can be used to update a multivariate (reg)ts object with
-#' another univariate or multivariate (reg)ts object.
-#' The result is an updated multivariate \code{\link{regts}} object.
+#' This function can be used to update a univariate or multivariate (reg)ts
+#' object with another univariate or multivariate (reg)ts object.
+#' The result is an updated \code{\link{regts}} object.
 #'
 #' @details
 #' The timeseries can be updated in four different ways:
@@ -26,14 +25,13 @@
 #' The non overlapping columns in both timeseries are added to the result.
 #' The overlapping columns in both timeseries are updated with the different methods.
 #'
-#' @param x1 the first timeseries (a multivariate \code{\link{regts}} or
+#' @param x1 the first timeseries (a \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
-#' @param x2 the second timeseries (a univariate or multivariate \code{regts}
-#' or \code{ts} object).
+#' @param x2 the second timeseries (a \code{regts} or \code{ts} object).
 #' @param method four different ways to update the timeseries.
 #' By default the timeseries are updated. This behaviour can be changed by
 #' using one of the other methods. See details.
-#' @return an updated multivariate \code{\link{regts}} object.
+#' @return an updated \code{\link{regts}} object.
 #'
 #' @examples
 #' library(regts)
@@ -55,13 +53,13 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
 
   method <- match.arg(method)
 
-  if (!is.mts(x1)) {
+  if (!is.ts(x1)) {
     stop(paste0("Argument x1 (", series_name1,
-                ") is not a multivariate timeseries"))
+                ") is not a timeseries"))
   }
   if (!is.ts(x2)) {
     stop(paste0("Argument x2 (", series_name2,
-               ") is not a univariate or multivariate timeseries"))
+               ") is not a timeseries"))
   }
 
   if (frequency(x1) != frequency(x2)) {
@@ -77,7 +75,13 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
 
   # create colnames if x1 or x2 does not have colnames
   if (is.null(names1)) {
-    names1 <- paste("column", 1 : ncol(x1))
+    if (is.matrix(x1)) {
+      names1 <- paste("column", 1 : ncol(x1))
+    } else {
+      # adapt (vector) timeseries: use timeseries name and give matrix dimension
+      names1 <- series_name1
+      dim(x1) <- c(length(x1), 1)
+    }
     colnames(x1) <- names1
   }
   if (is.null(names2)) {
