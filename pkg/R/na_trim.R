@@ -42,7 +42,10 @@ na_trim <- function (x, method = c("both", "first","last"),
 
     if (!is.ts(x)) {
         stop("Argument x is not a timeseries")
+    } else if (!is.regts(x)) {
+      x <- as.regts(x)
     }
+
     side <- match.arg(method)
     isna <- match.arg(is_na)
 
@@ -67,9 +70,9 @@ na_trim <- function (x, method = c("both", "first","last"),
     } else {
         sel <- 1 : max(elem)
     }
+
     per <- start_period(get_period_range(x)) + sel[1] - 1
     period <- period_range(per, per + length(sel) - 1)
 
-    return(x[period,])
-
+    return(x[period, ])
 }

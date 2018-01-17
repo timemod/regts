@@ -30,6 +30,8 @@ zero_trim <- function (x, method = c("both", "first","last")) {
 
   if (!is.ts(x)) {
     stop("Argument x is not a timeseries")
+  } else if (!is.regts(x)) {
+    x <- as.regts(x)
   }
   side <- match.arg(method)
 
