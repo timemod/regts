@@ -1,9 +1,8 @@
-#' Update a multivariate timeseries with another multivariate timeseries
-#' object
+#' Update a timeseries with another timeseries object
 #'
-#' This function can be used to update a multivariate (reg)ts object with
-#' another multivariate (reg)ts object.
-#' The result is an updated multivariate \code{\link{regts}} object.
+#' This function can be used to update, replace or extend a (reg)ts
+#' object with another (reg)ts object.
+#' The result is an updated \code{\link{regts}} object.
 #'
 #' @details
 #' The timeseries can be updated in four different ways:
@@ -26,13 +25,13 @@
 #' The non overlapping columns in both timeseries are added to the result.
 #' The overlapping columns in both timeseries are updated with the different methods.
 #'
-#' @param x1 the first timeseries (a multivariate \code{\link{regts}} or
+#' @param x1 the first timeseries (a \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
-#' @param x2 the second timeseries (a multivariate \code{regts} or \code{ts} object).
+#' @param x2 the second timeseries (a \code{regts} or \code{ts} object).
 #' @param method four different ways to update the timeseries.
 #' By default the timeseries are updated. This behaviour can be changed by
 #' using one of the other methods. See details.
-#' @return an updated multivariate \code{\link{regts}} object.
+#' @return an updated \code{\link{regts}} object.
 #'
 #' @examples
 #' library(regts)
@@ -49,23 +48,24 @@
 #' @export
 update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
 
-  if (!is.mts(x1)) {
-    stop(paste0("Argument x1 (", deparse(substitute(x1)),
-               ") is not a multivariate timeseries"))
+  series_name1 <- deparse(substitute(x1))
+  series_name2 <- deparse(substitute(x2))
+
+  method <- match.arg(method)
+
+  if (!is.ts(x1)) {
+    stop(paste0("Argument x1 (", series_name1,
+                ") is not a timeseries"))
   }
-  if (!is.mts(x2)) {
-    stop(paste0("Argument x2 (", deparse(substitute(x2)),
-               ") is not a multivariate timeseries"))
+  if (!is.ts(x2)) {
+    stop(paste0("Argument x2 (", series_name2,
+               ") is not a timeseries"))
   }
 
   if (frequency(x1) != frequency(x2)) {
-    series_name1 <- deparse(substitute(x1))
-    series_name2 <- deparse(substitute(x2))
     stop(paste0("Timeseries x1 and x2 (", series_name1, " and ", series_name2,
                ") have different frequencies"))
   }
-
-  method <- match.arg(method)
 
   x1 <- as.regts(x1)
   x2 <- as.regts(x2)
@@ -75,11 +75,23 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
 
   # create colnames if x1 or x2 does not have colnames
   if (is.null(names1)) {
-    names1 <- paste("column", 1 : ncol(x1))
+    if (is.matrix(x1)) {
+      names1 <- paste("column", 1 : ncol(x1))
+    } else {
+      # adapt (vector) timeseries: use timeseries name and give matrix dimension
+      names1 <- series_name1
+      dim(x1) <- c(length(x1), 1)
+    }
     colnames(x1) <- names1
   }
   if (is.null(names2)) {
-    names2 <- paste("column", 1 : ncol(x2))
+    if (is.matrix(x2)) {
+      names2 <- paste("column", 1 : ncol(x2))
+    } else {
+      # adapt (vector) timeseries: use timeseries name and give matrix dimension
+      names2 <- series_name2
+      dim(x2) <- c(length(x2), 1)
+    }
     colnames(x2) <- names2
   }
 
@@ -87,8 +99,12 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
   # columns from x2 with only NA
   if (method == "updval") {
     x2 <- na_trim(x2)
-    x2 <- remove_na_columns(x2)
-    names2 <- colnames(x2)
+    if (!is.null(x2)) {
+      x2 <- remove_na_columns(x2)
+      names2 <- colnames(x2)
+    } else {
+      return(x1)
+    }
   }
 
   common_names   <- intersect(names1, names2)
@@ -97,6 +113,7 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
 
   p1 <- get_period_range(x1)
   p2 <- get_period_range(x2)
+
 
   update <- calculate_update(x1, x2, common_names, p1, p2, method)
 

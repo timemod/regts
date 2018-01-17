@@ -296,6 +296,73 @@ test_that("no column names", {
 
 })
 
+test_that("update an univariate timeseries: matrix and vector", {
+
+  x1 <- regts(matrix(data = rep(2), nc = 1), period = "2002/2005",
+              names = c("a"))
+  a <- regts(rep(2), period = "2002/2005")
+
+  x2 <- regts(matrix(data = rep(1), nc = 1), period = "2000/2003",
+              names = c("b"))
+  b <- regts(rep(1), period = "2000/2003")
+
+  x3 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+              names = c("a", "b", "c"))
+
+  u1 <- update_ts(x1, x2, "upd")
+  u2 <- update_ts(x1, b,  "upd")
+  v1 <- update_ts(a , x2, "upd")
+  v2 <- update_ts(a , b,  "upd")
+  n1 <- update_ts(x1, x3, "upd")
+  n2 <- update_ts(a , x3, "upd")
+
+  expect_identical(u1, u2)
+  expect_identical(v1, v2)
+  expect_identical(n1, n2)
+})
+
+test_that("update with univariate timeseries: matrix and vector", {
+
+  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+              names = c("a", "b", "c"))
+
+  x2 <- regts(matrix(data = rep(2), nc = 1), period = "2002/2005",
+              names = c("a"))
+  a <- regts(rep(2), period = "2002/2005")
+
+  u1 <- update_ts(x1, x2, "upd")
+  u2 <- update_ts(x1, a,  "upd")
+  v1 <- update_ts(x1, x2, "updval")
+  v2 <- update_ts(x1, a,  "updval")
+  n1 <- update_ts(x1, x2, "updna")
+  n2 <- update_ts(x1, a,  "updna")
+
+  expect_identical(u1, u2)
+  expect_identical(v1, v2)
+  expect_identical(n1, n2)
+})
+
+test_that("update with several NA timeseries and method updval", {
+
+  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+                        names = c("a", "b", "c"))
+
+  x2 <- regts(matrix(data = rep(NA), nc = 3), period = "2000/2003",
+              names = c("a", "b", "c"))
+
+  x3 <- regts(matrix(data = rep(NA), nc = 1), period = "2002/2005",
+                        names = c("a"))
+  a <- regts(rep(NA), period = "2002/2005")
+
+  u1 <- update_ts(x1, x2, "updval")
+  u2 <- update_ts(x1, x3, "updval")
+  u3 <- update_ts(x1, a,  "updval")
+
+  expect_identical(u1, x1)
+  expect_identical(u1, u2)
+  expect_identical(u1, u3)
+})
+
 test_that("errors", {
   x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
@@ -303,7 +370,7 @@ test_that("errors", {
               names = c("a", "c", "d"))
   nr <- 2
   expect_error(update_ts(x1, nr, "replace"),
-               "Argument x2 \\(nr\\) is not a multivariate timeseries")
+               "Argument x2 \\(nr\\) is not a timeseries")
 
   expect_error(update_ts(x1, x2, "upd"),
                "Timeseries x1 and x2 \\(x1 and x2\\) have different frequencies")

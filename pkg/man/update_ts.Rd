@@ -2,28 +2,27 @@
 % Please edit documentation in R/update_ts.R
 \name{update_ts}
 \alias{update_ts}
-\title{Update a multivariate timeseries with another multivariate timeseries
-object}
+\title{Update a timeseries with another timeseries object}
 \usage{
 update_ts(x1, x2, method = c("upd", "updna", "updval", "replace"))
 }
 \arguments{
-\item{x1}{the first timeseries (a multivariate \code{\link{regts}} or
+\item{x1}{the first timeseries (a \code{\link{regts}} or
 \code{\link[stats]{ts}} object).}
 
-\item{x2}{the second timeseries (a multivariate \code{regts} or \code{ts} object).}
+\item{x2}{the second timeseries (a \code{regts} or \code{ts} object).}
 
 \item{method}{four different ways to update the timeseries.
 By default the timeseries are updated. This behaviour can be changed by
 using one of the other methods. See details.}
 }
 \value{
-an updated multivariate \code{\link{regts}} object.
+an updated \code{\link{regts}} object.
 }
 \description{
-This function can be used to update a multivariate (reg)ts object with
-another multivariate (reg)ts object.
-The result is an updated multivariate \code{\link{regts}} object.
+This function can be used to update, replace or extend a (reg)ts
+object with another (reg)ts object.
+The result is an updated \code{\link{regts}} object.
 }
 \details{
 The timeseries can be updated in four different ways:
