@@ -20,8 +20,8 @@ using one of the other methods. See details.}
 an updated \code{\link{regts}} object.
 }
 \description{
-This function can be used to update a univariate or multivariate (reg)ts
-object with another univariate or multivariate (reg)ts object.
+This function can be used to update, replace or extend a (reg)ts
+object with another (reg)ts object.
 The result is an updated \code{\link{regts}} object.
 }
 \details{
