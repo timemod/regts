@@ -1,44 +1,56 @@
-#' Moving average
+#' Moving average of a timeseries
 #'
-#' Function \code{movav} calculates the moving average of a timeseries.
+#' @description
+#' The moving average smoother calculates for each observation the average
+#' of the observations in a range around that observation.
+#' For example, the backwards moving average
+#' of order \eqn{n} is given by  \eqn{A[t] = (x[t-2] + x[t-1] + x[t])/ 2}.
+#' In general, the moving average is calculated as
 #'
-#' The moving average of a timeseries \eqn{x[t]} at time \eqn{t}
-#' is defined as \eqn{A[t] = (x[t - p] + x[t - p + 1] + ... +
-#' x[t + q - 1] + x[t + q]) / n}, where \eqn{-p} is the maximum lag
-#' and \eqn{q} the maximum lead in the summation
+#' \eqn{A[t] = (x[t - p] + x[t - p + 1] + \dots + x[t] + \dots +
+#' x[t + q - 1] + x[t + q]) / n},
+#'
+#' where \eqn{p} and \eqn{q} are the
+#' maximum lag and lead, respectively, and \eqn{n = p + q + 1} is the order
+#' of the moving average.
+#'
 #' @param x a a \code{\link[stats]{ts}} of \code{\link{regts}} object
-#' @param max_lag a numeric value specifying the maximum lag
-#' for the moving averaging calculation. This should be a negative number or zero.
-#' @param max_lead a numeric value the bound in the summation (see details).
-#' This should be a positive number or zero.
-#' @param na_pad If \code{TRUE} (the default), then  the output
+#' @param max_lag the maximum lag
+#' @param max_lead the maximal lead
+#' @param keep_range If \code{TRUE} (the default), then  the output
 #' timeseries has the same period range as the input timeseries.
-#' NA values are padded to the left and the right of calculated average (
-#' there wille be \code{-from} \code{NA}s at the left side and \code{to} NAs
-#' to the right side)
+#' \code{NA}s values are padded to the left and the right of calculated average
+#' (there will be \code{max_lag} \code{NA}s at the left side and \code{max_lead}
+#' NAs on the right side).
 #' @return a \code{regts} object with the moving average values
+#' @examples
+#' x <- regts(rnorm(10), start = "2018Q1")
+#'
+#' # backward moving average of order 3
+#' movav(x, max_lag = 2)
+#'
+#' # centered moving average of order 3
+#' movav(x, max_lag = 1, max_lead = 1, keep_range = FALSE)
 #' @export
 #' @useDynLib regts, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
-movav <- function(x, max_lag = 0L, max_lead = 0L, na_pad = TRUE) {
+movav <- function(x, max_lag = 0L, max_lead = 0L, keep_range = TRUE) {
 
   if (!is.ts(x)) {
     stop("Argument x is not a timeseries")
   }
 
-  if (max_lag < 0) {
-    stop("Argument from should be >= 0")
+  if (max_lag < 0 || max_lead < 0) {
+    stop("Argument max_lag and max_lead should be >= 0")
   }
-  if (max_lead < 0) {
-    stop("Argument to should be >= 0")
-  }
+
 
   x_is_matrix <- is.matrix(x)
   if (!x_is_matrix) {
     dim(x) <- c(length(x), 1)
   }
 
-  data <- moving_average(x, max_lag, max_lead, na_pad)
+  data <- moving_average(x, max_lag, max_lead, keep_range)
 
   if (!x_is_matrix) {
     # convert the vector to data
@@ -47,12 +59,13 @@ movav <- function(x, max_lag = 0L, max_lead = 0L, na_pad = TRUE) {
 
   # determine resulting period range
   old_range <- get_period_range(x)
-  if (na_pad) {
+  if (keep_range) {
     new_range <- old_range
   } else {
     new_range <- period_range(start_period(old_range) + max_lag,
                               end_period(old_range) - max_lead)
   }
 
-  return(regts(data, period = new_range, labels = ts_labels(x)))
+  return(regts(data, period = new_range, names = colnames(x),
+                 labels = ts_labels(x)))
 }

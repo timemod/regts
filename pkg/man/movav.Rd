@@ -2,32 +2,46 @@
 % Please edit documentation in R/movav.R
 \name{movav}
 \alias{movav}
-\title{Moving average}
+\title{Moving average of a timeseries}
 \usage{
-movav(x, max_lag = 0L, max_lead = 0L, na_pad = TRUE)
+movav(x, max_lag = 0L, max_lead = 0L, keep_range = TRUE)
 }
 \arguments{
 \item{x}{a a \code{\link[stats]{ts}} of \code{\link{regts}} object}
 
-\item{max_lag}{a numeric value specifying the maximum lag
-for the moving averaging calculation. This should be a negative number or zero.}
+\item{max_lag}{the maximum lag}
 
-\item{max_lead}{a numeric value the bound in the summation (see details).
-This should be a positive number or zero.}
+\item{max_lead}{the maximal lead}
 
-\item{na_pad}{If \code{TRUE} (the default), then  the output
+\item{keep_range}{If \code{TRUE} (the default), then  the output
 timeseries has the same period range as the input timeseries.
-NA values are padded to the left and the right of calculated average (
-there wille be \code{-from} \code{NA}s at the left side and \code{to} NAs
-to the right side)}
+\code{NA}s values are padded to the left and the right of calculated average
+(there will be \code{max_lag} \code{NA}s at the left side and \code{max_lead}
+NAs on the right side).}
 }
 \value{
 a \code{regts} object with the moving average values
 }
 \description{
-Function \code{movav} calculates the moving average of a timeseries.
-The moving average of a timeseries \eqn{x[t]} at time \eqn{t}
-is defined as \eqn{A[t] = (x[t - p] + x[t - p + 1] + ... +
-x[t + q - 1] + x[t + q]) / n}, where \eqn{-p} is the lower bound
-and \eqn{q} the upper bound of the summation.
+The moving average smoother calculates for each observation the average
+of the observations in a range around that observation.
+For example, the backwards moving average
+of order \eqn{n} is given by  \eqn{A[t] = (x[t-2] + x[t-1] + x[t])/ 2}.
+In general, the moving average is calculated as
+
+\eqn{A[t] = (x[t - p] + x[t - p + 1] + \dots + x[t] + \dots +
+x[t + q - 1] + x[t + q]) / n},
+
+where \eqn{p} and \eqn{q} are the
+maximum lag and lead, respectively, and \eqn{n = p + q + 1} is the order
+of the moving average.
+}
+\examples{
+x <- regts(rnorm(10), start = "2018Q1")
+
+# backward moving average of order 3
+movav(x, max_lag = 2)
+
+# centered moving average of order 3
+movav(x, max_lag = 1, max_lead = 1, keep_range = FALSE)
 }
