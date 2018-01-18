@@ -4,7 +4,7 @@
 #' The moving average smoother calculates for each observation the average
 #' of the observations in a range around that observation.
 #' For example, the backwards moving average
-#' of order \eqn{n} is given by  \eqn{A[t] = (x[t-2] + x[t-1] + x[t])/ 2}.
+#' of order 3 is given by  \eqn{A[t] = (x[t-2] + x[t-1] + x[t]) / 3}.
 #' In general, the moving average is calculated as
 #'
 #' \eqn{A[t] = (x[t - p] + x[t - p + 1] + \dots + x[t] + \dots +
@@ -19,9 +19,9 @@
 #' @param max_lead the maximal lead
 #' @param keep_range If \code{TRUE} (the default), then  the output
 #' timeseries has the same period range as the input timeseries.
-#' \code{NA}s values are padded to the left and the right of calculated average
+#' \code{NA}s values are padded to the left and right sides of the period range
 #' (there will be \code{max_lag} \code{NA}s at the left side and \code{max_lead}
-#' NAs on the right side).
+#' NAs at the right side).
 #' @return a \code{regts} object with the moving average values
 #' @examples
 #' x <- regts(rnorm(10), start = "2018Q1")
