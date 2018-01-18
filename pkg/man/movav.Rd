@@ -15,9 +15,11 @@ movav(x, max_lag = 0L, max_lead = 0L, keep_range = TRUE)
 
 \item{keep_range}{If \code{TRUE} (the default), then  the output
 timeseries has the same period range as the input timeseries.
-\code{NA}s values are padded to the left and right sides of the period range
-(there will be \code{max_lag} \code{NA}s at the left side and \code{max_lead}
-NAs at the right side).}
+The result will have \code{max_lag} \code{NA}s at the left side and
+\code{max_lead} NAs at the right side). If \code{FALSE}, then the
+result has a shorter period rang than the input timeseries
+(it starts \code{max_lags} periods later and ends \code{max_lead} periods
+earlier).}
 }
 \value{
 a \code{regts} object with the moving average values
