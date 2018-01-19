@@ -7,9 +7,9 @@ rm(list = ls())
 set.seed(12345)
 
 # movav_back calculates the backwards moving average for a univariate
-# timeseries independently from regts::movav
-movav_back <- function(xts, max_lag) {
-
+# timeseries independently from regts::movavc
+movav_back <- function(xts, order) {
+  max_lag <- order - 1
   lag_ts_list <- lapply(-max_lag:-1, FUN = function(x) {lag(xts, x)})
   names(lag_ts_list) <- paste0("lag", -max_lag:-1)
   lag_ts <- do.call(cbind, lag_ts_list)
@@ -22,9 +22,9 @@ movav_back <- function(xts, max_lag) {
   return(retval)
 }
 
-movav_back_multi <- function(xts, max_lag) {
+movav_back_multi <- function(xts, order) {
   l <- as.list(xts)
-  res <- lapply(l, movav_back, max_lag)
+  res <- lapply(l, movav_back, order)
   return(do.call(cbind, res))
 }
 
@@ -53,40 +53,47 @@ ts_labels(c_lbls) <- "Timeseries c"
 p <- get_period_range(a)
 
 test_that("univariate timeseries", {
-  expect_identical(movav(a), a)
-  expect_equal(movav(a, max_lag = 2), movav_back(a, max_lag = 2))
+  expect_identical(movavc(a, order = 1), a)
+  expect_identical(movavb(a, order = 1), a)
+  expect_equal(movavb(a, order = 3), movav_back(a, order = 3))
 
-  res <- movav(b_lbls, max_lag = 3)
-  expect_equal(res, movav_back(b_lbls, max_lag = 3))
+  res <- movavb(b_lbls, order = 4)
+  expect_equal(res, movav_back(b_lbls, order = 4))
   expect_identical(ts_labels(res), "Timeseries b")
-  expect_equal(movav(c, max_lag = 3, max_lead = 1),
-               lag(movav_back(c, max_lag = 4), 1)[p])
-  expect_equal(movav(c, max_lag = 2, keep_range = FALSE),
-               na_trim(movav_back(c, max_lag = 2)))
-  expect_equal(movav(c, max_lag = 3, max_lead = 1, keep_range = FALSE),
-               na_trim(lag(movav_back(c, max_lag = 4), 1)[p]))
+  expect_equal(movavc(c, order = 3),
+               lag(movav_back(c, order = 3), 1)[p])
+  expect_equal(movavb(c, order = 3, keep_range = FALSE),
+               na_trim(movav_back(c, order = 3)))
+  expect_equal(movavc(c, order = 5, keep_range = FALSE),
+               na_trim(lag(movav_back(c, order = 5), 2)[p]))
 })
 
 test_that("multivariate timeseries", {
   multi <- cbind(a, b, c)
-  result <- movav(multi, max_lag = 1, max_lead = 1)
-  expected_result <- lag(movav_back_multi(multi, max_lag = 2), 1)[p]
+  result <- movavc(multi, order = 3)
+  expected_result <- lag(movav_back_multi(multi, order = 3), 1)[p]
   expect_equal(result, expected_result)
 
   multi_lbl <- cbind(a_lbls, b_lbls, c_lbls)
-  result <- movav(multi_lbl, max_lag = 1, max_lead = 2, keep_range = FALSE)
-  expected_result <- na_trim(lag(movav_back_multi(multi_lbl, max_lag = 3), 2))
+  result <- movavb(multi_lbl, order = 3, keep_range = FALSE)
+  expected_result <- na_trim(movav_back_multi(multi_lbl, order = 3))
+  expect_equal(result, expected_result)
+
+  multi_lbl <- cbind(a_lbls, b_lbls, c_lbls)
+  result <- movavb(multi_lbl, order = 2, keep_range = FALSE)
+  expected_result <- na_trim(movav_back_multi(multi_lbl, order = 2))
   expect_equal(result, expected_result)
 })
+
 
 test_that("simpel annual timeseries", {
   xts <- regts(1:10, start = "2018")
   p <- get_period_range(xts)
   xts_movav <- regts(c(NA, NA, 2:9), start = "2018")
-  expect_equal(movav(xts, max_lag = 2), xts_movav)
-  expect_equal(movav(xts, max_lag = 2, keep_range = FALSE), na_trim(xts_movav))
-  expect_equal(movav(xts, max_lag = 1, max_lead = 1), lag(xts_movav, 1)[p])
-  expect_equal(movav(xts, max_lag = 1, max_lead = 1, keep_range = FALSE),
+  expect_equal(movavb(xts, order = 3), xts_movav)
+  expect_equal(movavb(xts, order = 3, keep_range = FALSE), na_trim(xts_movav))
+  expect_equal(movavc(xts, order = 3), lag(xts_movav, 1)[p])
+  expect_equal(movavc(xts, order = 3, keep_range = FALSE),
                na_trim(lag(xts_movav, 1), method = "first"))
 })
 
@@ -94,7 +101,7 @@ test_that("simpel annual timeseries", {
 test_that("errors", {
   x <- regts("hello", period =  p)
   msg <- "Not compatible with requested type: \\[type=character; target=double\\]."
-  expect_error(movav(x), msg)
-  msg <- "Argument max_lag and max_lead should be >= 0"
-  expect_error(movav(a, max_lag = -2), msg)
+  expect_error(movavb(x, order = 2), msg)
+  msg <- "movavc not yet supported for even orders."
+  expect_error(movavc(a, order = 2), msg)
 })

@@ -1,58 +1,71 @@
 #' Moving average of a timeseries
 #'
 #' @description
-#' The moving average smoother calculates for each observation the average
-#' of the observations in a range around that observation.
-#' For example, the backwards moving average
-#' of order 3 is given by  \eqn{A[t] = (x[t-2] + x[t-1] + x[t]) / 3}.
-#' In general, the moving average is calculated as
+#' Function \code{movavb} computes the backward moving avergage and
+#' function \code{movavc} the centered moving average.
 #'
-#' \eqn{A[t] = (x[t - p] + x[t - p + 1] + \dots + x[t] + \dots +
-#' x[t + q - 1] + x[t + q]) / n},
+#' For example, the backward moving average of order 3 is defined as
 #'
-#' where \eqn{p} and \eqn{q} are the
-#' maximum lag and lead, respectively, and \eqn{n = p + q + 1} is the order
-#' of the moving average.
+#' \eqn{A[t] = (x[t-2] + x[t-1] + x[t]) / 3},
+#'
+#' while the centered moving average of order 3 is calculated as
+#'
+#' \eqn{A[t] = (x[t - 1] + x[t] + x[t + 1]) / 3}
+#'
+#' Currently, the centered moving average has only been implemented for
+#' odd orders.
 #'
 #' @param x a \code{\link[stats]{ts}} or \code{\link{regts}} object
-#' @param max_lag the maximum lag
-#' @param max_lead the maximal lead
+#' @param order the order of the moving average
 #' @param keep_range If \code{TRUE} (the default), then  the output
 #' timeseries has the same period range as the input timeseries.
-#' The result will have \code{max_lag} \code{NA}s at the left side and
-#' \code{max_lead} NAs at the right side). If \code{FALSE}, then the
-#' result has a shorter period rang than the input timeseries
-#' (it starts \code{max_lags} periods later and ends \code{max_lead} periods
-#' earlier).
+#' Then the result timeseries will have \code{order} NA values. For
+#' \code{movavc} these NAs will apear on the left side of and for \code{movavc}
+#' they will be distributed over both sides.
+#' If \code{TRUE} then the result timeseries is \code{order} periods
+#' shorter than the input timeseries.
 #' @return a \code{regts} object with the moving average values
 #' @examples
 #' x <- regts(rnorm(10), start = "2018Q1")
 #'
-#' # backward moving average of order 3
-#' movav(x, max_lag = 2)
+#' movavb(x, order = 3)
 #'
-#' # centered moving average of order 3
-#' movav(x, max_lag = 1, max_lead = 1, keep_range = FALSE)
-#' @export
+#' movavc(x, order = 3, keep_range = FALSE)
 #' @useDynLib regts, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
-movav <- function(x, max_lag = 0L, max_lead = 0L, keep_range = TRUE) {
+#' @name movav
+NULL
 
+#' @describeIn movav Backward moving average
+#' @export
+movavb <- function(x, order, keep_range = TRUE) {
+  return(movav_internal(x, from = -(order) + 1L, to = 0L,
+                        keep_range = keep_range))
+}
+
+#' @describeIn movav Centered moving average (currently only for odd orders)
+#' @export
+movavc <- function(x, order, keep_range = TRUE) {
+  if (!order%%2) {
+    stop("movavc not yet supported for even orders.")
+  } else {
+    bound <- floor(order / 2)
+    return(movav_internal(x, from = -bound, to = bound,
+                          keep_range = keep_range))
+  }
+}
+
+movav_internal <- function(x, from, to, keep_range) {
   if (!is.ts(x)) {
     stop("Argument x is not a timeseries")
   }
-
-  if (max_lag < 0 || max_lead < 0) {
-    stop("Argument max_lag and max_lead should be >= 0")
-  }
-
 
   x_is_matrix <- is.matrix(x)
   if (!x_is_matrix) {
     dim(x) <- c(length(x), 1)
   }
 
-  data <- moving_average(x, max_lag, max_lead, keep_range)
+  data <- moving_average(x, from, to, keep_range)
 
   if (!x_is_matrix) {
     # convert the vector to data
@@ -64,10 +77,10 @@ movav <- function(x, max_lag = 0L, max_lead = 0L, keep_range = TRUE) {
   if (keep_range) {
     new_range <- old_range
   } else {
-    new_range <- period_range(start_period(old_range) + max_lag,
-                              end_period(old_range) - max_lead)
+    new_range <- period_range(start_period(old_range) - from,
+                              end_period(old_range) - to)
   }
 
   return(regts(data, period = new_range, names = colnames(x),
-                 labels = ts_labels(x)))
+               labels = ts_labels(x)))
 }

@@ -2,42 +2,44 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-NumericMatrix moving_average(NumericMatrix &x, const int max_lag,
-                             const int max_lead, const bool keep_range) {
+NumericMatrix moving_average(NumericMatrix &x, const int from,
+                             const int to, const bool keep_range) {
 
     // Calculate the moving average of number matrix x.
-    // The avering number runs from index -max_lead to max_lag.
+    // The avering index run from "from" to "to", where "from" <= 0
+    // and "to" >= 0.
     
-    int nord = max_lag + max_lead + 1;
+    int nord = to - from + 1;
 
     int ncol = x.ncol();
     int nrow = x.nrow();
 
-    int nrow_result = keep_range ? nrow : nrow + max_lag + max_lead;
-    int row_shift = keep_range ? 0 : -max_lag;
+    int nrow_result = keep_range ? nrow : nrow + from - to;
+    int row_shift = keep_range ? 0 : from;
 
     NumericMatrix result(nrow_result, ncol);
 
     for (int col = 0; col < ncol; col++) {
         NumericMatrix::Column col_old = x(_, col);
         NumericMatrix::Column col_result = result(_, col);
-        for (int row = max_lag; row < nrow - max_lead; row++) {
-            col_result[row] = 0.0;
-            for (int k = -max_lag; k <= max_lead; k++) {
-                col_result[row + row_shift] = col_result[row + row_shift] + 
+        for (int row = -from; row < nrow - to; row++) {
+            int row_result = row + row_shift;
+            col_result[row_result] = 0.0;
+            for (int k = from; k <= to; k++) {
+                col_result[row_result] = col_result[row_result] + 
                                               col_old[row + k];
             }
-            col_result[row + row_shift] = col_result[row + row_shift] / nord;
+            col_result[row_result] = col_result[row_result] / nord;
         }
     }
 
     if (keep_range) {
         for (int col = 0; col < ncol; col++) {
             NumericMatrix::Column col_result = result(_, col);
-            for (int row = 0; row < max_lag; row++) {
+            for (int row = 0; row < -from; row++) {
                 col_result[row] = NA_REAL;
             }
-            for (int row = nrow - max_lead; row < nrow; row++) {
+            for (int row = nrow - to; row < nrow; row++) {
                 col_result[row] = NA_REAL;
             }
         }
