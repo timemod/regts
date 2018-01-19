@@ -19,16 +19,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // moving_average
-NumericMatrix moving_average(NumericMatrix& x, const int max_lag, const int max_lead, const bool keep_range);
-RcppExport SEXP _regts_moving_average(SEXP xSEXP, SEXP max_lagSEXP, SEXP max_leadSEXP, SEXP keep_rangeSEXP) {
+NumericMatrix moving_average(NumericMatrix& x, const int from, const int to, const bool keep_range);
+RcppExport SEXP _regts_moving_average(SEXP xSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP keep_rangeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const int >::type max_lag(max_lagSEXP);
-    Rcpp::traits::input_parameter< const int >::type max_lead(max_leadSEXP);
+    Rcpp::traits::input_parameter< const int >::type from(fromSEXP);
+    Rcpp::traits::input_parameter< const int >::type to(toSEXP);
     Rcpp::traits::input_parameter< const bool >::type keep_range(keep_rangeSEXP);
-    rcpp_result_gen = Rcpp::wrap(moving_average(x, max_lag, max_lead, keep_range));
+    rcpp_result_gen = Rcpp::wrap(moving_average(x, from, to, keep_range));
     return rcpp_result_gen;
 END_RCPP
 }

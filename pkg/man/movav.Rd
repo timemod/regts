@@ -2,48 +2,56 @@
 % Please edit documentation in R/movav.R
 \name{movav}
 \alias{movav}
+\alias{movavb}
+\alias{movavc}
 \title{Moving average of a timeseries}
 \usage{
-movav(x, max_lag = 0L, max_lead = 0L, keep_range = TRUE)
+movavb(x, order, keep_range = TRUE)
+
+movavc(x, order, keep_range = TRUE)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object}
 
-\item{max_lag}{the maximum lag}
-
-\item{max_lead}{the maximal lead}
+\item{order}{the order of the moving average}
 
 \item{keep_range}{If \code{TRUE} (the default), then  the output
 timeseries has the same period range as the input timeseries.
-The result will have \code{max_lag} \code{NA}s at the left side and
-\code{max_lead} NAs at the right side). If \code{FALSE}, then the
-result has a shorter period rang than the input timeseries
-(it starts \code{max_lags} periods later and ends \code{max_lead} periods
-earlier).}
+Then the result timeseries will have \code{order} NA values. For
+\code{movavc} these NAs will apear on the left side of and for \code{movavc}
+they will be distributed over both sides.
+If \code{TRUE} then the result timeseries is \code{order} periods
+shorter than the input timeseries.}
 }
 \value{
 a \code{regts} object with the moving average values
 }
 \description{
-The moving average smoother calculates for each observation the average
-of the observations in a range around that observation.
-For example, the backwards moving average
-of order 3 is given by  \eqn{A[t] = (x[t-2] + x[t-1] + x[t]) / 3}.
-In general, the moving average is calculated as
+Function \code{movavb} computes the backward moving avergage and
+function \code{movavc} the centered moving average.
 
-\eqn{A[t] = (x[t - p] + x[t - p + 1] + \dots + x[t] + \dots +
-x[t + q - 1] + x[t + q]) / n},
+For example, the backward moving average of order 3 is defined as
 
-where \eqn{p} and \eqn{q} are the
-maximum lag and lead, respectively, and \eqn{n = p + q + 1} is the order
-of the moving average.
+\eqn{A[t] = (x[t-2] + x[t-1] + x[t]) / 3},
+
+while the centered moving average of order 3 is calculated as
+
+\eqn{A[t] = (x[t - 1] + x[t] + x[t + 1]) / 3}
+
+Currently, the centered moving average has only been implemented for
+odd orders.
 }
+\section{Functions}{
+\itemize{
+\item \code{movavb}: Backward moving average
+
+\item \code{movavc}: Centered moving average (currently only for odd orders)
+}}
+
 \examples{
 x <- regts(rnorm(10), start = "2018Q1")
 
-# backward moving average of order 3
-movav(x, max_lag = 2)
+movavb(x, order = 3)
 
-# centered moving average of order 3
-movav(x, max_lag = 1, max_lead = 1, keep_range = FALSE)
+movavc(x, order = 3, keep_range = FALSE)
 }
