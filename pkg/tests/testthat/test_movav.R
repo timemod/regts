@@ -53,7 +53,7 @@ ts_labels(c_lbls) <- "Timeseries c"
 p <- get_period_range(a)
 
 test_that("univariate timeseries", {
-  expect_equal(movav(a), a)
+  expect_identical(movav(a), a)
   expect_equal(movav(a, max_lag = 2), movav_back(a, max_lag = 2))
 
   res <- movav(b_lbls, max_lag = 3)

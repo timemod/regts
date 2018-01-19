@@ -7,7 +7,7 @@
 movav(x, max_lag = 0L, max_lead = 0L, keep_range = TRUE)
 }
 \arguments{
-\item{x}{a a \code{\link[stats]{ts}} of \code{\link{regts}} object}
+\item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object}
 
 \item{max_lag}{the maximum lag}
 

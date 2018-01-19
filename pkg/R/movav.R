@@ -14,7 +14,7 @@
 #' maximum lag and lead, respectively, and \eqn{n = p + q + 1} is the order
 #' of the moving average.
 #'
-#' @param x a a \code{\link[stats]{ts}} of \code{\link{regts}} object
+#' @param x a \code{\link[stats]{ts}} or \code{\link{regts}} object
 #' @param max_lag the maximum lag
 #' @param max_lead the maximal lead
 #' @param keep_range If \code{TRUE} (the default), then  the output
@@ -56,7 +56,7 @@ movav <- function(x, max_lag = 0L, max_lead = 0L, keep_range = TRUE) {
 
   if (!x_is_matrix) {
     # convert the vector to data
-    data <- data[, 1, drop = TRUE]
+    dim(data) <- NULL
   }
 
   # determine resulting period range
