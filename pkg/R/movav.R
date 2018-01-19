@@ -20,7 +20,7 @@
 #' @param keep_range If \code{TRUE} (the default), then  the output
 #' timeseries has the same period range as the input timeseries.
 #' Then the result timeseries will have \code{order} NA values. For
-#' \code{movavc} these NAs will apear on the left side of and for \code{movavc}
+#' \code{movavc} these NAs will apear on the left side and for \code{movavc}
 #' they will be distributed over both sides.
 #' If \code{TRUE} then the result timeseries is \code{order} periods
 #' shorter than the input timeseries.
