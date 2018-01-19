@@ -18,6 +18,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// moving_average
+NumericMatrix moving_average(NumericMatrix& x, const int max_lag, const int max_lead, const bool keep_range);
+RcppExport SEXP _regts_moving_average(SEXP xSEXP, SEXP max_lagSEXP, SEXP max_leadSEXP, SEXP keep_rangeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const int >::type max_lag(max_lagSEXP);
+    Rcpp::traits::input_parameter< const int >::type max_lead(max_leadSEXP);
+    Rcpp::traits::input_parameter< const bool >::type keep_range(keep_rangeSEXP);
+    rcpp_result_gen = Rcpp::wrap(moving_average(x, max_lag, max_lead, keep_range));
+    return rcpp_result_gen;
+END_RCPP
+}
 // parse_period
 NumericVector parse_period(const std::string& period_text, double frequency);
 RcppExport SEXP _regts_parse_period(SEXP period_textSEXP, SEXP frequencySEXP) {
@@ -68,6 +82,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_regts_agg_gr", (DL_FUNC) &_regts_agg_gr, 3},
+    {"_regts_moving_average", (DL_FUNC) &_regts_moving_average, 4},
     {"_regts_parse_period", (DL_FUNC) &_regts_parse_period, 2},
     {"_regts_parse_period_range", (DL_FUNC) &_regts_parse_period_range, 2},
     {"_regts_is_period_text_", (DL_FUNC) &_regts_is_period_text_, 2},

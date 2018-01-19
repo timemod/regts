@@ -143,7 +143,7 @@ regts <- function(data, start, end, period, frequency = NA,
 
   } else {
     ndata <- length(data)
-    if (!missing(names)) {
+    if (!missing(names) && !is.null(names)) {
       warning("Argument names is ignored if data is a vector")
     }
   }
