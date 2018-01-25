@@ -25,11 +25,14 @@
 #' df_t <- transpose_df(df, colname_column = 1, label_column = 2)
 #' print(df_t)
 #' print(transpose_df(df_t))
+#' @importFrom data.table is.data.table
+#' @importFrom data.table as.data.table
 #' @export
 transpose_df  <- function(x, colname_column, label_column) {
 
-  #todo: check arguments. x should be a dataframe, colname_column
-  # and label_column a numeric  or character vector of length 1
+  is_data_table <- is.data.table(x)
+  x <- as.data.frame(x)
+
   if (!missing(colname_column)) {
     if (is.character(colname_column)) {
       colname_column <- which(colnames(x) %in% colname_column)
@@ -60,6 +63,21 @@ transpose_df  <- function(x, colname_column, label_column) {
   }
 
   old_labels <- as.character(Hmisc::label(x))
+
+  # We need a special treatments for data frames with both numerical and
+  # character columns. The function t (transpose) first converts data frame x
+  # to a matrix with function as.matrix and then transposes that matrix.
+  # If some columns in x are character vectors then as.matrix returns a
+  # character matrix. However, during this conversion precision is lost:
+  # only about 6 digits are preserved. Therefore, in that case we should convert
+  # the numerical columns to character columns with function as.character.
+  # as.character does not loose precision.
+  is_num <- sapply(x, FUN = is.numeric)
+  is_text <- sapply(x, FUN = function(x) {is.character(x) | is.factor(x)})
+  if (any(is_text) && any(is_num)) {
+    x[is_num] <- lapply(x[is_num], FUN = as.character)
+  }
+
   ret <- as.data.frame(t(x), stringsAsFactors = FALSE)
 
   if (!missing(colname_column)) {
@@ -70,7 +88,16 @@ transpose_df  <- function(x, colname_column, label_column) {
   }
 
   if (any(nchar(old_labels, type = "bytes") > 0)) {
-    ret <- cbind(labels = old_labels, ret)
+    ret <- cbind(labels = old_labels, ret, stringsAsFactors = FALSE)
   }
+
+  if (is_data_table) {
+    # data.tables do not support rownames, so create another column with names
+    names <- rownames(ret)
+    rownames(ret) <- NULL
+    ret <- cbind(names = names, ret, stringsAsFactors = FALSE)
+    ret <- as.data.table(ret)
+  }
+
   return (ret)
 }

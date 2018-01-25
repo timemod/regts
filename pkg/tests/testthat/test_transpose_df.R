@@ -1,5 +1,6 @@
 library(testthat)
 library(regts)
+library(data.table)
 
 context("tranpose_df")
 
@@ -45,4 +46,56 @@ test_that("data frame with a column with column names and labels", {
   #View(df_t_2)
   expect_known_output(df_t, file = file.path("expected_output/transpose_df_t_2.rds"))
 })
+
+test_that("data frame with numbers and texts", {
+
+  df <- data.frame(numbers = c(1.000000000123, 10.12345678910111212),
+                   texts = c("jan", "piet"), stringsAsFactors = FALSE)
+  rownames(df) <- c("a", "b")
+
+  df_t <- transpose_df(df)
+  df_t_t <- transpose_df(df_t)
+  df_t_t$numbers <- as.numeric(df_t_t$numbers)
+  expect_equal(df, df_t_t)
+})
+
+
+test_that("data frame with numbers and factors", {
+
+  df <- data.frame(numbers = c(1.000000000123, 10.12345678910111212),
+                   texts = c("jan", "piet"), stringsAsFactors = TRUE)
+  rownames(df) <- c("a", "b")
+
+  df_t <- transpose_df(df)
+  df_t_t <- transpose_df(df_t)
+  df_t_t$numbers <- as.numeric(df_t_t$numbers)
+  df_t_t$texts <- as.factor(df_t_t$texts)
+  expect_equal(df, df_t_t)
+})
+
+test_that("data table with numbers, texts and labels", {
+
+  dt <- data.table(names = c("a", "b"),
+                   numbers = c(1.000000000123, 10.12345678910111212),
+                   texts = c("jan", "piet"), stringsAsFactors = FALSE)
+  Hmisc::label(dt, self = FALSE) <- c("Variable names", "Numeric data",
+                                      "Character Data")
+
+  dt_t <- transpose_df(dt, colname_column = "names")
+
+  expect_identical(class(dt_t), c("data.table", "data.frame"))
+
+  dt_t_t <- transpose_df(dt_t, colname_colum   = "names", label_column = "labels")
+  dt_t_t$numbers <- as.numeric(dt_t_t$numbers)
+
+  # we have lost the labels, so add them again (check this later)
+  Hmisc::label(dt_t_t, self = FALSE) <- c("Variable names", "Numeric data",
+                                      "Character Data")
+
+  expect_equal(dt, dt_t_t)
+})
+
+
+
+
 
