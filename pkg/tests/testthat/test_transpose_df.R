@@ -94,14 +94,12 @@ test_that("data table with numbers, texts and labels", {
   # the statement above has removed the label, so restore the label.
   Hmisc::label(dt_t_t$numbers) <- "Numeric Data"
 
+  # dt_t_t has lost the label for variable names (this cannot be avoided),
+  # therefore also remove the corresponding label in the expected result.
   expected_result <- dt
   expected_result$names <- as.character(expected_result$names)
   attr(expected_result$names, "label") <- NULL
 
-
-  # we have lost the labels, so add them again (check this later)
-  #Hmisc::label(dt_t_t, self = FALSE) <- c("Variable names", "Numeric data",
-  #                                    "Character Data")
 
   expect_equal(dt_t_t, expected_result)
 })
