@@ -19,17 +19,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // moving_average
-NumericMatrix moving_average(NumericMatrix& x, NumericVector& w, const int from, const int to, const bool keep_range);
-RcppExport SEXP _regts_moving_average(SEXP xSEXP, SEXP wSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP keep_rangeSEXP) {
+NumericMatrix moving_average(NumericMatrix& x, const int from, const int to, const bool keep_range);
+RcppExport SEXP _regts_moving_average(SEXP xSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP keep_rangeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< NumericVector& >::type w(wSEXP);
     Rcpp::traits::input_parameter< const int >::type from(fromSEXP);
     Rcpp::traits::input_parameter< const int >::type to(toSEXP);
     Rcpp::traits::input_parameter< const bool >::type keep_range(keep_rangeSEXP);
-    rcpp_result_gen = Rcpp::wrap(moving_average(x, w, from, to, keep_range));
+    rcpp_result_gen = Rcpp::wrap(moving_average(x, from, to, keep_range));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -83,7 +82,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_regts_agg_gr", (DL_FUNC) &_regts_agg_gr, 3},
-    {"_regts_moving_average", (DL_FUNC) &_regts_moving_average, 5},
+    {"_regts_moving_average", (DL_FUNC) &_regts_moving_average, 4},
     {"_regts_parse_period", (DL_FUNC) &_regts_parse_period, 2},
     {"_regts_parse_period_range", (DL_FUNC) &_regts_parse_period_range, 2},
     {"_regts_is_period_text_", (DL_FUNC) &_regts_is_period_text_, 2},

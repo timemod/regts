@@ -8,7 +8,7 @@
 \usage{
 movavb(x, order, keep_range = TRUE)
 
-movavc(x, order, keep_range = TRUE, method = c("centre", "left", "right"))
+movavc(x, order, keep_range = TRUE)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object}
@@ -22,10 +22,6 @@ Then the result timeseries will have \code{order} NA values. For
 they will be distributed over both sides.
 If \code{TRUE} then the result timeseries is \code{order} periods
 shorter than the input timeseries.}
-
-\item{method}{method used to handle the centered moving average for
-even orders. Possible values are \code{"centre"}, \code{"left"} and
-\code{"right"}. This argument is ignored for odd orders.}
 }
 \value{
 a \code{regts} object with the moving average values
@@ -42,16 +38,8 @@ while the centered moving average of order 3 is calculated as
 
 \eqn{A[t] = (x[t - 1] + x[t] + x[t + 1]) / 3}
 
-The centered moving average for even orders is somewhat more complicated,
-because it is no longer possible to distribute the observations evenly
-over the past and future. In that case there are several options  that can
-be controlled with argument \code{method}.
-\describe{
-\item{\code{"left"}}{Use one more observation from the past}
-\item{\code{"right"}}{Use one more observation from the future}
-\item{\code{"centre"}}{Calculate the average of the previous two calculations}
-}
-See argument \code{method}.
+Currently, the centered moving average has only been implemented for
+odd orders.
 }
 \section{Functions}{
 \itemize{
