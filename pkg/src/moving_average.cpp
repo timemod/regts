@@ -7,12 +7,13 @@ using namespace Rcpp;
                                  const bool keep_range) {
 
     // Calculate the moving average of number matrix x.
-    // The avering index run from "from" to "to", where "from" <= 0
+    // The averaging index run from "from" to "to", where "from" <= 0
     // and "to" >= 0.
     // If  w is a numeric vecor of length > 0, then the weighted
     // moving average is computed. Note that in that case the length
-    // of x should be equal to the number of periods (this should be
-    // checked in the calling R function).
+    // of x should be equal to the number of periods summed over (this should be
+    // checked in the calling R function). The weights do not have to add
+    // up to 1: the weights are normalized automatically.
     
     int nord = to - from + 1;
 
@@ -26,13 +27,19 @@ using namespace Rcpp;
 
     NumericMatrix result(nrow_result, ncol);
 
-
-    // for efficiency reasons, separate code is used for the
-    // weighted moving avergage.
+    // For efficiency, separate code is used for the weighted moving average.
     
     if (weighted) {
     
         double *weights = REAL(w);
+        double wsum = 0.0;
+        for (int  i = 0; i < nord; i++) {
+            wsum = wsum + weights[i];
+        }
+        for (int  i = 0; i < nord; i++) {
+            weights[i] = weights[i] / wsum;
+        }
+
         for (int col = 0; col < ncol; col++) {
             NumericMatrix::Column col_old = x(_, col);
             NumericMatrix::Column col_result = result(_, col);
@@ -41,9 +48,8 @@ using namespace Rcpp;
                 col_result[row_result] = 0.0;
                 for (int k = from; k <= to; k++) {
                     col_result[row_result] = col_result[row_result] + 
-                                              col_old[row + k] * weights[k - from];
+                                      col_old[row + k] * weights[k - from];
                 }
-                col_result[row_result] = col_result[row_result] / nord;
             }
         }
 
