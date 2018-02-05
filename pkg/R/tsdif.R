@@ -274,11 +274,13 @@ print.tsdif <- function(x, ...) {
       }
       cat("\n")
       if (!is.null(dif)) {
-        cat("Differences\n\n")
-        print(dif)
         cat("Names of timeseries with differences:\n")
         print(difnames)
-
+        nrow_max <- min(nrow(dif), 6)
+        ncol_max <- min(ncol(dif), 10)
+        cat(sprintf("Differences (the first %d rows and %d columns)\n",
+                    nrow_max, ncol_max))
+        print(topleft(dif, n = nrow_max, ncol = ncol_max))
       } else {
         if (is.null(common_range)) {
           cat(paste0("No differences computed because the two timeseries\n",
