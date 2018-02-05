@@ -40,7 +40,7 @@ zero_trim <- function (x, method = c("both", "first","last")) {
     sel[is.na(sel)] <- TRUE
     elem <- which(sel)
   } else {
-    sel <- apply(x != 0, 1, all)
+    sel <- apply(x != 0, 1, any)
     sel[is.na(sel)] <- TRUE
     elem <- which(sel)
   }
