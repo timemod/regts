@@ -1,6 +1,8 @@
 library(regts)
 library(testthat)
 
+rm(list = ls())
+
 context("tsdif")
 
 # prepare input data
@@ -47,6 +49,62 @@ test_that("no difference", {
                              tol = 0, fun = NULL)
   expect_equal(res, res_no_dif)
 })
+
+test_that("errors", {
+
+  msg <- "Argument tol should be >= 0"
+  expect_error(tsdif(ts1, ts1, tol = -1),  msg)
+
+  # univariate timeseries
+  expect_error(tsdif(ts1[, "a"], ts2[, "a"]),
+               "Argument x1 \\(ts1\\[, \"a\"\\]\\) is not a multivariate timeseries")
+  expect_error(tsdif(ts1, ts2[, "a", drop = FALSE]),
+               "Argument x2 \\(ts2\\[, \"a\", drop = FALSE\\]\\) is not a multivariate timeseries")
+
+  # different frequencies
+  tsy <- regts(matrix(data = rep(1:9), nc = 3), start = "2008",
+               names = c("a", "b", "c"))
+  expect_error(tsdif(ts1, tsy),
+                 "Timeseries x1 and x2 \\(ts1 and tsy\\) have different frequencies")
+})
+
+test_that("only one NA difference", {
+  ts1_NA <- ts1
+  ts1_NA[2, 2] <- NA
+  res <- tsdif(ts1, ts1_NA, tol = 0)
+  res_no_dif <- create_tsdif(equal = FALSE, difnames = "b",
+                             dif = zero_trim((ts1 - ts1_NA)[, "b", drop = FALSE]),
+                             common_names = c("a", "b", "c"),
+                             missing_names1 = character(0),
+                             missing_names2 = character(0),
+                             common_range  = get_period_range(ts1),
+                             period_range1 = get_period_range(ts1),
+                             period_range2 = get_period_range(ts1),
+                             ranges_equal = TRUE,
+                             ts_names = c("ts1", "ts1_NA"),
+                             tol = 0, fun = NULL)
+  expect_equal(res, res_no_dif)
+})
+
+test_that("two NA differences", {
+  ts1_NA <- ts1
+  ts1_NA[2, 2] <- NA
+  ts1_NA[4,3] <- NA
+  res <- tsdif(ts1, ts1_NA, tol = 0)
+  res_no_dif <- create_tsdif(equal = FALSE, difnames = c("b", "c"),
+                             dif = zero_trim((ts1 - ts1_NA)[, -1]),
+                             common_names = c("a", "b", "c"),
+                             missing_names1 = character(0),
+                             missing_names2 = character(0),
+                             common_range  = get_period_range(ts1),
+                             period_range1 = get_period_range(ts1),
+                             period_range2 = get_period_range(ts1),
+                             ranges_equal = TRUE,
+                             ts_names = c("ts1", "ts1_NA"),
+                             tol = 0, fun = NULL)
+  expect_equal(res, res_no_dif)
+})
+
 
 test_that("differences smaller than tol", {
   res <- tsdif(ts1, ts2,  tol = 0.1)
@@ -138,20 +196,6 @@ test_that("single common column", {
   expect_equal(res, res_correct2)
 })
 
-test_that("two univariate timeseries", {
-  expect_error(tsdif(ts1[, "a"], ts2[, "a"]),
-               "Argument x1 \\(ts1\\[, \"a\"\\]\\) is not a multivariate timeseries")
-  expect_error(tsdif(ts1, ts2[, "a", drop = FALSE]),
-               "Argument x2 \\(ts2\\[, \"a\", drop = FALSE\\]\\) is not a multivariate timeseries")
-})
-
-test_that("different frequencies", {
-  tsy <- regts(matrix(data = rep(1:9), nc = 3), start = "2008",
-               names = c("a", "b", "c"))
-  expect_error(tsdif(ts1, tsy),
-               "Timeseries x1 and x2 \\(ts1 and tsy\\) have different frequencies")
-})
-
 test_that("no column names simple", {
   x <- ts1
   y <- ts2[, 1:2]
@@ -203,9 +247,9 @@ test_that("a combination of negative and positive differences", {
   dif2 <- tsdif(ts1, ts2)
   expect_equal(dif2$dif, -dif_correct)
   dif3 <- tsdif(ts2, ts1, tol = 0.15)
-  expect_equal(dif3$dif, dif_correct)
+  expect_equal(dif3$dif, dif_correct["2008Q4"])
   dif4 <- tsdif(ts1, ts2, tol = 0.15)
-  expect_equal(dif3$dif, dif_correct)
+  expect_equal(dif4$dif, -dif_correct["2008Q4"])
 })
 
 test_that("NA, NaN, Inf and -Inf values", {
@@ -271,3 +315,6 @@ test_that("test combinations of NA, NaN, Inf and proper values", {
                         nc = 2), start = "2016", names = c("a", "b"))
   expect_equal(tsdif(tsInf, tsNA)$dif, tsNA)
 })
+
+
+

@@ -14,7 +14,7 @@ tsdif(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2))
 \item{x2}{the second timeseries (a multivariate \code{regts} or \code{ts} object).}
 
 \item{tol}{difference tolerance (by default zero). Differences with absolute
-values smaller than tol are ignored.}
+values smaller than or equal to \code{tol} are ignored.}
 
 \item{fun}{function to compute differences. This function should accept
 two arguments (two numbers) for which the difference is computed.
@@ -31,7 +31,9 @@ a list with class "tsdif", with the following components
                   larger than \code{tol}}
  \item{dif}{A \code{regts} with the computed differences,
  or \code{NULL} if there are no differences larger than \code{tol}.
- Only timeseries with differences larger than \code{tol} are included.}
+ Only timeseries with differences larger than \code{tol} are included.
+ Leading and trailing rows with differences less than \code{tol} have also been
+ removed.}
  \item{common_names}{the names of the common columns}
  \item{missing_names1}{The names of columns present in \code{x2} but missing
                        in \code{x1}}
@@ -54,10 +56,10 @@ a list with class "tsdif", with the following components
 This function can be used to compare two multivariate timeseries objects.
 The result is a list with a \code{\link{regts}} component with the computed
 differences or \code{NULL} if there are no differences.
-The function reports the names of columns with differences larger than a
-specified tolerance, and the names of the columns present in one object
-but missing in the other object.  The function also reports differences
-in the period ranges.
+The function returns a list with the differences, the names of columns with
+differences larger than a specified tolerance, and the names of the columns
+present in one object but missing in the other object. The return value also
+includes differences in the period ranges.
 }
 \details{
 This function calculates the difference between common columns
@@ -66,7 +68,7 @@ The two timeseries must have the same frequency, but may have a different
 period range. The difference is computed for the intersection of the two
 period ranges. Two \code{NA} or two \code{NaN} values are considered to be
 equal. A \code{NA} value is not equal to a \code{NaN} value.
-The function reports missing column names in one of the two objects,
+The function also returns missing column names in one of the two objects,
 }
 \examples{
 # create two timeseries x1 and x2

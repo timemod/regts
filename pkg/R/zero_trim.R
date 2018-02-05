@@ -33,25 +33,30 @@ zero_trim <- function (x, method = c("both", "first","last")) {
   } else if (!is.regts(x)) {
     x <- as.regts(x)
   }
-  side <- match.arg(method)
+  method <- match.arg(method)
 
   if (!is.matrix(x)) {
-    elem <- which(x != 0)
-    len <- length(x)
+    sel <- x != 0
+    sel[is.na(sel)] <- TRUE
+    elem <- which(sel)
   } else {
-    elem <-   which(!apply(x == 0, 1, all))
-    len <- nrow(x)
+    sel <- apply(x != 0, 1, any)
+    sel[is.na(sel)] <- TRUE
+    elem <- which(sel)
   }
+
   if (length(elem) == 0) {
     return(NULL)
   }
-  if (side == "both") {
+
+  if (method == "both") {
     sel <- min(elem) : max(elem)
-  } else if (side == "first") {
-    sel <- min(elem) : len
+  } else if (method == "first") {
+    sel <- min(elem) : NROW(x)
   } else {
     sel <- 1 : max(elem)
   }
+
   per <- start_period(get_period_range(x)) + sel[1] - 1
   period <- period_range(per, per + length(sel) - 1)
 

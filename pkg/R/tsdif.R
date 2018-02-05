@@ -4,10 +4,10 @@
 #' This function can be used to compare two multivariate timeseries objects.
 #' The result is a list with a \code{\link{regts}} component with the computed
 #' differences or \code{NULL} if there are no differences.
-#' The function reports the names of columns with differences larger than a
-#' specified tolerance, and the names of the columns present in one object
-#' but missing in the other object.  The function also reports differences
-#' in the period ranges.
+#' The function returns a list with the differences, the names of columns with
+#' differences larger than a specified tolerance, and the names of the columns
+#' present in one object but missing in the other object. The return value also
+#' includes differences in the period ranges.
 #'
 #' @details
 #' This function calculates the difference between common columns
@@ -16,14 +16,14 @@
 #' period range. The difference is computed for the intersection of the two
 #' period ranges. Two \code{NA} or two \code{NaN} values are considered to be
 #' equal. A \code{NA} value is not equal to a \code{NaN} value.
-#' The function reports missing column names in one of the two objects,
+#' The function also returns missing column names in one of the two objects,
 #'
 #' @export
 #' @param x1 the first timeseries (a multivariate \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
 #' @param x2 the second timeseries (a multivariate \code{regts} or \code{ts} object).
 #' @param tol difference tolerance (by default zero). Differences with absolute
-#' values smaller than tol are ignored.
+#' values smaller than or equal to \code{tol} are ignored.
 #' @param fun function to compute differences. This function should accept
 #' two arguments (two numbers) for which the difference is computed.
 #' By default the normal difference (\eqn{x_1 - x_2}) is computed. A useful function for
@@ -37,7 +37,9 @@
 #'                   larger than \code{tol}}
 #'  \item{dif}{A \code{regts} with the computed differences,
 #'  or \code{NULL} if there are no differences larger than \code{tol}.
-#'  Only timeseries with differences larger than \code{tol} are included.}
+#'  Only timeseries with differences larger than \code{tol} are included.
+#'  Leading and trailing rows with differences less than \code{tol} have also been
+#'  removed.}
 #'  \item{common_names}{the names of the common columns}
 #'  \item{missing_names1}{The names of columns present in \code{x2} but missing
 #'                        in \code{x1}}
@@ -79,21 +81,25 @@
 #'
 tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
 
-  if (!is.mts(x1)) {
-      stop(paste0("Argument x1 (", deparse(substitute(x1))),
-                   ") is not a multivariate timeseries")
-  }
-  if (!is.mts(x2)) {
-      stop(paste0("Argument x2 (", deparse(substitute(x2))),
-           ") is not a multivariate timeseries")
-  }
-
   series_name1 <- deparse(substitute(x1))
   series_name2 <- deparse(substitute(x2))
 
+  if (!is.mts(x1)) {
+    stop(paste0("Argument x1 (", series_name1,
+                ") is not a multivariate timeseries"))
+  }
+  if (!is.mts(x2)) {
+    stop(paste0("Argument x2 (", series_name2,
+                ") is not a multivariate timeseries"))
+  }
+
+  if (tol < 0) {
+    stop("Argument tol should be >= 0")
+  }
+
   if (frequency(x1) != frequency(x2)) {
-      stop(paste0("Timeseries x1 and x2 (", series_name1, " and ", series_name2,
-                 ") have different frequencies"))
+    stop(paste0("Timeseries x1 and x2 (", series_name1, " and ", series_name2,
+                ") have different frequencies"))
   }
 
   x1 <- as.regts(x1)
@@ -104,12 +110,12 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
 
   # create colnames if x1 or x2 do not have colnames
   if (is.null(names1)) {
-      names1 <- paste("column", 1 : ncol(x1))
-      colnames(x1) <- names1
+    names1 <- paste("column", 1 : ncol(x1))
+    colnames(x1) <- names1
   }
   if (is.null(names2)) {
-      names2 <- paste("column", 1 : ncol(x2))
-      colnames(x2) <- names2
+    names2 <- paste("column", 1 : ncol(x2))
+    colnames(x2) <- names2
   }
 
   common_names   <- intersect(names1, names2)
@@ -139,15 +145,16 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
   dif <- calculate_difference(common_names, common_range, x1, x2, tol, fun)
 
   if (!is.null(dif)) {
-      difnames <- colnames(dif)
+    difnames <- colnames(dif)
   } else {
-      difnames <- character(0)
+    difnames <- character(0)
   }
 
-  ret <- list(equal = length(missing_names1) == 0 &&
-                length(missing_names2) == 0 &&
-                length(difnames) == 0 &&
-                ranges_equal,
+  # check if results are equal
+  equal <- ranges_equal && length(missing_names1) == 0 &&
+           length(missing_names2) == 0 && length(difnames) == 0
+
+  ret <- list(equal          = equal,
               difnames       = difnames,
               dif            = dif,
               common_names   = common_names,
@@ -160,10 +167,10 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
               ts_names       = c(series_name1, series_name2),
               tol            = tol,
               fun            = if (missing(fun)) {
-                                 NULL
-                               } else {
-                                 deparse(substitute(fun))
-                               })
+                NULL
+              } else {
+                deparse(substitute(fun))
+              })
 
   return(structure(ret, class = "tsdif"))
 }
@@ -175,7 +182,7 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
 
   var_count <- length(common_names)
   if (var_count == 0 || is.null(common_range) || nperiod(common_range) == 0) {
-      return (NULL)
+    return (NULL)
   }
 
   xx1 <- x1[common_range, common_names, drop = FALSE]
@@ -197,14 +204,26 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
   sel <- apply(abs(dif), FUN = max, MARGIN = 2) > tol
   sel[is.na(sel)] <- TRUE
   if (any(sel)) {
-      dif <- dif[, sel, drop = FALSE]
+
+    # remove columns with differences <= tol
+    dif <- dif[, sel, drop = FALSE]
+
+    # now remove leading/trailing rows with differences <= tol
+    row_sel <- apply(abs(dif), FUN = max, MARGIN = 1) > tol
+    row_sel[is.na(row_sel)] <- TRUE
+    row_sel <- which(row_sel)
+    row_sel <- min(row_sel) : max(row_sel)
+    pstart <- start_period(common_range) + row_sel[1] - 1
+    period <- period_range(pstart, pstart + length(row_sel) - 1)
+    dif <- dif[period, , drop = FALSE]
+
   } else {
-      dif <- NULL
+    dif <- NULL
   }
 
   if (!is.null(dif)) {
-      # sort columns of dif
-      dif <- dif[, sort(colnames(dif)), drop = FALSE]
+    # sort columns of dif
+    dif <- dif[, sort(colnames(dif)), drop = FALSE]
   }
 }
 
@@ -255,15 +274,17 @@ print.tsdif <- function(x, ...) {
       }
       cat("\n")
       if (!is.null(dif)) {
-        cat("Differences\n\n")
-        print(dif)
         cat("Names of timeseries with differences:\n")
         print(difnames)
-
+        nrow_max <- min(nrow(dif), 6)
+        ncol_max <- min(ncol(dif), 10)
+        cat(sprintf("Differences (the first %d rows and %d columns)\n",
+                    nrow_max, ncol_max))
+        print(topleft(dif, n = nrow_max, ncol = ncol_max))
       } else {
         if (is.null(common_range)) {
           cat(paste0("No differences computed because the two timeseries\n",
-                    "have no overlapping period ranges\n"))
+                     "have no overlapping period ranges\n"))
         } else if (length(common_names) == 0) {
           cat(paste("No differences computed because the two timeseries",
                     "have no common columns\n"))
