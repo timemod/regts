@@ -1,6 +1,8 @@
 library(regts)
 library(testthat)
 
+rm(list = ls())
+
 context("tsdif")
 
 # prepare input data
@@ -71,7 +73,26 @@ test_that("only one NA difference", {
   ts1_NA[2, 2] <- NA
   res <- tsdif(ts1, ts1_NA, tol = 0)
   res_no_dif <- create_tsdif(equal = FALSE, difnames = "b",
-                             dif = (ts1 - ts1_NA)[, "b", drop = FALSE],
+                             dif = zero_trim((ts1 - ts1_NA)[, "b", drop = FALSE]),
+                             common_names = c("a", "b", "c"),
+                             missing_names1 = character(0),
+                             missing_names2 = character(0),
+                             common_range  = get_period_range(ts1),
+                             period_range1 = get_period_range(ts1),
+                             period_range2 = get_period_range(ts1),
+                             ranges_equal = TRUE,
+                             ts_names = c("ts1", "ts1_NA"),
+                             tol = 0, fun = NULL)
+  expect_equal(res, res_no_dif)
+})
+
+test_that("two NA differences", {
+  ts1_NA <- ts1
+  ts1_NA[2, 2] <- NA
+  ts1_NA[4,3] <- NA
+  res <- tsdif(ts1, ts1_NA, tol = 0)
+  res_no_dif <- create_tsdif(equal = FALSE, difnames = c("b", "c"),
+                             dif = zero_trim((ts1 - ts1_NA)[, -1]),
                              common_names = c("a", "b", "c"),
                              missing_names1 = character(0),
                              missing_names2 = character(0),
@@ -226,9 +247,9 @@ test_that("a combination of negative and positive differences", {
   dif2 <- tsdif(ts1, ts2)
   expect_equal(dif2$dif, -dif_correct)
   dif3 <- tsdif(ts2, ts1, tol = 0.15)
-  expect_equal(dif3$dif, dif_correct)
+  expect_equal(dif3$dif, dif_correct["2008Q4"])
   dif4 <- tsdif(ts1, ts2, tol = 0.15)
-  expect_equal(dif3$dif, dif_correct)
+  expect_equal(dif4$dif, -dif_correct["2008Q4"])
 })
 
 test_that("NA, NaN, Inf and -Inf values", {

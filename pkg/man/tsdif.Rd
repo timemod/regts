@@ -31,7 +31,9 @@ a list with class "tsdif", with the following components
                   larger than \code{tol}}
  \item{dif}{A \code{regts} with the computed differences,
  or \code{NULL} if there are no differences larger than \code{tol}.
- Only timeseries with differences larger than \code{tol} are included.}
+ Only timeseries with differences larger than \code{tol} are included.
+ Leading and trailing rows with differences less than \code{tol} have also been
+ removed.}
  \item{common_names}{the names of the common columns}
  \item{missing_names1}{The names of columns present in \code{x2} but missing
                        in \code{x1}}

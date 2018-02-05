@@ -37,7 +37,9 @@
 #'                   larger than \code{tol}}
 #'  \item{dif}{A \code{regts} with the computed differences,
 #'  or \code{NULL} if there are no differences larger than \code{tol}.
-#'  Only timeseries with differences larger than \code{tol} are included.}
+#'  Only timeseries with differences larger than \code{tol} are included.
+#'  Leading and trailing rows with differences less than \code{tol} have also been
+#'  removed.}
 #'  \item{common_names}{the names of the common columns}
 #'  \item{missing_names1}{The names of columns present in \code{x2} but missing
 #'                        in \code{x1}}
@@ -202,7 +204,19 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
   sel <- apply(abs(dif), FUN = max, MARGIN = 2) > tol
   sel[is.na(sel)] <- TRUE
   if (any(sel)) {
+
+    # remove columns with differences <= tol
     dif <- dif[, sel, drop = FALSE]
+
+    # now remove leading/trailing rows with differences <= tol
+    row_sel <- apply(abs(dif), FUN = max, MARGIN = 1) > tol
+    row_sel[is.na(row_sel)] <- TRUE
+    row_sel <- which(row_sel)
+    row_sel <- min(row_sel) : max(row_sel)
+    pstart <- start_period(common_range) + row_sel[1] - 1
+    period <- period_range(pstart, pstart + length(row_sel) - 1)
+    dif <- dif[period, , drop = FALSE]
+
   } else {
     dif <- NULL
   }
