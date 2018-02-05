@@ -12,8 +12,6 @@ before_install:
   - R -e "devtools::install_deps('./pkg')"
   - R -e "devtools::document('./pkg')"
   - cd ./pkg
-  - chmod a+w tests/testthat/write_read_ts/csv
-  - chmod a+w tests/testthat/write_read_ts/xlsx
 
 r_packages:
   - rmarkdown

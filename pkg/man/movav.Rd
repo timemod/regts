@@ -8,7 +8,7 @@
 \usage{
 movavb(x, order, keep_range = TRUE)
 
-movavc(x, order, keep_range = TRUE)
+movavc(x, order, keep_range = TRUE, method = c("centre", "left", "right"))
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object}
@@ -22,6 +22,10 @@ Then the result timeseries will have \code{order} NA values. For
 they will be distributed over both sides.
 If \code{TRUE} then the result timeseries is \code{order} periods
 shorter than the input timeseries.}
+
+\item{method}{method used to handle the centered moving average for
+even orders. Possible values are \code{"centre"} (the default),
+\code{"left"} and \code{"right"}. See Details. This argument is ignored for odd orders.}
 }
 \value{
 a \code{regts} object with the moving average values
@@ -36,16 +40,37 @@ For example, the backward moving average of order 3 is defined as
 
 while the centered moving average of order 3 is calculated as
 
-\eqn{A[t] = (x[t - 1] + x[t] + x[t + 1]) / 3}
+\eqn{A[t] = (x[t - 1] + x[t] + x[t + 1]) / 3}.
 
-Currently, the centered moving average has only been implemented for
-odd orders.
+The calculation of the centered moving average for even orders is somewhat
+more complicated, see Details.
+}
+\details{
+The centered moving average for even orders is usually computed by
+using one more observation than the order and to use weights 0.5 for the
+end points. For example, for order 4 we have
+
+\eqn{A[t] = (0.5 x[t - 2] + x[t - 1] + x[t] + x[t + 1] + 0.5 x[t + 2]) / 4}.
+
+In this way the observations are distributed evenly over the past
+and future. An alternative approach is to use the same number
+of observations as the order but use one more observation from the past
+than from the future, or the other way around. These methods can be be used
+by specifying argument \code{method}. Possible methods are
+\describe{
+\item{\code{centre}}{Standard method
+ e.g.  (0.5 x[t - 2] + x[t - 1] + x[t] + x[t + 1] + 0.5 x[t + 2]) / 4}
+\item{\code{left  }}{Use one more observation from the past, e.g.
+(x[t - 2] + x[t - 1] + x[t] + x[t + 1]) / 4}
+\item{\code{right }}{Use one more observation from the future, e.g.
+(x[t - 1] + x[t] + x[t + 1] + x[t + 2]) / 4}
+}
 }
 \section{Functions}{
 \itemize{
 \item \code{movavb}: Backward moving average
 
-\item \code{movavc}: Centered moving average (currently only for odd orders)
+\item \code{movavc}: Centered moving average
 }}
 
 \examples{

@@ -64,8 +64,21 @@ test_that("univariate timeseries", {
                lag(movav_back(c, order = 3), 1)[p])
   expect_equal(movavb(c, order = 3, keep_range = FALSE),
                na_trim(movav_back(c, order = 3)))
-  expect_equal(movavc(c, order = 5, keep_range = FALSE),
+  # method = "left" should be ignored
+  expect_equal(movavc(c, order = 5, keep_range = FALSE, method = "left"),
                na_trim(lag(movav_back(c, order = 5), 2)[p]))
+
+  expected_result_left <- lag(movavb(a_lbls, order = 4), 1)[p]
+  expected_result_right <- lag(movavb(a_lbls, order = 4), 2)[p]
+  expected_result_centre <- 0.5 * (expected_result_left  + expected_result_right)
+
+  expect_equal(movavc(a_lbls, order = 4, method = "left"),
+               expected_result_left)
+  expect_equal(movavc(a_lbls, order = 4, method = "right", keep_range = FALSE),
+               na_trim(expected_result_right))
+
+  expect_equal(movavc(a_lbls, order = 4, method = "centre"),
+               expected_result_centre)
 })
 
 test_that("multivariate timeseries", {
@@ -79,9 +92,21 @@ test_that("multivariate timeseries", {
   expected_result <- na_trim(movav_back_multi(multi_lbl, order = 3))
   expect_equal(result, expected_result)
 
-  multi_lbl <- cbind(a_lbls, b_lbls, c_lbls)
   result <- movavb(multi_lbl, order = 2, keep_range = FALSE)
   expected_result <- na_trim(movav_back_multi(multi_lbl, order = 2))
+  expect_equal(result, expected_result)
+
+  result <- movavc(multi_lbl, order = 2, keep_range = TRUE)
+  expected_result <- (lag(movav_back_multi(multi_lbl, order = 2), 1)[p] +
+                      movav_back_multi(multi_lbl, order = 2)[p]) / 2
+  expect_equal(result, expected_result)
+
+  result <- movavc(multi_lbl, order = 2, keep_range = FALSE, method = "left")
+  expected_result <- na_trim(movav_back_multi(multi_lbl, order = 2)[p])
+  expect_equal(result, expected_result)
+
+  result <- movavc(multi, order = 2, method = "right")
+  expected_result <- lag(movav_back_multi(multi, order = 2), 1)[p]
   expect_equal(result, expected_result)
 })
 
@@ -95,13 +120,28 @@ test_that("simpel annual timeseries", {
   expect_equal(movavc(xts, order = 3), lag(xts_movav, 1)[p])
   expect_equal(movavc(xts, order = 3, keep_range = FALSE),
                na_trim(lag(xts_movav, 1), method = "first"))
+
+  #
+  # centered moving averge with order 4
+  #
+
+  expected_result_left <- regts(2:8 + 0.5, start = "2020")[p]
+  expected_result_centre <- regts(as.numeric(3:8), start = "2020")[p]
+
+  expect_identical(movavc(xts, order = 4, method = "left", keep_range = FALSE),
+                    na_trim(expected_result_left))
+  expect_identical(movavc(xts, order = 4, method = "right"),
+                   lag(expected_result_left, 1)[p])
+  expect_identical(movavc(xts, order = 4, method = "centre", keep_range = TRUE),
+                   expected_result_centre)
 })
+
+
+
 
 
 test_that("errors", {
   x <- regts("hello", period =  p)
   msg <- "Not compatible with requested type: \\[type=character; target=double\\]."
   expect_error(movavb(x, order = 2), msg)
-  msg <- "movavc not yet supported for even orders."
-  expect_error(movavc(a, order = 2), msg)
 })

@@ -10,13 +10,37 @@
 #'
 #' while the centered moving average of order 3 is calculated as
 #'
-#' \eqn{A[t] = (x[t - 1] + x[t] + x[t + 1]) / 3}
+#' \eqn{A[t] = (x[t - 1] + x[t] + x[t + 1]) / 3}.
 #'
-#' Currently, the centered moving average has only been implemented for
-#' odd orders.
+#' The calculation of the centered moving average for even orders is somewhat
+#' more complicated, see Details.
+#'
+#' @details
+#' The centered moving average for even orders is usually computed by
+#' using one more observation than the order and to use weights 0.5 for the
+#' end points. For example, for order 4 we have
+#'
+#' \eqn{A[t] = (0.5 x[t - 2] + x[t - 1] + x[t] + x[t + 1] + 0.5 x[t + 2]) / 4}.
+#'
+#' In this way the observations are distributed evenly over the past
+#' and future. An alternative approach is to use the same number
+#' of observations as the order but use one more observation from the past
+#' than from the future, or the other way around. These methods can be be used
+#' by specifying argument \code{method}. Possible methods are
+#' \describe{
+#' \item{\code{centre}}{Standard method
+#'  e.g.  (0.5 x[t - 2] + x[t - 1] + x[t] + x[t + 1] + 0.5 x[t + 2]) / 4}
+#' \item{\code{left  }}{Use one more observation from the past, e.g.
+#' (x[t - 2] + x[t - 1] + x[t] + x[t + 1]) / 4}
+#' \item{\code{right }}{Use one more observation from the future, e.g.
+#' (x[t - 1] + x[t] + x[t + 1] + x[t + 2]) / 4}
+#' }
 #'
 #' @param x a \code{\link[stats]{ts}} or \code{\link{regts}} object
 #' @param order the order of the moving average
+#' @param method method used to handle the centered moving average for
+#' even orders. Possible values are \code{"centre"} (the default),
+#' \code{"left"} and \code{"right"}. See Details. This argument is ignored for odd orders.
 #' @param keep_range If \code{TRUE} (the default), then  the output
 #' timeseries has the same period range as the input timeseries.
 #' Then the result timeseries will have \code{order} NA values. For
@@ -39,23 +63,40 @@ NULL
 #' @describeIn movav Backward moving average
 #' @export
 movavb <- function(x, order, keep_range = TRUE) {
-  return(movav_internal(x, from = -(order) + 1L, to = 0L,
+  return(movav_internal(x, w = numeric(), from = -(order) + 1L, to = 0L,
                         keep_range = keep_range))
 }
 
-#' @describeIn movav Centered moving average (currently only for odd orders)
+#' @describeIn movav Centered moving average
 #' @export
-movavc <- function(x, order, keep_range = TRUE) {
-  if (!order%%2) {
-    stop("movavc not yet supported for even orders.")
+movavc <- function(x, order, keep_range = TRUE,
+                   method = c("centre", "left", "right")) {
+
+  method <- match.arg(method)
+
+  is_odd_order <- as.logical(order%%2)
+  if (is_odd_order || method == "centre") {
+    to <- floor(order / 2)
+    from <- -to
+  } else if (method == "right") {
+    to <- order / 2
+    from <- - to + 1
   } else {
-    bound <- floor(order / 2)
-    return(movav_internal(x, from = -bound, to = bound,
-                          keep_range = keep_range))
+    to <- order / 2 - 1
+    from <- - to - 1
   }
+
+  if (is_odd_order || method != "centre") {
+    w <- numeric(0)
+  } else {
+    w <- (c(0.5, rep(1, (order - 1)), 0.5))
+  }
+
+  return(movav_internal(x, w = w, from = from, to = to,
+                        keep_range = keep_range))
 }
 
-movav_internal <- function(x, from, to, keep_range) {
+movav_internal <- function(x, w, from, to, keep_range) {
   if (!is.ts(x)) {
     stop("Argument x is not a timeseries")
   }
@@ -65,7 +106,7 @@ movav_internal <- function(x, from, to, keep_range) {
     dim(x) <- c(length(x), 1)
   }
 
-  data <- moving_average(x, from, to, keep_range)
+  data <- moving_average(x, w, from, to, keep_range)
 
   if (!x_is_matrix) {
     # convert the vector to data

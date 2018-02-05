@@ -5,8 +5,8 @@ agg_gr <- function(ts_old, freq_new, method) {
     .Call(`_regts_agg_gr`, ts_old, freq_new, method)
 }
 
-moving_average <- function(x, from, to, keep_range) {
-    .Call(`_regts_moving_average`, x, from, to, keep_range)
+moving_average <- function(x, w, from, to, keep_range) {
+    .Call(`_regts_moving_average`, x, w, from, to, keep_range)
 }
 
 parse_period <- function(period_text, frequency) {
