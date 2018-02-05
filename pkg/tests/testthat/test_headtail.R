@@ -17,3 +17,10 @@ test_that("head, tail & topleft for regts", {
   expect_identical(topleft(data, ncol = 6), head(data[, 1:6 ]))
   expect_identical(topleft(data, ncol = 5), topleft(data2, ncol = 5))
 })
+
+test_that("topleft for small regts", {
+
+  data <- regts(matrix(1:12, ncol = 3), start = "2010",
+                names = paste0("a", 1:3))
+  expect_identical(topleft(data), head(data))
+})
