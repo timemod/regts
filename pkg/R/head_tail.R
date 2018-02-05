@@ -48,6 +48,8 @@ topleft <- function(x, n = 6L, ncol = 10L) {
   last  <- end_period(get_period_range(x))
   period <- period_range(first, min(first + n-1, last))
 
+  ncol = min(ncol, ncol(x))
+
   return(x[period, 1:ncol, drop = FALSE ])
 
 }
