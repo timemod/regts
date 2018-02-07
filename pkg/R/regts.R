@@ -33,21 +33,38 @@
 #' # univariate timeseries
 #' ts1 <- regts(1:10, start = "2010Q4")
 #'
+#' # period selection
+#' print(ts1["2011Q2/2011Q3"])
 #'
 #' # multivariate timeseries
 #' ts2 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"))
 #'
-#'# multivariate timeseries with labels
+#' # two equivalent ways to select a column in a multivariate ts
+#' print(ts2$a)
+#' print(ts2[, "a"])
+#'
+#' # period selection in multivariate regts
+#' print(ts2["2011Q2/2011Q3"])
+#'
+#' # period and column selection in multivariate regts
+#' print(ts2["2011Q2/2011Q3", "a"])
+#'
+#' # two equivalent ways to add a column
+#' ts2$d <- 2
+#' ts2[ , "e"] <- 2
+#'
+#' # multivariate timeseries with labels
 #' ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"),
 #'              labels = paste("Timeseries", c("a", "b", "c")))
 #'
-#'# multivariate timeseries with period
+#'# multivariate timeseries created with a period_range object
 #' range <- period_range("2016Q1", "2017Q4")
 #' ts4 <- regts(matrix(1:16, ncol = 2), period = range, names = c("a", "b"))
 #'
 #' # create a half-yearly timeseries; because argument end is specified the
 #' # length of the timeseries is smaller than the length of data (10).
 #' ts5 <- regts(1:10, start = "2010-1", end = '2011-2', frequency = 2)
+#'
 #' @seealso
 #' The function \code{\link{is.regts}} can be used to test if an object is a
 #' \code{regts}.
@@ -521,3 +538,37 @@ window_regts <- function(x, sel_range) {
   return (create_regts(data, sel_range[1], sel_range[2], sel_range[3],
                        ts_labels(x)))
 }
+
+#' @export
+"$.regts" <- function(object, x) {
+  if (!is.matrix(object)) stop("$ operator not possible for vector timeseries")
+  cnames <- colnames(object)
+  if (is.null(cnames)) stop(paste("$ operator not possible for regts without",
+                            "column names"))
+  i <- pmatch(x, cnames)
+  if (is.na(i)) {
+    return(NULL)
+  } else {
+    return(object[, i])
+  }
+}
+
+#' @export
+"$<-.regts" <- function(object, x, value) {
+  if (!is.matrix(object)) stop("$ operator not possible for vector timeseries")
+  cnames <- colnames(object)
+  if (is.null(cnames)) stop(paste("$ operator not possible for regts without",
+                                  "column names"))
+
+  if (is.null(value)) {
+    i <- pmatch(x, cnames)
+    if (!is.na(i)) {
+      object <- object[, -i, drop = FALSE]
+    }
+  } else {
+    object[, x] <- value
+  }
+
+  return(object)
+}
+
