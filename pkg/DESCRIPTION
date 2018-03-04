@@ -1,8 +1,7 @@
 Package: regts
 Type: Package
-Title: Regular timeseries
+Title: Regular Timeseries
 Version: 0.1
-Date: 2016-01-26
 Authors@R: c(
  person("Rob", "van Harrevelt", email = "rvanharrevelt@gmail.com", role = c("aut", "cre")),
  person("Anita", "van der Roest", email = "J.C.van.der.Roest@cpb.nl",role = "aut")
@@ -10,7 +9,7 @@ Authors@R: c(
 Author: Rob van Harrevelt [aut, cre],
     Anita van der Roest [aut]
 Maintainer: Rob van Harrevelt <rvanharrevelt@gmail.com>
-Description: This package contains a number of tools to work efficiently with
+Description: Several tools to work efficiently with
     regular timeseries, in particular monthy, quarterly and yearly timeseries.
 License: GPL-3
 LazyData: TRUE
@@ -27,6 +26,10 @@ Imports:
 Suggests:
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    zoo,
+    xts,
+    timeSeries,
+    tseries
 LinkingTo: Rcpp
 VignetteBuilder: knitr

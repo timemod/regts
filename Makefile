@@ -4,7 +4,7 @@
 
 PKGDIR=pkg
 INSTALL_FLAGS=--no-multiarch --with-keep.source
-RCHECKARG=--no-multiarch
+RCHECKARG=--no-multiarch --as-cran
 R_HOME=$(shell R RHOME)
 PKG_CXXFLAGS = -std=c++11 `"$(R_HOME)/bin/Rscript" -e "Rcpp:::CxxFlags()"`
 
