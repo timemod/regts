@@ -4,10 +4,12 @@
 \alias{as.data.frame.regts}
 \title{Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}}
 \usage{
-\method{as.data.frame}{regts}(x, rowwise = FALSE, row_names = TRUE, ...)
+\method{as.data.frame}{regts}(x, ..., rowwise = FALSE, row_names = TRUE)
 }
 \arguments{
 \item{x}{a \code{\link{regts}}}
+
+\item{...}{additional arguments to be passed to methods.}
 
 \item{rowwise}{a logical value: should the timeseries be stored rowwise
 or columnwise in the data frame? Defaults to \code{FALSE}}
@@ -15,8 +17,6 @@ or columnwise in the data frame? Defaults to \code{FALSE}}
 \item{row_names}{Whether to create row names. If \code{FALSE},
 then an additional column with name \code{"period"} or \code{"name"} is created for
 columnwise or rowwise timeseries, respectively.}
-
-\item{...}{additional arguments to be passed to methods.}
 }
 \value{
 A \code{\link[base]{data.frame}}

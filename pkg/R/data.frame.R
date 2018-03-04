@@ -19,7 +19,7 @@
 #' ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),
 #'            labels = c("Timeseries a", "Timeseries b"))
 #' print(as.data.frame(ts))
-as.data.frame.regts <- function(x, rowwise = FALSE, row_names = TRUE, ...) {
+as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE) {
 
   if (!is.matrix(x)) {
     x <- univec2unimat(x, deparse(substitute(x)))
