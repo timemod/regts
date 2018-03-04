@@ -31,6 +31,10 @@ static int get_frequency(const char *c);
 
 #define YY_FATAL_ERROR(msg) Rf_error(msg)
 
+// the following error cannot occur
+#define ECHO Rf_error("Internal error in period scanner ... uncatched input");
+
+
 %}
 
 DIGIT           [0-9]

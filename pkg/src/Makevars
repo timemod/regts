@@ -14,6 +14,10 @@ all: $(SHLIB) period_scanner.o period_parser.o
 # rules for lex and yacc
 period_scanner.cpp : $(LEX_YACC_DIR)/period_scanner.l
 	$(LEX)  -P$(LYPREFIX) -o$@ $<
+        # flex generates code containing a reference to stdout. 
+        # R CMD check gives a note about this. However, stdout 
+        # is actually never used, therefore replace stdout with NULL.
+	sed -i 's/stdout/\/*&*\/NULL/' $@
 
 period_parser.cpp : $(LEX_YACC_DIR)/period_parser.yy
 	$(YACC) --defines=period_parser.h -p $(LYPREFIX) -o $@ $<
