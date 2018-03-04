@@ -6,7 +6,7 @@ PKGDIR=pkg
 INSTALL_FLAGS=--no-multiarch --with-keep.source
 RCHECKARG=--no-multiarch
 R_HOME=$(shell R RHOME)
-PKG_CXXFLAGS = -std=c++0x `"$(R_HOME)/bin/Rscript" -e "Rcpp:::CxxFlags()"`
+PKG_CXXFLAGS = -std=c++11 `"$(R_HOME)/bin/Rscript" -e "Rcpp:::CxxFlags()"`
 
 # Package name, Version and date from DESCIPTION
 PKG=$(shell grep 'Package:' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2)
