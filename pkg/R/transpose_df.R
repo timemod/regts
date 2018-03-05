@@ -88,14 +88,14 @@ transpose_df  <- function(x, colname_column, label_column) {
   }
 
   if (any(nchar(old_labels, type = "bytes") > 0)) {
-    ret <- cbind(labels = old_labels, ret, stringsAsFactors = FALSE)
+    ret <- cbind(label = old_labels, ret, stringsAsFactors = FALSE)
   }
 
   if (is_data_table) {
     # data.tables do not support rownames, so create another column with names
     names <- rownames(ret)
     rownames(ret) <- NULL
-    ret <- cbind(names = names, ret, stringsAsFactors = FALSE)
+    ret <- cbind(name = names, ret, stringsAsFactors = FALSE)
     ret <- as.data.table(ret)
   }
 
