@@ -53,7 +53,7 @@ a sheet with a specified name.
 object.
 }
 \details{
-The functions employs function \code{\link[xlsx]{addDataFrame}}
+The functions employ function \code{\link[xlsx]{addDataFrame}}
 from the \code{\link[xlsx:xlsx-package]{xlsx}} package for writing the Excel file.
 
 If you want to write multiple timeseries objects to different
