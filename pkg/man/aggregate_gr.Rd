@@ -31,6 +31,9 @@ scaled). The result is a first difference of length 1 in the output frequency.
 The \code{pct} and \code{rel} methods assume timeseries that contain
 percentage or relative change. They calculate the exact percentage or
 relative change for the output timeseries.
+
+More details of the aggregation methods as provided in the Vignette
+"Introduction to package regts".
 }
 \examples{
 ts_q <- regts(rnorm(10), start = "2016Q1")
