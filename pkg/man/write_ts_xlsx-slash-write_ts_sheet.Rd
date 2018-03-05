@@ -39,7 +39,7 @@ written.}
 \item{number_format}{a character value specifying the number format.
 For example, \code{"#.00"} corresponds to two decimal spaces.
 For details see the description of the function \code{\link[xlsx]{DataFormat}}
-in the \code{\link[xlsx]{xlsx}} package.}
+in the \code{\link[xlsx:xlsx-package]{xlsx}} package.}
 
 \item{sheet}{a \code{\link[xlsx]{Sheet}} object (see the documentation
 of package \code{xlsx})}
@@ -54,7 +54,7 @@ object.
 }
 \details{
 The functions employ function \code{\link[xlsx]{addDataFrame}}
-from the \code{\link[xlsx]{xlsx}} package for writing the Excel file.
+from the \code{\link[xlsx:xlsx-package]{xlsx}} package for writing the Excel file.
 
 If you want to write multiple timeseries objects to different
 sheets, you can use \code{write_ts_xlsx} with argument

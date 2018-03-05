@@ -54,14 +54,15 @@
 #' \strong{\code{Date}, \code{POSIXct} and \code{POSIXlt}}
 #'
 #' The function also accepts a \code{\link{Date}},
-#' \code{\link{POSIXct}} or \code{\link{POSIXlt}} argument.
+#' \code{\link[base:DateTimeClasses]{POSIXct}} or
+#' \code{\link[base:DateTimeClasses]{POSIXlt}} argument.
 #' By default the function converts this object to a \code{period} with
 #' frequency month. It is possible to specify another output frequency,
 #' provided that this frequency is a divisor of 12.
 #'
 #' @param x a character string, numeric scalar,
-#' \code{\link[base]{Date}}, \code{\link[base]{POSIXct}}
-#' or  \code{\link[base]{POSIXlt}}
+#' \code{\link[base]{Date}}, \code{\link[base:DateTimeClasses]{POSIXct}}
+#' or  \code{\link[base:Dates]{POSIXlt}}
 #' @param frequency frequency of the period. Argument \code{frequency} is
 #' mandatory if the frequency cannot be inferred from \code{x} (for example
 #' \code{"2017-2"} could be a quarter, month, etc.)

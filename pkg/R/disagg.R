@@ -3,14 +3,14 @@
 #' This function converts an timeseries to a timeseries with higher frequency,
 #' for example a yearly timeseries to a quarterly timeseries. Missing values
 #' are obtained by spline interpolation. This function employs function
-#' \code{\link[stats]{spline}} of the \code{stats} package.
+#' \code{\link[stats:splinefun]{spline}} of the \code{stats} package.
 #'
 #' For each individual timeseries, trailing and leading \code{NA} values are
 #' removed before interpolation. If the timeseries contains intermediate
 #' \code{NA} values,  the resulting timeseries is set to NA.
 #'
 #' For details about the different spline methods,
-#' consult the documentation of the \code{\link[stats]{spline}}
+#' consult the documentation of the \code{\link[stats:splinefun]{spline}}
 #' function of the \code{stats} package.
 #'
 #' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object

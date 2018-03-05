@@ -2,9 +2,24 @@
 # the package.  The actual building and installation of the package is achieved
 # with the standard R commands R CMD BUOLD and R CMD INSTALL.
 
+OSNAME := $(shell uname | tr A-Z a-z)
+ifeq ($(findstring windows, $(OSNAME)), windows)
+    OSTYPE = windows
+else
+    # Linux or MAC OSX
+    OSTYPE = unix
+endif
+
 PKGDIR=pkg
 INSTALL_FLAGS=--no-multiarch --with-keep.source
+ifeq ($(OSTYPE), windows) 
+# for unknown reason R CMD check --as-cran does not work on Windows
+# (the same problem occurs in for example package nleqslv).
+RCHECKARG=--no-multiarch
+else
 RCHECKARG=--no-multiarch --as-cran
+endif
+
 R_HOME=$(shell R RHOME)
 PKG_CXXFLAGS = -std=c++11 `"$(R_HOME)/bin/Rscript" -e "Rcpp:::CxxFlags()"`
 
@@ -14,13 +29,6 @@ PKGTAR=$(PKG)_$(shell grep 'Version' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2).t
 PKGDATE=$(shell grep 'Date' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2)
 TODAY=$(shell date "+%Y-%m-%d")
 
-OSNAME := $(shell uname | tr A-Z a-z)
-ifeq ($(findstring windows, $(OSNAME)), windows)
-    OSTYPE = windows
-else
-    # Linux or MAC OSX
-    OSTYPE = unix
-endif
 
 help:
 	@echo
@@ -123,7 +131,7 @@ bin: install_deps
 
 document: install_deps
 	-@rm -f $(PKGDIR).pdf
-	R -e "roxygen2::update_collate('"$(PKGDIR)"'); devtools::document('"$(PKGDIR)"')"
+	R -e "devtools::document('"$(PKGDIR)"')"
 	R CMD Rd2pdf --batch $(PKGDIR) 2>$(PKGDIR).log
 
 install: install_deps

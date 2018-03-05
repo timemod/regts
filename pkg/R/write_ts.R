@@ -48,7 +48,7 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' object.
 #'
 #' The functions employ function \code{\link[xlsx]{addDataFrame}}
-#' from the \code{\link[xlsx]{xlsx}} package for writing the Excel file.
+#' from the \code{\link[xlsx:xlsx-package]{xlsx}} package for writing the Excel file.
 #'
 #' If you want to write multiple timeseries objects to different
 #' sheets, you can use \code{write_ts_xlsx} with argument
@@ -72,7 +72,7 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @param number_format a character value specifying the number format.
 #' For example, \code{"#.00"} corresponds to two decimal spaces.
 #' For details see the description of the function \code{\link[xlsx]{DataFormat}}
-#' in the \code{\link[xlsx]{xlsx}} package.
+#' in the \code{\link[xlsx:xlsx-package]{xlsx}} package.
 #' @param comments a character vector or data frame. The comments
 #' are written to the beginning of the sheet, before the timeseries data is
 #' written.

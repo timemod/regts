@@ -54,7 +54,7 @@ of the matrix
 \code{regts}
 
 \item \code{default}: Default method to convert an R object to a
-\code{regts}. This method first employs \code{\link[stats]{as.ts}}
+\code{regts}. This method first employs \code{\link[stats:ts]{as.ts}}
 and then \code{\link{as.regts.ts}}
 }}
 
