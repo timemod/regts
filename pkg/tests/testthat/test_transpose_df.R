@@ -75,19 +75,19 @@ test_that("data frame with numbers and factors", {
 
 test_that("data table with numbers, texts and labels", {
 
-  dt <- data.table(names = c("a", "b"),
+  dt <- data.table(name = c("a", "b"),
                    numbers = c(1.000000000123, 10.12345678910111212),
                    texts = c("jan", "piet"), stringsAsFactors = FALSE)
   Hmisc::label(dt, self = FALSE) <- c("Variable names", "Numeric Data",
                                       "Character Data")
 
-  dt_t <- transpose_df(dt, colname_column = "names")
+  dt_t <- transpose_df(dt, colname_column = "name")
 
   expect_identical(class(dt_t), c("data.table", "data.frame"))
 
-  dt_t_t <- transpose_df(dt_t, colname_colum   = "names", label_column = "labels")
+  dt_t_t <- transpose_df(dt_t, colname_colum   = "name", label_column = "label")
 
-  expect_identical(Hmisc::label(dt_t_t), c(names = "", numbers = "Numeric Data",
+  expect_identical(Hmisc::label(dt_t_t), c(name = "", numbers = "Numeric Data",
                                            texts = "Character Data"))
 
   dt_t_t$numbers <- as.numeric(dt_t_t$numbers)
@@ -97,8 +97,8 @@ test_that("data table with numbers, texts and labels", {
   # dt_t_t has lost the label for variable names (this cannot be avoided),
   # therefore also remove the corresponding label in the expected result.
   expected_result <- dt
-  expected_result$names <- as.character(expected_result$names)
-  attr(expected_result$names, "label") <- NULL
+  expected_result$name <- as.character(expected_result$name)
+  attr(expected_result$name, "label") <- NULL
 
 
   expect_equal(dt_t_t, expected_result)

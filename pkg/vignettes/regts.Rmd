@@ -1203,7 +1203,7 @@ specify this argument, then the values in the selected column are used to
 create labels:
 
 ```{r collapse = TRUE}
-df2 <- transpose_df(dft, label_column = "labels")
+df2 <- transpose_df(dft, label_column = "label")
 df2
 label(df2)
 ```
