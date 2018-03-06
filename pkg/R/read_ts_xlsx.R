@@ -8,10 +8,11 @@
 #' Valid period texts should have the format recognized by function
 #' \code{\link{period}}, for example \code{"2010Q2"},
 #' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
+#'
 #' An integer value is considered as a period wih frequency year.
 #' In many cases, this function will read timeseries correctly.
 #' However, \emph{you should always carefully check the results of this
-#' function}. If the result is not
+#' function}. If the function fails or if the result is not
 #' what you want, then you have to read the data into a data frame
 #' (for example by using function \code{read_excel} of package \code{readxl}),
 #' then convert the data frame to a standard columnwise data frame
