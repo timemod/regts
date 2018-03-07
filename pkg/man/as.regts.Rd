@@ -25,8 +25,8 @@ as.regts(x, ...)
 \item{...}{arguments passed to \code{fun}}
 
 \item{time_column}{the column names or numbers of the data frame
-in which the time is stored. Specify \code{0} if the index is in the row names
-of the data frame}
+in which the time (periods) is stored. Specify \code{0} if the index is in
+the row names of the data frame}
 
 \item{numeric}{logical: should non numeric values be converted to numeric data.
 By default they are converted to numeric. This can be changed by setting

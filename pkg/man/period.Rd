@@ -26,11 +26,14 @@ a \code{period} object
 }
 \description{
 Function \code{period} creates a \code{period} object
-based on a character string or numeric scalar.
+based on a character string or numeric scalar,
 Possible character string formats are for example \code{"2017Q2"},
 \code{"2017M2"}, \code{"2017"} or \code{"2017-2"}.
 Possible numeric formats are for example \code{2017} or
 \code{2017.25} (the second quarter or the fourth month of 2017).
+The function also accepts a \code{\link{Date}},
+\code{\link[base:DateTimeClasses]{POSIXct}} or
+\code{\link[base:DateTimeClasses]{POSIXlt}} argument.
 See Details.
 \cr\cr
 Function \code{as.period}

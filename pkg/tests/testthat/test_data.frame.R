@@ -131,3 +131,19 @@ test_that("as.regts.data.frame for a tibble", {
   expect_identical(ts1, ts2)
 })
 
+test_that("as.regts.data.frame for a data.frame with dates", {
+
+  periods <- c(as.Date("2015-05-30"), as.Date("2015-06-30"),
+               as.Date("2015-07-30"))
+
+  df <- data.frame(period = periods, a = 1:3)
+
+  ts1 <- as.regts(df, time_column = "period")
+
+  ts2 <- regts(matrix(1:3, ncol = 1) , start = "2015M05", names = "a")
+  expect_identical(ts1, ts2)
+
+  expect_error(as.regts(df, time_column = "period", frequency = 4),
+               "Duplicate periods found in data \\(2015Q2\\).")
+})
+

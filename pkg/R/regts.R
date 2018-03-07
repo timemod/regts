@@ -219,8 +219,8 @@ is.regts <- function(x) {
 #'
 #' @param x an arbitrary R object
 #' @param time_column the column names or numbers of the data frame
-#' in which the time is stored. Specify \code{0} if the index is in the row names
-#' of the data frame
+#' in which the time (periods) is stored. Specify \code{0} if the index is in
+#' the row names of the data frame
 #' @param numeric logical: should non numeric values be converted to numeric data.
 #' By default they are converted to numeric. This can be changed by setting
 #' \code{numeric = FALSE}.
@@ -292,16 +292,21 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   # x could be a subclass of a data frame, for example a data.table.
   # Therefore use function as.data.frame to make sure that x is a normal
   # data frame.
+
   x <- as.data.frame(x)
 
+  if (nrow(x) == 0) {
+    stop("'regts' object must have one or more observations")
+  }
+
   if (time_column == 0) {
-    times <- rownames(x)
+    periods <- rownames(x)
     data <- x
   } else {
     if (is.character(time_column)) {
       time_column <- which(colnames(x) %in% time_column)
     }
-    times <- x[[time_column]]
+    periods <- x[[time_column]]
     data <- x[-time_column]
   }
 
@@ -311,11 +316,10 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     datamat <- as.matrix(data)
   }
 
-  rownames(datamat) <- times
-
   # Use numeric == FALSE, because the data has already been converted
   # to numeric when needed
-  ret <- as.regts.matrix(datamat, numeric = FALSE, fun = fun, ...)
+  ret <- matrix2regts_(datamat, periods = periods, numeric = FALSE, fun = fun,
+                      ...)
 
   # handle labels
   if (ncol(data) > 0) {
@@ -337,21 +341,30 @@ as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
     stop("'regts' object must have one or more observations")
   }
 
+  # we assume that the periods are in the rownames of the matrix
+  return(matrix2regts_(x, periods = rownames(x), numeric = numeric, fun = fun,
+                       ...))
+}
+
+# internal function to convert a matrix to a regts.
+matrix2regts_ <- function(x, periods, numeric, fun, ...) {
+
   if (numeric && !is.numeric(x)) {
     x <- as.numeric(x)
   }
 
   # convert the rownames to a list of periods
-  times <- rownames(x)
-  if (is.null(times)) {
-    times <- seq_len(nrow(x))
+  if (is.null(periods)) {
+    periods <- seq_len(nrow(x))
+  } else if (is.factor(periods)) {
+    periods <- as.character(periods)
   }
 
   # create a list of regperiod objects
-  times <- lapply(as.character(times), FUN = fun, ...)
+  periods <- lapply(periods, FUN = fun, ...)
 
   # check that all frequencies are equal
-  frequencies <- sapply(times, FUN = frequency)
+  frequencies <- sapply(periods, FUN = frequency)
   frequencies <- unique(frequencies)
   if (length(frequencies) > 1) {
     stop("The time column(s) contain different frequencies")
@@ -360,28 +373,36 @@ as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
   }
 
   # compute times as the number of subperiods since AD 0.
-  times <- as.integer(unlist(times))
+  subp <- as.integer(unlist(periods))
 
-  if (identical(as.integer(times), times[1]:times[nrow(x)])) {
+  if (anyDuplicated(subp)) {
+    dupl <- duplicated(subp)
+    period_strings <- sapply(periods[dupl], FUN = as.character)
+    stop(paste0("Duplicate periods found in data (",
+               paste(period_strings, collapse = ", "), ")."))
+  }
+
+  if (identical(subp, subp[1]:subp[nrow(x)])) {
     # normal regular timeseries, no missing periods and periods
     # are ordered synchronically
-    ret <- regts(x, start = create_period(times[1], freq))
+    ret <- regts(x, start = create_period(subp[1], freq))
   } else {
     # irregular timeseries in dataframe (missing periods or
     # unorderered time index)
-    subp_min <- min(times)
-    subp_max <- max(times)
+    subp_min <- min(subp)
+    subp_max <- max(subp)
     per_count <- subp_max - subp_min + 1
     pmin <- create_period(subp_min, frequency = freq)
     mat <- matrix(NA, nrow = per_count, ncol = ncol(x))
     colnames(mat) <- colnames(x)
     ret <- regts(mat, start = pmin)
-    rows <- times - subp_min +1
+    rows <- subp - subp_min +1
     ret[rows, ] <- x
   }
 
   return (ret)
 }
+
 
 #' @describeIn as.regts Default method to convert an R object to a
 #' \code{regts}. This method first employs \code{\link[stats:ts]{as.ts}}
