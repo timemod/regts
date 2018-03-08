@@ -5,17 +5,17 @@
 \title{Temporal disaggregation of time series using spline interpolation.}
 \usage{
 disagg(x, nfrequency, method = c("fmm", "periodic", "natural", "monoH.FC",
-  "hyman"), constraint = c("sum", "average", "last", "first"))
+  "hyman", "cspline"), constraint = c("sum", "average", "last", "first"))
 }
 \arguments{
-\item{x}{a \code{\link[stats]{ts}} of \code{\link{regts}} object}
+\item{x}{a \code{\link[stats]{ts}} object}
 
 \item{nfrequency}{the frequency of the result. This should be higher than
 the frequency of timeseries \code{x}.}
 
 \item{method}{specifies the type of spline to be used.
 Possible values are \code{"fmm"}, \code{"natural"}, \code{"periodic"},
-\code{"monoH.FC"} and \code{"hyman"}. Can be abbreviated.}
+\code{"monoH.FC"}, \code{"hyman"} and \code{"nakn"}. Can be abbreviated.}
 
 \item{constraint}{Constraint on the high frequency result.
 Possible values are \code{"sum"}, \code{"average"}, \code{"last"},
@@ -33,9 +33,17 @@ are obtained by spline interpolation. This function employs function
 \details{
 For each individual timeseries, trailing and leading \code{NA} values are
 removed before interpolation. If the timeseries contains intermediate
-\code{NA} values,  the resulting timeseries is set to NA.
+\code{NA} values,  the resulting timeseries is set to \code{NA}.
 
-For details about the different spline methods,
-consult the documentation of the \code{\link[stats:splinefun]{spline}}
-function of the \code{stats} package.
+Argument \code{method} can be used to select a spline interpolation
+methods. All methods except \code{"cspline"} employ
+the function code{\link[stats:splinefun]{spline}}
+function of the \code{stats} package is used. More information
+about the varous methods can be found in the documentation of that
+package.
+
+For method \code{"cspline"} the function {\link[cspline]{cspline}}
+of the \code{cspline} is used. This method used a not-a-knot
+boundary conditions, which implies that the first derivative
+at the second and one but last point are continuous.
 }

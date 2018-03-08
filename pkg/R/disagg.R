@@ -7,18 +7,26 @@
 #'
 #' For each individual timeseries, trailing and leading \code{NA} values are
 #' removed before interpolation. If the timeseries contains intermediate
-#' \code{NA} values,  the resulting timeseries is set to NA.
+#' \code{NA} values,  the resulting timeseries is set to \code{NA}.
 #'
-#' For details about the different spline methods,
-#' consult the documentation of the \code{\link[stats:splinefun]{spline}}
-#' function of the \code{stats} package.
+#' Argument \code{method} can be used to select a spline interpolation
+#' methods. All methods except \code{"cspline"} employ
+#' the function code{\link[stats:splinefun]{spline}}
+#' function of the \code{stats} package is used. More information
+#' about the varous methods can be found in the documentation of that
+#' package.
 #'
-#' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object
+#' For method \code{"cspline"} the function {\link[cspline]{cspline}}
+#' of the \code{cspline} is used. This method used a not-a-knot
+#' boundary conditions, which implies that the first derivative
+#' at the second and one but last point are continuous.
+#'
+#' @param x  a \code{\link[stats]{ts}} object
 #' @param nfrequency the frequency of the result. This should be higher than
 #' the frequency of timeseries \code{x}.
 #' @param method specifies the type of spline to be used.
 #' Possible values are \code{"fmm"}, \code{"natural"}, \code{"periodic"},
-#' \code{"monoH.FC"} and \code{"hyman"}. Can be abbreviated.
+#' \code{"monoH.FC"}, \code{"hyman"} and \code{"nakn"}. Can be abbreviated.
 #' @param constraint Constraint on the high frequency result.
 #' Possible values are \code{"sum"}, \code{"average"}, \code{"last"},
 #' \code{"first"}.
@@ -26,9 +34,11 @@
 #' high-frequency series should be equal to the corresponding
 #' low-frequency value.
 #' @importFrom stats spline
+#' @importFrom cspline cspline
 #' @export
 disagg <- function(x, nfrequency,
-                   method = c("fmm", "periodic", "natural", "monoH.FC", "hyman"),
+                   method = c("fmm", "periodic", "natural", "monoH.FC", "hyman",
+                              "cspline"),
                    constraint = c("sum", "average", "last", "first")) {
 
   method <- match.arg(method)
@@ -87,9 +97,11 @@ disagg <- function(x, nfrequency,
     nres <- (n - 1) * frac + 1
     if (any(is.na(x_trim))) {
       result <- rep(NA_real_, nres)
-    } else {
+    } else if (method != "cspline") {
       result  <- spline(x = seq_len(n), y = x_trim, n = nres,
                         method = method)$y
+    } else {
+      result  <- cspline(x = seq_len(n), y = x_trim, n = nres)$y
     }
     result <- regts(result, start = p_start_out)
     if (do_cumul) {

@@ -23,6 +23,7 @@ Imports:
     data.table,
     readxl,
     cellranger,
+    cspline
 Suggests:
     testthat,
     knitr,
