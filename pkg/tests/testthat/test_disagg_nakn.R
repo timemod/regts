@@ -3,7 +3,7 @@ library(testthat)
 
 rm(list = ls())
 
-context("disagg with cspline method")
+context("disagg with nakn method")
 
 q_per <- period_range("2017Q2/2018Q3")
 l <- seq_len(nperiod(q_per))
@@ -17,9 +17,9 @@ test_that("example 1", {
                  period = m_per)
   b_ref <- a_ref**2
   a_m <- disagg(a_q, nfrequency = 12, constraint = "last",
-                 method = "cspline")
+                method = "nakn")
   b_m <- disagg(b_q, nfrequency = 12, constraint = "last",
-                method = "cspline")
+                method = "nakn")
   expect_equal(a_m, a_ref)
   expect_equal(b_m, b_ref)
 })
@@ -30,7 +30,7 @@ test_that("example with NA values (1)", {
   xyz_q["2018Q3", "x"] <- NA
   xyz_q["2018Q1", "y"] <- NA
   xyz_m <- disagg(xyz_q, nfrequency = 12, constraint = "last",
-                  method = "cspline")
+                  method = "nakn")
 
   expected_result <- regts(matrix(rep(3:18, 3), ncol = 3), start = "2017M6",
                            names = c("x", "y", "z"))
@@ -46,6 +46,6 @@ test_that("few observations", {
   # 1 observation
   a_y <- regts(1, period = "2017")
   expect_error(disagg(a_y, nfrequency = 4, constraint = "last",
-                          method = "cspline"),
+                          method = "nakn"),
                "Not enough observations for the nakn method")
 })

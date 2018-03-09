@@ -5,7 +5,7 @@
 \title{Temporal disaggregation of time series using spline interpolation.}
 \usage{
 disagg(x, nfrequency, method = c("fmm", "periodic", "natural", "monoH.FC",
-  "hyman", "cspline"), constraint = c("sum", "average", "last", "first"))
+  "hyman", "nakn"), constraint = c("sum", "average", "last", "first"))
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} object}
@@ -27,8 +27,7 @@ low-frequency value.}
 \description{
 This function converts an timeseries to a timeseries with higher frequency,
 for example a yearly timeseries to a quarterly timeseries. Missing values
-are obtained by spline interpolation. This function employs function
-\code{\link[stats:splinefun]{spline}} of the \code{stats} package.
+are obtained by spline interpolation.
 }
 \details{
 For each individual timeseries, trailing and leading \code{NA} values are
@@ -36,14 +35,14 @@ removed before interpolation. If the timeseries contains intermediate
 \code{NA} values,  the resulting timeseries is set to \code{NA}.
 
 Argument \code{method} can be used to select a spline interpolation
-methods. All methods except \code{"cspline"} employ
+methods. All methods except \code{"nakn"} employ
 the function code{\link[stats:splinefun]{spline}}
-function of the \code{stats} package is used. More information
+function of the \code{stats} package. More information
 about the varous methods can be found in the documentation of that
 package.
 
-For method \code{"cspline"} the function {\link[cspline]{cspline}}
-of the \code{cspline} is used. This method used a not-a-knot
+For method \code{"nakn"} the function {\link[cspline]{cspline}}
+of package \code{cspline} is used. This method used a not-a-knot
 boundary conditions, which implies that the first derivative
 at the second and one but last point are continuous.
 }
