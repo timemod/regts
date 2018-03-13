@@ -22,9 +22,13 @@ List disagg_spline(NumericMatrix ts_old, const int freq_new,
     PeriodRange per_new;
     per_new.freq = freq_new;
 
-    if ((int) per_new.freq % (int) per_old.freq != 0) {
-        Rf_error("The new frequency %d is not an integer multiple "
-                "of the input frequency (%d)", freq_new, per_old.freq);
+    if (freq_new <= (int) per_old.freq) {
+        Rf_error("nfrequency (%d) is not larger than the "
+                "input frequency (%d)", freq_new, (int) per_old.freq);
+    }
+    if (freq_new % (int) per_old.freq != 0) {
+        Rf_error("nfrequency (%d) is not an integer multiple "
+                "of the input frequency (%d)", freq_new, (int) per_old.freq);
     }
 
     bool do_cumul = constraint == "average" || constraint == "sum"; 
