@@ -4,27 +4,37 @@
 \alias{index_ts}
 \title{Construct an index timeseries by scaling}
 \usage{
-index_ts(x, base_period = start_period(get_period_range(x)),
-  index_value = 100)
+index_ts(x, base = start_period(x), index_value = 100)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} of \code{\link{regts}} object}
 
-\item{base_period}{The base period: a \code{\link{period}} or a
-\code{\link{period_range}}, or an object that can be coerced to a period or
-period range. By default base period is the first period of the input
-timeseries.}
+\item{base}{a \code{\link{period}} or a
+\code{\link{period_range}} specifying the base period
+used for calculating the index factor,
+or an object that can be coerced to a
+\code{period} or \code{period_range}. By default the
+base period is the first period of the input timeseries.}
 
-\item{index_value}{the index value (by default 100). If \code{base_period}\
-is a single period, then the returned timeseries will be equal to the index value
-at this period. If \code{base_period} is a period
-range with multiple periods, then the average of the index timeseries
-is equal to the index value}
-}
-\value{
-an index timeseries
+\item{index_value}{the index value (by default 100).
+This is the value of the index timeseries at the base period.
+If the base period is a \code{period_range} spanning multiple
+periods, then \code{index_value} is the average of the index timeseries
+at the base period.}
 }
 \description{
-This function scales a timeseries by dividing all observations with
+This function scales a timeseries by dividing all observations by
 one selected observation or by the mean of a range of observations.
+}
+\examples{
+\dontshow{
+set.seed(123)
+}
+ab <- regts(matrix(rnorm(18), ncol = 2), start = "2016Q1",
+            names = c("a", "b"))
+
+index_ts(ab)
+
+index_ts(ab, base = "2017", index_value = 1)
+
 }
