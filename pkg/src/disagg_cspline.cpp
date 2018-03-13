@@ -6,11 +6,13 @@
 
 using namespace Rcpp;
 
-void disagg_spline_single(NumericMatrix::Column column_old,
-                          NumericMatrix::Column column_new,
-                          int frac, bool do_cumul, const char spline_method,
-                          double x[], double y[], double xnew[], double ynew[],
-                          double *work[4]);
+static void disagg_spline_single(NumericMatrix::Column column_old,
+                                 NumericMatrix::Column column_new,
+                                 int nper_old, int nper_new,
+                                 int frac, bool do_cumul, 
+                                 const char spline_method,
+                                 double x[], double y[], double xnew[], 
+                                 double ynew[], double *work[4]);
 
 // [[Rcpp::export]]
 List disagg_spline(NumericMatrix ts_old, const int freq_new,
@@ -59,11 +61,17 @@ List disagg_spline(NumericMatrix ts_old, const int freq_new,
         work[i] = new double[n_max];
     }
 
+    for (int i = 0; i < n_max; i++) {
+       x[i] = i;
+    }
+    for (int i = 0; i < nnew_max; i++) {
+       xnew[i] = ((double) i) / frac;
+    }
      
     for (int col = 0; col < ts_old.ncol(); col++) {
-        disagg_spline_single(ts_old(_, col), data(_, col), frac,
-                             do_cumul, spline_method, x, y, xnew,
-                             ynew, work);
+        disagg_spline_single(ts_old(_, col), data(_, col), nper_old,
+                             nper_new, frac, do_cumul, spline_method, 
+                             x, y, xnew, ynew, work);
     }
 
     delete[] x;
@@ -84,52 +92,58 @@ List disagg_spline(NumericMatrix ts_old, const int freq_new,
     return (result);
 }
 
-void disagg_spline_single(NumericMatrix::Column column_old,
+static void disagg_spline_single(NumericMatrix::Column column_old,
                           NumericMatrix::Column column_new,
+                          int nper_old, int nper_new,
                           int frac, bool do_cumul, char spline_method,
                           double x[], double y[], double xnew[],
                           double ynew[], double *work[4]) {
-        
-    // TODO: take care of leading and trailing NA values
-    int n = column_old.size();
-    int nnew = column_new.size();
+    
+    // find first non-NA 
+    int i1_old;
+    for (i1_old = 0; i1_old < nper_old; i1_old++) {
+        if (R_FINITE(column_old[i1_old])) break;
+    }
+    if (i1_old == nper_old - 1) return;
+
+    int i2_old;
+    for (i2_old = nper_old - 1; i2_old >= 0; i2_old--) {
+        if (R_FINITE(column_old[i2_old])) break;
+    }
+    
+    int n = i2_old - i1_old + 1;
+
+    int i1_new = i1_old * frac;
+    int i2_new = nper_new - 1 - (nper_old - 1 - i2_old) * frac;
+    int nnew = i2_new - i1_new + 1;
 
     if (do_cumul) {
         n++;
         nnew++;
-    }
-
-    for (int i = 0; i < n; i++) {
-       x[i] = i;
-    }
-    for (int i = 0; i < nnew; i++) {
-       xnew[i] = ((double) i) / frac;
-    }
-
-    if (do_cumul) {
-        y[0] = 0;
-        double sum = 0.0;
+        y[0] = 0.0;
         for (int i = 1; i < n; i++) {
-            sum = sum + column_old[i - 1];
-            y[i] = sum;
+            y[i] = y[i - 1] + column_old[i - 1 + i1_old];
         }
     } else {
         for (int i = 0; i < n; i++)  {
-            y[i] = column_old[i];
+            y[i] = column_old[i + i1_old];
         }
+    }
+    
+    // check for NA values in y
+    for (int i = 0; i < n; i++) {
+        if (!R_FINITE(y[i])) return;
     }
 
     intpol_cspline(n, nnew, x, y, xnew, ynew, spline_method, work);
 
     if (do_cumul) {
         for (int i = 1; i < nnew; i++) {
-            column_new[i - 1] = (ynew[i] - ynew[i - 1]);
+            column_new[i - 1 + i1_new] = (ynew[i] - ynew[i - 1]);
         }
     } else {
         for (int i = 0; i < nnew; i++) {
-            column_new[i] = ynew[i];
+            column_new[i + i1_new] = ynew[i];
         }
     }
 }
-
-
