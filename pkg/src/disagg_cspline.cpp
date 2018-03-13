@@ -2,50 +2,80 @@
 #include <math.h>
 #include <string>
 #include "period_range.h"
+#include "intpol_cspline.h"
+
 using namespace Rcpp;
 
 void disagg_spline_single(NumericMatrix::Column column_old,
-                NumericMatrix::Column column_new, int rep, int shift);
+                          NumericMatrix::Column column_new,
+                          int frac, bool do_cumul, const char spline_method,
+                          double x[], double y[], double xnew[], double ynew[],
+                          double *work[4]);
 
 // [[Rcpp::export]]
 List disagg_spline(NumericMatrix ts_old, const int freq_new,
-                   const std::string &method) {
+                   const std::string &constraint, const std::string &method) {
 
     PeriodRange per_old = get_prd_range(ts_old);
     PeriodRange per_new;
     per_new.freq = freq_new;
 
-    if ((int) per_new.freq % (int) freq_old != 0) {
+    if ((int) per_new.freq % (int) per_old.freq != 0) {
         Rf_error("The new frequency %d is not an integer multiple "
-                "of the input frequency (%d)"
-                 freq_new, per_old.freq);
+                "of the input frequency (%d)", freq_new, per_old.freq);
     }
 
-    int frac = ((int) freq_new / ((int) per_old.freq));
-    per_new.first = (((int) per_old.first) + 2 * (rep - 1)) / rep;
-    per_new.last  = (((int) per_old.last) - (rep - 1)) / rep;
-    int nper_new = per_new.len();
+    bool do_cumul = constraint == "average" || constraint == "sum"; 
+    const char spline_method = method == "nakn" ? '3' : 'n';
 
+    int frac = ((int) freq_new / ((int) per_old.freq));
+    per_new.first = per_old.first * frac;
+    per_new.last  = per_old.last * frac;
+    if (do_cumul) {
+        per_new.last  = per_new.last + frac - 1;
+    } else if (constraint == "last") {
+        per_new.first = per_new.first + frac - 1;
+        per_new.last  = per_new.last + frac - 1;
+    }
+    int nper_new = per_new.len();
+    int nper_old = per_old.len();
 
     NumericMatrix data(nper_new, ts_old.ncol());
+    std::fill(data.begin(), data.end(), NumericVector::get_na());
 
-    int shift = per_new.first * rep - rep - per_old.first;
-    if (method == "dif1s" || method == "dif1") {
-        for (int col = 0; col < ts_old.ncol(); col++) {
-            agg_gr_abs(ts_old(_, col), data(_, col), rep, shift);
-        }
-        if (method == "dif1s") {
-            data = data / rep;
-        }
-    } else if (method == "rel" || method == "pct") {
-        double *work = new double[2*rep];
-        int perc = method == "rel" ? 1 : 100;
-        for (int col = 0; col < ts_old.ncol(); col++) {
-            agg_gr_rel(ts_old(_, col), data(_, col), work, rep, shift, perc);
-        }
-        delete[] work;
-    } else {
-        Rf_error((std::string("Illegal aggregation method ") + method).c_str());
+    // allocate auxiliary arrays
+    int n_max = nper_old;
+    int nnew_max = nper_new;
+    if (do_cumul) {
+        n_max++;
+        nnew_max++;
+    }
+    double *x = new double[n_max];
+    double *y = new double[n_max];
+    double *xnew = new double[nnew_max];
+    double *ynew = new double[nnew_max];
+    double *work[4];
+    for (int i = 0; i < 4; i++) {
+        work[i] = new double[n_max];
+    }
+
+     
+    for (int col = 0; col < ts_old.ncol(); col++) {
+        disagg_spline_single(ts_old(_, col), data(_, col), frac,
+                             do_cumul, spline_method, x, y, xnew,
+                             ynew, work);
+    }
+
+    delete[] x;
+    delete[] y;
+    delete[] xnew;
+    delete[] ynew;
+    for (int i = 0; i < 4; i++) {
+        delete[] work[i];
+    }
+
+    if (constraint == "average") {
+        data = data * frac;
     }
 
     List result(2);
@@ -54,69 +84,52 @@ List disagg_spline(NumericMatrix ts_old, const int freq_new,
     return (result);
 }
 
-void agg_gr_abs(NumericMatrix::Column column_old,
-                NumericMatrix::Column column_new, int rep, int shift) {
-    for (int row = 0; row < column_new.size(); row++) {
-        for (int i = 1; i < rep; i++) {
-            column_new[row] = column_new[row] + i *
-                              column_old[i + rep * row + shift];
+void disagg_spline_single(NumericMatrix::Column column_old,
+                          NumericMatrix::Column column_new,
+                          int frac, bool do_cumul, char spline_method,
+                          double x[], double y[], double xnew[],
+                          double ynew[], double *work[4]) {
+        
+    // TODO: take care of leading and trailing NA values
+    int n = column_old.size();
+    int nnew = column_new.size();
+
+    if (do_cumul) {
+        n++;
+        nnew++;
+    }
+
+    for (int i = 0; i < n; i++) {
+       x[i] = i;
+    }
+    for (int i = 0; i < nnew; i++) {
+       xnew[i] = ((double) i) / frac;
+    }
+
+    if (do_cumul) {
+        y[0] = 0;
+        double sum = 0.0;
+        for (int i = 1; i < n; i++) {
+            sum = sum + column_old[i - 1];
+            y[i] = sum;
         }
-        for (int i = 0; i < rep; i++) {
-            column_new[row] = column_new[row] + (rep - i) *
-                              column_old[i + rep + rep * row + shift];
+    } else {
+        for (int i = 0; i < n; i++)  {
+            y[i] = column_old[i];
+        }
+    }
+
+    intpol_cspline(n, nnew, x, y, xnew, ynew, spline_method, work);
+
+    if (do_cumul) {
+        for (int i = 1; i < nnew; i++) {
+            column_new[i - 1] = (ynew[i] - ynew[i - 1]);
+        }
+    } else {
+        for (int i = 0; i < nnew; i++) {
+            column_new[i] = ynew[i];
         }
     }
 }
 
-// The macro CONVERT_INVALID converts an invalid number
-// (Inf, -Inf, NaN or NA) to either NA_REAL or NAN
-#define CONVERT_INVALID(X) ISNA(X) ? NA_REAL : NAN
 
-void agg_gr_rel(NumericMatrix::Column column_old,
-                NumericMatrix::Column column_new, double work[], int rep,
-                int shift, int perc) {
-
-    bool na_found = false;
-    double xtot1 = 0.0, xtot2 = 0.0, help1 = 0.0, help2 = 0.0;
-    for (int row = 0; row < column_new.size(); row++) {
-        if (row == 0 || na_found) {
-            na_found = false;
-            work[0] = 1.0;
-            xtot1 = 1.0;
-            xtot2 = 0.0;
-            for (int j = 1; j < rep; j++) {
-                double x_old = column_old[j + shift + rep * row];
-                if (!R_FINITE(x_old)) {
-                    column_new[row] = CONVERT_INVALID(x_old);
-                    na_found = true;
-                    goto next_row;
-                }
-                work[j] = work[j - 1] * (x_old / perc + 1);
-                xtot1 = xtot1 + work[j];
-            }
-            help1 = work[rep - 1];
-        } else {
-            // for row > 0 results are kept in help1 and help2 to be used in
-            // next round
-            xtot1 = xtot2 / help1;
-            help1 = work[rep - 1];
-            xtot2 = 0.0;
-            work[rep - 1] = help2;
-        }
-        for (int j = rep; j < 2 * rep; j++) {
-            double x_old = column_old[j + shift + rep * row];
-            if (!R_FINITE(x_old)) {
-                column_new[row] = CONVERT_INVALID(x_old);
-                na_found = true;
-                goto next_row;
-            }
-            work[j] = work[j - 1] * (x_old / perc + 1);
-            xtot2 = xtot2 + work[j];
-        }
-        help2 = work[2 * rep - 1] / help1;
-        column_new[row] = perc * (xtot2 / xtot1 - 1);
-
-        next_row:
-            continue;
-    }
-}

@@ -32,3 +32,5 @@ parse_period.o : parse_period.h
 period_range.o : period_range.h
 aggr_gr.o : period_range.h
 window_regts.o : period_range.h
+intpol_cspline.o : intpol_cspline.h
+disagg_cspline.o : intpol_cspline.h

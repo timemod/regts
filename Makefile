@@ -154,3 +154,7 @@ clean:
 	rm -f $(PKGTAR)
 	rm -f $(PKGDIR).pdf
 	rm -f $(PKGDIR).log
+	rm -f $(PKGDIR)/src/*.o
+	rm -f $(PKGDIR)/src/*.so
+	rm -f $(PKGDIR)/src/*.dll
+

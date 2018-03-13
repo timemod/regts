@@ -9,6 +9,7 @@ a_q <- regts(l,  period = q_per)
 b_q <- regts(l**2, period = q_per)
 ab_q <- cbind(a = a_q, b = b_q)
 
+
 test_that("last method, univariate and multivariate", {
   ab_m <- disagg(ab_q, nfrequency = 12, constraint = "last")
   expect_identical(disagg(a_q, nfrequency = 12, constraint = "last"),

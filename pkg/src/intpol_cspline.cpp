@@ -1,19 +1,19 @@
 #include "intpol_cspline.h"
 #include <stdio.h>
 
-static int csplin(int n, double x[n + 1], double y[n + 1], 
-                  const char method, int ncol_work, double work[][ncol_work]);
-static void csrand(int n, double x[n + 1], double y[n + 1], 
+static int csplin(int n, double x[], double y[], 
+                  const char method, double *work[4]);
+static void csrand(int n, double x[], double y[], 
                    const char method, double b[4]);
-static int csybar(int n, int nbar, double x[n + 1], 
-                  int ncol_work, double work[][ncol_work], 
-                  double xbar[nbar], double ybar[nbar]);
+static int csybar(int n, int nbar, double x[], double *work[4],
+                  double xbar[], double ybar[]);
 
-int intpol_cspline(int n, int nnew, double x[n], double y[n],
-                   double xnew[nnew], double ynew[nnew], const char method,
-                   int ncol_work, double work[][ncol_work]) {
+int intpol_cspline(int n, int nnew, double x[], double y[],
+                   double xnew[], double ynew[], const char method,
+                   double *work[4]) {
 
-    int ierr = csplin(n - 1, x, y, method, ncol_work, work);
+
+    int ierr = csplin(n - 1, x, y, method, work);
 
 #ifdef DEBUG
     printf("After csplin, ierr = %d\n", ierr);
@@ -27,14 +27,14 @@ int intpol_cspline(int n, int nnew, double x[n], double y[n],
     }
 #endif
 
-    if (ierr == 0) ierr = csybar(n - 1, nnew, x, ncol_work, work, xnew, ynew);
+    if (ierr == 0) ierr = csybar(n - 1, nnew, x, work, xnew, ynew);
 
     return ierr;
 }
 
 
-static int csplin(int n, double x[n + 1], double y[n + 1],
-                  const char method, int ncol_c, double c[][ncol_c]) {
+static int csplin(int n, double x[], double y[],
+                  const char method, double *c[4]) {
 
     /*
      bereken afgeleiden volgens cubic spline methode zdd eerste en
@@ -134,7 +134,7 @@ static int csplin(int n, double x[n + 1], double y[n + 1],
     return 0;
 }
  
-static void csrand(int n, double x[n + 1], double y[n + 1], 
+static void csrand(int n, double x[], double y[], 
                    const char method, double b[4]) {
    /* csrand maakt coefficienten b voor randvoorwaarden in csplin
       bij type 'cs..'.
@@ -207,8 +207,8 @@ static void csrand(int n, double x[n + 1], double y[n + 1],
 
 
 
-static int csybar(int n, int nbar, double x[n + 1], int ncol_c, 
-                  double c[][ncol_c], double xbar[nbar], double ybar[nbar]) {
+static int csybar(int n, int nbar, double x[], double **c,
+                  double xbar[], double ybar[]) {
 
     /*     Bereken nieuwe y-waarden die behoren by nieuwe x-waarden als de
          coefficienten van de partiele derde-graads polynomen bekend zyn.
