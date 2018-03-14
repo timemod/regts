@@ -39,8 +39,8 @@ index_ts <- function(x, base = start_period(x), index_value = 100) {
     freq_x <- frequency(x)
     if (freq_base != freq_x) {
       if (freq_base > freq_x) {
-        stop(paste("Argument period should not have a higher frequency",
-                   "than the input timeseries"))
+        stop(paste0("Base period (", base, ") should not have a higher",
+                    " frequency than the input timeseries (", freq_x, ")"))
       }
       base <- change_frequency(base, new_frequency = freq_x)
     }
@@ -54,8 +54,7 @@ index_ts <- function(x, base = start_period(x), index_value = 100) {
 
   startp_base <- base[1]
   endp_base <- base[2]
-  if (is.na(startp_base) || is.na(endp_base))
-    {
+  if (is.na(startp_base) || is.na(endp_base)) {
     stop("The base period should have a lower and upper bound")
   }
 

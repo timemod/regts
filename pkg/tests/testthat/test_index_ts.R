@@ -42,6 +42,9 @@ test_that("base and index_value", {
 test_that("errors", {
   msg <- "Base period \\(2017Q1\\) not within timeseries period \\(2018Q1/2022Q2\\)"
   expect_error(index_ts(a, base  = "2017Q1"), msg)
+  msg <-  paste0("Base period \\(2017M01\\) should not have a higher frequency",
+                 " than the input timeseries \\(4\\)")
+  expect_error(index_ts(a, base  = "2017M1"), msg)
 })
 
 
