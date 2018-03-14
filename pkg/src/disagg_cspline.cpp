@@ -10,7 +10,7 @@ static void disagg_spline_single(NumericMatrix::Column column_old,
                                  NumericMatrix::Column column_new,
                                  int nper_old, int nper_new,
                                  int frac, bool do_cumul, 
-                                 const char spline_method,
+                                 const char conds,
                                  double x[], double y[], double xnew[], 
                                  double ynew[], double *work[4]);
 
@@ -32,7 +32,7 @@ List disagg_spline(NumericMatrix ts_old, const int freq_new,
     }
 
     bool do_cumul = constraint == "average" || constraint == "sum"; 
-    const char spline_method = method == "nakn" ? '3' : 'n';
+    const char conds = method == "not-a-knot" ? '3' : 'n';
 
     int frac = ((int) freq_new / ((int) per_old.freq));
     per_new.first = per_old.first * frac;
@@ -74,7 +74,7 @@ List disagg_spline(NumericMatrix ts_old, const int freq_new,
      
     for (int col = 0; col < ts_old.ncol(); col++) {
         disagg_spline_single(ts_old(_, col), data(_, col), nper_old,
-                             nper_new, frac, do_cumul, spline_method, 
+                             nper_new, frac, do_cumul, conds, 
                              x, y, xnew, ynew, work);
     }
 
@@ -99,7 +99,7 @@ List disagg_spline(NumericMatrix ts_old, const int freq_new,
 static void disagg_spline_single(NumericMatrix::Column column_old,
                           NumericMatrix::Column column_new,
                           int nper_old, int nper_new,
-                          int frac, bool do_cumul, char spline_method,
+                          int frac, bool do_cumul, char conds,
                           double x[], double y[], double xnew[],
                           double ynew[], double *work[4]) {
     
@@ -140,7 +140,7 @@ static void disagg_spline_single(NumericMatrix::Column column_old,
         if (!R_FINITE(y[i])) return;
     }
 
-    int ierr  = intpol_cspline(n, nnew, x, y, xnew, ynew, spline_method, work);
+    int ierr  = intpol_cspline(n, nnew, x, y, xnew, ynew, conds, work);
     if (ierr != 0) return;
 
     if (do_cumul) {

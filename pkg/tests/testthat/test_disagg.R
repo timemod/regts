@@ -37,11 +37,12 @@ test_that("last method, univariate and multivariate", {
                lag(b_ref, 2))
 
 
-  # not-a-knot should give the same results here
+  # not-a-knot should give the same for a_q (because the data is linear,
+  # but not for b_q
   expect_equal(disagg(a_q, nfrequency = 12, constraint = "last",
                       conds = "not-a-knot"), a_ref)
-  expect_equal(disagg(b_q, nfrequency = 12, constraint = "last",
-                      conds = "not-a-knot"), b_ref)
+  expect_false(isTRUE(all.equal(disagg(b_q, nfrequency = 12, constraint = "last",
+                       conds = "not-a-knot"), b_ref)))
 })
 
 
@@ -239,4 +240,15 @@ test_that("few observations", {
                    regts(1, period = "2017Q1/2018Q1"))
   expect_identical(disagg(a_y, nfrequency = 4, conds = "natural",
                           constraint = "last"), regts(1, period = "2017Q4/2018Q4"))
+})
+
+
+test_that("octave example", {
+  x <- regts(c(1, 3, 4, 4, 1), start = "2018")
+  xspl <- disagg(x, constraint = "last", conds = "not-a-knot", nfrequency = 4)
+
+  data <- as.numeric(read.csv("octave/output/interp_example1.csv",
+                              header = FALSE))
+  expected_result <- regts(data, start = "2018Q4")
+  expect_equal(xspl, expected_result)
 })
