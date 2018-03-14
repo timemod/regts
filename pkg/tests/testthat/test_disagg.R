@@ -1,6 +1,10 @@
 library(regts)
 library(testthat)
 
+rm(list = ls())
+
+source("utils/disagg_natural.R")
+
 context("disagg")
 
 q_per <- period_range("2017Q2/2018Q3")
@@ -9,9 +13,8 @@ a_q <- regts(l,  period = q_per)
 b_q <- regts(l**2, period = q_per)
 ab_q <- cbind(a = a_q, b = b_q)
 
-
 test_that("last method, univariate and multivariate", {
-  ab_m <- disagg(ab_q, nfrequency = 12, constraint = "last")
+  ab_m <- disagg(ab_q, nfrequency = 12, constraint = "last", conds = "natural")
   expect_identical(disagg(a_q, nfrequency = 12, constraint = "last"),
                    ab_m[, "a"])
   expect_identical(disagg(ab_q[, "a", drop = FALSE], nfrequency = 12,
@@ -22,8 +25,9 @@ test_that("last method, univariate and multivariate", {
   m_per <- period_range("2017m6/2018m9")
   a_ref <- regts(seq(from = 1, to = 6, length.out = nperiod(m_per)),
                  period = m_per)
-  b_ref <- a_ref**2
   expect_equal(ab_m[, "a"], a_ref)
+
+  b_ref <- disagg_natural(ab_q[, "b"], nfrequency = 12, constraint = "last")
   expect_equal(ab_m[, "b"], b_ref)
 
   # test first method
@@ -33,29 +37,26 @@ test_that("last method, univariate and multivariate", {
                lag(b_ref, 2))
 
 
-  # natural cubic spline, should give the same result for timeseries a
-  # but a different result for timeseries b (which is nonlinear)
+  # not-a-knot should give the same results here
   expect_equal(disagg(a_q, nfrequency = 12, constraint = "last",
-                      method = "natural"), a_ref)
-
-  expect_false(isTRUE(all.equal(disagg(b_q, nfrequency = 12, constraint = "last",
-                      method = "natural"), b_ref)))
+                      conds = "not-a-knot"), a_ref)
+  expect_equal(disagg(b_q, nfrequency = 12, constraint = "last",
+                      conds = "not-a-knot"), b_ref)
 })
 
 
 test_that("sum and average method", {
-  ab_m <- disagg(ab_q, nfrequency = 12)
-  expect_equal(disagg(b_q, nfrequency = 12,
-                          constraint = "average") / 3,
-                   ab_m[, "b"])
+  ab_m <- disagg(ab_q, nfrequency = 12, constraint = "sum")
 
-  m_per <- period_range("2017m4/2018m9")
-  a_ref <- regts(seq(from = 2, to = 19, length.out = nperiod(m_per)),
-                 period = m_per) / 9
+  expect_equal(disagg(b_q, nfrequency = 12) / 3, ab_m[, "b"])
+
+  a_ref <- disagg_natural(a_q, constraint = "sum", nfrequency = 12)
   expect_equal(ab_m[, "a"], a_ref)
+  b_ref <- disagg_natural(b_q, constraint = "sum", nfrequency = 12)
+  expect_equal(ab_m[, "b"], b_ref)
 
-  #print(ab_m[, "b"])
-  expect_known_output(ab_m[, "b"], file.path("expected_output/disagg_b_sum.rds"))
+  expect_known_output(ab_m[, "b"],
+                      file.path("expected_output/disagg_b_sum.rds"))
 
   b_q_agg <- aggregate(ab_m[, "b"], FUN = sum, nfrequency = 4)
   expect_equal(b_q, b_q_agg)
@@ -75,13 +76,10 @@ test_that("example with NA values (1)", {
   expected_result[, "y"] <- NA
   expect_equal(xyz_m, expected_result)
 
-  xyz_m_av <- disagg(xyz_q, nfrequency = 12, constraint = "average")
+  xyz_m_av <- disagg(xyz_q, nfrequency = 12, constraint = "average",
+                     conds = "natural")
 
-  expected_result <- regts(matrix(rep(2:19, 3), ncol = 3), start = "2017M4",
-                           names = c("x", "y", "z"))
-  expected_result["/2017M6", "x"] <- NA
-  expected_result["2018M7/", "x"] <- NA
-  expected_result[, "y"] <- NA
+  expected_result <- disagg_natural(xyz_q, nfrequency = 12, constraint = "average")
   expect_equal(xyz_m_av, expected_result)
 })
 
@@ -112,10 +110,10 @@ test_that("example with NA values (3)", {
   expected_result["2018M3", "y"] <- 3
   expect_equal(xy_m, expected_result)
 
-  xy_m_av <- disagg(xy_q, nfrequency = 12, constraint = "average")
-  expected_result_av <- regts(matrix(c(2:19, rep(NA, 18)), ncol = 2),
-                           start = "2017M4", names = c("x", "y"))
-  expected_result_av["2018M1/2018M3", "y"] <- 3
+  xy_m_av <- disagg(xy_q, nfrequency = 12, constraint = "average",
+                    conds = "natural")
+  expected_result_av <- disagg_natural(xy_q, nfrequency = 12,
+                                       constraint = "average")
   expect_equal(xy_m_av, expected_result_av)
 })
 
@@ -142,8 +140,6 @@ test_that("errors", {
   expect_error(disagg(ab_q, nfrequency = 10), msg)
   msg <- "nfrequency \\(3\\) is not larger than the input frequency \\(4\\)"
   expect_error(disagg(ab_q, nfrequency = 3), msg)
-  msg <- "Input timeseries contains only NA values"
-  expect_error(disagg(ab_q * NA, nfrequency = 12), msg)
 })
 
 test_that("year to quarter", {
@@ -151,7 +147,7 @@ test_that("year to quarter", {
   y_per <- period_range("2017Y/2040Y")
   n_y <- nperiod(y_per)
   a_y <- regts(seq_len(n_y), period = y_per)
-  a_q <- disagg(a_y, nfrequency = 4, constraint = "last", method = "natural")
+  a_q <- disagg(a_y, nfrequency = 4, constraint = "last")
 
   q_per <- period_range("2017Q4/2040Q4")
   n_q <- nperiod(q_per) / 4
@@ -186,26 +182,25 @@ test_that("complex example", {
   x_q <- (1:n_q) / 3
   a_q <- regts(log(x_q) * exp(x_q) / x_q + 1/(x_q - 3)**4, period = q_per)
 
-  a_first_natural <- disagg(a_q, nfrequency = 12, constraint = "first",
-                            method = "natural")
-  a_first_fmm <- disagg(a_q, nfrequency = 12, constraint = "first",
-                            method = "fmm")
+  a_first_natural <- disagg(a_q, nfrequency = 12, constraint = "first")
+  a_first_nakn <- disagg(a_q, nfrequency = 12, constraint = "first",
+                         conds = "not-a-knot")
 
 
   expect_equal(a_q, aggregate(a_first_natural["2017M1/2018M9"], nfrequency = 4,
                               FUN = function(x) {x[1]}))
-  expect_equal(a_q, aggregate(a_first_fmm["2017M1/2018M9"], nfrequency = 4,
+  expect_equal(a_q, aggregate(a_first_nakn["2017M1/2018M9"], nfrequency = 4,
                               FUN = function(x) {x[1]}))
 
 
   a_average_natural <- disagg(a_q, nfrequency = 12, constraint = "average",
-                            method = "natural")
-  a_average_fmm <- disagg(a_q, nfrequency = 12, constraint = "average",
-                        method = "fmm")
+                              conds = "natural")
+  a_average_nakn <- disagg(a_q, nfrequency = 12, constraint = "average",
+                           conds = "not-a-knot")
 
   expect_equal(a_q, aggregate(a_average_natural["2017M1/2018M9"],
                               nfrequency = 4, FUN = mean))
-  expect_equal(a_q, aggregate(a_average_fmm["2017M1/2018M9"], nfrequency = 4,
+  expect_equal(a_q, aggregate(a_average_nakn["2017M1/2018M9"], nfrequency = 4,
                               FUN = mean))
 
   # plot(a_first_natural, type = "o")
@@ -214,8 +209,15 @@ test_that("complex example", {
   # plot(a_average_natural, type = "o")
   # lines(a_average_fmm, col = "red", type = "o")
 
-  all <- cbind(a_first_natural, a_first_fmm, a_average_natural, a_average_fmm)
-  expect_known_value(all, file.path("expected_output/complex.rds"))
+  all <- cbind(a_first_natural, a_first_nakn, a_average_natural, a_average_nakn)
+  expect_known_value(all, file.path("expected_output/disagg_complex.rds"))
+
+  expect_equal(a_first_natural,
+               disagg_natural(a_q, nfrequency = 12, constraint = "first"))
+
+  expect_equal(a_average_natural,
+               disagg_natural(a_q, nfrequency = 12, constraint = "average"))
+
 })
 
 test_that("few observations", {
@@ -223,18 +225,18 @@ test_that("few observations", {
   # 1 observation
   a_y <- regts(1, period = "2017")
   expect_identical(disagg(a_y, nfrequency = 4),
-                   regts(0.25, period = "2017Q1/2017Q4"))
+                   regts(1, period = "2017Q1/2017Q4"))
   expect_identical(disagg(a_y, nfrequency = 4, constraint = "first"),
                    regts(1, period = "2017Q1"))
-  expect_identical(disagg(a_y, nfrequency = 4, method = "natural",
+  expect_identical(disagg(a_y, nfrequency = 4, conds = "not-a-knot",
                           constraint = "last"), regts(1, period = "2017Q4"))
 
   # 2 observations
   a_y <- regts(1, period = "2017/2018")
-  expect_identical(disagg(a_y, nfrequency = 4),
+  expect_identical(disagg(a_y, nfrequency = 4, constraint = "sum"),
                    regts(0.25, period = "2017Q1/2018Q4"))
   expect_identical(disagg(a_y, nfrequency = 4, constraint = "first"),
                    regts(1, period = "2017Q1/2018Q1"))
-  expect_identical(disagg(a_y, nfrequency = 4, method = "natural",
+  expect_identical(disagg(a_y, nfrequency = 4, conds = "natural",
                           constraint = "last"), regts(1, period = "2017Q4/2018Q4"))
 })

@@ -1,7 +1,9 @@
 #include "intpol_cspline.h"
+#ifdef DEBUG
 #include <stdio.h>
+#endif
 
-static int csplin(int n, double x[], double y[], 
+static void csplin(int n, double x[], double y[], 
                   const char method, double *work[4]);
 static void csrand(int n, double x[], double y[], 
                    const char method, double b[4]);
@@ -12,8 +14,20 @@ int intpol_cspline(int n, int nnew, double x[], double y[],
                    double xnew[], double ynew[], const char method,
                    double *work[4]) {
 
+     // als ierr <> 0, dan is er een fout opgetreden:
+     //        ierr = -2: er zijn te weinig datapunten
+        
+    if (n == 0) {
+        return -2;
+    } else if (n == 1) {
+        // a single point: assume that the timeseries is constant
+        for (int i = 0; i < nnew; i++) {
+            ynew[i] = y[0];
+        }
+        return 0;
+    }
 
-    int ierr = csplin(n - 1, x, y, method, work);
+    csplin(n - 1, x, y, method, work);
 
 #ifdef DEBUG
     printf("After csplin, ierr = %d\n", ierr);
@@ -27,14 +41,14 @@ int intpol_cspline(int n, int nnew, double x[], double y[],
     }
 #endif
 
-    if (ierr == 0) ierr = csybar(n - 1, nnew, x, work, xnew, ynew);
+    int ierr = csybar(n - 1, nnew, x, work, xnew, ynew);
 
     return ierr;
 }
 
 
-static int csplin(int n, double x[], double y[],
-                  const char method, double *c[4]) {
+static void csplin(int n, double x[], double y[],
+              const char method, double *c[4]) {
 
     /*
      bereken afgeleiden volgens cubic spline methode zdd eerste en
@@ -52,20 +66,11 @@ static int csplin(int n, double x[], double y[],
          n is het aantal te berekenen polynomen.
          er zijn n-1 continue aansluitingen en twee randvoorwaarden.
          er zijn dus in totaal n+1 punten in x
-
-     als ierr <> 0, dan is er een fout opgetreden:
-             ierr = -2: er zijn te weinig datapunten
-  
     
     */
 
     double b[4], f, dxr, dd1, dd3;
     int i, ii;
-
-    // controleer of er voldoende punten zijn:
-    if (n < 2) {
-        return -2;
-    }
 
     for (i = 0; i < n + 1; i++) {
         c[0][i] = y[i];
@@ -131,7 +136,7 @@ static int csplin(int n, double x[], double y[],
         c[3][i] = dd3 *dxr * dxr;
     }
 
-    return 0;
+    return;
 }
  
 static void csrand(int n, double x[], double y[], 

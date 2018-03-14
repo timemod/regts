@@ -108,7 +108,8 @@ static void disagg_spline_single(NumericMatrix::Column column_old,
     for (i1_old = 0; i1_old < nper_old; i1_old++) {
         if (R_FINITE(column_old[i1_old])) break;
     }
-    if (i1_old == nper_old - 1) return;
+
+    if (i1_old == nper_old) return; // all NA 
 
     int i2_old;
     for (i2_old = nper_old - 1; i2_old >= 0; i2_old--) {
@@ -139,7 +140,8 @@ static void disagg_spline_single(NumericMatrix::Column column_old,
         if (!R_FINITE(y[i])) return;
     }
 
-    intpol_cspline(n, nnew, x, y, xnew, ynew, spline_method, work);
+    int ierr  = intpol_cspline(n, nnew, x, y, xnew, ynew, spline_method, work);
+    if (ierr != 0) return;
 
     if (do_cumul) {
         for (int i = 1; i < nnew; i++) {
