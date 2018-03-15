@@ -42,7 +42,7 @@ int intpol_cspline(int n, int nnew, double x[], double y[],
             ynew[i] = y[0];
         }
         return 0;
-    }
+    } 
 
     int ierr = csplin(n - 1, x, y, conds, work);
     if (ierr != 0) return ierr;
@@ -50,7 +50,7 @@ int intpol_cspline(int n, int nnew, double x[], double y[],
 #ifdef DEBUG
     printf("After csplin, ierr = %d\n", ierr);
     int i, j;
-    printf("work array:\n");
+    printf("coefficients:\n");
     for (i = 0; i < n; i++) {
         for (j = 0; j < 4; j++) {
             printf("%10g", work[j][i]);
@@ -96,13 +96,24 @@ static int csplin(int n, double x[], double y[],
         c[0][i] = y[i];
     }
 
+    if (n == 1) {
+        // single interval: linear interpolation
+        for (int j = 0; j < n + 1; j++) {
+            c[2][j] = 0.0;
+            c[3][j] = 0.0;
+        }
+        c[1][0] = (y[1] - y[0]) / (x[1] - x[0]);
+        c[1][1] = c[1][0];
+        return 0;
+    }
+
     // boundary conditions
  
     int ier = csrand(n, x, y, conds, b);
     if (ier != 0) return ier;
 
 #ifdef DEBUG
-    printf(" b coefficienten csrand:\n");
+    printf(" b coefficients csrand:\n");
     for (i = 0; i < 4; i++) {
         printf("%g\n", b[i]);
     }
@@ -142,8 +153,8 @@ static int csplin(int n, double x[], double y[],
     }
     c[1][0] = c[1][0] - c[3][0] * c[1][1];
 
-    // bereken coefficienten voor piecewise cubic interpolation
-    // als de functie waarden en de afgeleiden gegeven zyn
+    // Calculate the coefficients for piecewise cubic interpolation
+    // given the function values and derivatives.
 
     for (i = 0; i < n; i++) {
         dxr = 1.0 / (x[i + 1] - x[i]);
