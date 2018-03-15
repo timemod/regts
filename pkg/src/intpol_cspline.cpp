@@ -113,6 +113,9 @@ static int csplin(int n, double x[], double y[],
     printf("\n");
 #endif
 
+    /* for the time being, the right hand side is stored in c[1],
+     * the diagonal in c[2] and the subdiagonal in c[3] */
+
     c[2][0] = 1;
     c[3][0] = b[0];
     for (i = 0; i < n; i++) {
@@ -128,7 +131,8 @@ static int csplin(int n, double x[], double y[],
     c[1][n] = b[3];
 
  
-    // start elimination of the tridiagonal
+    // start elimination of the tridiagonal (c[2] /c[3]), also convert the 
+    // right hand side of the matrix equation (c[1])
 
     for (i = 1; i < n; i++) {
         f = c[3][i + 1] / c[2][i - 1];
