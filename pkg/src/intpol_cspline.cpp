@@ -32,7 +32,7 @@ int intpol_cspline(int n, int nnew, double x[], double y[],
      *     0   ok
      *    -1   no data points available (n == 0)
      *    -2   illegal boundary condition conds
-     *   > 0   xbar[retval - 1] not in the range between min(x) and max(x)
+     *   > 0   xbar[retval - 1] not in the range between x[0] and x[n - 1]
      */   
     if (n == 0) {
         return -1;
@@ -236,53 +236,74 @@ static int csybar(int n, int nbar, double x[], double **c,
      *  nbar= number of points in xbar (input) and ybar (output)
 
      *  The values in xbar do not have to be in increasing order,
-     *  however this function if more efficient if xbar is orderd.
+     *  however this function is more efficient if xbar is orderd.
+     *
+     *  Return code retval:
+     *      0    ok
+     *    > 0    xbar[retval -1] is not in the range between x[0] and x[n]
+     *           (extrapolation is not implemented)
      */
      
-    int in, n1, i, l;
+    int i_start, n1, i, l;
     double dx;
     
-    in = 0;
-    n1 = n + 1;
+    // i_start is the index in array x where we start looking
+    i_start = 0;
+
+    n1 = n + 1; // number of x points
+
+    bool found;
     
     for (l = 0; l < nbar; l++) {
     
-        //  search upwards
-        for (i = in; i < n1; i++) {
+        found = false;
+
+        //  search forwards
+        for (i = i_start; i < n1; i++) {
             dx = xbar[l] - x[i];
-            if (dx < 0) {
-                goto l30;
-            } else if (dx == 0) {
-                goto l100;
+            if (i == i_start && dx < 0) break;
+            found = dx <= 0;
+            if (found) {
+                if (dx < 0) {
+                    i = i - 1;
+                    dx = xbar[l] - x[i];
+                }
+                break;
             }
         }
-        goto l300;
 
-    l30:    if (i == in) goto l50;
-            i = i - 1;
-            dx = xbar[l] - x[i];
-            goto l100;
-         
-           //  search downwards
-    l50:    if (in == 0) goto l300;
-            for (i = in - 1; i >= 0; i--) {
+        if (!found) {
+            // search backwards
+            if (i_start == 0) break;
+            for (i = i_start - 1; i >= 0; i--) {
                 dx = xbar[l] - x[i];
-                if (dx >= 0) goto l100;
+                if (dx >= 0) {
+                    found = true;
+                    break;
+                }
             }
-            goto l300;
-        
+        }  
+         
+        if (found) {
             // compute ybar in the interval
-    l100:   ybar[l] = c[0][i];
+            ybar[l] = c[0][i];
             if (dx > 0) ybar[l] = ybar[l] + dx *(c[1][i] + dx * 
-                                  (c[2][i] + dx * c[3][i]));
-            in = i;
+                                   (c[2][i] + dx * c[3][i]));
+            i_start = i;
+
+        } else {
+
+           break;
+
+        }
 
     }
-    return 0;
     
-    // error : xbar[l] is not in the range between min(x) and max(x)
-    // (we cannot handle extrapolation)
-l300:   return l + 1;
+    if (found) {
+        return 0;
+    } else {
+        return l;
+    }
         
 }
 
