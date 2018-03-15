@@ -11,7 +11,7 @@ static int csybar(int n, int nbar, double x[], double *work[4],
                   double xbar[], double ybar[]);
 
 int intpol_cspline(int n, int nnew, double x[], double y[],
-                   double xnew[], double ynew[], const char conds,
+                   double xnew[], double ynew[], char conds,
                    double *work[4]) {
 
     /* 
@@ -36,12 +36,6 @@ int intpol_cspline(int n, int nnew, double x[], double y[],
      */   
     if (n == 0) {
         return -1;
-    } else if (n == 1) {
-        // a single point: assume that the timeseries is constant
-        for (int i = 0; i < nnew; i++) {
-            ynew[i] = y[0];
-        }
-        return 0;
     } 
 
     int ierr = csplin(n - 1, x, y, conds, work);
@@ -96,19 +90,18 @@ static int csplin(int n, double x[], double y[],
         c[0][i] = y[i];
     }
 
-    if (n == 1) {
-        // single interval: linear interpolation
-        for (int j = 0; j < n + 1; j++) {
-            c[2][j] = 0.0;
-            c[3][j] = 0.0;
+    if (n == 0) {
+        // single point, all derivatives zero.
+        for (i = 1; i < 4; i++) {
+            for (int j = 0; j < n + 1; j++) {
+                c[i][j] = 0.0;
+            }
         }
-        c[1][0] = (y[1] - y[0]) / (x[1] - x[0]);
-        c[1][1] = c[1][0];
         return 0;
     }
 
+
     // boundary conditions
- 
     int ier = csrand(n, x, y, conds, b);
     if (ier != 0) return ier;
 
@@ -170,18 +163,30 @@ static int csplin(int n, double x[], double y[],
 }
  
 static int csrand(int n, double x[], double y[], 
-                   const char conds, double b[4]) {
+                  char conds, double b[4]) {
 
     /* Determine coefficients b for the boundary conditions.
      * conds specifies the type of boundary condition.
      *      '3'   f'''(x[1]) and f'''(x[n-1]) continuous
      *      'n'   natural spline
      *
-     * Return value is -1 is conds in an invalid boundary condition
+     * n is the number of intervals.
+     * The number of points in x and y is n + 1.
+     *
+     * The return value is -1 is conds in an invalid boundary condition
      */
 
     double xx1213;
     int  i, i1, i2, i3;
+    char type;
+
+    if (n == 1) {
+        /* A single interval. In that case use the natural spline,
+         * which in this case will generate a linear interpolation.
+         */
+        conds = 'n';
+    }
+
   
     // fdd = first divided difference
     #define fdd(i, j) ((y[i] - y[j]) / (x[i] - x[j]))
@@ -304,6 +309,5 @@ static int csybar(int n, int nbar, double x[], double **c,
     } else {
         return l;
     }
-        
 }
 
