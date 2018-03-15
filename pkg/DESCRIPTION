@@ -22,8 +22,7 @@ Imports:
     Hmisc,
     data.table,
     readxl,
-    cellranger,
-    cspline
+    cellranger
 Suggests:
     testthat,
     knitr,

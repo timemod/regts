@@ -26,8 +26,6 @@
 #' Either the average, the sum, the first or the last value of the resulting
 #' high-frequency series should be equal to the corresponding
 #' low-frequency value.
-#' @importFrom stats spline
-#' @importFrom cspline cspline
 #' @examples
 #' # construct quarterly series
 #' q <- regts(matrix(c(1:3, NA, -3, -5),  ncol = 2),
