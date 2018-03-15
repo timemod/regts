@@ -141,7 +141,7 @@ static void disagg_spline_single(NumericMatrix::Column column_old,
     }
 
     int ierr  = intpol_cspline(n, nnew, x, y, xnew, ynew, conds, work);
-    if (ierr != 0) return;
+    if (ierr != 0)  Rf_error("Internal error in disagg: intpol_cspline failed");
 
     if (do_cumul) {
         for (int i = 1; i < nnew; i++) {
