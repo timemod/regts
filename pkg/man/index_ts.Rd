@@ -38,3 +38,6 @@ index_ts(ab)
 index_ts(ab, base = "2017", index_value = 1)
 
 }
+\seealso{
+\code{\link{rel2index}} and \code{\link{pct2index}}
+}
