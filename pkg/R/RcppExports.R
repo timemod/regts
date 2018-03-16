@@ -5,6 +5,10 @@ agg_gr <- function(ts_old, freq_new, method) {
     .Call(`_regts_agg_gr`, ts_old, freq_new, method)
 }
 
+disagg_spline <- function(ts_old, freq_new, constraint, method) {
+    .Call(`_regts_disagg_spline`, ts_old, freq_new, constraint, method)
+}
+
 moving_average <- function(x, w, from, to, keep_range) {
     .Call(`_regts_moving_average`, x, w, from, to, keep_range)
 }

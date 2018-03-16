@@ -18,6 +18,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// disagg_spline
+List disagg_spline(NumericMatrix ts_old, const int freq_new, const std::string& constraint, const std::string& method);
+RcppExport SEXP _regts_disagg_spline(SEXP ts_oldSEXP, SEXP freq_newSEXP, SEXP constraintSEXP, SEXP methodSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type ts_old(ts_oldSEXP);
+    Rcpp::traits::input_parameter< const int >::type freq_new(freq_newSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type constraint(constraintSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type method(methodSEXP);
+    rcpp_result_gen = Rcpp::wrap(disagg_spline(ts_old, freq_new, constraint, method));
+    return rcpp_result_gen;
+END_RCPP
+}
 // moving_average
 NumericMatrix moving_average(NumericMatrix& x, NumericVector& w, const int from, const int to, const bool keep_range);
 RcppExport SEXP _regts_moving_average(SEXP xSEXP, SEXP wSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP keep_rangeSEXP) {
@@ -83,6 +97,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_regts_agg_gr", (DL_FUNC) &_regts_agg_gr, 3},
+    {"_regts_disagg_spline", (DL_FUNC) &_regts_disagg_spline, 4},
     {"_regts_moving_average", (DL_FUNC) &_regts_moving_average, 5},
     {"_regts_parse_period", (DL_FUNC) &_regts_parse_period, 2},
     {"_regts_parse_period_range", (DL_FUNC) &_regts_parse_period_range, 2},

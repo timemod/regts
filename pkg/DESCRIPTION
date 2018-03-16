@@ -22,7 +22,7 @@ Imports:
     Hmisc,
     data.table,
     readxl,
-    cellranger,
+    cellranger
 Suggests:
     testthat,
     knitr,
@@ -30,6 +30,7 @@ Suggests:
     zoo,
     xts,
     timeSeries,
-    tseries
+    tseries,
+    tempdisagg
 LinkingTo: Rcpp
 VignetteBuilder: knitr

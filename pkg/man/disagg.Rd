@@ -2,40 +2,54 @@
 % Please edit documentation in R/disagg.R
 \name{disagg}
 \alias{disagg}
-\title{Temporal disaggregation of time series using spline interpolation.}
+\title{Disaggregation of time series using cubic spline interpolation.}
 \usage{
-disagg(x, nfrequency, method = c("fmm", "periodic", "natural", "monoH.FC",
-  "hyman"), constraint = c("sum", "average", "last", "first"))
+disagg(x, nfrequency, constraint = c("average", "sum", "first", "last"),
+  conds = c("natural", "not-a-knot"))
 }
 \arguments{
-\item{x}{a \code{\link[stats]{ts}} of \code{\link{regts}} object}
+\item{x}{a  \code{\link{regts}}  or \code{\link[stats]{ts}} object}
 
 \item{nfrequency}{the frequency of the result. This should be higher than
 the frequency of timeseries \code{x}.}
 
-\item{method}{specifies the type of spline to be used.
-Possible values are \code{"fmm"}, \code{"natural"}, \code{"periodic"},
-\code{"monoH.FC"} and \code{"hyman"}. Can be abbreviated.}
-
 \item{constraint}{Constraint on the high frequency result.
-Possible values are \code{"sum"}, \code{"average"}, \code{"last"},
-\code{"first"}.
-Either the sum, the average, the first or the last value of the resulting
+Possible values are \code{"average"}, \code{"sum"}, \code{"first"} and
+\code{"last"}.
+Either the average, the sum, the first or last value of the resulting
 high-frequency series should be equal to the corresponding
 low-frequency value.}
+
+\item{conds}{a character specifying the boundary conditions:
+\code{"natural"} or \code{"not-a-knot"}. Default is \code{"natural"}.
+See details.}
 }
 \description{
-This function converts an timeseries to a timeseries with higher frequency,
-for example a yearly timeseries to a quarterly timeseries. Missing values
-are obtained by spline interpolation. This function employs function
-\code{\link[stats:splinefun]{spline}} of the \code{stats} package.
+This function converts a timeseries to a timeseries with higher frequency,
+for example a yearly timeseries to a quarterly timeseries.
+Cubic spline interpolation is used to interpolate between the low frequency
+observations.
 }
 \details{
-For each individual timeseries, trailing and leading \code{NA} values are
-removed before interpolation. If the timeseries contains intermediate
-\code{NA} values,  the resulting timeseries is set to NA.
+Argument \code{conds} can be used to select the boundary conditions
+for the cubic spline interpolation.
+Choose \code{"natural"} for a natural cubic spline
+(zero second derivatives at the end points).
+For \code{"not-a-knot"} the third derivative is continuous at the
+second and one but last point.
 
-For details about the different spline methods,
-consult the documentation of the \code{\link[stats:splinefun]{spline}}
-function of the \code{stats} package.
+Leading and trailing \code{NA} values are removed before the interpolation.
+}
+\examples{
+# construct quarterly series
+q <- regts(matrix(c(1:3, NA, -3, -5),  ncol = 2),
+           period = "2017Q2/2017Q4", names = c("a", "b"))
+
+disagg(q, nfrequency = 12)
+
+disagg(q, constraint = "last", conds = "not-a-knot", nfrequency = 12)
+}
+\seealso{
+Alternative spline methods are available in package
+\code{\link[tempdisagg:tempdisagg-package]{tempdisagg}}
 }
