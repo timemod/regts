@@ -15,6 +15,7 @@
 #' If the base period is a \code{period_range} spanning multiple
 #' periods, then \code{index_value} is the average of the index timeseries
 #' at the base period.
+#' @seealso \code{\link{rel2index}} and \code{\link{pct2index}}
 #' @examples
 #' \dontshow{
 #' set.seed(123)
