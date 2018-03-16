@@ -21,9 +21,9 @@
 #' \code{"natural"} or \code{"not-a-knot"}. Default is \code{"natural"}.
 #' See details.
 #' @param constraint Constraint on the high frequency result.
-#' Possible values are \code{"average"}, \code{"sum"}, \code{"last"} and
-#' \code{"first"}.
-#' Either the average, the sum, the first or the last value of the resulting
+#' Possible values are \code{"average"}, \code{"sum"}, \code{"first"} and
+#' \code{"last"}.
+#' Either the average, the sum, the first or last value of the resulting
 #' high-frequency series should be equal to the corresponding
 #' low-frequency value.
 #' @examples
@@ -38,7 +38,7 @@
 #' \code{\link[tempdisagg:tempdisagg-package]{tempdisagg}}
 #' @export
 disagg <- function(x, nfrequency,
-                   constraint = c("average", "sum", "last", "first"),
+                   constraint = c("average", "sum", "first", "last"),
                    conds = c("natural", "not-a-knot")) {
 
   conds <- match.arg(conds)

@@ -4,7 +4,7 @@
 \alias{disagg}
 \title{Disaggregation of time series using cubic spline interpolation.}
 \usage{
-disagg(x, nfrequency, constraint = c("average", "sum", "last", "first"),
+disagg(x, nfrequency, constraint = c("average", "sum", "first", "last"),
   conds = c("natural", "not-a-knot"))
 }
 \arguments{
@@ -14,9 +14,9 @@ disagg(x, nfrequency, constraint = c("average", "sum", "last", "first"),
 the frequency of timeseries \code{x}.}
 
 \item{constraint}{Constraint on the high frequency result.
-Possible values are \code{"average"}, \code{"sum"}, \code{"last"} and
-\code{"first"}.
-Either the average, the sum, the first or the last value of the resulting
+Possible values are \code{"average"}, \code{"sum"}, \code{"first"} and
+\code{"last"}.
+Either the average, the sum, the first or last value of the resulting
 high-frequency series should be equal to the corresponding
 low-frequency value.}
 
