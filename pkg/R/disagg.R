@@ -12,16 +12,16 @@
 #' For \code{"not-a-knot"} the third derivative is continuous at the
 #' second and one but last point.
 #'
-#' Leading an trailing \code{NA} values are removed before the interpolation.
+#' Leading and trailing \code{NA} values are removed before the interpolation.
 #'
-#' @param x  a  \code{\link{regts}}  or \code{\link[stats]{ts}} orobject
+#' @param x  a  \code{\link{regts}}  or \code{\link[stats]{ts}} object
 #' @param nfrequency the frequency of the result. This should be higher than
 #' the frequency of timeseries \code{x}.
 #' @param conds a character specifying the boundary conditions:
 #' \code{"natural"} or \code{"not-a-knot"}. Default is \code{"natural"}.
 #' See details.
 #' @param constraint Constraint on the high frequency result.
-#' Possible values are \code{"sum"}, \code{"average"}, \code{"last"},
+#' Possible values are \code{"average"}, \code{"sum"}, \code{"last"} and
 #' \code{"first"}.
 #' Either the average, the sum, the first or the last value of the resulting
 #' high-frequency series should be equal to the corresponding
