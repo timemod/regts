@@ -132,69 +132,238 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     range <- as.cell_limits(range)
   }
 
-  if (missing(rowwise)) {
-    # Read the first line(s) of the Excel sheet to determine if the
-    # timeseries are stored rowwise or columnwise
-    if (!is.na(range$ul[1])) {
-      # first row specified
-      ul <- range$ul
-      lr <- range$lr
-      lr[1] <- ul[1]
-      range_first_row <- cell_limits(ul = ul, lr = lr, sheet = range$sheet)
-      first_row <- read_excel(filename, sheet, range = range_first_row,
-                              col_names = FALSE)
-    } else {
-      MAX_NROWS = 100
-      rownr <- 0
-      while (rownr < MAX_NROWS) {
-        rownr <- rownr + 1
-        ul <- range$ul
-        lr <- range$lr
-        ul[1] <- rownr
-        lr[1] <- rownr
-        range_first_row <- cell_limits(ul = ul, lr = lr, sheet = range$sheet)
-        first_row <- read_excel(filename, sheet, range = range_first_row,
-                                col_names = FALSE)
-        if (ncol(first_row) > 0) {
-          break
-        }
-      }
-      if (ncol(first_row) == 0) {
-        stop(paste("The first", MAX_NROWS, "rows are all empty.\n",
-                   "Therefore we could not determine whether the timeseries",
-                   "are rowwise or columnwise.\n",
-                   "Please supply argument columnwise."))
-      }
-    }
+  tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
+                    col_types = "list", na = na_string)
 
-    # the next statement is necessary. Why?
-    first_row <- as.data.frame(first_row)
+  if (missing(rowwise)) {
+    first_row <- sapply(tbl[1, ], FUN = as.character, USE.NAMES = FALSE)
     is_period <- is_period_text(get_strings(first_row), frequency)
     rowwise <- any(is_period)
   }
 
-  # read the data data frame. For rowwise timeseries, the time index is put in
-  # the header
   if (rowwise) {
-    df <- read_excel(filename, sheet, range = range, col_names = TRUE,
-                     na = na_string)
+    ret <- read_ts_tbl_rowwise(tbl, frequency = frequency, labels = labels)
   } else {
-    # we use argument col_names = FALSE, because otherwise read_excel generates
-    # dummy column names X__NR (NR is a number) for all columns with an empty
-    # header.
-    df <- read_excel(filename, sheet, range = range, col_names = FALSE,
-                     na = na_string)
+    ret <- read_ts_tbl_columnwise(tbl, frequency = frequency, labels = labels)
   }
 
-  # convert df to a normal data frame (read_excel returns a tibble)
-  df <- as.data.frame(df)
-
-
-  if (rowwise) {
-    return(read_ts_rowwise(df, frequency = frequency, labels = labels,
-                           name_fun = name_fun))
-  } else {
-    return(read_ts_columnwise(df, frequency = frequency, labels = labels,
-                              name_fun = name_fun))
+  # apply function to column names if given
+  if (!missing(name_fun)) {
+    if (!is.function(name_fun)) {
+      stop("argument name_fun is not a function")
+    }
+    colnames(ret) <- name_fun(colnames(ret))
   }
+
+  return(ret)
+}
+
+
+# internal function to read timeseries rowwise from a data frame with
+# the time index in the column header.
+# is numeric = TRUE, then the timeseries are converted to numeric
+read_ts_tbl_rowwise <- function(tbl, frequency,
+                                labels = c("no", "after", "before")) {
+
+  labels <- match.arg(labels)
+
+  first_row <- sapply(tbl[1, ], FUN = function(x) {as.character(x[[1]])})
+
+  # Sometimes, in Excel integer numbers are stored internally as
+  # for example "2010.0". The corresponding column name then becomes "2010.0".
+  # This is the case for the Excel files written by Isis with
+  # the "nice" method. Therefore we have to remove the redundant .0 in this situation.
+  if (is.na(frequency) || frequency == 1) {
+    sel <- grep("^\\d{1,4}\\.0+$", first_row)
+    first_row[sel] <- gsub("\\.0+$", "", first_row[sel])
+  }
+
+  is_period <- is_period_text(get_strings(first_row), frequency)
+  first_prd_col <- Position(function(x) {x}, is_period)
+  if (is.na(first_prd_col)) {
+    stop("No periods found when reading rowwise timeseries")
+  }
+  if (labels == "before") {
+    name_col <- first_prd_col - 1
+    label_cols <- seq_len(name_col - 1)
+  } else {
+    name_col <- 1
+    if (first_prd_col >= 3) {
+      label_cols <- 2 : (first_prd_col - 1)
+    } else {
+      label_cols <- numeric(0)
+    }
+  }
+
+  # remove columns to be ignored
+  col_sel <- is_period
+  col_sel[1:(first_prd_col - 1)] <- TRUE
+  if (labels == "no") {
+    # remove label colums
+    col_sel[label_cols] <- FALSE
+    label_cols <- numeric(0)
+  }
+  tbl <- tbl[ , col_sel, drop = FALSE]
+
+  data_cols <- (max(c(name_col, label_cols)) + 1) : ncol(tbl)
+
+  periods <- sapply(tbl[1, data_cols], FUN = function(x) {as.character(x[[1]])})
+
+  names <- sapply(tbl[-1, name_col][[1]], FUN = function(x) x[[1]],
+                  USE.NAMES = FALSE)
+  name_sel <- which(!is.na(names))
+  names <- names[name_sel]
+  keep_rows <- c(1, name_sel + 1)
+  tbl <- tbl[keep_rows, , drop = FALSE]
+
+  # now select only data
+  tbl_data <- tbl[-1, data_cols, drop = FALSE]
+  # TODO: what to do if tbl[[icol]] contains factors (can that ever occur)?
+  # TODO: error handling: what if the columns contains invalid texts,
+  tbl_data[] <- lapply(tbl_data, FUN = function(x) {as.numeric(x)})
+
+  # convert all data columns to numerical columns, taking the decimal separator
+  # into account
+  mat <- t(tbl_data)
+  rownames(mat) <- periods
+  colnames(mat) <- names
+
+  # convert the matrix to a regts, using numeric = FALSE, because we already
+  # know that df is numeric
+  ret <- as.regts(mat, frequency = frequency, numeric = FALSE)
+
+  if (labels != "no" && length(label_cols) > 0) {
+    lbls <- tbl[-1, label_cols, drop = FALSE]
+    # TODO: is there a better way to do this
+    for (i in 1:ncol(lbls)) {
+      lbls[[i]] <- lapply(lbls[[i]], FUN = function(x) {ifelse(is.na(x), "", x)})
+    }
+    lbls <- do.call(paste, lbls)
+    lbls <- trimws(lbls)
+    if (any(labels != "")) {
+      ts_labels(ret) <- lbls
+    }
+  }
+
+  return(ret)
+}
+
+# Internal function to read timeseries columnwise from a tibble read in
+# with readxl::read_excel.
+read_ts_tbl_columnwise <- function(tbl, frequency = NA,
+                                   labels = c("no", "after", "before")) {
+
+  labels <- match.arg(labels)
+
+  # remove all columns with only NAs
+  all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
+
+  tbl <- tbl[ , all_na, drop = FALSE]
+
+  period_info <- find_period_column_tbl(tbl, frequency)
+
+  time_column <- period_info$col_nr
+  is_period <- period_info$is_period
+  first_data_row <- Position(function(x) {x}, is_period)
+  if (is.na(first_data_row)) {
+    stop("No periods found when reading columnwise timeseries")
+  }
+
+  # compute the row with variable names. 0 means: column names
+  # and the label rows
+  if (labels != "before") {
+    name_row <- 1
+    if (first_data_row > 2) {
+      label_rows <- 2:(first_data_row -1)
+    } else {
+      label_rows <- integer(0)
+    }
+  } else {  # labels == before
+    name_row <- first_data_row - 1
+    if (first_data_row > 2) {
+      label_rows <- 1:(first_data_row - 2)
+    } else {
+      label_rows <- integer(0)
+    }
+  }
+
+  if (length(label_rows) == 0) {
+    labels <- "no"
+  }
+
+  # remove column withouts names to the right of the time_columns
+  keep_cols <- get_strings(sapply(tbl[1, ], FUN = as.character,
+                                  USE.NAMES = FALSE)) != ""
+
+  keep_cols[time_column] <- TRUE
+  if (time_column > 1) {
+    keep_cols[1:(time_column - 1)] <- FALSE
+  }
+
+  tbl <- tbl[, keep_cols, drop = FALSE]
+
+  ts_names <- sapply(tbl[name_row, ], FUN = function(x) {as.character(x[[1]])},
+                     USE.NAMES = FALSE)
+
+  keep_cols <- which(!is.na(ts_names))
+  keep_cols <- c(1, setdiff(keep_cols, 1))
+
+  # remove columns without names
+  tbl <- tbl[, keep_cols, drop = FALSE]
+  colnames(tbl) <- ts_names[keep_cols]
+
+  if (labels != "no") {
+    lbl_data <- tbl[label_rows, , drop = FALSE]
+    lbl_data <- lbl_data[ , -1, drop = FALSE]
+    lbl_data[] <- lapply(lbl_data,
+                         FUN = function(x) {ifelse(is.na(x),  "", as.character(x))})
+    lbl_data <<- lbl_data
+    if (length(label_rows) == 1) {
+      lbls <- get_strings(sapply(tbl[name_row, ],
+                                 FUN = function(x) {x[[1]]},
+                                 USE.NAMES = FALSE))
+    } else {
+      lbls <- as.data.frame(t(lbl_data))
+      l <- lapply(lbls, get_strings)
+      lbls <- do.call(paste, l)
+      lbls <- trimws(lbls)
+    }
+  }
+
+  # remove rows without period (the names have already been stored in the
+  # column names and the labels in variable lbls).
+  tbl <- tbl[is_period, , drop = FALSE]
+
+  # convert columns to numeric or character
+  tbl[[1]] <- sapply(tbl[[1]], FUN = as.character)
+  for (icol in 2:ncol(tbl)) {
+    # TODO: what to do if tbl[[icol]] contains factors (can that ever occur)?
+    # TODO: error handling: what if the columns contains invalid texts,
+    # give warning about these text
+    tbl[[icol]] <- sapply(tbl[[icol]], FUN = as.numeric)
+  }
+
+  # set numeric = FALSE, because we already know that tbl is numeric
+  ret <- as.regts(tbl, time_column = 1, frequency = frequency, numeric = FALSE)
+
+  if (labels != "no" && any(lbls != "")) {
+    ts_labels(ret) <- lbls
+  }
+
+  return(ret)
+}
+
+# internal function: find period column in tibble read by read_excel
+find_period_column_tbl <- function(tbl, frequency) {
+
+  for (i in 1:ncol(tbl)) {
+    is_period <- is_period_text(get_strings(tbl[[i]]), frequency)
+    if (any(is_period)) {
+      col_index <- i
+      row_nr <- Position(function(x) {x}, is_period)
+      return(list(col_nr = i, is_period = is_period))
+    }
+  }
+
+  stop("No periods found for columnwise timeseries!")
 }
