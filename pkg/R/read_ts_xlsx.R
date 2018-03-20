@@ -135,6 +135,15 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
                     col_types = "list", na = na_string)
 
+  if (nrow(tbl) == 0 && ncol(tbl) == 0) {
+    if (is.null(sheet)) {
+      sheetname <- "1"
+    } else {
+      sheetname <- as.character(sheet)
+    }
+    stop(sprintf("Sheet %s of file %s is empty\n", sheetname, filename))
+  }
+
   if (missing(rowwise)) {
     first_row <- sapply(tbl[1, ], FUN = as.character, USE.NAMES = FALSE)
     is_period <- is_period_text(get_strings(first_row), frequency)
@@ -220,7 +229,7 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
   tbl_data <- tbl[-1, data_cols, drop = FALSE]
   # TODO: what to do if tbl[[icol]] contains factors (can that ever occur)?
   # TODO: error handling: what if the columns contains invalid texts,
-  tbl_data[] <- lapply(tbl_data, FUN = function(x) {as.numeric(x)})
+  tbl_data[] <- lapply(tbl_data, FUN = as.numeric)
 
   # convert all data columns to numerical columns, taking the decimal separator
   # into account
@@ -254,6 +263,7 @@ read_ts_tbl_columnwise <- function(tbl, frequency = NA,
                                    labels = c("no", "after", "before")) {
 
   labels <- match.arg(labels)
+
 
   # remove all columns with only NAs
   all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
@@ -317,17 +327,16 @@ read_ts_tbl_columnwise <- function(tbl, frequency = NA,
     lbl_data <- lbl_data[ , -1, drop = FALSE]
     lbl_data[] <- lapply(lbl_data,
                          FUN = function(x) {ifelse(is.na(x),  "", as.character(x))})
-    lbl_data <<- lbl_data
     if (length(label_rows) == 1) {
-      lbls <- get_strings(sapply(tbl[name_row, ],
-                                 FUN = function(x) {x[[1]]},
+      lbls <- get_strings(sapply(lbl_data, FUN = function(x) {x[[1]]},
                                  USE.NAMES = FALSE))
     } else {
       lbls <- as.data.frame(t(lbl_data))
       l <- lapply(lbls, get_strings)
       lbls <- do.call(paste, l)
-      lbls <- trimws(lbls)
+
     }
+    lbls <- trimws(lbls)
   }
 
   # remove rows without period (the names have already been stored in the
@@ -335,16 +344,16 @@ read_ts_tbl_columnwise <- function(tbl, frequency = NA,
   tbl <- tbl[is_period, , drop = FALSE]
 
   # convert columns to numeric or character
-  tbl[[1]] <- sapply(tbl[[1]], FUN = as.character)
-  for (icol in 2:ncol(tbl)) {
-    # TODO: what to do if tbl[[icol]] contains factors (can that ever occur)?
-    # TODO: error handling: what if the columns contains invalid texts,
-    # give warning about these text
-    tbl[[icol]] <- sapply(tbl[[icol]], FUN = as.numeric)
-  }
+  periods <- sapply(tbl[[1]], FUN = as.character)
 
-  # set numeric = FALSE, because we already know that tbl is numeric
-  ret <- as.regts(tbl, time_column = 1, frequency = frequency, numeric = FALSE)
+  tbl_data <- tbl[, -1]
+  tbl_data[] <- lapply(tbl_data, FUN = as.numeric)
+
+  mat <- as.matrix(tbl_data)
+  rownames(mat) <- periods
+
+  # set numeric = FALSE, because we already know that mat is numeric
+  ret <- as.regts(mat, frequency = frequency, numeric = FALSE)
 
   if (labels != "no" && any(lbls != "")) {
     ts_labels(ret) <- lbls

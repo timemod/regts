@@ -14,7 +14,7 @@ msg <- paste0("NAs introduced by coercion\n",
               "The following texts could not be converted to numeric:",
               "\"x\"")
 
-test_that("example5.xlsx is read correctly",  {
+test_that("example6.xlsx is read correctly",  {
   xlsx_file <- "xlsx/example6.xlsx"
   expect_warning(result <- read_ts_xlsx(xlsx_file, labels = "after"), msg = msg)
   expect_identical(result, correct_result)
