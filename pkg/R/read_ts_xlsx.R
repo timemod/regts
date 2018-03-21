@@ -371,25 +371,26 @@ find_period_column_tbl <- function(tbl, frequency) {
 # to a numeric matrix, giving warnings when some values could not be
 tbl2nummat <- function(tbl) {
 
-  # check for texts in  tbl. Use C++ function is_character_list
-  # because this is much faster than
-  # sapply(tbl, FUN = function(x) {sapply(x, is.character)}
+  # first check for strings in tbl that cannot be converted to numeric,
+  # and give a warning about these texts
   is_char <- sapply(tbl, FUN = is_character_list)
   if (any(is_char)) {
     texts <- as.character(as.data.frame(tbl)[is_char])
-    ntexts <- length(texts)
-    NTEXTS_MAX <- 10
-    nmax <- min(NTEXTS_MAX, ntexts)
-    texts <- paste0("\"", texts[1:nmax], "\"")
-    if (ntexts <= NTEXTS_MAX) {
+    suppressWarnings(nums <- as.numeric(texts))
+    weird_texts <- texts[is.na(nums)]
+    nweird <- length(weird_texts)
+    NWEIRD_MAX <- 10
+    nmax <- min(NWEIRD_MAX, nweird)
+    weird_texts <- paste0("\"", weird_texts[1:nmax], "\"")
+    if (nweird <= NWEIRD_MAX) {
       warning(paste0("NAs introduced by coercion\n",
                          "The following texts could not be converted to numeric:\n",
-                       paste0(texts, collapse = "\n")))
+                       paste0(weird_texts, collapse = "\n")))
     } else {
       warning(paste0("NAs introduced by coercion.\n",
                      ntexts, " texts could not be converte to numeric.\n",
                      "The first ", nmax, " texts that gave problems are:\n",
-                      paste0(texts, collapse = "\n")))
+                      paste0(weird_texts, collapse = "\n")))
     }
   }
 
