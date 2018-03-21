@@ -371,8 +371,10 @@ find_period_column_tbl <- function(tbl, frequency) {
 # to a numeric matrix, giving warnings when some values could not be
 tbl2nummat <- function(tbl) {
 
-  # first check for strings in tbl that cannot be converted to numeric,
-  # and give a warning about these texts
+  # the following code is used to check for for strings in tbl that cannot be
+  # converted to numeric. A warning about these texts is given.
+  # We employ function regts:::is_character_list, which has been implemented
+  # with Rcpp for efficiency reasons.
   is_char <- sapply(tbl, FUN = is_character_list)
   if (any(is_char)) {
     texts <- as.character(as.data.frame(tbl)[is_char])
