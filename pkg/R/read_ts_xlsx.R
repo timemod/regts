@@ -369,16 +369,12 @@ find_period_column_tbl <- function(tbl, frequency) {
 
 # internal function to convert a tible containing data only
 # to a numeric matrix, giving warnings when some values could not be
-# converted.
 tbl2nummat <- function(tbl) {
 
-  is_char <- function(l) {
-    return(sapply(l, is.character))
-  }
-
-  # check for texts in  tbl. Note: for large files this next statement
-  # costs about 20% of the total time.
-  is_char <- sapply(tbl, FUN = function(x) {sapply(x, is.character)})
+  # check for texts in  tbl. Use C++ function is_character_list
+  # because this is much faster than
+  # sapply(tbl, FUN = function(x) {sapply(x, is.character)}
+  is_char <- sapply(tbl, FUN = is_character_list)
   if (any(is_char)) {
     texts <- as.character(as.data.frame(tbl)[is_char])
     ntexts <- length(texts)
