@@ -223,17 +223,11 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
   name_sel <- which(!is.na(names))
   names <- names[name_sel]
   keep_rows <- c(1, name_sel + 1)
-  tbl <- tbl[keep_rows, , drop = FALSE]
+  tbl <- tbl[keep_rows, ]
 
-  # now select only data
-  tbl_data <- tbl[-1, data_cols, drop = FALSE]
-  # TODO: what to do if tbl[[icol]] contains factors (can that ever occur)?
-  # TODO: error handling: what if the columns contains invalid texts,
-  tbl_data[] <- lapply(tbl_data, FUN = as.numeric)
-
-  # convert all data columns to numerical columns, taking the decimal separator
-  # into account
-  mat <- t(tbl_data)
+  # now create data matrix
+  mat <- tbl2nummat(tbl[-1, data_cols])
+  mat <- t(mat)
   rownames(mat) <- periods
   colnames(mat) <- names
 
@@ -242,7 +236,7 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
   ret <- as.regts(mat, frequency = frequency, numeric = FALSE)
 
   if (labels != "no" && length(label_cols) > 0) {
-    lbls <- tbl[-1, label_cols, drop = FALSE]
+    lbls <- tbl[-1, label_cols]
     # TODO: is there a better way to do this
     for (i in 1:ncol(lbls)) {
       lbls[[i]] <- lapply(lbls[[i]], FUN = function(x) {ifelse(is.na(x), "", x)})
@@ -346,13 +340,9 @@ read_ts_tbl_columnwise <- function(tbl, frequency = NA,
   # convert columns to numeric or character
   periods <- sapply(tbl[[1]], FUN = as.character)
 
-  tbl_data <- tbl[, -1]
-  tbl_data[] <- lapply(tbl_data, FUN = as.numeric)
-
-  mat <- as.matrix(tbl_data)
+  mat <- tbl2nummat(tbl[, -1])
   rownames(mat) <- periods
 
-  # set numeric = FALSE, because we already know that mat is numeric
   ret <- as.regts(mat, frequency = frequency, numeric = FALSE)
 
   if (labels != "no" && any(lbls != "")) {
@@ -376,3 +366,41 @@ find_period_column_tbl <- function(tbl, frequency) {
 
   stop("No periods found for columnwise timeseries!")
 }
+
+# internal function to convert a tible containing data only
+# to a numeric matrix, giving warnings when some values could not be
+# converted.
+tbl2nummat <- function(tbl) {
+
+  is_char <- function(l) {
+    return(sapply(l, is.character))
+  }
+
+  # check for texts in  tbl. Note: for large files this next statement
+  # costs about 20% of the total time.
+  is_char <- sapply(tbl, FUN = function(x) {sapply(x, is.character)})
+  if (any(is_char)) {
+    texts <- as.character(as.data.frame(tbl)[is_char])
+    ntexts <- length(texts)
+    NTEXTS_MAX <- 10
+    nmax <- min(NTEXTS_MAX, ntexts)
+    texts <- paste0("\"", texts[1:nmax], "\"")
+    if (ntexts <= NTEXTS_MAX) {
+      warning(paste0("NAs introduced by coercion\n",
+                         "The following texts could not be converted to numeric:\n",
+                       paste0(texts, collapse = "\n")))
+    } else {
+      warning(paste0("NAs introduced by coercion.\n",
+                     ntexts, " texts could not be converte to numeric.\n",
+                     "The first ", nmax, " texts that gave problems are:\n",
+                      paste0(texts, collapse = "\n")))
+    }
+  }
+
+  suppressWarnings(tbl[] <- lapply(tbl, FUN = as.numeric))
+
+  mat <- as.matrix(tbl)
+
+  return(mat)
+}
+
