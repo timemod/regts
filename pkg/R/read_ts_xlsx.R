@@ -145,13 +145,16 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   }
 
   if (missing(rowwise)) {
-    first_row <- sapply(tbl[1, ], FUN = as.character, USE.NAMES = FALSE)
-    is_period <- is_period_text(get_strings(first_row), frequency)
+    first_row <- tbl_2_char(tbl[1, ])
+    is_period <- is_period_text(first_row, frequency)
     rowwise <- any(is_period)
+  } else {
+    is_period <- NULL
   }
 
   if (rowwise) {
-    ret <- read_ts_tbl_rowwise(tbl, frequency = frequency, labels = labels)
+    ret <- read_ts_tbl_rowwise(tbl, frequency = frequency, labels = labels,
+                               is_period = is_period)
   } else {
     ret <- read_ts_tbl_columnwise(tbl, frequency = frequency, labels = labels)
   }
@@ -172,26 +175,21 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 # the time index in the column header.
 # is numeric = TRUE, then the timeseries are converted to numeric
 read_ts_tbl_rowwise <- function(tbl, frequency,
-                                labels = c("no", "after", "before")) {
+                                labels = c("no", "after", "before"),
+                                is_period) {
 
   labels <- match.arg(labels)
 
-  first_row <- sapply(tbl[1, ], FUN = function(x) {as.character(x[[1]])})
-
-  # Sometimes, in Excel integer numbers are stored internally as
-  # for example "2010.0". The corresponding column name then becomes "2010.0".
-  # This is the case for the Excel files written by Isis with
-  # the "nice" method. Therefore we have to remove the redundant .0 in this situation.
-  if (is.na(frequency) || frequency == 1) {
-    sel <- grep("^\\d{1,4}\\.0+$", first_row)
-    first_row[sel] <- gsub("\\.0+$", "", first_row[sel])
+  if (is.null(is_period)) {
+    first_row <- tbl_2_char(tbl[1, ])
+    is_period <- is_period_text(first_row, frequency)
   }
 
-  is_period <- is_period_text(get_strings(first_row), frequency)
   first_prd_col <- Position(function(x) {x}, is_period)
   if (is.na(first_prd_col)) {
     stop("No periods found when reading rowwise timeseries")
   }
+
   if (labels == "before") {
     name_col <- first_prd_col - 1
     label_cols <- seq_len(name_col - 1)
@@ -204,7 +202,8 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
     }
   }
 
-  # remove columns to be ignored
+  # remove columns without period (except for the name column and the label
+  # columns if applicable
   col_sel <- is_period
   col_sel[1:(first_prd_col - 1)] <- TRUE
   if (labels == "no") {
@@ -216,16 +215,19 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
 
   data_cols <- (max(c(name_col, label_cols)) + 1) : ncol(tbl)
 
-  periods <- sapply(tbl[1, data_cols], FUN = function(x) {as.character(x[[1]])})
+  periods <- tbl_2_char(tbl[1, data_cols])
 
-  names <- sapply(tbl[-1, name_col][[1]], FUN = function(x) x[[1]],
-                  USE.NAMES = FALSE)
+  names <- tbl_2_char(tbl[-1, name_col], replace_na = FALSE)
   name_sel <- which(!is.na(names))
   names <- names[name_sel]
+
+  # move rows without names, except for the first row which contains the periods
   keep_rows <- c(1, name_sel + 1)
   tbl <- tbl[keep_rows, ]
 
-  # now create data matrix
+
+  # convert data columns to a numeric matrix, employing C++ function
+  # list_tbl_2_mat.
   mat <- list_tbl_2_mat(tbl[-1, data_cols])
   mat <- t(mat)
   rownames(mat) <- periods
@@ -236,14 +238,16 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
   ret <- as.regts(mat, frequency = frequency, numeric = FALSE)
 
   if (labels != "no" && length(label_cols) > 0) {
-    lbls <- tbl[-1, label_cols]
-    for (i in 1:ncol(lbls)) {
-      lbls[[i]] <- lapply(lbls[[i]], FUN = function(x)
-                                             {ifelse(is.na(x), "", x)})
+    lbl_data <- tbl[-1, label_cols]
+    lbl_data[] <- lapply(lbl_data, FUN = function(x)
+                          {ifelse(is.na(x),  "", as.character(x))})
+    if (length(label_cols) == 1) {
+      lbls <- unlist(lbl_data, use.names = FALSE)
+    } else {
+      lbls <- do.call(paste, lbl_data)
+      lbls <- trimws(lbls, which = "right")
     }
-    lbls <- do.call(paste, lbls)
-    lbls <- trimws(lbls)
-    if (any(labels != "")) {
+    if (any(lbls != "")) {
       ts_labels(ret) <- lbls
     }
   }
@@ -308,45 +312,58 @@ read_ts_tbl_columnwise <- function(tbl, frequency = NA,
   keep_cols <- c(1, name_sel + 1)
   tbl <- tbl[, keep_cols]
 
-  if (labels != "no") {
+  # labels
+  if (labels != "no" && length(label_rows) > 0) {
     lbl_data <- tbl[label_rows, -1]
     lbl_data[] <- lapply(lbl_data, FUN = function(x)
-                            {ifelse(is.na(x),  "", as.character(x))})
+    {ifelse(is.na(x),  "", as.character(x))})
     if (length(label_rows) == 1) {
       lbls <- unlist(lbl_data, use.names = FALSE)
     } else {
       lbl_mat <- as.matrix(lbl_data)
       lbls <- apply(lbl_mat, MARGIN = 2, FUN = paste, collapse = " ")
+      lbls <- trimws(lbls, which = "right")
     }
-    lbls <- trimws(lbls)
   }
 
   # remove all rows without period (the names and labels have already been
   # stored in variables ts_names and lbls)
   tbl <- tbl[is_period, ]
 
-  # convert data column to a numeric matrix, employing C++ function
+  # convert data columns to a numeric matrix, employing C++ function
   # list_tbl_2_mat.
   mat <- list_tbl_2_mat(tbl[-1])
-  rownames(mat) <- as.character(tbl[[1]])
+  rownames(mat) <- tbl_2_char(tbl[[1]])
   colnames(mat) <- ts_names
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
   ret <- as.regts(mat, frequency = frequency, numeric = FALSE)
 
-  if (labels != "no" && any(lbls != "")) {
-    ts_labels(ret) <- lbls
+  if (labels != "no" && length(label_rows) > 0 && any(lbls != "")) {
+      ts_labels(ret) <- lbls
   }
 
   return(ret)
 }
 
+
+# converts a tibble to a character vector.
+tbl_2_char <- function(tbl, replace_na = TRUE) {
+  ret <- unlist(tbl, use.names = FALSE)
+  ret <- as.character(ret)
+  if (replace_na) {
+    ret[is.na(ret)] <- ""
+  }
+  return(ret)
+}
+
+
 # internal function: find period column in tibble read by read_excel
 find_period_column_tbl <- function(tbl, frequency) {
 
   for (i in 1:ncol(tbl)) {
-    is_period <- is_period_text(get_strings(tbl[[i]]), frequency)
+    is_period <- is_period_text(tbl_2_char(tbl[[i]]), frequency)
     if (any(is_period)) {
       col_index <- i
       row_nr <- Position(function(x) {x}, is_period)
