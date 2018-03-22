@@ -212,7 +212,7 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
     col_sel[label_cols] <- FALSE
     label_cols <- numeric(0)
   }
-  tbl <- tbl[ , col_sel, drop = FALSE]
+  tbl <- tbl[ , col_sel]
 
   data_cols <- (max(c(name_col, label_cols)) + 1) : ncol(tbl)
 
@@ -231,15 +231,15 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
   rownames(mat) <- periods
   colnames(mat) <- names
 
-  # convert the matrix to a regts, using numeric = FALSE, because we already
-  # know that df is numeric
+  # convert the matrix to a regts, using numeric = FALSE because we already
+  # know that mat is numeric
   ret <- as.regts(mat, frequency = frequency, numeric = FALSE)
 
   if (labels != "no" && length(label_cols) > 0) {
     lbls <- tbl[-1, label_cols]
-    # TODO: is there a better way to do this
     for (i in 1:ncol(lbls)) {
-      lbls[[i]] <- lapply(lbls[[i]], FUN = function(x) {ifelse(is.na(x), "", x)})
+      lbls[[i]] <- lapply(lbls[[i]], FUN = function(x)
+                                             {ifelse(is.na(x), "", x)})
     }
     lbls <- do.call(paste, lbls)
     lbls <- trimws(lbls)
@@ -258,11 +258,10 @@ read_ts_tbl_columnwise <- function(tbl, frequency = NA,
 
   labels <- match.arg(labels)
 
-
   # remove all columns with only NAs
   all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
 
-  tbl <- tbl[ , all_na, drop = FALSE]
+  tbl <- tbl[ , all_na]
 
   period_info <- find_period_column_tbl(tbl, frequency)
 
@@ -295,56 +294,45 @@ read_ts_tbl_columnwise <- function(tbl, frequency = NA,
     labels <- "no"
   }
 
-  # remove column withouts names to the right of the time_columns
-  keep_cols <- get_strings(sapply(tbl[1, ], FUN = as.character,
-                                  USE.NAMES = FALSE)) != ""
-
-  keep_cols[time_column] <- TRUE
+  # drop all columns to the left of time_column
   if (time_column > 1) {
-    keep_cols[1:(time_column - 1)] <- FALSE
+    tbl <- tbl[, -(1:(time_column - 1))]
   }
 
-  tbl <- tbl[, keep_cols, drop = FALSE]
-
-  ts_names <- sapply(tbl[name_row, ], FUN = function(x) {as.character(x[[1]])},
-                     USE.NAMES = FALSE)
-
-  keep_cols <- which(!is.na(ts_names))
-  keep_cols <- c(1, setdiff(keep_cols, 1))
+  # get variable names
+  ts_names <- unlist(tbl[name_row, -1], use.names = FALSE)
+  name_sel <- which(!is.na(ts_names))
+  ts_names <- ts_names[name_sel]
 
   # remove columns without names
-  tbl <- tbl[, keep_cols, drop = FALSE]
-  colnames(tbl) <- ts_names[keep_cols]
+  keep_cols <- c(1, name_sel + 1)
+  tbl <- tbl[, keep_cols]
 
   if (labels != "no") {
-    lbl_data <- tbl[label_rows, , drop = FALSE]
-    lbl_data <- lbl_data[ , -1, drop = FALSE]
-    lbl_data[] <- lapply(lbl_data,
-                         FUN = function(x) {ifelse(is.na(x),  "", as.character(x))})
+    lbl_data <- tbl[label_rows, -1]
+    lbl_data[] <- lapply(lbl_data, FUN = function(x)
+                            {ifelse(is.na(x),  "", as.character(x))})
     if (length(label_rows) == 1) {
-      lbls <- get_strings(sapply(lbl_data, FUN = function(x) {x[[1]]},
-                                 USE.NAMES = FALSE))
+      lbls <- unlist(lbl_data, use.names = FALSE)
     } else {
-      lbls <- as.data.frame(t(lbl_data))
-      l <- lapply(lbls, get_strings)
-      lbls <- do.call(paste, l)
-
+      lbl_mat <- as.matrix(lbl_data)
+      lbls <- apply(lbl_mat, MARGIN = 2, FUN = paste, collapse = " ")
     }
     lbls <- trimws(lbls)
   }
 
-  # remove rows without period (the names have already been stored in the
-  # column names and the labels in variable lbls).
-  tbl <- tbl[is_period, , drop = FALSE]
+  # remove all rows without period (the names and labels have already been
+  # stored in variables ts_names and lbls)
+  tbl <- tbl[is_period, ]
 
-  # convert columns to numeric or character
-  periods <- sapply(tbl[[1]], FUN = as.character)
+  # convert data column to a numeric matrix, employing C++ function
+  # list_tbl_2_mat.
+  mat <- list_tbl_2_mat(tbl[-1])
+  rownames(mat) <- as.character(tbl[[1]])
+  colnames(mat) <- ts_names
 
-  data_tbl <- tbl[, -1]
-  mat <- list_tbl_2_mat(data_tbl)
-  rownames(mat) <- periods
-  colnames(mat) <- colnames(data_tbl)
-
+  # convert the matrix to a regts, using numeric = FALSE because we already
+  # know that mat is numeric
   ret <- as.regts(mat, frequency = frequency, numeric = FALSE)
 
   if (labels != "no" && any(lbls != "")) {
