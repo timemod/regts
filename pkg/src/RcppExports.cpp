@@ -32,17 +32,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// is_character_list
-LogicalVector is_character_list(List l);
-RcppExport SEXP _regts_is_character_list(SEXP lSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type l(lSEXP);
-    rcpp_result_gen = Rcpp::wrap(is_character_list(l));
-    return rcpp_result_gen;
-END_RCPP
-}
 // list_tbl_2_mat
 NumericMatrix list_tbl_2_mat(List tbl);
 RcppExport SEXP _regts_list_tbl_2_mat(SEXP tblSEXP) {
@@ -120,7 +109,6 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_regts_agg_gr", (DL_FUNC) &_regts_agg_gr, 3},
     {"_regts_disagg_spline", (DL_FUNC) &_regts_disagg_spline, 4},
-    {"_regts_is_character_list", (DL_FUNC) &_regts_is_character_list, 1},
     {"_regts_list_tbl_2_mat", (DL_FUNC) &_regts_list_tbl_2_mat, 1},
     {"_regts_moving_average", (DL_FUNC) &_regts_moving_average, 5},
     {"_regts_parse_period", (DL_FUNC) &_regts_parse_period, 2},

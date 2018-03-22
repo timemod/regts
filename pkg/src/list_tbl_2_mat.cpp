@@ -8,9 +8,8 @@ using namespace Rcpp;
 #define NWEIRD_MAX 10
 
 //  Tnternal function used in function read_ts_xlsx.
-//  Converts a tibble for which each column is a List
-//  to a numeric matrix. For efficiency this function has been implemented
-//  in C++.
+//  Converts a tibble for which each column is a list to a numeric matrix. 
+//  For efficiency this function has been implemented in C++.
 // [[Rcpp::export]]
 NumericMatrix list_tbl_2_mat(List tbl) {
 
@@ -42,10 +41,7 @@ NumericMatrix list_tbl_2_mat(List tbl) {
                 case STRSXP:
                     {
                         const char *txt = CHAR(STRING_ELT(obj, 0));
-                        // Note that strtod is locale-dependent.
-                        // this could lead to different behaviour on
-                        // different platforms. It would be better
-                        // to use a locale-independent version.
+                        // Note that strtod is locale dependent.
                         val = strtod(txt, &txt_p);
                         if (*txt_p != '\0') {
                             // not a number

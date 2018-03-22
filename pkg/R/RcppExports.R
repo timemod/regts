@@ -9,10 +9,6 @@ disagg_spline <- function(ts_old, freq_new, constraint, method) {
     .Call(`_regts_disagg_spline`, ts_old, freq_new, constraint, method)
 }
 
-is_character_list <- function(l) {
-    .Call(`_regts_is_character_list`, l)
-}
-
 list_tbl_2_mat <- function(tbl) {
     .Call(`_regts_list_tbl_2_mat`, tbl)
 }
