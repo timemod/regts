@@ -1,15 +1,16 @@
 #include <Rcpp.h>
-#include <stdlib.h>
 #include <sstream>
 #include <algorithm>
+#include <set>
+#include <string>
 
 using namespace Rcpp;
 
 #define NWEIRD_MAX 10
 
 //  Tnternal function used in function read_ts_xlsx.
-//  Converts a tibble for which each column is a list to a numeric matrix. 
-//  For efficiency this function has been implemented in C++.
+//  Converts a "list tibble" (a tibble for which each column is a list)
+//  to a numeric matrix. For efficiency this function has been implemented in C++.
 // [[Rcpp::export]]
 NumericMatrix list_tbl_2_mat(List tbl) {
 
@@ -25,8 +26,11 @@ NumericMatrix list_tbl_2_mat(List tbl) {
 
     NumericMatrix mat(nrows, ncols);
 
-    int error_count = 0;
-    const char *weird_texts[NWEIRD_MAX];
+    std::set<std::string> weird_texts;
+
+    // boolean more_weird_texts will be set to true if more weird
+    // texts than NWEIRD_MAX were found
+    bool more_weird_texts = false;
 
     for (int colnr = 0; colnr < ncols; colnr++) {
         List col = tbl[colnr];
@@ -45,10 +49,14 @@ NumericMatrix list_tbl_2_mat(List tbl) {
                         val = strtod(txt, &txt_p);
                         if (*txt_p != '\0') {
                             // not a number
-                            if (error_count < NWEIRD_MAX) {
-                                weird_texts[error_count] = txt;
+                            if (!more_weird_texts) {
+                                if (weird_texts.size() < NWEIRD_MAX) {
+                                    weird_texts.insert(txt);
+                                } else {
+                                    more_weird_texts = weird_texts.find(txt) != 
+                                                       weird_texts.end();
+                                }
                             }
-                            error_count++;
                             val = na_val;
                         }
                     }
@@ -61,19 +69,23 @@ NumericMatrix list_tbl_2_mat(List tbl) {
         }
     }
 
-    if (error_count > 0) {
-        // TODO: only print unique texts, to prevent many double texts
+    int nweird = weird_texts.size();
+
+    int error_count = 0;
+    if (nweird > 0) {
         std::stringstream ss;
         ss << "NAs introduced by coercion" << std::endl;
-        if (error_count <= NWEIRD_MAX) {
+        if (nweird <= NWEIRD_MAX) {
             ss << "The following texts could not be converted to numeric:";
         } else {
-            ss << error_count << " texts could not be converted to numeric:";
+            ss << "Some texts could not be converted to numeric:";
             ss << std::endl;
-            ss << "The first " << NWEIRD_MAX << " texts that gave problems are";
+            ss << "The first " << nweird << " texts that gave problems are";
         } 
-        for (int i = 0; i < std::min(error_count, NWEIRD_MAX); i++) {
-            ss << std::endl << "\"" << weird_texts[i] << "\"";
+        std::vector<std::string> txts(weird_texts.begin(), weird_texts.end());
+        std::sort(txts.begin(), txts.end());
+        for (int i = 0; i < nweird; i++) {
+            ss << std::endl << "\"" << txts[i] << "\"";
         }
         Rf_warning(ss.str().c_str());
     }
