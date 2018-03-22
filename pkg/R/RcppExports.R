@@ -13,6 +13,10 @@ is_character_list <- function(l) {
     .Call(`_regts_is_character_list`, l)
 }
 
+list_tbl_2_mat <- function(tbl) {
+    .Call(`_regts_list_tbl_2_mat`, tbl)
+}
+
 moving_average <- function(x, w, from, to, keep_range) {
     .Call(`_regts_moving_average`, x, w, from, to, keep_range)
 }
