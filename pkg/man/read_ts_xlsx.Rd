@@ -97,7 +97,7 @@ now should contain label information.
 \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=240}}
 \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 
-For columnwise timeseries, the first non-empty row that has been read (see
+For columnwise timeseries, the first row that has been read (see
 argument \code{range} or \code{skiprow}) should contain the variable names.
 The periods can be in any column on the sheet.
 All columns to the left of the time column are ignored.

@@ -49,7 +49,7 @@
 #' \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=200}}
 #' \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 #'
-#' For columnwise timeseries, the first non-empty row that is not skipped (see
+#' For columnwise timeseries, the first row that is not skipped (see
 #' argument \code{skiprow}) should contain the variable names.
 #' The periods can be in any column.
 #' All columns to the left of the time column are ignored.
@@ -154,13 +154,8 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
 
   tbl <- as.tibble(df)
 
-  # remove all columns with only NAs
   not_all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
   tbl <- tbl[ , not_all_na, drop = FALSE]
-
-  # remove all rows with only NAs
-  not_all_na <- rowSums(!is.na(tbl)) > 0
-  tbl <- tbl[not_all_na, , drop = FALSE]
 
   period_info <- find_periods(tbl, frequency, rowwise)
 
@@ -231,6 +226,7 @@ read_ts_rowwise <- function(tbl, frequency, labels = c("no", "after", "before"),
   mat <- t(mat)
   rownames(mat) <- periods
   colnames(mat) <- names
+
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that df is numeric
