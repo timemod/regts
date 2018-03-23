@@ -29,11 +29,8 @@ test_that("weird data frames", {
 
   msg <-paste0("NAs introduced by coercion\n",
                "The following texts could not be converted to numeric:\n",
-               "\"x\"\n\"1969-12-31 23:59:59\"\n\"1969-12-31 23:59:59\"",
-               "\n\"1969-12-31 23:59:59\"\n\"1969-12-31\"\n",
-               "\"1969-12-31\"\n\"1969-12-31\"")
+               "\"x\"\n\"1969-12-31 23:59:59\"\n\"1969-12-31\"")
 
-  msg <- "NAs introduced by coercion\nThe following texts could not be converted to numeric:\n\"x\"\n\"1969-12-31 23:59:59\"\n\"1969-12-31 23:59:59\"\n\"1969-12-31 23:59:59\"\n\"1969-12-31\"\n\"1969-12-31\"\n\"1969-12-31\""
   expect_warning(mat_num <- numeric_matrix(df), msg)
 
   mat_ref <- as.matrix(data.frame(a = c(1.123, NA, NA), b = rep(NA_real_, 3),
