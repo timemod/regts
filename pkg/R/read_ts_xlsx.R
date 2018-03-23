@@ -118,7 +118,7 @@
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          skiprow = NA, skipcol = NA, rowwise, frequency = NA,
                          labels = c("no", "after", "before"),
-                         na_string = c(""), name_fun) {
+                         na_string = "", name_fun) {
 
   if (missing(range)) {
     range <- cell_limits()
@@ -127,6 +127,8 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   } else {
     range <- as.cell_limits(range)
   }
+
+  na_string <- union(na_string, "")
 
   tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
                     col_types = "list", na = na_string)
@@ -144,8 +146,6 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   # remove all rows with only NAs
   not_all_na <- rowSums(!is.na(tbl)) > 0
   tbl <- tbl[not_all_na, ]
-
-
 
   period_info <- find_periods(tbl, frequency, rowwise)
 
@@ -386,7 +386,7 @@ find_periods <- function(tbl, frequency, rowwise) {
           rowwise <- TRUE
         } else {
           is_period_col <- is_period_text(tibble_2_char(tbl[[col_nr]]))
-          rowwise <- sum(is_period_row) > sum(is_period_col)
+          rowwise <- col_nr != 1  && sum(is_period_row) > sum(is_period_col)
         }
       }
 
