@@ -6,7 +6,7 @@
 \usage{
 read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = NA,
   skipcol = NA, rowwise, frequency = NA, labels = c("no", "after",
-  "before"), na_string = c(""), name_fun)
+  "before"), na_string = "", name_fun)
 }
 \arguments{
 \item{filename}{a string with the filename}

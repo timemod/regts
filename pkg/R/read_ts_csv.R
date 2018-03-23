@@ -20,19 +20,18 @@
 #' and finally convert it to a \code{\link{regts}} by using function
 #' \code{\link{as.regts}}.
 #'
+#'
 #' If argument \code{rowwise} has not been specified, then
-#' function \code{\link{read_ts_csv}} searches for any valid period text in the
-#' first row after the skipped rows. If a valid period was found, then
-#' \code{read_ts_csv} assumes that the timeseries are stored rowwise. Otherwise it
-#' assumes that the timeseries are stored columnwise.
+#' function \code{read_ts_xlsx} tries to guess if the timeseries are stored
+#' rowwise based on the position of periods in the sheet.,
 #'
 #' \strong{rowwise timeseries}
 #'
 #' \if{html}{\figure{xlsschemarowwise.jpg}{options: width=200}}
 #' \if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
 #'
-#' For rowwise timeseries, the first row that is not skipped (see
-#' argument \code{skiprow}) should contain the periods.
+#' For rowwise timeseries, the function searches for the first
+#' row with periods.  All rows before the period row are ignored.
 #' Columns for which the corresponding period is not a valid period
 #' are ignored. The timeseries names should be in the first column.
 #' Otherwise use argument \code{skipcol} to specify the number of
@@ -50,7 +49,7 @@
 #' \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=200}}
 #' \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 #'
-#' For columnwise timeseries, the first row that is not skipped (see
+#' For columnwise timeseries, the first non-empty row that is not skipped (see
 #' argument \code{skiprow}) should contain the variable names.
 #' The periods can be in any column.
 #' All columns to the left of the time column are ignored.
@@ -166,8 +165,7 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
   period_info <- find_periods(tbl, frequency, rowwise)
 
   if (is.null(period_info)) {
-    stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
-                 filename))
+    stop(sprintf("No periods found in file %s\n", filename))
   }
 
   if (period_info$rowwise) {
