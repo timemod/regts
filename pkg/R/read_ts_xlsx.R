@@ -20,23 +20,19 @@
 #' \code{\link{as.regts}}.
 #'
 #' If argument \code{rowwise} has not been specified, then
-#' function \code{read_ts_xlsx} searches for any valid period text in the first
-#' row read. If a valid period was found, then
-#' \code{read_ts_xlsx} assumes that the timeseries are stored rowwise.
-#' Otherwise it assumes that the timeseries are stored columnwise.
+#' function \code{read_ts_xlsx} tries to guess if the timeseries are stored
+#' rowwise based on the position of periods in the sheet.,
 #'
 #' \strong{rowwise timeseries}
 #'
 #' \if{html}{\figure{xlsschemarowwise.jpg}{options: width=260}}
 #' \if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
 #'
-#' For rowwise timeseries, the first row that is read (see
-#' argument \code{range} and \code{skiprow}) should contain the periods.
-#' Columns for which the corresponding period is not a valid period
-#' are ignored. The timeseries names should be in the
-#' first column of the sheet. Otherwise, use argument \code{skipcol}
-#' to specify the number of columns to skip.
-#' There may be one or more columns between the column with variable names
+#' For rowwise timeseries, the function searches for the first
+#' row with periods.  All rows before the period row are ignored.
+#' The first non-empty column in the sheet should contain  the timeseries names.
+#' Otherwise, use argument \code{skipcol} to specify the number of columns
+#' to skip. There may be one or more columns between the column with variable names
 #' and the columns where the actual timeseries are stored.
 #' If argument \code{labels = "after"}  then the texts in these
 #' columns will be used to create timeseries labels. If \code{labels = "before"},
@@ -49,7 +45,7 @@
 #' \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=240}}
 #' \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 #'
-#' For columnwise timeseries, the first row that was read (see
+#' For columnwise timeseries, the first non-empty row that has been read (see
 #' argument \code{range} or \code{skiprow}) should contain the variable names.
 #' The periods can be in any column on the sheet.
 #' All columns to the left of the time column are ignored.
@@ -135,28 +131,35 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
                     col_types = "list", na = na_string)
 
+  sheetname <- if (is.null(sheet)) "1" else as.character(sheet)
+
   if (nrow(tbl) == 0 && ncol(tbl) == 0) {
-    if (is.null(sheet)) {
-      sheetname <- "1"
-    } else {
-      sheetname <- as.character(sheet)
-    }
     stop(sprintf("Sheet %s of file %s is empty\n", sheetname, filename))
   }
 
-  if (missing(rowwise)) {
-    first_row <- tibble_2_char(tbl[1, ])
-    is_period <- is_period_text(first_row, frequency)
-    rowwise <- any(is_period)
-  } else {
-    is_period <- NULL
+  # remove all columns with only NAs
+  not_all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
+  tbl <- tbl[ , not_all_na]
+
+  # remove all rows with only NAs
+  not_all_na <- rowSums(!is.na(tbl)) > 0
+  tbl <- tbl[not_all_na, ]
+
+
+
+  period_info <- find_periods(tbl, frequency, rowwise)
+
+  if (is.null(period_info)) {
+    stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
+                 filename))
   }
 
-  if (rowwise) {
+  if (period_info$rowwise) {
     ret <- read_ts_tbl_rowwise(tbl, frequency = frequency, labels = labels,
-                               is_period = is_period)
+                               period_info = period_info)
   } else {
-    ret <- read_ts_tbl_columnwise(tbl, frequency = frequency, labels = labels)
+    ret <- read_ts_tbl_columnwise(tbl, frequency = frequency, labels = labels,
+                                  period_info = period_info)
   }
 
   # apply function to column names if given
@@ -176,19 +179,17 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 # is numeric = TRUE, then the timeseries are converted to numeric
 read_ts_tbl_rowwise <- function(tbl, frequency,
                                 labels = c("no", "after", "before"),
-                                is_period) {
+                                period_info) {
 
   labels <- match.arg(labels)
 
-  if (is.null(is_period)) {
-    first_row <- tibble_2_char(tbl[1, ])
-    is_period <- is_period_text(first_row, frequency)
+  # remove all rows before the period row
+  if (period_info$row_nr > 1) {
+    tbl <- tbl[-(1:(period_info$row_nr - 1)), ]
   }
 
-  first_prd_col <- Position(function(x) {x}, is_period)
-  if (is.na(first_prd_col)) {
-    stop("No periods found when reading rowwise timeseries")
-  }
+  is_period <- period_info$is_period
+  first_prd_col <- period_info$col_nr
 
   name_col <- if (labels == "before") first_prd_col - 1 else 1
 
@@ -253,23 +254,14 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
 # Internal function to read timeseries columnwise from a tibble read in
 # with readxl::read_excel.
 read_ts_tbl_columnwise <- function(tbl, frequency = NA,
-                                   labels = c("no", "after", "before")) {
+                                   labels = c("no", "after", "before"),
+                                   period_info) {
 
   labels <- match.arg(labels)
 
-  # remove all columns with only NAs
-  all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
-
-  tbl <- tbl[ , all_na]
-
-  period_info <- find_period_column_tbl(tbl, frequency)
-
   time_column <- period_info$col_nr
   is_period <- period_info$is_period
-  first_data_row <- Position(function(x) {x}, is_period)
-  if (is.na(first_data_row)) {
-    stop("No periods found when reading columnwise timeseries")
-  }
+  first_data_row <- period_info$row_nr
 
   # compute the row with variable names. 0 means: column names
   # and the label rows
@@ -354,17 +346,58 @@ tibble_2_char <- function(tbl, replace_na = TRUE) {
 }
 
 
-# internal function: find period column in tibble read by read_excel
-find_period_column_tbl <- function(tbl, frequency) {
+# internal function: find the first row containing a period in the
+# tibble read by read_excel. Returns NULL if no period has been found
+find_periods <- function(tbl, frequency, rowwise) {
 
-  for (i in 1:ncol(tbl)) {
-    is_period <- is_period_text(tibble_2_char(tbl[[i]]), frequency)
-    if (any(is_period)) {
-      col_index <- i
-      row_nr <- Position(function(x) {x}, is_period)
-      return(list(col_nr = i, is_period = is_period))
+  found <- FALSE
+
+  if (!missing(rowwise) && !rowwise) {
+    # columnwise
+
+    for (col_nr in 1:ncol(tbl)) {
+      is_period <- is_period_text(tibble_2_char(tbl[[col_nr]]), frequency)
+      if (any(is_period)) {
+        found <- TRUE
+        break
+      }
+    }
+
+    if (found) row_nr <- Position(function(x) {x}, is_period)
+
+  }  else {
+    # rowwise or columnwise
+
+    # first search for a period rowwise
+    for (row_nr in 1:nrow(tbl)) {
+      is_period_row <- is_period_text(tibble_2_char(tbl[row_nr, ]), frequency)
+      if (any(is_period_row)) {
+        found <- TRUE
+        break
+      }
+    }
+
+    if (found) {
+
+      col_nr <- Position(function(x) {x}, is_period_row)
+
+      if (missing(rowwise)) {
+        if (row_nr == 1) {
+          rowwise <- TRUE
+        } else {
+          is_period_col <- is_period_text(tibble_2_char(tbl[[col_nr]]))
+          rowwise <- sum(is_period_row) > sum(is_period_col)
+        }
+      }
+
+      is_period <- if(rowwise) is_period_row else is_period_col
     }
   }
 
-  stop("No periods found for columnwise timeseries!")
+  if (found) {
+    return(list(rowwise = rowwise, row_nr = row_nr, col_nr = col_nr,
+                is_period = is_period))
+  } else {
+    return(NULL)
+  }
 }

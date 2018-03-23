@@ -72,23 +72,19 @@ and finally convert it to a \code{\link{regts}} by using function
 \code{\link{as.regts}}.
 
 If argument \code{rowwise} has not been specified, then
-function \code{read_ts_xlsx} searches for any valid period text in the first
-row read. If a valid period was found, then
-\code{read_ts_xlsx} assumes that the timeseries are stored rowwise.
-Otherwise it assumes that the timeseries are stored columnwise.
+function \code{read_ts_xlsx} tries to guess if the timeseries are stored
+rowwise based on the position of periods in the sheet.,
 
 \strong{rowwise timeseries}
 
 \if{html}{\figure{xlsschemarowwise.jpg}{options: width=260}}
 \if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
 
-For rowwise timeseries, the first row that is read (see
-argument \code{range} and \code{skiprow}) should contain the periods.
-Columns for which the corresponding period is not a valid period
-are ignored. The timeseries names should be in the
-first column of the sheet. Otherwise, use argument \code{skipcol}
-to specify the number of columns to skip.
-There may be one or more columns between the column with variable names
+For rowwise timeseries, the function searches for the first
+row with periods.  All rows before the period row are ignored.
+The first non-empty column in the sheet should contain  the timeseries names.
+Otherwise, use argument \code{skipcol} to specify the number of columns
+to skip. There may be one or more columns between the column with variable names
 and the columns where the actual timeseries are stored.
 If argument \code{labels = "after"}  then the texts in these
 columns will be used to create timeseries labels. If \code{labels = "before"},
@@ -101,7 +97,7 @@ now should contain label information.
 \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=240}}
 \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 
-For columnwise timeseries, the first row that was read (see
+For columnwise timeseries, the first non-empty row that has been read (see
 argument \code{range} or \code{skiprow}) should contain the variable names.
 The periods can be in any column on the sheet.
 All columns to the left of the time column are ignored.

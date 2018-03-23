@@ -99,7 +99,7 @@ test_that("example5.xlsx is read correctly (leading empty are skipped)",  {
   expect_error(read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", NA)),
                          sheet = "Sheet3"), msg)
 
-  msg <- "No periods found for columnwise timeseries!"
+  msg <- "No periods found on Sheet example2 of file xlsx/example5.xlsx\n"
   expect_error(read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", "D")),
                             sheet = "example2"), msg)
 })

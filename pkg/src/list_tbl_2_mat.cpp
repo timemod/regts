@@ -71,7 +71,6 @@ NumericMatrix list_tbl_2_mat(List tbl) {
 
     int nweird = weird_texts.size();
 
-    int error_count = 0;
     if (nweird > 0) {
         std::stringstream ss;
         ss << "NAs introduced by coercion" << std::endl;

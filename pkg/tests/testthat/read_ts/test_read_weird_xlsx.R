@@ -22,7 +22,7 @@ test_that("weird_isis.xlsx is read correctly",  {
                "No periods found")
 
   expect_error(read_ts_xlsx(xlsx_file, rowwise = TRUE, frequency = 4),
-               "No periods found when reading rowwise timeseries")
+               "No periods found on Sheet 1 of file xlsx/weird_isis.xlsx\n")
 })
 
 test_that("weird_1.xlsx is read correctly",  {

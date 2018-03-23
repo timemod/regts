@@ -37,4 +37,16 @@ test_that("example9.xlsx is read correctly",  {
   expect_identical(result, expected_result)
 })
 
+test_that("example10.xlsx is read correctly",  {
+  xlsx_file <- "xlsx/example10.xlsx"
+  result <- read_ts_xlsx(xlsx_file, labels = "after", skipcol = 1)
+  expected_result <- regts(matrix(c(1.12345678901234, NA, NA, 5, 6,
+                                    10.123, NA, NA, 50, 60), ncol = 2),
+                           names = c("a", "b"),
+                           labels = paste("Timeseries", c("a", "b (EUR)")),
+                           period =  "2010q2/2011q2")
+  expect_equal(result, expected_result)
+})
+
+
 
