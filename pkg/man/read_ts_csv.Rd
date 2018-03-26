@@ -89,7 +89,7 @@ There may be one or more columns between the column with variable names
 and the columns where the actual timeseries are stored.
 If argument \code{labels = "after"}  then the texts in these
 columns will be used to create timeseries labels. If \code{labels = "before"},
-The last column before the data is supposed to contain
+the last column before the data is supposed to contain
 the variable names. The columns before the variable name column
 now should contain label information.
 

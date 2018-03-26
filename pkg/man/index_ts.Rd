@@ -20,7 +20,7 @@ By default the base period is the first period of the input timeseries.}
 \description{
 This function scales a timeseries by dividing all observations by
 one selected observation or by the mean of a range of observations.
-The index series is calculated with \code{i[t] = s * X[t] / mean(X[base])},
+The index series is calculated with \code{i[t] = s * x[t] / mean(X[base])},
 where \code{s} is an arbitrary scale and \code{base} an arbitrary base period.
 }
 \examples{
