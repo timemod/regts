@@ -7,8 +7,8 @@
 \method{cbind}{regts}(..., union = TRUE, suffixes)
 }
 \arguments{
-\item{...}{two or more univariate or multivariate time series,
-or objects which can be coerced to time series}
+\item{...}{two or more univariate or multivariate timeseries,
+or objects which can be coerced to timeseries}
 
 \item{union}{if \code{TRUE}, then the period range of the result
 is the union of the period ranges of the joined objects
@@ -23,7 +23,7 @@ or objects.
 have overlapping columns.}
 }
 \description{
-Bind two or more time series objects with a common frequency.
+Bind two or more timeseries objects with a common frequency.
 By default, the period range of the result is the union of the period ranges
 of the individual timeseries. The result is padded with \code{NA}s if
 necessary. If argument \code{union} is false, then the period range

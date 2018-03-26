@@ -1,4 +1,4 @@
-#' Return the frequency of a \code{period} or \code{period_range}
+#' Return the frequency of a \code{period} or a \code{period_range}
 #'
 #' This is an extension to S3 generic function \code{\link[stats:time]{frequency}}.
 #' Function now also returns the frequency of a \code{period} or a

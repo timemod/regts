@@ -4,7 +4,7 @@
 #' class of the \link{stats} package. Working with \code{regts} makes it
 #' easier to select periods.
 #'
-#' @param data a vector or matrix of the observed time-series values.
+#' @param data a vector or matrix of the observed timeseries values.
 #' A \code{\link[base]{data.frame}}
 #' will be coerced to a numeric matrix via \code{\link{data.matrix}}.
 #' (See also the description of the
@@ -249,7 +249,7 @@ is.regts <- function(x) {
 #' df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
 #' ts <- as.regts(df, time_column = 1, frequency = 4)
 #'
-#' # create a dataframe with non numeric data and convert to regts
+#' # create a data frame with non numeric data and convert to regts
 #' # Strings containing non numeric values are converted to NA
 #' # Logical values TRUE/FALSE are converted to 1/0
 #' df <- data.frame(a = c("1", "2", "X"), b = c(TRUE, FALSE, TRUE), stringsAsFactors = FALSE)
@@ -387,7 +387,7 @@ matrix2regts_ <- function(x, periods, numeric, fun, ...) {
     # are ordered synchronically
     ret <- regts(x, start = create_period(subp[1], freq))
   } else {
-    # irregular timeseries in dataframe (missing periods or
+    # irregular timeseries in data frame (missing periods or
     # unorderered time index)
     subp_min <- min(subp)
     subp_max <- max(subp)

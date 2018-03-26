@@ -40,7 +40,8 @@ with \code{NA}.}
 \item{dec}{the decimal separator as in \code{base::read.csv}.
 If not "." (default) then usually ",".}
 
-\item{name_fun}{function to apply to the names of the timese, tries}
+\item{name_fun}{function to apply to the names of the timeseries, e.g.
+\code{tolower}.}
 }
 \value{
 a \code{regts} object
@@ -88,7 +89,7 @@ There may be one or more columns between the column with variable names
 and the columns where the actual timeseries are stored.
 If argument \code{labels = "after"}  then the texts in these
 columns will be used to create timeseries labels. If \code{labels = "before"},
-the last column before the data is supposed to contain
+The last column before the data is supposed to contain
 the variable names. The columns before the variable name column
 now should contain label information.
 
@@ -105,6 +106,7 @@ There may be one or more rows between the column names and the rows
 where the actual timeseries are stored.
 If argument \code{labels = "after"}  then the texts in these
 rows will be used to create timeseries labels.
+If \code{labels = "before"},
 the last row before the data is supposed to contain
 the variable names. Now the row before the variable name columns
 should contain label information. If argument \code{use_colnames = TRUE},
@@ -119,7 +121,7 @@ Argument \code{frequency} is mandatory if a general period format
 such as  \code{"2011-1"} has been used.
 
 With \code{name_fun} a function can be applied to names of the timeseries,
-e.g. \code{\link{tolower}}
+e.g. \code{\link{tolower}}.
 
 \strong{automatic row skip}
 

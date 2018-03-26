@@ -2,19 +2,17 @@
 #'
 #' This function scales a timeseries by dividing all observations by
 #' one selected observation or by the mean of a range of observations.
+#' The index series is calculated with \code{i[t] = s * X[t] / mean(X[base])},
+#' where \code{s} is an arbitrary scale and \code{base} an arbitrary base period.
 #'
 #' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object
 #' @param base a \code{\link{period}} or a
-#' \code{\link{period_range}} specifying the base period
-#' used for calculating the index factor,
-#' or an object that can be coerced to a
-#' \code{period} or \code{period_range}. By default the
-#' base period is the first period of the input timeseries.
-#' @param  index_value the index value (by default 100).
-#' This is the value of the index timeseries at the base period.
-#' If the base period is a \code{period_range} spanning multiple
-#' periods, then \code{index_value} is the average of the index timeseries
-#' at the base period.
+#' \code{\link{period_range}} specifying the base period or an object that can
+#' be coerced to a \code{period} or \code{period_range}.
+#' By default the base period is the first period of the input timeseries.
+#' @param scale the (average) value of the index series at the base period
+#' (by default 100).
+#'
 #' @seealso \code{\link{rel2index}} and \code{\link{pct2index}}
 #' @examples
 #' \dontshow{
@@ -25,10 +23,10 @@
 #'
 #' index_ts(ab)
 #'
-#' index_ts(ab, base = "2017", index_value = 1)
+#' index_ts(ab, base = "2017", scale = 1)
 #'
 #' @export
-index_ts <- function(x, base = start_period(x), index_value = 100) {
+index_ts <- function(x, base = start_period(x), scale = 100) {
 
   if (!is.ts(x)) {
     stop("Argument x is not a timeseries")
@@ -69,9 +67,9 @@ index_ts <- function(x, base = start_period(x), index_value = 100) {
   if (is.mts(x)) {
     # multivariate timeseries
     x[] <- apply(x, FUN = function(x) {x / mean(x[psel])}, MARGIN = 2)
-    return(x * index_value)
+    return(scale * x)
   } else {
     # univariate timeseries
-    return(index_value * x / mean(x[psel]))
+    return(scale * x / mean(x[psel]))
   }
 }
