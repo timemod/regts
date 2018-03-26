@@ -260,6 +260,9 @@ cvgdif <- function(x1, x2) {
 #' @export
 print.tsdif <- function(x, ...) {
   cat("\n     tsdif timeseries comparison result\n\n")
+
+  maxprint <- 50
+
   with(x, {
     if (equal  && is.null(fun) && tol == 0) {
       cat(paste("The two timeseries objects", ts_names[1], "and", ts_names[2],
@@ -278,7 +281,7 @@ print.tsdif <- function(x, ...) {
         print(difnames)
         nrow_max <- min(nrow(dif), 6)
         ncol_max <- min(ncol(dif), 10)
-        cat(sprintf("Differences (the first %d rows and %d columns)\n",
+        cat(sprintf("\nDifferences (the first %d rows and %d columns)\n",
                     nrow_max, ncol_max))
         print(topleft(dif, n = nrow_max, ncol = ncol_max))
       } else {
@@ -296,15 +299,29 @@ print.tsdif <- function(x, ...) {
       }
       cat("\n")
       if (length(missing_names1) > 0) {
-        cat(paste("Missing timeseries in ", ts_names[1]), ":\n")
-        print(missing_names1)
+        if (length(missing_names1) > maxprint){
+          cat(paste("Missing timeseries in ", ts_names[1]),
+              "(first", maxprint,"total", length(missing_names1), ") :\n")
+          print(missing_names1[1:maxprint])
+        } else {
+          cat(paste("Missing timeseries in ", ts_names[1]), ":\n")
+          print(missing_names1)
+        }
       }
+      cat("\n")
       if (length(missing_names2) > 0) {
-        cat(paste("Missing timeseries in ", ts_names[2]), ":\n")
-        print(missing_names2)
+        if (length(missing_names2) > maxprint){
+          cat(paste("Missing timeseries in ", ts_names[2]),
+              "(first", maxprint, "total", length(missing_names2), ") :\n")
+          print(missing_names2[1:maxprint])
+        } else {
+          cat(paste("Missing timeseries in ", ts_names[2]), ":\n")
+          print(missing_names1)
+        }
       }
+
       if (!ranges_equal) {
-        cat("The two timeseries have different period ranges:\n")
+        cat("\nThe two timeseries have different period ranges:\n")
         df <- data.frame(ranges = c(as.character(period_range1),
                                     as.character(period_range2)))
         rownames(df) <- ts_names
