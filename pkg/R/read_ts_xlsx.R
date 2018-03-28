@@ -29,7 +29,7 @@
 #' row with periods.  All rows before the period row are ignored.
 #' The first non-empty column in the sheet should contain  the timeseries names.
 #' Otherwise, use argument \code{skipcol} to specify the number of columns
-#' to skip. 
+#' to skip.
 #'
 #' \if{html}{\figure{xlsschemarowwise.jpg}{options: width=260}}
 #' \if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
@@ -295,7 +295,7 @@ read_ts_xlsx_columnwise <- function(tbl, frequency = NA,
   name_sel <- which(!is.na(ts_names))
   ts_names <- ts_names[name_sel]
 
-  # remove columns without names
+  # keep the period column and the columnws with names
   keep_cols <- c(1, name_sel + 1)
   tbl <- tbl[, keep_cols]
 
