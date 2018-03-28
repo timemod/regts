@@ -76,7 +76,7 @@ ts <- as.regts(df)
 df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
 ts <- as.regts(df, time_column = 1, frequency = 4)
 
-# create a dataframe with non numeric data and convert to regts
+# create a data frame with non numeric data and convert to regts
 # Strings containing non numeric values are converted to NA
 # Logical values TRUE/FALSE are converted to 1/0
 df <- data.frame(a = c("1", "2", "X"), b = c(TRUE, FALSE, TRUE), stringsAsFactors = FALSE)

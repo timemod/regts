@@ -34,8 +34,6 @@
 #' @return an updated \code{\link{regts}} object.
 #'
 #' @examples
-#' library(regts)
-#'
 #' x1 <- regts(matrix(data = rep(1:9), nc = 3), period = "2000/2002",
 #'             names = c("a", "b", "c"))
 #' x2 <- regts(matrix(data = rep(10:15), nc = 3), period = "2000/2001",

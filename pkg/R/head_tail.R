@@ -32,7 +32,10 @@ tail.regts <- function(x, n = 6L, ...) {
 #' @param ncol a single integer. Number of columns in \code{regts}.
 #' By default only the first 10 columns are printed.
 #' @examples
-#' data <- regts(matrix(1:200, ncol = 20), start = "2010Q2",
+#' \dontshow{
+#' set.seed(123)
+#' }
+#' data <- regts(matrix(rnorm(200), ncol = 20), start = "2010Q2",
 #'               names = paste0("abc", 1:20))
 #' topleft(data)
 #' @seealso

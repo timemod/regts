@@ -76,10 +76,11 @@ A single `regts` timeseries is created with the function `regts`. An example for
 a quarterly timeseries:
 
 ```{r echo = 1}
-tq <- regts(1:10, start = "2016Q3")
+tq <- regts(1:10, start = "2016q3")
 tq
 ```
 The end period of the timeseries is based on the length of the input data.
+The period indicator can be uppercase ("Q") or lowercase ("q").
 The period can also be a month, like `"2016M3"`, or a year: 
 
 ```{r echo = 1}
@@ -97,13 +98,13 @@ If the input data is longer than you require you can make a selection with the
 `end` argument:
 
 ```{r}
-ts_data <- regts(1:10, start = "2016Q1", end = "2016Q4")
+ts_data <- regts(1:10, start = "2016q1", end = "2016q4")
 ```
 If the input data is shorter than the period determined by the `start` and the 
 `end` argument, the data is repeated:
 
 ```{r}
-ts_data <- regts(1:2, start = "2016Q1", end = "2017Q1")
+ts_data <- regts(1:2, start = "2016q1", end = "2017q1")
 ts_data
 ```
 As you can see the length of the period doesn't have to be a multiple of the 
@@ -132,7 +133,7 @@ A multivariate timeseries is just a matrix with two or more columns.
 multivariate `regts` is such a matrix with some extra attributes. 
 
 ```{r}
-rts <- regts(matrix(1:9, ncol = 3), start = "2016Q1", names = c("a", "b", "c"))
+rts <- regts(matrix(1:9, ncol = 3), start = "2016q1", names = c("a", "b", "c"))
 rts
 ```
 Argument `names` can be used to set the column names. If omitted then the 
@@ -140,7 +141,7 @@ column names of the input matrix are used. In the next example the input
 matrix has no column names:
 
 ```{r}
-rts1 <- regts(matrix(1:9, ncol = 3), start = "2016Q1")
+rts1 <- regts(matrix(1:9, ncol = 3), start = "2016q1")
 rts1
 ```
 
@@ -177,6 +178,15 @@ rts
 ```
 
 This is not possible for classes `ts` and `matrix`.
+
+Besides the 'matrix' selection you can also use the `$` to select or create one
+column in a multivariate `regts`:
+
+```{r}
+ats <- rts$a
+rts$d <- rts$c + 1
+```
+
 
 
 ### Selecting columns with a regular expression
@@ -260,20 +270,20 @@ with a `regts` you can select periods with the selection operator `[]`. Period
 selection is a form of subsetting. 
 
 ```{r results = "hide"}
-ts <- regts(1:8, start = "2016Q1", end = "2017Q4")
-ts["2016Q4/2017Q2"]
+ts <- regts(1:8, start = "2016q1", end = "2017q4")
+ts["2016q4/2017q2"]
 ```
 Besides a range you can also select one period:
 
 ```{r results = "hide"}
-ts["2017Q1"]
+ts["2017q1"]
 ```    
     
 or a range with an open beginning or end:
 
 ```{r results = "hide"}
-ts["/2017Q2"]
-ts["2017Q1/"]
+ts["/2017q2"]
+ts["2017q1/"]
 ```
 or a range with a lower frequency:
 
@@ -285,26 +295,26 @@ If a selection is specified outside the defined range, the timeseries is filled
 with NA values for that range:
 
 ```{r}
-ts["/2018Q2"]
-ts["2015Q3/"] 
+ts["/2018q2"]
+ts["2015q3/"] 
 ```
 
 Period selection can also be applied on the left hand side of an assignment, in 
 the target timeseries. The object must exist before applying selection.
 
 ```{r}
-rts1 <- regts(1:8, start = "2010Q1", end = "2011Q4")
-rts1["2011Q2"] <- 2
-rts1["/2010Q3"] <- 99
+rts1 <- regts(1:8, start = "2010q1", end = "2011q4")
+rts1["2011q2"] <- 2
+rts1["/2010q3"] <- 99
 rts1
 ```
 
 The period of the timeseries can also be extended:
 ```{r}
-rts1["2009Q1/2009Q2"] <- rts1["2010Q3/2010Q4"]
+rts1["2009q1/2009q2"] <- rts1["2010q3/2010q4"]
 rts1
 ```
-The missing quarters (`2009Q3` and `2009Q4`) are filled in with NA values.
+The missing quarters (`2009q3` and `2009q4`) are filled in with NA values.
 
 <!-- Special header: a bold line with some whitespace before, because we
 want no header in the table of contents -->
@@ -315,12 +325,12 @@ Selecting a period for a multivariate regts is quite similar. You can select
 one or more periods, or a combination of period(s) and columns:
 
 ```{r}
-rts <- regts(matrix(1:12, ncol = 3), start = "2011Q1", names = c("a", "b", "c"))
-rts["2011Q2", ]
+rts <- regts(matrix(1:12, ncol = 3), start = "2011q1", names = c("a", "b", "c"))
+rts["2011q2", ]
 
-rts["2011Q2"]                 # the , is not necessary
+rts["2011q2"]                      # the , is not necessary
 
-rts["2011Q1/2012Q2", "c"]     # extended selection
+rts["2011q1/2012q2", c("b","c")]   # extended selection
 ```
 
 All the extended elements become NA.
@@ -328,14 +338,14 @@ All the extended elements become NA.
 Select a combination of period and columns:
 
 ```{r}
-rts["2011Q4/", c("a", "b")]
+rts["2011q4/", c("a", "b")]
 ```
 
 Selection can also take place in the target timeseries:
 
 ```{r echo = 1:3}
 rts[, "x"] <- NA              # define an extra column
-rts["2012Q1", ] <- 99         # extend period for all columns 
+rts["2012q1", ] <- 99         # extend period for all columns 
 rts["2011", "x"] <- 1         # update all quarters in 2011 in column "x"
 rts
 ```
@@ -404,7 +414,7 @@ cat(readLines("transpose.csv"), sep = "\n")
 ```
 
 Now the periods are in the first row (column headers), the next rows contain the 
-timeseries. Note that `;` is the field separator and that quarter `2017Q3` is
+timeseries. Note that `;` is the field separator and that quarter `2017q3` is
 missing in the file.
 
 
@@ -433,7 +443,7 @@ By default the timeseries are stored rowwise (i.e. the period is written in the
 first row). 
 
 ```{r}
-rts <- regts(matrix(1:8, ncol = 2), start = "2016Q1", names = c("a","b"))
+rts <- regts(matrix(1:8, ncol = 2), start = "2016q1", names = c("a","b"))
 write_ts_csv(rts, "result.csv")
 ```
 
@@ -498,7 +508,7 @@ A label is a way to document an object or the elements of an object. Labels in b
 In the `regts` package each timeseries in a `regts` object can be equipped with a label. Labels can be defined when the series are created and they are preserved in most timeseries functions.
 
 ```{r}
-t1 <- regts(data1, start = "2017Q1", names = c("child", "adult", "senior"),
+t1 <- regts(data1, start = "2017q1", names = c("child", "adult", "senior"),
       labels = c("Age 0-17", "Age 18-65", "Age 65+"))
 t1
 ```
@@ -523,7 +533,7 @@ In combination with the `<-` operator, the `ts_labels` command can be used to
 assign labels to, or remove labels from an existing `regts`:
 
 ```{r}
-tx <- regts(data, start = "2017Q1")
+tx <- regts(data, start = "2017q1")
 ts_labels(tx) <- c("Trans X", "Label X")
 ts_labels(tx)
 ts_labels(tx) <- NULL       # remove all labels 
@@ -643,7 +653,7 @@ automatically including the labels. By default they are written after the names.
 An example:
 
 ```{r}
-ts_data <- regts(matrix(1:8, ncol = 2), start = "2016Q1", end = "2016Q4",
+ts_data <- regts(matrix(1:8, ncol = 2), start = "2016q1", end = "2016q4",
                  names = c("a", "b"), labels = c("Series_a", "Series_b"))
 write_ts_xlsx(ts_data, "result_label.xlsx")
 ```
@@ -664,22 +674,22 @@ applicable for a `ts` variable, can be used for a `regts` timeseries.
 Some examples:
 
 ```{r}
-tx <- regts(1:10, start = "2017Q1")
+tx <- regts(1:10, start = "2017q1")
 
 # operators
 ty    <- 2*tx + 1
 tpyth <- tx^2 + ty^2   
 modulo <- tx %% 2
 tlog  <- tx < ty && ty > 1
-number <- tx["2017Q2"]
+number <- tx["2017q2"]
 
 ```
 When a binary arithmetic operator is used on two timeseries objects, the 
 intersection of the periods is taken:
 
 ```{r}
-tx <- regts(1:6, start = "2016Q1")
-ty <- regts(1:6, start = "2017Q1")
+tx <- regts(1:6, start = "2016q1")
+ty <- regts(1:6, start = "2017q1")
 tx + ty
 ```
 
@@ -707,8 +717,8 @@ value, the union of the period ranges of the joined objects is taken, otherwise
 it is the `intersection`. An example:
 
 ```{r}
-rt1 <- regts(1:4, start = "2016Q1")
-rt2 <- regts(1:4, start = "2016Q2")
+rt1 <- regts(1:4, start = "2016q1")
+rt2 <- regts(1:4, start = "2016q2")
 ```
 
 ```{r}
@@ -737,8 +747,8 @@ The `suffixes` argument is obligatory if the joined objects have overlapping
 column names:
 
 ```{r}
-rt1 <- regts(data1, start = "2016Q1", names = c("b", "a", "c"))
-rt2 <- regts(data, start = "2016Q1", names = c("d", "b"))
+rt1 <- regts(data1, start = "2016q1", names = c("b", "a", "c"))
+rt2 <- regts(data, start = "2016q1", names = c("d", "b"))
 
 cbind(rt1, rt2, suffixes = c("_1","_2"))
 ```
@@ -753,7 +763,7 @@ Sometimes you have a 'chain' of calculations, where the left hand side of an
 equation is used in the right hand side of a following equation. For example:
 
 ```{r}
-a <- regts(1:4, start = "2010Q2")
+a <- regts(1:4, start = "2010q2")
 b <- a + 1
 c <- b / a
 d <- lag(a, -1)
@@ -766,10 +776,10 @@ timeseries:
 
 \longerpage[2]
 ```{r}
-xts <- regts(data, start = "2010Q2", names = c("a", "x"))
+xts <- regts(data, start = "2010q2", names = c("a", "x"))
 xts[, "b"] <- xts[, "a"] + 1
 xts[, "c"] <- xts[, "b"] / xts[, "a"]
-xts["2010Q3/2011Q2", "d"] <- lag( xts[, "a"], -1)
+xts["2010q3/2011q2", "d"] <- lag( xts[, "a"], -1)
 xts
 ```
 Note that when timeseries `d` is created you also have to select the lagged 
@@ -781,7 +791,7 @@ regts to a list of univariate timeseries with the `as.list` function. Then
 apply the `within` function. 
 
 ```{r}
-xts <- regts(data, start = "2010Q2", names = c("a", "x"))
+xts <- regts(data, start = "2010q2", names = c("a", "x"))
 list <- as.list(xts)
 list2 <- within(list, {
     b <- a + 1
@@ -830,20 +840,22 @@ three different methods to deal with NA values. Possible methods for this functi
 
 * `upd` use all of the second timeseries to update the first timeseries
 
+* `replace` replace the first timeseries with the second timeseries
+
 * `updna` only replace NA values in the first timeseries with values from the second timeseries
 
 * `updval` only use valid values in the second timeseries to update the first
 timeseries
 
 Of course only the common columns in both timeseries are updated. Extra columns
-in the second timeseries aer added to the result, depending on the method and 
+in the second timeseries are added to the result, depending on the method and 
 the content of that columns.
 
 Some examples:
 
 ```{r}
-series1 <- regts(matrix(rep(1,6), ncol = 3), start = "2017Q1", names = c("a","b","c"))
-series2 <- regts(matrix(rep(2,4), ncol = 2), start = "2017Q1", names = c("a","d"))
+series1 <- regts(matrix(rep(1,6), ncol = 3), start = "2017q1", names = c("a","b","c"))
+series2 <- regts(matrix(rep(2,4), ncol = 2), start = "2017q1", names = c("a","d"))
 series1["2017q2", "b"] <- NA
 series2[, "c"] <- NA
 update_ts(series1, series2, method = "upd")
@@ -863,7 +875,7 @@ Also argument `tol` can be specified: all differences smaller than `tol` will be
 
 
 ```{r}
-rt1 <- regts(matrix(1:12, ncol = 3), start = "2016Q1", names = c("a", "b", "c"))
+rt1 <- regts(matrix(1:12, ncol = 3), start = "2016q1", names = c("a", "b", "c"))
 # create timeseries with slight differences, larger and smaller than the tolerance factor 
 rt2 <- rt1
 rt2[ ,"a"] <- rt1[ ,"a"] + 0.01
@@ -887,7 +899,7 @@ In the previous example the two objects had the same column names. Now we look a
 
 ```{r}
 rt3 <- rt1
-rt3[, "d"] <- regts(9:12, start = "2016Q1")
+rt3[, "d"] <- regts(9:12, start = "2016q1")
 tsdif(rt1, rt3)
 tsdif(rt1, rt3)$missing_names1
 ```
@@ -926,7 +938,7 @@ period or the period_range, as shown further on in this section.
 A `period` object can be created with the `period` function. 
 
 ```{r}
-prd1 <- period("2016Q4")
+prd1 <- period("2016q4")
 prd1
 prd2 <- period("2015-2", frequency = 4)
 prd2
@@ -958,10 +970,10 @@ string. With the `str` function we can show the internal representation of a
 `period` object:
 
 ```{r}
-str(period("2016Q4"))
+str(period("2016q4"))
 ```
 
-The internal representation of period `2016Q4` is the number of quarters since 
+The internal representation of period `2016q4` is the number of quarters since 
 the beginning of the Christian era, starting with 0 (`8067 = 2016 * 4 + 3`).
 
 ## `period_range`
@@ -969,22 +981,22 @@ There is also a `period_range`, an object that represents an interval of
 periods. Such a range can be created in the following ways:
 
 ```{r}
-range <- period_range("2014Q4", "2017Q4")
+range <- period_range("2014q4", "2017q4")
 range
-period_range("2014Q4/2017Q4")
+period_range("2014q4/2017q4")
 ```
 
 The lower or upper bound of the range may be undetermined:
 
 ```{r}
-period_range("2017Q1", NULL)      # No upper bound
+period_range("2017q1", NULL)      # No upper bound
 ```
 
 A `period_range` variable can be used in the `regts` function, specifying the 
 `period` argument:
  
 ```{r}
-range1 <- period_range("2016Q1", "2016Q3")
+range1 <- period_range("2016q1", "2016q3")
 rts <- regts(matrix(1:18, ncol = 3), period = range1, names = c("a", "b", "c"))
 rts
 ```
@@ -1013,19 +1025,19 @@ ts <- regts(data, period = range2)
 With operators `+` and `-` the period can be shifted. Some examples for `period`: 
 
 ```{r}
-period("2016Q4") + 1
-p1 <- period("2015Q1")
+period("2016q4") + 1
+p1 <- period("2015q1")
 p1-5
 ```
 
 And for a `period_range`:
 
 ```{r}
-period_range("2016Q4", "2017Q4") + 1
+period_range("2016q4", "2017q4") + 1
 period_range(p1, p1+4)            # a `period` as input
 ```
 
-Note that one of the operands must be numeric^[Command `period("2015Q1") + period("2015Q2")` results in an error message: 'Arithmetic operation on two 
+Note that one of the operands must be numeric^[Command `period("2015q1") + period("2015q2")` results in an error message: 'Arithmetic operation on two 
 periods is not allowed.'].
 
 
@@ -1041,7 +1053,7 @@ rts
 Use a `period` to select and modify the timeseries.
 \longerpage[2]
 ```{r}
-prd1 <- period("2016Q2")
+prd1 <- period("2016q2")
 rts[prd1] 
 rts[prd1] <- 3
 rts
@@ -1051,11 +1063,11 @@ A `period_range` can be used to select and modify multiple periods:
 
 ```{r}
 # define a period range and make selections
-range <- period_range("2016Q2", "2016Q3")
+range <- period_range("2016q2", "2016q3")
 var <- rts[range]     
 rts[range, c("a", "b")]
 # define another period range and create a new timeseries column
-smpl <- period_range("2016Q1", "2017Q1")
+smpl <- period_range("2016q1", "2017q1")
 rts[smpl, "xx"] <- 2                
 rts
 ```
@@ -1076,7 +1088,7 @@ Suppose we have a data frame with (numerical) data. It is possible to use such a
 
 ```{r}
 df  <- data.frame(a = 1:3, b = 4:6, c = 7:9)
-ts <- regts(df, start = "2017Q1")             # create a multivariate regts
+ts <- regts(df, start = "2017q1")             # create a multivariate regts
 ts
 ```
 
@@ -1089,7 +1101,7 @@ In the previous example we had to specify the period of the result timeseries. S
 
 ```{r}
 df <- data.frame(a = 1:3, b = 4:6)  # data frame with period in row names
-rownames(df) <- c("2015Q3", "2015Q4", "2016Q1")
+rownames(df) <- c("2015q3", "2015q4", "2016q1")
 df
 ```
 
@@ -1105,13 +1117,13 @@ If the periods are in a column of the data frame, then the `time_column` argumen
 
 ```{r}
 # data frame with period in column 'periods'
-df2 <- data.frame(periods = c("2015Q3", "2015Q4", "2016Q1"), a = 1:3, b = 4:6)
+df2 <- data.frame(periods = c("2015q3", "2015q4", "2016q1"), a = 1:3, b = 4:6)
 ts2 <- as.regts(df2, time_column = "periods")
 ts2
 ```
 
 Function `as.regts` uses the function `period` to convert the 'period text' 
-(like `2015Q3`) to a `period`.
+(like `2015q3`) to a `period`.
 This function can handle several period formats: `2016`, `2016Q4`, `2016.4q`,
 `2016/4Q`, `2016-4q`, `2016_q4`, ...
 where no distinction is made between 'q' and 'Q'.
@@ -1176,7 +1188,7 @@ Similarly, if a `regts` object with labels is converted to a data frame, then
 the timeseries labels are used to create the label attributes of the data frame.
 
 ```{r}
-ts_data <- regts(matrix(1:8, ncol = 2), start = "2016Q1", end = "2016Q4",
+ts_data <- regts(matrix(1:8, ncol = 2), start = "2016q1", end = "2016q4",
                  names = c("a", "b"), labels = c("Series_a", "Series_b"))
 df1 <- as.data.frame(ts_data)
 label(df1)
@@ -1281,7 +1293,7 @@ aggregate(regtm1, FUN = mean, nfrequency = 4)
 
 And another with a quarterly timeseries:
 ```{r}
-regt1 <- regts(1:10, start = "2016Q1")
+regt1 <- regts(1:10, start = "2016q1")
 regt1
 ```
 ```{r results = "hide"}
@@ -1299,7 +1311,7 @@ years at the end.
 A special situation occurs when for instance a quarterly timeseries doesn't 
 start in the first quarter:
 ```{r}
-regt2 <- regts(2:10, start = "2016Q2")
+regt2 <- regts(2:10, start = "2016q2")
 regt2
 ```
 ```{r results = "hide"}
@@ -1356,7 +1368,7 @@ change for the output timeseries.
 
 First a timeseries is created containing differences:
 ```{r}
-xdif <- diff(regts(c(1,3,4,3,6,2,4,1,3,2), start = "2015Q4"))
+xdif <- diff(regts(c(1,3,4,3,6,2,4,1,3,2), start = "2015q4"))
 xdif
 ```
 

@@ -8,7 +8,7 @@ regts(data, start, end, period, frequency = NA, names = colnames(data),
   labels = NULL)
 }
 \arguments{
-\item{data}{a vector or matrix of the observed time-series values.
+\item{data}{a vector or matrix of the observed timeseries values.
 A \code{\link[base]{data.frame}}
 will be coerced to a numeric matrix via \code{\link{data.matrix}}.
 (See also the description of the

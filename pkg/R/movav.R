@@ -1,7 +1,7 @@
 #' Moving average of a timeseries
 #'
 #' @description
-#' Function \code{movavb} computes the backward moving avergage and
+#' Function \code{movavb} computes the backward moving average and
 #' function \code{movavc} the centered moving average.
 #'
 #' For example, the backward moving average of order 3 is defined as
@@ -44,9 +44,9 @@
 #' @param keep_range If \code{TRUE} (the default), then  the output
 #' timeseries has the same period range as the input timeseries.
 #' Then the result timeseries will have \code{order} NA values. For
-#' \code{movavc} these NAs will apear on the left side and for \code{movavc}
+#' \code{movavb} these NAs will appear on the left side and for \code{movavc}
 #' they will be distributed over both sides.
-#' If \code{TRUE} then the result timeseries is \code{order} periods
+#' If \code{FALSE} then the result timeseries is \code{order} periods
 #' shorter than the input timeseries.
 #' @return a \code{regts} object with the moving average values
 #' @examples

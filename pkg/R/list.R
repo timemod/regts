@@ -26,6 +26,7 @@
 #' # transfer all timeseries in the list to the global environment
 #' list2env(ts_list2, .GlobalEnv)
 #' @seealso \code{\link[base]{list2env}} and  \code{\link{cbind.regts}}
+#' @name as.list
 #' @export
 as.list.regts <- function(x, ...) {
 

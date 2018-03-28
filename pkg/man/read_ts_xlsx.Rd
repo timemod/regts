@@ -73,18 +73,20 @@ and finally convert it to a \code{\link{regts}} by using function
 
 If argument \code{rowwise} has not been specified, then
 function \code{read_ts_xlsx} tries to guess if the timeseries are stored
-rowwise based on the position of periods in the sheet.,
+rowwise or columnwise based on the positions of periods in the sheet.
 
 \strong{rowwise timeseries}
-
-\if{html}{\figure{xlsschemarowwise.jpg}{options: width=260}}
-\if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
 
 For rowwise timeseries, the function searches for the first
 row with periods.  All rows before the period row are ignored.
 The first non-empty column in the sheet should contain  the timeseries names.
 Otherwise, use argument \code{skipcol} to specify the number of columns
-to skip. There may be one or more columns between the column with variable names
+to skip.
+
+\if{html}{\figure{xlsschemarowwise.jpg}{options: width=260}}
+\if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
+
+There may be one or more columns between the column with variable names
 and the columns where the actual timeseries are stored.
 If argument \code{labels = "after"}  then the texts in these
 columns will be used to create timeseries labels. If \code{labels = "before"},
@@ -94,17 +96,19 @@ now should contain label information.
 
 \strong{columnwise timeseries}
 
-\if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=240}}
-\if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
-
 For columnwise timeseries, the first row that has been read (see
 argument \code{range} or \code{skiprow}) should contain the variable names.
 The periods can be in any column on the sheet.
 All columns to the left of the time column are ignored.
 There may be one or more rows between the column names and the rows
 where the actual timeseries are stored.
+
+\if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=240}}
+\if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
+
 If argument \code{labels = "after"}  then the texts in these
 rows will be used to create timeseries labels.
+ If \code{labels = "before"},
 the last row before the data is supposed to contain
 the variable names. Now the row before the variable name columns
 should contain label information. If argument \code{use_colnames = TRUE},
@@ -123,7 +127,7 @@ Argument \code{frequency} is mandatory if a general period format
 such as  \code{"2011-1"} has been used.
 
 With \code{name_fun} a function can be applied to names of the timeseries,
-e.g. \code{\link{tolower}}
+e.g. \code{\link{tolower}}.
 }
 \examples{
 \dontrun{

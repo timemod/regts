@@ -57,7 +57,7 @@
 #' where the actual timeseries are stored.
 #' If argument \code{labels = "after"}  then the texts in these
 #' rows will be used to create timeseries labels.
-#  If \code{labels = "before"},
+#' If \code{labels = "before"},
 #' the last row before the data is supposed to contain
 #' the variable names. Now the row before the variable name columns
 #' should contain label information. If argument \code{use_colnames = TRUE},
@@ -72,7 +72,7 @@
 #' such as  \code{"2011-1"} has been used.
 #'
 #' With \code{name_fun} a function can be applied to names of the timeseries,
-#' e.g. \code{\link{tolower}}
+#' e.g. \code{\link{tolower}}.
 #'
 #' \strong{automatic row skip}
 #'
@@ -113,7 +113,8 @@
 #' If not "." (default) then usually ",".
 #' @param na_string Character vector of strings to use for missing values.
 #' By default, \code{read_ts_xlsx} treats blank cells as missing data.
-#' @param name_fun function to apply to the names of the timese, tries
+#' @param name_fun function to apply to the names of the timeseries, e.g.
+#' \code{tolower}.
 #' @return a \code{regts} object
 #'
 #' @examples

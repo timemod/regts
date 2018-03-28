@@ -5,7 +5,7 @@
 #' of package \code{data.table}.
 #' @param x a \code{\link{ts}} or \code{\link{regts}} object
 #' @param file a \code{regts} object
-#' @param rowwise a logical value: should the timeseries we written rowwise?
+#' @param rowwise a logical value: should the timeseries be written rowwise?
 #' @param sep The separator between columns. Default is ",".
 #' @param dec The decimal separator, by default ".". Cannot be the same as sep.
 #' @param labels should labels we written, and if so before the names or after
@@ -93,8 +93,7 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @examples
 #' # create two timeseries objects
 #' ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
-#'              labels = c("Timeseries a", "Timeseries b"),
-#'              start = "2017Q2")
+#'              labels = c("Timeseries a", "Timeseries b"), start = "2017Q2")
 #'
 #' # write timeseries ts1 to an Excel file
 #' write_ts_xlsx(ts1, file = "ts1.xlsx", sheet_name = "ts1", labels = "after")
@@ -110,8 +109,8 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' # write a timeseries with comments
 #' comments <- c("Timeseries ts1 is created on the Central Bureau of Policy Analysis",
 #'               "using a random number generator")
-#'  write_ts_xlsx(ts1, file = "ts_comments.xlsx", sheet_name = "ts1",
-#'                comments = comments)
+#' write_ts_xlsx(ts1, file = "ts_comments.xlsx", sheet_name = "ts1",
+#'               comments = comments)
 #' \dontshow{
 #'    unlink("ts1.xlsx")
 #'    unlink("timeseries.xlsx")

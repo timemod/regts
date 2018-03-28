@@ -7,17 +7,17 @@
 \title{Calculate an index timeseries from a timeseries with relative or
 percentage changes.}
 \usage{
-rel2index(x, base_period = start_period(x) - 1, scale = 100)
+rel2index(x, base = start_period(x) - 1, scale = 100)
 
-pct2index(x, base_period = start_period(x) - 1, scale = 100)
+pct2index(x, base = start_period(x) - 1, scale = 100)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}}}
 
-\item{base_period}{base period of the index timeseries (a \code{\link{period}}
+\item{base}{base period of the index timeseries (a \code{\link{period}}
 object or an object that can be coerced to a \code{period} object)}
 
-\item{scale}{the value of the index series at the base period}
+\item{scale}{the value of the index series at the base period (by default 100)}
 }
 \description{
 The relative change of a timeseries X[t]
@@ -44,7 +44,7 @@ timeseries with percentage changes
 \examples{
 ts1 <- regts(abs(rnorm(10)), start = "2010Q2")
 print(rel2index(ts1))
-print(rel2index(ts1, base_period = "2010Q3", scale = 1))
+print(rel2index(ts1, base = "2010Q3", scale = 1))
 }
 \seealso{
 \code{\link{index_ts}}

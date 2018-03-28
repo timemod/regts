@@ -58,7 +58,7 @@ ts_labels <- function(x) {
 #' @examples
 #' ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"),
 #'              labels = c("Timeseries a", "???"))
-#' ts <-update_ts_labels(ts, c(b = "Timeseries b"))
+#' ts <- update_ts_labels(ts, c(b = "Timeseries b"))
 #' print(ts_labels(ts))
 #'
 #' @seealso \code{\link{ts_labels}}
