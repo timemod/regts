@@ -1,13 +1,13 @@
 #' Bind two or more timeseries
 #'
-#' Bind two or more time series objects with a common frequency.
+#' Bind two or more timeseries objects with a common frequency.
 #' By default, the period range of the result is the union of the period ranges
 #' of the individual timeseries. The result is padded with \code{NA}s if
 #' necessary. If argument \code{union} is false, then the period range
 #' of the result is the intersection of the period ranges.
 #'
-#' @param  ... two or more univariate or multivariate time series,
-#' or objects which can be coerced to time series
+#' @param  ... two or more univariate or multivariate timeseries,
+#' or objects which can be coerced to timeseries
 #' @param union if \code{TRUE}, then the period range of the result
 #' is the union of the period ranges of the joined objects
 #' (the result is padded with \code{NA}s if necessary). If \code{FALSE},
@@ -28,6 +28,7 @@
 #' x1 <- regts(matrix(1:27, nc = 3), start = "2008Q4", names = c("a", "b", "c"))
 #' x2 <- regts(matrix(1:27, nc = 3), start = "2008Q4", names = c("a", "c", "d"))
 #' cbind(x1, x2, suffixes = c("_1","_2"))
+#' @name cbind
 #' @export
 cbind.regts <- function(..., union = TRUE, suffixes) {
 

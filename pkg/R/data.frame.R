@@ -14,6 +14,7 @@
 #' columnwise or rowwise timeseries, respectively.
 #' @param ... additional arguments to be passed to methods.
 #' @return A \code{\link[base]{data.frame}}
+#' @name as.data.frame
 #' @export
 #' @examples
 #' ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),

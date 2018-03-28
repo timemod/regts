@@ -1,4 +1,4 @@
-# Internal function to read timeseries columnwise from a dataframe.
+# Internal function to read timeseries columnwise from a data frame.
 # This function is used in function read_ts_csv and read_ts_xlsx
 read_ts_columnwise <- function(df, frequency = NA,
                                labels = c("no", "after", "before"),

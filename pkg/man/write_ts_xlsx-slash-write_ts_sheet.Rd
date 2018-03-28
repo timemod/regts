@@ -73,8 +73,7 @@ workbook
 \examples{
 # create two timeseries objects
 ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
-             labels = c("Timeseries a", "Timeseries b"),
-             start = "2017Q2")
+             labels = c("Timeseries a", "Timeseries b"), start = "2017Q2")
 
 # write timeseries ts1 to an Excel file
 write_ts_xlsx(ts1, file = "ts1.xlsx", sheet_name = "ts1", labels = "after")
@@ -90,8 +89,8 @@ saveWorkbook(wb, "timeseries.xlsx")
 # write a timeseries with comments
 comments <- c("Timeseries ts1 is created on the Central Bureau of Policy Analysis",
               "using a random number generator")
- write_ts_xlsx(ts1, file = "ts_comments.xlsx", sheet_name = "ts1",
-               comments = comments)
+write_ts_xlsx(ts1, file = "ts_comments.xlsx", sheet_name = "ts1",
+              comments = comments)
 \dontshow{
    unlink("ts1.xlsx")
    unlink("timeseries.xlsx")

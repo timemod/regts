@@ -12,7 +12,7 @@
 #' percentage or relative change. They calculate the exact percentage or
 #' relative change for the output timeseries.
 #'
-#' More details of the aggregation methods as provided in the Vignette
+#' More details of the aggregation methods are  provided in the Vignette
 #' "Introduction to package regts".
 #'
 #' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object

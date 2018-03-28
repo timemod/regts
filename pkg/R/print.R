@@ -2,7 +2,7 @@
 #'
 #' This function prints the name, class and value of its argument.
 #' The value is printed using the standard \code{\link{print}} function.
-#' It returns the value of the argument invisibly
+#' It returns the value of the argument invisibly.
 #' @param  x an R object
 #' @param ... further arguments passed to \code{print}
 #' @export
