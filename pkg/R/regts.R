@@ -432,6 +432,41 @@ add_columns <- function(x, new_colnames) {
 #' @importFrom stats is.mts
 #' @export
 "[<-.regts" <- function (x, i, j, value) {
+
+  if ((!missing(i) && any(is.na(i))) || !missing(j) && any(is.na(j))) {
+    stop(paste("missing values are not allowed in subscripted assignments of",
+               "regts objects"))
+  }
+
+  if (is.null(value) && is.matrix(x)) {
+    # remove columns
+    if (!missing(i)) {
+      stop("Row selection not allowed when the replacement is NULL")
+    }
+    if (missing(j)) {
+      # x[] <- NULL: remove all columns
+      return(x[, numeric(0)])
+    } else {
+      if (length(j) == 0) {
+        return(x)
+      }
+      if (is.numeric(j)) {
+        return(x[, -j, drop = FALSE])
+      } else if (is.logical(j)) {
+        return(x[, !j, drop = FALSE])
+      } else {
+        colsel <- match(as.character(j), colnames(x))
+        colsel <- colsel[!is.na(colsel)]
+        if (length(colsel) > 0) {
+          return(x[, -colsel, drop = FALSE])
+        } else {
+          # no matching columns, do nothing
+          return(x)
+        }
+      }
+    }
+  }
+
   if (!missing(j) && is.character(j)) {
     # Check if j contains names of columns not present in x.
     # Add missing columns if necessary
@@ -566,7 +601,7 @@ window_regts <- function(x, sel_range) {
   cnames <- colnames(object)
   if (is.null(cnames)) stop(paste("$ operator not possible for regts without",
                             "column names"))
-  i <- pmatch(x, cnames)
+  i <- match(x, cnames)
   if (is.na(i)) {
     return(NULL)
   } else {
