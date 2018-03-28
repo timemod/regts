@@ -28,6 +28,7 @@
 #' x1 <- regts(matrix(1:27, nc = 3), start = "2008Q4", names = c("a", "b", "c"))
 #' x2 <- regts(matrix(1:27, nc = 3), start = "2008Q4", names = c("a", "c", "d"))
 #' cbind(x1, x2, suffixes = c("_1","_2"))
+#' @name cbind
 #' @export
 cbind.regts <- function(..., union = TRUE, suffixes) {
 
