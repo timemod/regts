@@ -6,10 +6,9 @@
 #' The timeseries can be stored both rowwise or columnwise.
 #' The function tries to find valid period texts.
 #' Valid period texts should have the format recognized by function
-#' \code{\link{period}}, for example \code{"2010Q2"},
+#' \code{\link{period}}, for example \code{"2010Q2"}, \code{"2010.2Q"},
 #' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
 #'
-#' An integer value is considered as a period wih frequency year.
 #' In many cases, this function will read timeseries correctly.
 #' However, \emph{you should always carefully check the results of this
 #' function}. If the function fails or if the result is not
@@ -27,15 +26,16 @@
 #'
 #' \strong{rowwise timeseries}
 #'
-#' \if{html}{\figure{xlsschemarowwise.jpg}{options: width=200}}
-#' \if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
-#'
 #' For rowwise timeseries, the function searches for the first
 #' row with periods.  All rows before the period row are ignored.
 #' Columns for which the corresponding period is not a valid period
 #' are ignored. The timeseries names should be in the first non-empty column.
 #' Otherwise use argument \code{skipcol} to specify the number of
 #' columns to skip.
+#'
+#' \if{html}{\figure{xlsschemarowwise.jpg}{options: width=200}}
+#' \if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
+#'
 #' There may be one or more columns between the column with variable names
 #' and the columns where the actual timeseries are stored.
 #' If argument \code{labels = "after"}  then the texts in these
@@ -65,7 +65,7 @@
 #' timeseries, since in that case the column names are the timeseries names.
 #'
 #' Sometimes it helps to supply information about the structure of
-#' the data on the csv file. Specify option  \code{rowwise} if you know
+#' the data on the csv file. Specify argument \code{rowwise} if you know
 #' that the timeseries are stored rowwise or columnwise. Specify
 #' argument \code{frequency} if you already know the frequency of the timeseries.
 #' Argument \code{frequency} is mandatory if a general period format
@@ -112,7 +112,7 @@
 #' @param dec the decimal separator as in \code{base::read.csv}.
 #' If not "." (default) then usually ",".
 #' @param na_string Character vector of strings to use for missing values.
-#' By default, \code{read_ts_xlsx} treats blank cells as missing data.
+#' By default, \code{read_ts_csv} treats blank cells as missing data.
 #' @param name_fun function to apply to the names of the timeseries, e.g.
 #' \code{tolower}.
 #' @return a \code{regts} object

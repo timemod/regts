@@ -4,12 +4,13 @@
 #' The xls(x) file is actually read by function \code{\link[readxl]{read_excel}}
 #' of package \code{readxl}.
 #' The timeseries can be stored both rowwise or columnwise on the sheet.
-#' The function tries to find valid period texts on the sheet.
-#' Valid period texts should have the format recognized by function
-#' \code{\link{period}}, for example \code{"2010Q2"},
-#' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
+#' The function tries to find period cells on the sheet.
+#' Period cells should contain a text with the format recognized by function
+#' \code{\link{period}}, for example \code{"2010Q2"}, \code{"2010.2Q"},
+#' \code{"2010M2"}, \code{"2011"} or \code{"2011-1"},
+#' Period cells may also contain an integer value (e.g. \code{2018}), which
+#' is considered as   year.
 #'
-#' An integer value is considered as a period wih frequency year.
 #' In many cases, this function will read timeseries correctly.
 #' However, \emph{you should always carefully check the results of this
 #' function}. If the function fails or if the result is not
