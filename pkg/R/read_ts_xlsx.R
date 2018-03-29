@@ -45,16 +45,17 @@
 #'
 #'\strong{columnwise timeseries}
 #'
-#' For columnwise timeseries, the first row that has been read (see
+#' For columnwise timeseries, the first non-empty row that has been read (see
 #' argument \code{range} or \code{skiprow}) should contain the variable names.
 #' The periods can be in any column on the sheet.
 #' All columns to the left of the time column are ignored.
-#' There may be one or more rows between the column names and the rows
-#' where the actual timeseries are stored.
+
 #'
 #' \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=240}}
 #' \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 #'
+#' There may be one or more rows between the column names and the rows
+#' where the actual timeseries are stored.
 #' If argument \code{labels = "after"}  then the texts in these
 #' rows will be used to create timeseries labels.
 #'  If \code{labels = "before"},
@@ -155,12 +156,13 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   }
 
   if (period_info$rowwise) {
-    ret <- read_ts_xlsx_rowwise(tbl, frequency = frequency, labels = labels,
+    ret <- read_ts_tbl_rowwise(tbl, frequency = frequency, labels = labels,
                                period_info = period_info)
   } else {
-    ret <- read_ts_xlsx_columnwise(tbl, frequency = frequency, labels = labels,
+    ret <- read_ts_tbl_columnwise(tbl, frequency = frequency, labels = labels,
                                   period_info = period_info)
   }
+
 
   # apply function to column names if given
   if (!missing(name_fun)) {
@@ -173,11 +175,10 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   return(ret)
 }
 
-
 # internal function to read timeseries rowwise from a data frame with
 # the time index in the column header.
 # is numeric = TRUE, then the timeseries are converted to numeric
-read_ts_xlsx_rowwise <- function(tbl, frequency,
+read_ts_tbl_rowwise <- function(tbl, frequency,
                                 labels = c("no", "after", "before"),
                                 period_info) {
 
@@ -190,6 +191,9 @@ read_ts_xlsx_rowwise <- function(tbl, frequency,
 
   is_period <- period_info$is_period
   first_prd_col <- period_info$col_nr
+
+  # ignore possible period in the first colum
+  first_prd_col <- max(first_prd_col, 2)
 
   name_col <- if (labels == "before") first_prd_col - 1 else 1
 
@@ -253,7 +257,7 @@ read_ts_xlsx_rowwise <- function(tbl, frequency,
 
 # Internal function to read timeseries columnwise from a tibble read in
 # with readxl::read_excel.
-read_ts_xlsx_columnwise <- function(tbl, frequency = NA,
+read_ts_tbl_columnwise <- function(tbl, frequency = NA,
                                    labels = c("no", "after", "before"),
                                    period_info) {
 
@@ -262,6 +266,9 @@ read_ts_xlsx_columnwise <- function(tbl, frequency = NA,
   time_column <- period_info$col_nr
   is_period <- period_info$is_period
   first_data_row <- period_info$row_nr
+
+  # ignore possible period in the first row
+  first_data_row <- max(first_data_row, 2)
 
   # compute the row with variable names. 0 means: column names
   # and the label rows

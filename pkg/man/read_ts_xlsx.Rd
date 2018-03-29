@@ -96,16 +96,16 @@ now should contain label information.
 
 \strong{columnwise timeseries}
 
-For columnwise timeseries, the first row that has been read (see
+For columnwise timeseries, the first non-empty row that has been read (see
 argument \code{range} or \code{skiprow}) should contain the variable names.
 The periods can be in any column on the sheet.
 All columns to the left of the time column are ignored.
-There may be one or more rows between the column names and the rows
-where the actual timeseries are stored.
 
 \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=240}}
 \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 
+There may be one or more rows between the column names and the rows
+where the actual timeseries are stored.
 If argument \code{labels = "after"}  then the texts in these
 rows will be used to create timeseries labels.
  If \code{labels = "before"},

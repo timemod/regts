@@ -33,7 +33,7 @@
 #' For rowwise timeseries, the function searches for the first
 #' row with periods.  All rows before the period row are ignored.
 #' Columns for which the corresponding period is not a valid period
-#' are ignored. The timeseries names should be in the first column.
+#' are ignored. The timeseries names should be in the first non-empty column.
 #' Otherwise use argument \code{skipcol} to specify the number of
 #' columns to skip.
 #' There may be one or more columns between the column with variable names
@@ -49,10 +49,10 @@
 #' \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=200}}
 #' \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 #'
-#' For columnwise timeseries, the first row that is not skipped (see
+#' For columnwise timeseries, the first non-empty row that is not skipped (see
 #' argument \code{skiprow}) should contain the variable names.
 #' The periods can be in any column.
-#' All columns to the left of the time column are ignored.
+#' All columns to the left of the period column are ignored.
 #' There may be one or more rows between the column names and the rows
 #' where the actual timeseries are stored.
 #' If argument \code{labels = "after"}  then the texts in these
@@ -165,14 +165,25 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
   }
 
   if (period_info$rowwise) {
-    return(read_ts_rowwise(tbl, frequency = frequency, labels = labels,
+    ret <- read_ts_rowwise(tbl, frequency = frequency, labels = labels,
                            dec = dec, name_fun = name_fun,
-                           period_info = period_info))
+                           period_info = period_info)
   } else {
-    return(read_ts_columnwise(tbl, frequency = frequency, labels = labels,
+    ret <- read_ts_columnwise(tbl, frequency = frequency, labels = labels,
                              dec = dec, name_fun = name_fun,
-                             period_info = period_info))
+                             period_info = period_info)
   }
+
+  # apply function to columnnames if given
+  if (!missing(name_fun)) {
+    if (!is.function(name_fun)) {
+      stop("argument name_fun is not a function")
+    }
+    colnames(ret) <- name_fun(colnames(ret))
+  }
+
+  return(ret)
+
 }
 
 # internal function to read timeseries rowwise from a data frame with
@@ -190,6 +201,9 @@ read_ts_rowwise <- function(tbl, frequency, labels = c("no", "after", "before"),
 
   is_period <- period_info$is_period
   first_prd_col <- period_info$col_nr
+
+  # ignore possible period in the first colum
+  first_prd_col <- max(first_prd_col, 2)
 
   name_col <- if (labels == "before") first_prd_col - 1 else 1
 
@@ -248,14 +262,6 @@ read_ts_rowwise <- function(tbl, frequency, labels = c("no", "after", "before"),
     }
   }
 
-  # apply function to columnnames if given
-  if (!missing(name_fun)) {
-    if (!is.function(name_fun)) {
-      stop("argument name_fun is not a function")
-    }
-    colnames(ret) <- name_fun(colnames(ret))
-  }
-
   return(ret)
 }
 
@@ -270,6 +276,9 @@ read_ts_columnwise <- function(tbl, frequency = NA,
   time_column <- period_info$col_nr
   is_period <- period_info$is_period
   first_data_row <- period_info$row_nr
+
+  # ignore possible period in the first row
+  first_data_row <- max(first_data_row, 2)
 
   # compute the row with variable names. 0 means: column names
   # and the label rows
@@ -336,14 +345,6 @@ read_ts_columnwise <- function(tbl, frequency = NA,
 
   if (labels != "no" && any(lbls != "")) {
     ts_labels(ret) <- lbls
-  }
-
-  # apply function to columnnames if given
-  if (!missing(name_fun)) {
-    if (!is.function(name_fun)) {
-      stop("argument name_fun is not a function")
-    }
-    colnames(ret) <- name_fun(colnames(ret))
   }
 
   return(ret)

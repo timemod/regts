@@ -83,7 +83,7 @@ rowwise based on the position of periods in the sheet.,
 For rowwise timeseries, the function searches for the first
 row with periods.  All rows before the period row are ignored.
 Columns for which the corresponding period is not a valid period
-are ignored. The timeseries names should be in the first column.
+are ignored. The timeseries names should be in the first non-empty column.
 Otherwise use argument \code{skipcol} to specify the number of
 columns to skip.
 There may be one or more columns between the column with variable names
@@ -99,10 +99,10 @@ now should contain label information.
 \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=200}}
 \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 
-For columnwise timeseries, the first row that is not skipped (see
+For columnwise timeseries, the first non-empty row that is not skipped (see
 argument \code{skiprow}) should contain the variable names.
 The periods can be in any column.
-All columns to the left of the time column are ignored.
+All columns to the left of the period column are ignored.
 There may be one or more rows between the column names and the rows
 where the actual timeseries are stored.
 If argument \code{labels = "after"}  then the texts in these
