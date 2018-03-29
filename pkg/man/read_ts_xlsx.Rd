@@ -60,7 +60,7 @@ Period cells should contain a text with the format recognized by function
 \code{\link{period}}, for example \code{"2010Q2"}, \code{"2010.2Q"},
 \code{"2010M2"}, \code{"2011"} or \code{"2011-1"},
 Period cells may also contain an integer value (e.g. \code{2018}), which
-is considered as   year.
+is considered as a year.
 }
 \details{
 In many cases, this function will read timeseries correctly.
@@ -74,7 +74,7 @@ and finally convert it to a \code{\link{regts}} by using function
 
 If argument \code{rowwise} has not been specified, then
 function \code{read_ts_xlsx} tries to guess if the timeseries are stored
-rowwise or columnwise based on the positions of periods in the sheet.
+rowwise or columnwise based on the positions of the period cells.
 
 \strong{rowwise timeseries}
 

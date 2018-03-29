@@ -22,7 +22,7 @@
 #'
 #' If argument \code{rowwise} has not been specified, then
 #' function \code{read_ts_xlsx} tries to guess if the timeseries are stored
-#' rowwise based on the position of periods in the sheet.,
+#' rowwise or columnwise based on the positions of the fields with period texts.
 #'
 #' \strong{rowwise timeseries}
 #'
