@@ -22,7 +22,7 @@ test_that("weird_isis.xlsx is read correctly",  {
                "No periods found")
 
   expect_error(read_ts_xlsx(xlsx_file, rowwise = TRUE, frequency = 4),
-               "No periods found when reading rowwise timeseries")
+               "No periods found on Sheet 1 of file xlsx/weird_isis.xlsx\n")
 })
 
 test_that("weird_1.xlsx is read correctly",  {
@@ -58,3 +58,16 @@ test_that("weird_2.xlsx is read correctly",  {
   expect_error(read_ts_xlsx(xlsx_file),
                "The time column\\(s\\) contain different frequencies")
 })
+
+
+test_that("weird_3.xlsx is read correctly",  {
+
+  xlsx_file <- "xlsx/weird_3.xlsx"
+  result1 <- read_ts_xlsx(xlsx_file)
+
+  expected_result <- regts(matrix(as.numeric(1:2), ncol =2), names = c("a", "b"),
+                           start = "2011")
+  expect_identical(result1, expected_result)
+})
+
+

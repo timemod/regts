@@ -101,7 +101,7 @@ numeric_matrix <- function(x, dec = ".") {
     }
     has_text <-sapply(x_test, FUN = has_text_f)
     problem <- has_text & is.na(x2[, is_char])
-    weird_texts <- x_test[problem]
+    weird_texts <- unique(x_test[problem])
     nweird <- length(weird_texts)
     NWEIRD_MAX <- 10
     nmax <- min(NWEIRD_MAX, nweird)

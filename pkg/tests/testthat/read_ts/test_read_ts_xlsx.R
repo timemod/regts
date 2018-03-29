@@ -1,6 +1,8 @@
 library(regts)
 library(testthat)
 
+rm(list = ls())
+
 context("read_ts_xlsx")
 
 # construct correct result
@@ -93,9 +95,13 @@ test_that("example5.xlsx is read correctly (leading empty are skipped)",  {
                          sheet = "example2")
   expect_identical(result, correct_result)
 
-  msg <- "The first 100 rows are all empty.\n Therefore we could not determine whether the timeseries are rowwise or columnwise.\n Please supply argument columnwise."
+  msg <- "Sheet Sheet3 of file xlsx/example5.xlsx is empty\n"
   expect_error(read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", NA)),
                          sheet = "Sheet3"), msg)
+
+  msg <- "No periods found on Sheet example2 of file xlsx/example5.xlsx\n"
+  expect_error(read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", "D")),
+                            sheet = "example2"), msg)
 })
 
 test_that("example8.xlsx is read correctly (names to lowercase)",  {
