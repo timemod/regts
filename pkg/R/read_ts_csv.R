@@ -59,7 +59,7 @@
 #' rows will be used to create timeseries labels.
 #' If \code{labels = "before"},
 #' the last row before the data is supposed to contain
-#' the variable names. Now the row before the variable name columns
+#' the variable names. Now the row before the variable name row
 #' should contain label information. If argument \code{use_colnames = TRUE},
 #' then the label option \code{"before"} is not allowed for columnwise
 #' timeseries, since in that case the column names are the timeseries names.
@@ -92,16 +92,16 @@
 #' @param filename  a string with the filename
 #' @param rowwise a logical value: are the timeseries stored rowwise?
 #' If not specified, then \code{read_ts_csv} tries to figure out itself if
-#' the timeseries are stored rowwise or columnwise
+#' the timeseries are stored rowwise or columnwise.
 #' @param frequency the frequency of the timeseries.
 #' This argument is mandatory if the file contains a period texts without
-#' frequency indicator (for example "2011-1")
+#' frequency indicator (for example "2011-1").
 #' @param skiprow the number of rows to skip.
 #' If 0 (default) and if argument \code{fill} is \code{FALSE},
 #' then comment rows are automatically skipped.
 #' See Details.
 #' @param skipcol the number of columns to skip
-#' @param labels label option. See details
+#' @param labels label option. See details.
 #' @param sep the separator between columns. If not specified, then
 #' the separator is determined automatically by inspecting the
 #' first 30 lines of the csv file (see the details of function
@@ -113,8 +113,7 @@
 #' If not "." (default) then usually ",".
 #' @param na_string Character vector of strings to use for missing values.
 #' By default, \code{read_ts_csv} treats blank cells as missing data.
-#' @param name_fun function to apply to the names of the timeseries, e.g.
-#' \code{tolower}.
+#' @param name_fun function to apply to the names of the timeseries.
 #' @return a \code{regts} object
 #'
 #' @examples
