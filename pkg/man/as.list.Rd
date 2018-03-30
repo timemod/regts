@@ -40,5 +40,5 @@ regts2 <- do.call(cbind, ts_list2)
 list2env(ts_list2, .GlobalEnv)
 }
 \seealso{
-\code{\link[base]{list2env}} and  \code{\link{cbind.regts}}
+\code{\link[base]{list2env}} and  \code{\link{cbind}}
 }
