@@ -262,6 +262,7 @@ print.tsdif <- function(x, ...) {
   cat("\n     tsdif timeseries comparison result\n\n")
 
   maxprint <- 50
+  nmax <- 10
 
   with(x, {
     if (equal  && is.null(fun) && tol == 0) {
@@ -277,13 +278,38 @@ print.tsdif <- function(x, ...) {
       }
       cat("\n")
       if (!is.null(dif)) {
-        cat("Names of timeseries with differences:\n")
-        print(difnames)
-        nrow_max <- min(nrow(dif), 6)
-        ncol_max <- min(ncol(dif), 10)
-        cat(sprintf("\nDifferences (the first %d rows and %d columns)\n",
-                    nrow_max, ncol_max))
-        print(topleft(dif, n = nrow_max, ncol = ncol_max))
+
+        nrow_max <- min(nrow(dif), 10)
+        ncol_max <- min(ncol(dif), nmax)
+        cat(paste0("Names of timeseries with largest differences (first ",
+                   ncol_max, ", total ", ncol(dif), ") :\n"))
+
+        absdif <- abs(dif)
+        maxdif <- as.numeric(lapply(absdif, FUN = max))
+
+        # get nmax number of highest (absolute) differences in dif
+        top <- function(x, nmax){
+          result <- numeric()
+          for(i in 1:nmax){
+            j <- which.max(x)
+            result[i] <- j
+            x[j] <- -Inf
+          }
+          result
+        }
+        top <- top(maxdif, ncol_max)
+
+        # print first ncol_max difnames with largest difference in specified period
+        print(difnames[top])
+        cat("Difnames", "Value", "Period")
+
+        match(top[1], dif[top[1]])
+
+        cat(difnames[top[1]], top[1], dif[top[1]] )
+
+        cat(sprintf("\nLargest differences (the first %d rows)\n", nrow_max))
+        print(topleft(dif[, difnames[top]], n = nrow_max, ncol = ncol_max))
+
       } else {
         if (is.null(common_range)) {
           cat(paste0("No differences computed because the two timeseries\n",
