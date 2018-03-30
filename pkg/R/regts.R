@@ -229,8 +229,8 @@ is.regts <- function(x) {
 #' @param ... arguments passed to \code{fun}
 #' @return a \code{regts} object
 #' @seealso \code{\link{regts}}, \code{\link{is.regts}},
-#' \code{\link{as.data.frame.regts}},
-#' \code{\link{as.list.regts}}, \code{\link{start_period}}, \code{\link{end_period}}
+#' \code{\link{as.data.frame}},
+#' \code{\link{as.list}}, \code{\link{start_period}}, \code{\link{end_period}}
 #' @examples
 #' # convert a ts to regts
 #' x <- ts(1:3, start = c(2015,3), frequency = 4)
