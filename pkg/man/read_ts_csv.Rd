@@ -13,11 +13,11 @@ read_ts_csv(filename, rowwise, frequency = NA, skiprow = 0, skipcol = 0,
 
 \item{rowwise}{a logical value: are the timeseries stored rowwise?
 If not specified, then \code{read_ts_csv} tries to figure out itself if
-the timeseries are stored rowwise or columnwise}
+the timeseries are stored rowwise or columnwise.}
 
 \item{frequency}{the frequency of the timeseries.
 This argument is mandatory if the file contains a period texts without
-frequency indicator (for example "2011-1")}
+frequency indicator (for example "2011-1").}
 
 \item{skiprow}{the number of rows to skip.
 If 0 (default) and if argument \code{fill} is \code{FALSE},
@@ -26,7 +26,7 @@ See Details.}
 
 \item{skipcol}{the number of columns to skip}
 
-\item{labels}{label option. See details}
+\item{labels}{label option. See details.}
 
 \item{sep}{the separator between columns. If not specified, then
 the separator is determined automatically by inspecting the
@@ -43,8 +43,7 @@ If not "." (default) then usually ",".}
 \item{na_string}{Character vector of strings to use for missing values.
 By default, \code{read_ts_csv} treats blank cells as missing data.}
 
-\item{name_fun}{function to apply to the names of the timeseries, e.g.
-\code{tolower}.}
+\item{name_fun}{function to apply to the names of the timeseries.}
 }
 \value{
 a \code{regts} object
@@ -109,7 +108,7 @@ If argument \code{labels = "after"}  then the texts in these
 rows will be used to create timeseries labels.
 If \code{labels = "before"},
 the last row before the data is supposed to contain
-the variable names. Now the row before the variable name columns
+the variable names. Now the row before the variable name row
 should contain label information. If argument \code{use_colnames = TRUE},
 then the label option \code{"before"} is not allowed for columnwise
 timeseries, since in that case the column names are the timeseries names.

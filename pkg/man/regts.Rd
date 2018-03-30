@@ -91,7 +91,7 @@ The S3 generic \code{\link{as.regts}} can be used to coerce an R object to a
  \code{regts}. There are currently methods for \code{\link[stats]{ts}} and
  \code{\link[base]{data.frame}}.
 
-\code{\link{as.data.frame.regts}} and \code{\link{as.list.regts}} can be used
+\code{\link{as.data.frame}} and \code{\link{as.list}} can be used
 to convert \code{regts} to a \code{\link[base]{data.frame}} or a
 \code{\link[base]{list}}.
 

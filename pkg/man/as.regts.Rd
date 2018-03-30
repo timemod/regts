@@ -84,6 +84,6 @@ as.regts(df)
 }
 \seealso{
 \code{\link{regts}}, \code{\link{is.regts}},
-\code{\link{as.data.frame.regts}},
-\code{\link{as.list.regts}}, \code{\link{start_period}}, \code{\link{end_period}}
+\code{\link{as.data.frame}},
+\code{\link{as.list}}, \code{\link{start_period}}, \code{\link{end_period}}
 }
