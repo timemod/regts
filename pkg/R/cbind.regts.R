@@ -18,7 +18,7 @@
 #' column names. Length suffixes must be equal to the number of joined timeseries
 #' or objects.
 #' have overlapping columns.
-#' @seealso \code{\link{as.list.regts}}
+#' @seealso \code{\link{as.list}}
 #' @importFrom stats ts.union ts.intersect
 #' @examples
 #' a <- regts(1:5, start = "2011Q1")
