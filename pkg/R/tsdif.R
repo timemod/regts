@@ -261,7 +261,7 @@ cvgdif <- function(x1, x2) {
 print.tsdif <- function(x, ...) {
   cat("\n     tsdif timeseries comparison result\n\n")
 
-  maxprint <- 50
+  max_missing <- 50
   nmax <- 10
 
   with(x, {
@@ -279,16 +279,14 @@ print.tsdif <- function(x, ...) {
       cat("\n")
       if (!is.null(dif)) {
 
-        nrow_max <- min(nrow(dif), 10)
-        ncol_max <- min(ncol(dif), nmax)
-        cat(paste0("Names of timeseries with largest differences (first ",
-                   ncol_max, ", total ", ncol(dif), ") :\n"))
+        nmax <- min(ncol(dif), nmax)
 
+        # absolute values to get largest values with function max
         absdif <- abs(dif)
-        maxdif <- as.numeric(lapply(absdif, FUN = max))
+        maxdif <- as.numeric(apply(absdif, FUN = max, MARGIN = 2))
 
-        # get nmax number of highest (absolute) differences in dif
-        top <- function(x, nmax){
+        # get nmax number of highest (absolute) differences
+        topf <- function(x, nmax){
           result <- numeric()
           for(i in 1:nmax){
             j <- which.max(x)
@@ -297,18 +295,66 @@ print.tsdif <- function(x, ...) {
           }
           result
         }
-        top <- top(maxdif, ncol_max)
 
-        # print first ncol_max difnames with largest difference in specified period
-        print(difnames[top])
-        cat("Difnames", "Value", "Period")
+        # maxdif can contain Na values, we want to print them first:
+        # if it contains more than nmax NA values than take first nmax names
+        # if it contains less than nmax NA values than take all names with
+        # NA values and add names with highest differences (via topf function)
+        length_na <- 0
+        if (any(is.na(maxdif))){
+          maxdif_na <- which(is.na(maxdif))
+          length_na <- length(maxdif_na)
+          if (length_na >= nmax){
+            top <- c(1:nmax)
+          } else {
+            top_na <- maxdif_na
+            maxdif[maxdif_na] <- 0
+            top <- topf(maxdif, nmax - length_na)
+            top <- c(top_na, top)
+          }
+        # maxdif contains no NA values, get nmax timeseries with highest differences
+        } else {
+          top <- topf(maxdif, nmax)
+        }
 
-        match(top[1], dif[top[1]])
+        # print first max_missing difnames with largest difference
+        cat("\nNames of timeseries with differences (alphabetical)\n")
+        if (length(difnames) > max_missing){
+          print(difnames[1:max_missing])
+          cat("[ reached max print -- omitted ",length(difnames) - max_missing,
+              "names ]\n")
+        } else {
+          print(difnames)
+        }
 
-        cat(difnames[top[1]], top[1], dif[top[1]] )
+        cat("\nTimeseries with largest differences\n")
+        # print first nmax difnames with largest difference in specified period
+        cat("\nNames                                 Max dif      Period\n")
 
-        cat(sprintf("\nLargest differences (the first %d rows)\n", nrow_max))
-        print(topleft(dif[, difnames[top]], n = nrow_max, ncol = ncol_max))
+        for(i in 1:nmax){
+
+          # if maxdif contains NA's then find position NA
+          if (i <= length_na){
+            idx <- match(NA, dif[, difnames[top[i]]])
+
+          } else {
+            # get index with largest difference, if NA the difference is negative
+            idx <- match(maxdif[top[i]], dif[, difnames[top[i]]])
+            if (is.na(idx)){idx <- match(-maxdif[top[i]], dif[, difnames[top[i]]]) }
+          }
+
+          idx_prd <- idx + start_period(dif) - 1
+
+          cat(sprintf("%-25s%20f%12s\n", difnames[top[i]],
+                      as.numeric(dif[idx_prd, difnames[top[i]]]), idx_prd ))
+        }
+        if (ncol(dif) > nmax){
+          cat("[ reached max print -- omitted ",ncol(dif) - nmax, "names ]\n")
+        }
+
+        # print timeseries with largest difference
+        cat(sprintf("\nTimeseries with largest difference (%s)\n", difnames[top[1]]))
+        print(dif[, difnames[top[1]]])
 
       } else {
         if (is.null(common_range)) {
@@ -325,10 +371,11 @@ print.tsdif <- function(x, ...) {
       }
       cat("\n")
       if (length(missing_names1) > 0) {
-        if (length(missing_names1) > maxprint){
-          cat(paste("Missing timeseries in ", ts_names[1]),
-              "(first", maxprint,"total", length(missing_names1), ") :\n")
-          print(missing_names1[1:maxprint])
+        if (length(missing_names1) > max_missing){
+          cat(paste("Missing timeseries in ", ts_names[1]), ":\n")
+          print(missing_names1[1:max_missing])
+          cat("[ reached max print -- omitted ",length(missing_names1) - max_missing,
+              "names ]\n")
         } else {
           cat(paste("Missing timeseries in ", ts_names[1]), ":\n")
           print(missing_names1)
@@ -336,10 +383,11 @@ print.tsdif <- function(x, ...) {
       }
       cat("\n")
       if (length(missing_names2) > 0) {
-        if (length(missing_names2) > maxprint){
-          cat(paste("Missing timeseries in ", ts_names[2]),
-              "(first", maxprint, "total", length(missing_names2), ") :\n")
-          print(missing_names2[1:maxprint])
+        if (length(missing_names2) > max_missing){
+          cat(paste("Missing timeseries in ", ts_names[2]), ":\n")
+          print(missing_names2[1:max_missing])
+          cat("[ reached max print -- omitted ",length(missing_names2) - max_missing,
+              "names ]\n")
         } else {
           cat(paste("Missing timeseries in ", ts_names[2]), ":\n")
           print(missing_names1)
