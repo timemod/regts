@@ -10,10 +10,10 @@
 #' \code{"last"} to remove NAs at both ends (by default), just at the start
 #' or just at the end.
 #' @param is_na character string with values \code{"all"} or \code{"any"}.
-#' If \code{"all"} #' (default) then a row will be regarded as \code{NA} only if
-#' all elements in #' the row are \code{NA}. If \code{"any"} then a row will be
-#' regarded as \code{NA} #' if it has any \code{NA}s. For one dimensional regts
-#' objects this argument #' has no effect.
+#' If \code{"all"} (default) then a row will be regarded as \code{NA} only if
+#' all elements in the row are \code{NA}. If \code{"any"} then a row will be
+#' regarded as \code{NA} if it has any \code{NA}s. For one dimensional regts
+#' objects this argument has no effect.
 #' @return A \code{\link{regts}} object in which leading and/or trailing NAs have
 #' been removed.
 #'
@@ -33,7 +33,7 @@
 #' rts <- regts(data, start = "2010Q1", names = c("a", "b", "c"))
 #' # remove leading NAs if all elements in the row are NA
 #' na_trim(rts, method = "first")
-#' # or remove rows if any NA occurs in that row
+#' # or remove rows on both sides if any NA occurs in that row
 #' na_trim(rts, is_na = "any")
 
 #' @export

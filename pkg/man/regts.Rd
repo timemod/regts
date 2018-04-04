@@ -8,7 +8,7 @@ regts(data, start, end, period, frequency = NA, names = colnames(data),
   labels = NULL)
 }
 \arguments{
-\item{data}{a vector or matrix of the observed time-series values.
+\item{data}{a vector or matrix of the observed timeseries values.
 A \code{\link[base]{data.frame}}
 will be coerced to a numeric matrix via \code{\link{data.matrix}}.
 (See also the description of the
@@ -91,7 +91,7 @@ The S3 generic \code{\link{as.regts}} can be used to coerce an R object to a
  \code{regts}. There are currently methods for \code{\link[stats]{ts}} and
  \code{\link[base]{data.frame}}.
 
-\code{\link{as.data.frame.regts}} and \code{\link{as.list.regts}} can be used
+\code{\link{as.data.frame}} and \code{\link{as.list}} can be used
 to convert \code{regts} to a \code{\link[base]{data.frame}} or a
 \code{\link[base]{list}}.
 

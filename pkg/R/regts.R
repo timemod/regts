@@ -4,7 +4,7 @@
 #' class of the \link{stats} package. Working with \code{regts} makes it
 #' easier to select periods.
 #'
-#' @param data a vector or matrix of the observed time-series values.
+#' @param data a vector or matrix of the observed timeseries values.
 #' A \code{\link[base]{data.frame}}
 #' will be coerced to a numeric matrix via \code{\link{data.matrix}}.
 #' (See also the description of the
@@ -73,7 +73,7 @@
 #'  \code{regts}. There are currently methods for \code{\link[stats]{ts}} and
 #'  \code{\link[base]{data.frame}}.
 #'
-#' \code{\link{as.data.frame.regts}} and \code{\link{as.list.regts}} can be used
+#' \code{\link{as.data.frame}} and \code{\link{as.list}} can be used
 #' to convert \code{regts} to a \code{\link[base]{data.frame}} or a
 #' \code{\link[base]{list}}.
 #'
@@ -229,8 +229,8 @@ is.regts <- function(x) {
 #' @param ... arguments passed to \code{fun}
 #' @return a \code{regts} object
 #' @seealso \code{\link{regts}}, \code{\link{is.regts}},
-#' \code{\link{as.data.frame.regts}},
-#' \code{\link{as.list.regts}}, \code{\link{start_period}}, \code{\link{end_period}}
+#' \code{\link{as.data.frame}},
+#' \code{\link{as.list}}, \code{\link{start_period}}, \code{\link{end_period}}
 #' @examples
 #' # convert a ts to regts
 #' x <- ts(1:3, start = c(2015,3), frequency = 4)
@@ -249,7 +249,7 @@ is.regts <- function(x) {
 #' df <- data.frame(periods = c("2015 3", "2015 4", "2016 1"),  a = 1:3)
 #' ts <- as.regts(df, time_column = 1, frequency = 4)
 #'
-#' # create a dataframe with non numeric data and convert to regts
+#' # create a data frame with non numeric data and convert to regts
 #' # Strings containing non numeric values are converted to NA
 #' # Logical values TRUE/FALSE are converted to 1/0
 #' df <- data.frame(a = c("1", "2", "X"), b = c(TRUE, FALSE, TRUE), stringsAsFactors = FALSE)
@@ -387,7 +387,7 @@ matrix2regts_ <- function(x, periods, numeric, fun, ...) {
     # are ordered synchronically
     ret <- regts(x, start = create_period(subp[1], freq))
   } else {
-    # irregular timeseries in dataframe (missing periods or
+    # irregular timeseries in data frame (missing periods or
     # unorderered time index)
     subp_min <- min(subp)
     subp_max <- max(subp)
@@ -432,6 +432,41 @@ add_columns <- function(x, new_colnames) {
 #' @importFrom stats is.mts
 #' @export
 "[<-.regts" <- function (x, i, j, value) {
+
+  if ((!missing(i) && any(is.na(i))) || !missing(j) && any(is.na(j))) {
+    stop(paste("missing values are not allowed in subscripted assignments of",
+               "regts objects"))
+  }
+
+  if (is.null(value) && is.matrix(x)) {
+    # remove columns
+    if (!missing(i)) {
+      stop("Row selection not allowed when the replacement is NULL")
+    }
+    if (missing(j)) {
+      # x[] <- NULL: remove all columns
+      return(x[, numeric(0)])
+    } else {
+      if (length(j) == 0) {
+        return(x)
+      }
+      if (is.numeric(j)) {
+        return(x[, -j, drop = FALSE])
+      } else if (is.logical(j)) {
+        return(x[, !j, drop = FALSE])
+      } else {
+        colsel <- match(as.character(j), colnames(x))
+        colsel <- colsel[!is.na(colsel)]
+        if (length(colsel) > 0) {
+          return(x[, -colsel, drop = FALSE])
+        } else {
+          # no matching columns, do nothing
+          return(x)
+        }
+      }
+    }
+  }
+
   if (!missing(j) && is.character(j)) {
     # Check if j contains names of columns not present in x.
     # Add missing columns if necessary
@@ -566,7 +601,7 @@ window_regts <- function(x, sel_range) {
   cnames <- colnames(object)
   if (is.null(cnames)) stop(paste("$ operator not possible for regts without",
                             "column names"))
-  i <- pmatch(x, cnames)
+  i <- match(x, cnames)
   if (is.na(i)) {
     return(NULL)
   } else {

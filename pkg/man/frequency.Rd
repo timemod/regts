@@ -4,7 +4,7 @@
 \alias{frequency}
 \alias{frequency.period}
 \alias{frequency.period_range}
-\title{Return the frequency of a \code{period} or \code{period_range}}
+\title{Return the frequency of a \code{period} or a \code{period_range}}
 \usage{
 \method{frequency}{period}(x, ...)
 

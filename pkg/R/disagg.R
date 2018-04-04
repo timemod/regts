@@ -1,4 +1,4 @@
-#' Disaggregation of time series using cubic spline interpolation.
+#' Disaggregation of timeseries using cubic spline interpolation.
 #'
 #' This function converts a timeseries to a timeseries with higher frequency,
 #' for example a yearly timeseries to a quarterly timeseries.

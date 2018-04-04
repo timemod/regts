@@ -46,8 +46,6 @@ The non overlapping columns in both timeseries are added to the result.
 The overlapping columns in both timeseries are updated with the different methods.
 }
 \examples{
-library(regts)
-
 x1 <- regts(matrix(data = rep(1:9), nc = 3), period = "2000/2002",
             names = c("a", "b", "c"))
 x2 <- regts(matrix(data = rep(10:15), nc = 3), period = "2000/2001",

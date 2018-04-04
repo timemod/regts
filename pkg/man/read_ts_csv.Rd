@@ -6,18 +6,18 @@
 \usage{
 read_ts_csv(filename, rowwise, frequency = NA, skiprow = 0, skipcol = 0,
   labels = c("no", "after", "before"), sep = "auto", fill = FALSE,
-  dec = if (sep != ".") "." else ",", name_fun)
+  dec = if (sep != ".") "." else ",", na_string = "", name_fun)
 }
 \arguments{
 \item{filename}{a string with the filename}
 
 \item{rowwise}{a logical value: are the timeseries stored rowwise?
 If not specified, then \code{read_ts_csv} tries to figure out itself if
-the timeseries are stored rowwise or columnwise}
+the timeseries are stored rowwise or columnwise.}
 
 \item{frequency}{the frequency of the timeseries.
 This argument is mandatory if the file contains a period texts without
-frequency indicator (for example "2011-1")}
+frequency indicator (for example "2011-1").}
 
 \item{skiprow}{the number of rows to skip.
 If 0 (default) and if argument \code{fill} is \code{FALSE},
@@ -26,7 +26,7 @@ See Details.}
 
 \item{skipcol}{the number of columns to skip}
 
-\item{labels}{label option. See details}
+\item{labels}{label option. See details.}
 
 \item{sep}{the separator between columns. If not specified, then
 the separator is determined automatically by inspecting the
@@ -40,7 +40,10 @@ with \code{NA}.}
 \item{dec}{the decimal separator as in \code{base::read.csv}.
 If not "." (default) then usually ",".}
 
-\item{name_fun}{function to apply to the names of the timese, tries}
+\item{na_string}{Character vector of strings to use for missing values.
+By default, \code{read_ts_csv} treats blank cells as missing data.}
+
+\item{name_fun}{function to apply to the names of the timeseries.}
 }
 \value{
 a \code{regts} object
@@ -52,11 +55,10 @@ of package \code{data.table}.
 The timeseries can be stored both rowwise or columnwise.
 The function tries to find valid period texts.
 Valid period texts should have the format recognized by function
-\code{\link{period}}, for example \code{"2010Q2"},
+\code{\link{period}}, for example \code{"2010Q2"}, \code{"2010.2Q"},
 \code{"2010M2"}, \code{"2011"} or \code{"2011-1"}.
 }
 \details{
-An integer value is considered as a period wih frequency year.
 In many cases, this function will read timeseries correctly.
 However, \emph{you should always carefully check the results of this
 function}. If the function fails or if the result is not
@@ -68,22 +70,21 @@ and finally convert it to a \code{\link{regts}} by using function
 \code{\link{as.regts}}.
 
 If argument \code{rowwise} has not been specified, then
-function \code{\link{read_ts_csv}} searches for any valid period text in the
-first row after the skipped rows. If a valid period was found, then
-\code{read_ts_csv} assumes that the timeseries are stored rowwise. Otherwise it
-assumes that the timeseries are stored columnwise.
+function \code{read_ts_xlsx} tries to guess if the timeseries are stored
+rowwise or columnwise based on the positions of the fields with period texts.
 
 \strong{rowwise timeseries}
+
+For rowwise timeseries, the function searches for the first
+row with periods.  All rows before the period row are ignored.
+Columns for which the corresponding period is not a valid period
+are ignored. The timeseries names should be in the first non-empty column.
+Otherwise use argument \code{skipcol} to specify the number of
+columns to skip.
 
 \if{html}{\figure{xlsschemarowwise.jpg}{options: width=200}}
 \if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
 
-For rowwise timeseries, the first row that is not skipped (see
-argument \code{skiprow}) should contain the periods.
-Columns for which the corresponding period is not a valid period
-are ignored. The timeseries names should be in the first column.
-Otherwise use argument \code{skipcol} to specify the number of
-columns to skip.
 There may be one or more columns between the column with variable names
 and the columns where the actual timeseries are stored.
 If argument \code{labels = "after"}  then the texts in these
@@ -97,29 +98,30 @@ now should contain label information.
 \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=200}}
 \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 
-For columnwise timeseries, the first row that is not skipped (see
+For columnwise timeseries, the first non-empty row that is not skipped (see
 argument \code{skiprow}) should contain the variable names.
 The periods can be in any column.
-All columns to the left of the time column are ignored.
+All columns to the left of the period column are ignored.
 There may be one or more rows between the column names and the rows
 where the actual timeseries are stored.
 If argument \code{labels = "after"}  then the texts in these
 rows will be used to create timeseries labels.
+If \code{labels = "before"},
 the last row before the data is supposed to contain
-the variable names. Now the row before the variable name columns
+the variable names. Now the row before the variable name row
 should contain label information. If argument \code{use_colnames = TRUE},
 then the label option \code{"before"} is not allowed for columnwise
 timeseries, since in that case the column names are the timeseries names.
 
 Sometimes it helps to supply information about the structure of
-the data on the csv file. Specify option  \code{rowwise} if you know
+the data on the csv file. Specify argument \code{rowwise} if you know
 that the timeseries are stored rowwise or columnwise. Specify
 argument \code{frequency} if you already know the frequency of the timeseries.
 Argument \code{frequency} is mandatory if a general period format
 such as  \code{"2011-1"} has been used.
 
 With \code{name_fun} a function can be applied to names of the timeseries,
-e.g. \code{\link{tolower}}
+e.g. \code{\link{tolower}}.
 
 \strong{automatic row skip}
 

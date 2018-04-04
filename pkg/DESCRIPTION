@@ -22,7 +22,8 @@ Imports:
     Hmisc,
     data.table,
     readxl,
-    cellranger
+    cellranger,
+    tibble
 Suggests:
     testthat,
     knitr,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/disagg.R
 \name{disagg}
 \alias{disagg}
-\title{Disaggregation of time series using cubic spline interpolation.}
+\title{Disaggregation of timeseries using cubic spline interpolation.}
 \usage{
 disagg(x, nfrequency, constraint = c("average", "sum", "first", "last"),
   conds = c("natural", "not-a-knot"))

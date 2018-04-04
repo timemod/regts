@@ -50,7 +50,7 @@ period are separated by \code{"/"}. The first and last period
 are specified according to the same format recognized by function
 \code{\link{period}}. The first or last period may be omitted
 (e.g. \code{"2017Q3/"})), in that case the period range
-has no lower or upper bound.
+has no lower or upper bound. The string format is case insensitive.
 }
 \examples{
 # two methods to create a period_range from 2010Q2 to 2016Q3
@@ -58,11 +58,11 @@ period_range("2010Q2", "2016Q3")
 period_range("2010Q2/2016Q3")
 
 # create a period_range for the first 5 quarters after 2013Q2
-p1 <- period("2013Q3")
+p1 <- period("2013q3")
 period_range(p1, p1 + 5)
 
 # create a period_range from 2010Q2 with no upper bound
-period_range("2010Q2", NULL)
+period_range("2010q2", NULL)
 
 # create a period_range for a timeseries with frequency 2 (half year)
 period_range("2010-2", "2016-2", frequency = 2)

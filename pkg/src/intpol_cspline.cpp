@@ -182,7 +182,6 @@ static int csrand(int n, double x[], double y[],
 
     double xx1213;
     int  i, i1, i2, i3;
-    char type;
 
     if (n == 1) {
         /* A single interval. In that case use the natural spline,

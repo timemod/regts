@@ -19,7 +19,10 @@ This function returns the topleft part of a \code{\link{regts}}. By default
 the first 10 columns for the first 6 periods.
 }
 \examples{
-data <- regts(matrix(1:200, ncol = 20), start = "2010Q2",
+\dontshow{
+set.seed(123)
+}
+data <- regts(matrix(rnorm(200), ncol = 20), start = "2010Q2",
               names = paste0("abc", 1:20))
 topleft(data)
 }

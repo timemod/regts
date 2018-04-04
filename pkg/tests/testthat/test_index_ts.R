@@ -16,7 +16,7 @@ test_that("default arguments", {
   expect_identical(index_ts(ab), expected_result)
 })
 
-test_that("base and index_value", {
+test_that("base and scale", {
   bp <- "2021Q1"
   expect_equal(index_ts(a, base = bp), (100 / 13)* a)
   expected_result  <- (100 / 13) * ab
@@ -33,10 +33,10 @@ test_that("base and index_value", {
   bp <- period_range("2019Q2", "2020Q1")
   mean_bp <- mean(a[bp])
   expect_equal(index_ts(a, base = bp,
-                        index_value = 1), (1 / mean_bp) * a)
+                        scale = 1), (1 / mean_bp) * a)
   expected_result  <- (1 / mean_bp) * ab
   expected_result$b <- expected_result$a
-  expect_equal(index_ts(ab, bp, index_value = 1), expected_result)
+  expect_equal(index_ts(ab, bp, scale = 1), expected_result)
 })
 
 test_that("errors", {

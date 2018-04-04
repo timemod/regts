@@ -32,6 +32,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// list_tbl_2_mat
+NumericMatrix list_tbl_2_mat(List tbl);
+RcppExport SEXP _regts_list_tbl_2_mat(SEXP tblSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type tbl(tblSEXP);
+    rcpp_result_gen = Rcpp::wrap(list_tbl_2_mat(tbl));
+    return rcpp_result_gen;
+END_RCPP
+}
 // moving_average
 NumericMatrix moving_average(NumericMatrix& x, NumericVector& w, const int from, const int to, const bool keep_range);
 RcppExport SEXP _regts_moving_average(SEXP xSEXP, SEXP wSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP keep_rangeSEXP) {
@@ -98,6 +109,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_regts_agg_gr", (DL_FUNC) &_regts_agg_gr, 3},
     {"_regts_disagg_spline", (DL_FUNC) &_regts_disagg_spline, 4},
+    {"_regts_list_tbl_2_mat", (DL_FUNC) &_regts_list_tbl_2_mat, 1},
     {"_regts_moving_average", (DL_FUNC) &_regts_moving_average, 5},
     {"_regts_parse_period", (DL_FUNC) &_regts_parse_period, 2},
     {"_regts_parse_period_range", (DL_FUNC) &_regts_parse_period_range, 2},
