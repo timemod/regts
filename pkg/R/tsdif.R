@@ -280,7 +280,7 @@ print.tsdif <- function(x, ...) {
       if (!is.null(dif)) {
 
         # print first max_names difnames with largest difference
-        cat("\nNames of timeseries with differences (alphabetical)\n")
+        cat("Names of timeseries with differences (alphabetical)\n")
         if (length(difnames) > max_names){
           print(difnames[1:max_names])
           cat("[ reached max print -- omitted ",length(difnames) - max_names,
@@ -335,8 +335,8 @@ print.tsdif <- function(x, ...) {
         }
 
         # print timeseries with largest difference
-        cat(sprintf("\nTimeseries with largest difference (%s)\n", difnames[index[i]]))
-        print(dif[, difnames[index[i]]])
+        cat(sprintf("\nTimeseries with largest difference (%s)\n", difnames[index[1]]))
+        print(dif[, difnames[index[1]]])
 
       } else {
         if (is.null(common_range)) {
