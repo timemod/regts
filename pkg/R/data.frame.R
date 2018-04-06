@@ -23,7 +23,11 @@
 as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE) {
 
   if (!is.matrix(x)) {
-    x <- univec2unimat(x, deparse(substitute(x)))
+    xsub <- substitute(x)
+    # when as.data.frame.regts is called by View, xsub has class
+    # regts, in that case deparse does not give the desired result
+    name <- if (is.regts(xsub)) "Series" else deparse(xsub)
+    x <- univec2unimat(x, name)
   }
 
   # convert the time index to a character vector with period texts
