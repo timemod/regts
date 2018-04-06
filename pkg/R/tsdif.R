@@ -292,33 +292,43 @@ print.tsdif <- function(x, ...) {
         nmax <- min(ncol(dif), nmax)
 
         # absolute values to get largest values per timeseries with function max
-        maxdif <- as.numeric(apply(abs(dif), FUN = max, MARGIN = 2))
+        absdif <- abs(dif)
+        maxdif <- as.numeric(apply(absdif, FUN = max, MARGIN = 2))
+        # print only nmax values
+        maxdif <- maxdif[1:nmax]
 
         # reorder maxdif, with Na's first
-        index <- order(maxdif, decreasing = TRUE, na.last = FALSE)
-
         # maxdif can contain Na values, we want to print them first, followed
         # by names with highest differences
+        index <- order(maxdif, decreasing = TRUE, na.last = FALSE)
 
-        cat("\nTimeseries with largest differences\n")
-        # print first nmax difnames with largest difference in specified period
-        cat("\nNames                                 Max dif      Period\n")
-
-        for(i in index[1:nmax]){
-
-          # find position of values, if NA search for position NA
-          idx <- Position(f = function(x) {if (is.na(maxdif[i])) is.na(x) else x == maxdif[i]},
-                          dif[, difnames[i]])
-          # maxdif contains only absolute values, the largest value can be negative
-          if(is.na(idx)){
-            idx <- Position(f = function(x){x == -maxdif[i]}, dif[, difnames[i]])
-          }
-
-          idx_prd <- idx + start_period(dif) - 1
-
-          cat(sprintf("%-25s%20f%12s\n", difnames[i],
-                      as.numeric(dif[idx_prd, difnames[i]]), idx_prd ))
+        # find position of values, if NA search for position NA
+        pos_func <- function(i){
+          mdif <- maxdif[i]
+          pos <- Position(f = function(x) {if (is.na(mdif)) is.na(x) else x == mdif},
+                          absdif[,i])
+          return(pos)
         }
+        pos <- sapply(index, FUN = pos_func)
+
+        startp <- start_period(dif)
+        periods <- sapply(pos, FUN = function(i) {as.character(startp + i - 1)})
+
+        idx_names <- difnames[index]
+
+        # periods and idx_names are already in index order
+        max_value <- function(i){
+          v <- dif[periods[i], idx_names[i]]
+          return(as.numeric(v))
+        }
+        max_values <- sapply(1:nmax, FUN = max_value)
+
+        df <- data.frame(Period = periods, Max_dif = max_values)
+        rownames(df) <- idx_names
+
+        cat("\nTimeseries with largest differences\n\n")
+        # print first nmax difnames with largest difference in specified period
+        print(df)
 
         if (ncol(dif) > nmax){
           cat("[ reached max print -- omitted ",ncol(dif) - nmax, "names ]\n")
