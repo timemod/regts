@@ -4,7 +4,7 @@
 \alias{select_columns}
 \title{Select columns using a regular expression}
 \usage{
-select_columns(x, regex, drop = TRUE)
+select_columns(x, regex, drop = TRUE, ...)
 }
 \arguments{
 \item{x}{an R object with column names (e.g. a \code{data.frame},
@@ -12,7 +12,9 @@ select_columns(x, regex, drop = TRUE)
 
 \item{regex}{a regular expression used to select a column}
 
-\item{drop}{if \code{TRUE}, the result is coerced to a vector if possible.}
+\item{drop}{if \code{TRUE}, the result is coerced to a vector if possible}
+
+\item{...}{arguments passed to \link{grep}}
 }
 \value{
 the column selection of object \code{x}
@@ -22,6 +24,7 @@ This function selects columns of an R object with column names
 (for example a \code{\link[base]{data.frame}}, \code{\link[base]{matrix}},
 \code{\link[stats]{ts}} or \code{\link{regts}}).
 The columns with names matching a given regular expression are selected.
+This function employs base R function \code{\link{grep}}
 }
 \examples{
 data <- regts(matrix(1:20, ncol = 4), start = "2010Q2",
