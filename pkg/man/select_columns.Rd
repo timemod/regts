@@ -14,7 +14,7 @@ select_columns(x, regex, drop = TRUE, ...)
 
 \item{drop}{if \code{TRUE}, the result is coerced to a vector if possible}
 
-\item{...}{arguments passed to \link{grep}}
+\item{...}{arguments passed to function \code{\link{grep}}}
 }
 \value{
 the column selection of object \code{x}
@@ -31,5 +31,8 @@ data <- regts(matrix(1:20, ncol = 4), start = "2010Q2",
               names = c("nlc", "ukc", "nly", "uky"))
 
 # select all columns with names starting with nl
-nl_data <- select_columns(data, "nl.*")
+nl_data <- select_columns(data, "^nl")
+
+# select all columns except column "nlc"
+no_nlc <- select_columns(data, "^nlc$", invert = TRUE)
 }

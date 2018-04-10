@@ -9,14 +9,17 @@
 #' \code{matrix}, \code{ts} or \code{regts})
 #' @param regex a regular expression used to select a column
 #' @param drop if \code{TRUE}, the result is coerced to a vector if possible
-#' @param ... arguments passed to \link{grep}
+#' @param ... arguments passed to function \code{\link{grep}}
 #' @return the column selection of object \code{x}
 #' @examples
 #' data <- regts(matrix(1:20, ncol = 4), start = "2010Q2",
 #'               names = c("nlc", "ukc", "nly", "uky"))
 #'
 #' # select all columns with names starting with nl
-#' nl_data <- select_columns(data, "nl.*")
+#' nl_data <- select_columns(data, "^nl")
+#'
+#' # select all columns except column "nlc"
+#' no_nlc <- select_columns(data, "^nlc$", invert = TRUE)
 #' @export
 select_columns <- function(x, regex, drop = TRUE, ...) {
   cnames <- colnames(x)
