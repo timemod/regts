@@ -4,6 +4,8 @@ library(data.table)
 
 context("tranpose_df")
 
+rm(list = ls())
+
 test_that("data frame without row names and labels", {
   df <- data.frame(a = 1:3, b = 10:12)
   df_t <- transpose_df(df)
@@ -40,11 +42,11 @@ test_that("data frame with a column with column names and labels", {
 
   df_t <- transpose_df(df, colname_column = 3, label_column = "lbls")
   #View(df_t)
-  expect_known_output(df_t, file = file.path("expected_output/transpose_df_t.rds"))
+  expect_known_value(df_t, file = "expected_output/transpose_df_t.rds")
 
   df_t_2 <- transpose_df(df_t, label_column = 1)
   #View(df_t_2)
-  expect_known_output(df_t, file = file.path("expected_output/transpose_df_t_2.rds"))
+  expect_known_value(df_t, file = "expected_output/transpose_df_t_2.rds")
 })
 
 test_that("data frame with numbers and texts", {
