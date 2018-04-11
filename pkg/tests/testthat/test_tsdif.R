@@ -35,8 +35,7 @@ test_that("simple example", {
 })
 
 test_that("check simple output", {
-expect_known_output(tsdif(ts1, ts2), file.path("expected_output/tsdif.txt"),
-                    print = TRUE)
+expect_known_output(tsdif(ts1, ts2), "expected_output/tsdif.txt", print = TRUE)
 })
 
 test_that("no difference", {
@@ -327,11 +326,7 @@ test_that("check more complex output with combinations of NA and proper values",
   ts2 <- (ts1 + 1) + 2 * ts1
   ts1["2016q3", "c"] <- NA
   ts2["2017q4", "f"] <- NA
-<<<<<<< HEAD
-  expect_known_output(tsdif(ts1, ts2), file.path("expected_output/test_complex_tsdif.txt"),
-=======
-  expect_known_output(tsdif(ts1, ts2), file.path("expected_output/tsdif_complex.txt"),
->>>>>>> master
+  expect_known_output(tsdif(ts1, ts2), "expected_output/tsdif_complex.txt",
                       print = TRUE)
 })
 
