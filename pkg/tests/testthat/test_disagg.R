@@ -56,8 +56,8 @@ test_that("sum and average method", {
   b_ref <- disagg_natural(b_q, constraint = "sum", nfrequency = 12)
   expect_equal(ab_m[, "b"], b_ref)
 
-  expect_known_output(ab_m[, "b"],
-                      file.path("expected_output/disagg_b_sum.rds"))
+  expect_equal(aggregate(ab_m, FUN = sum, nfrequency = 4), ab_q)
+  expect_known_value(ab_m[, "b"], "expected_output/disagg_b_sum.rds")
 
   b_q_agg <- aggregate(ab_m[, "b"], FUN = sum, nfrequency = 4)
   expect_equal(b_q, b_q_agg)
@@ -211,7 +211,7 @@ test_that("complex example", {
   # lines(a_average_fmm, col = "red", type = "o")
 
   all <- cbind(a_first_natural, a_first_nakn, a_average_natural, a_average_nakn)
-  expect_known_value(all, file.path("expected_output/disagg_complex.rds"))
+  expect_known_value(all, "expected_output/disagg_complex.rds")
 
   expect_equal(a_first_natural,
                disagg_natural(a_q, nfrequency = 12, constraint = "first"))
