@@ -1,4 +1,9 @@
+library(testthat)
+library(regts)
+
 context("regts")
+
+rm(list = ls())
 
 test_that("constructor regts for univariate timeseries", {
 
@@ -188,7 +193,7 @@ test_that("period and column selection at the lhs of an assignment", {
                                                 c('a', 'b')]
   regts2['2010Q3/',  c('a', 'a_3')] <- 2 * regts1['2011Q2/2011Q3',
                                                   c('a', 'a')]
-  expect_known_output(regts2, file.path("expected_output/period_and_column.rds"))
+  expect_known_value(regts2, "expected_output/period_and_column.rds")
 })
 
 test_that("colnames are preserved in miscellaneous timeseries functions", {
