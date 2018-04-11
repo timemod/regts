@@ -34,6 +34,11 @@ test_that("simple example", {
   expect_equal(res, res_correct)
 })
 
+test_that("check simple output", {
+  expect_known_output(tsdif(ts1, ts2), file.path("expected_output/test_tsdif.txt"),
+                      print = TRUE)
+})
+
 test_that("no difference", {
   res <- tsdif(ts1, ts1)
   res_no_dif <- create_tsdif(equal = TRUE, difnames = character(0),
@@ -316,5 +321,13 @@ test_that("test combinations of NA, NaN, Inf and proper values", {
   expect_equal(tsdif(tsInf, tsNA)$dif, tsNA)
 })
 
-
+test_that("check more complex output with combinations of NA and proper values", {
+  ts1 <- regts(matrix(data = c(1:144), nc = 12), start = "2016q1",
+               names = c("a", "b", "c", "d","e","f","g","h","i","j","k","l"))
+  ts2 <- (ts1 + 1) + 2 * ts1
+  ts1["2016q3", "c"] <- NA
+  ts2["2017q4", "f"] <- NA
+  expect_known_output(tsdif(ts1, ts2), file.path("expected_output/test_complex_tsdif.txt"),
+                      print = TRUE)
+})
 

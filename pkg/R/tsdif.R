@@ -259,7 +259,7 @@ cvgdif <- function(x1, x2) {
 
 #' @export
 print.tsdif <- function(x, ...) {
-  cat("\n     tsdif timeseries comparison result\n\n")
+  cat("\ntsdif timeseries comparison result\n\n")
 
   max_names <- 50
   nmax <- 10
@@ -280,7 +280,7 @@ print.tsdif <- function(x, ...) {
       if (!is.null(dif)) {
 
         # print first max_names difnames with largest difference
-        cat("Names of timeseries with differences (alphabetical)\n")
+        cat("Names of timeseries with differences (alphabetical)\n\n")
         if (length(difnames) > max_names){
           print(difnames[1:max_names])
           cat("[ reached max print -- omitted ",length(difnames) - max_names,
@@ -300,33 +300,27 @@ print.tsdif <- function(x, ...) {
         # reorder maxdif, with Na's first
         # maxdif can contain Na values, we want to print them first, followed
         # by names with highest differences
-        index <- order(maxdif, decreasing = TRUE, na.last = FALSE)
+        max_index <- order(maxdif, decreasing = TRUE, na.last = FALSE)
 
-        # find position of values, if NA search for position NA
-        pos_func <- function(i){
+        # find period index of maxdif values, if NA search for position NA
+        period_index_func <- function(i){
           mdif <- maxdif[i]
           pos <- Position(f = function(x) {if (is.na(mdif)) is.na(x) else x == mdif},
                           absdif[,i])
           return(pos)
         }
-        pos <- sapply(index, FUN = pos_func)
+        per_index <- sapply(max_index, FUN = period_index_func)
 
         startp <- start_period(dif)
-        periods <- sapply(pos, FUN = function(i) {as.character(startp + i - 1)})
+        periods <- sapply(per_index, FUN = function(i) {as.character(startp + i - 1)})
 
-        idx_names <- difnames[index]
+        max_values <- dif[cbind(per_index, max_index)]
 
-        # periods and idx_names are already in index order
-        max_value <- function(i){
-          v <- dif[periods[i], idx_names[i]]
-          return(as.numeric(v))
-        }
-        max_values <- sapply(1:nmax, FUN = max_value)
+        # periods and max_values are already in index order
+        df <- data.frame(period = periods, max_dif = max_values)
+        rownames(df) <- difnames[max_index]
 
-        df <- data.frame(Period = periods, Max_dif = max_values)
-        rownames(df) <- idx_names
-
-        cat("\nTimeseries with largest differences\n\n")
+        cat("\nMaximum differences timeseries in decreasing order\n\n")
         # print first nmax difnames with largest difference in specified period
         print(df)
 
@@ -335,8 +329,8 @@ print.tsdif <- function(x, ...) {
         }
 
         # print timeseries with largest difference
-        cat(sprintf("\nTimeseries with largest difference (%s)\n", difnames[index[1]]))
-        print(dif[, difnames[index[1]]])
+        cat(sprintf("\nTimeseries with largest difference (%s)\n", difnames[max_index[1]]))
+        print(dif[, difnames[max_index[1]]])
 
       } else {
         if (is.null(common_range)) {
@@ -353,26 +347,23 @@ print.tsdif <- function(x, ...) {
       }
       cat("\n")
       if (length(missing_names1) > 0) {
-        if (length(missing_names1) > max_names){
-          cat(paste("Missing timeseries in ", ts_names[1]), ":\n")
-          print(missing_names1[1:max_names])
-          cat("[ reached max print -- omitted ",length(missing_names1) - max_names,
+        cat(paste("Missing timeseries in ", ts_names[1]), ":\n")
+        nmissing <- length(missing_names1)
+        print(missing_names1[1:min(max_names, nmissing)])
+        if (nmissing > max_names){
+          cat("[ reached max print -- omitted ", nmissing - max_names,
               "names ]\n")
-        } else {
-          cat(paste("Missing timeseries in ", ts_names[1]), ":\n")
-          print(missing_names1)
         }
+
       }
       cat("\n")
       if (length(missing_names2) > 0) {
-        if (length(missing_names2) > max_names){
-          cat(paste("Missing timeseries in ", ts_names[2]), ":\n")
-          print(missing_names2[1:max_names])
-          cat("[ reached max print -- omitted ",length(missing_names2) - max_names,
+        cat(paste("Missing timeseries in ", ts_names[2]), ":\n")
+        nmissing <- length(missing_names2)
+        print(missing_names2[1:min(max_names, nmissing)])
+        if (nmissing > max_names){
+          cat("[ reached max print -- omitted ",nmissing - max_names,
               "names ]\n")
-        } else {
-          cat(paste("Missing timeseries in ", ts_names[2]), ":\n")
-          print(missing_names1)
         }
       }
 
