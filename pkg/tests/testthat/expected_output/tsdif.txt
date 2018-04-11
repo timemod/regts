@@ -1,0 +1,30 @@
+
+tsdif timeseries comparison result
+
+Compared timeseries: ts1 and ts2 
+
+Names of timeseries with differences (alphabetical)
+
+[1] "a" "b"
+
+Maximum differences timeseries in decreasing order
+
+  period max_dif
+a 2008Q4   -0.01
+b 2008Q4   -0.01
+
+Timeseries with largest difference (a)
+      Qtr1  Qtr2 Qtr3  Qtr4
+2008                  -0.01
+2009 -0.01 -0.01           
+
+Missing timeseries in  ts1 :
+[1] "d"
+
+Missing timeseries in  ts2 :
+[1] "c"
+
+The two timeseries have different period ranges:
+           ranges
+ts1 2008Q4/2009Q3
+ts2 2008Q3/2009Q2
