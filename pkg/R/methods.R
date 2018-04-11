@@ -33,6 +33,10 @@ aggregate.regts <- function(x, nfrequency = 1, ...) {
     x <- window_regts(x, period_range(p1, NULL))
   }
 
+  if (NROW(x) < rep) {
+    stop("Not enough observations to perform aggregation")
+  }
+
   ret <- as.regts(aggregate.ts(x, nfrequency, ...))
 
   if (is.matrix(x) && is.null(colnames(x))) {
