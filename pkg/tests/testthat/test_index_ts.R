@@ -49,13 +49,33 @@ test_that("errors", {
 
 
 test_that("NA values", {
+
   a_NA <- a
   a_NA["2019Q3"] <- NA
-  index_ts(a_NA,  base = "2019Q3/2019Q4")
+  warning <- "Input timeseries contains NA values in base period 2019Q3/2019Q4"
+  expect_warning(a_NA_i <- index_ts(a_NA,  base = "2019Q3/2019Q4"), warning)
+  expect_equal(a_NA_i, NA * a)
+
+  warning <- "Input timeseries contains NA values in base period 2019Q3"
+  expect_warning(a_NA_i <- index_ts(a_NA,  base = "2019Q3"), warning)
+  expect_equal(a_NA_i, NA * a)
+
   ab_NA <- ab
-  expect_identical(index_ts(a), 100 * a)
-  expected_result  <- 100 * ab
-  expected_result$b <- expected_result$a
-  expect_identical(index_ts(ab), expected_result)
+  ab_NA["2019Q3", "a"] <- NA
+  warning <- "Input timeseries contains NA values in base period 2019Q3/2019Q4"
+  expect_warning(ab_NA_i <- index_ts(ab_NA,  base = "2019Q3/2019Q4"), warning)
+
+  expected_result  <-100 * ab_NA / 15
+  expected_result$a <- NA
+  expect_equal(ab_NA_i, expected_result)
+
+  ab_NA <- ab
+  ab_NA["2019Q3", "a"] <- NA
+  warning <- "Input timeseries contains NA values in base period 2019Q3"
+  expect_warning(ab_NA_i <- index_ts(ab_NA,  base = "2019Q3"), warning)
+
+  expected_result  <-100 * ab_NA / 14
+  expected_result$a <- NA
+  expect_equal(ab_NA_i, expected_result)
 })
 
