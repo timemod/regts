@@ -207,10 +207,21 @@ Ops.period <- function(e1, e2) {
       } else {
         stop("Arithmetic operation + on two periods is not allowed")
       }
-
+    } else {
+      # one of the operands is not a period object
+      if (anyNA(retval)) {
+        stop("NA values in arithmetic operations with period objects")
+      }
+      if (!all(retval == round(retval))) {
+          stop(paste("Arithmetic operations with periods are only possible",
+                     "with integer operands"))
+      }
+      if (length(retval) > 1) {
+        frequency <- if (is.period(e1)) frequency(e1) else frequency(e2)
+        retval <- lapply(retval, FUN = create_period, frequency = frequency)
+      }
     }
-    # the return value should always be an integer
-    return (floor(retval))
+    return(retval)
   } else {
     stop("Illegal arithmetic operation, only + and - allowed")
   }
