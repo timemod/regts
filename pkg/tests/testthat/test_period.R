@@ -105,6 +105,12 @@ test_that("arithmetic operators: only + and - allowed", {
   expect_identical(period("2010m2") - period("2009m6"), 8)
   expect_identical(period("2010q2") + 4, 4 + period("2010q2"))
 
+  expect_identical(period("2010m2") + c(1, 4),
+                   list(period("2010m3"), period("2010m6")))
+  expect_identical(period("2010") - 1:3,
+                   list(period("2009"), period("2008"), period("2007")))
+
+  # errors
   expect_error(period("2010Q1") * 2,
                "Illegal arithmetic operation, only \\+ and \\- allowed")
   expect_error(period("2010Q1") + period("2010Q2"),
@@ -112,6 +118,10 @@ test_that("arithmetic operators: only + and - allowed", {
   expect_error(period("2010Q1") - period("2010M1"),
                paste("Arithmetic operations on periods with different",
                      "frequencies are not allowed"))
+  expect_error(period("2010Q1") + 0.1,
+               "Arithmetic operations with periods are only possible with integer operands")
+  expect_error(period("2010Q1") + NA,
+               "NA values in arithmetic operations with period objects")
 })
 
 test_that("as.period", {

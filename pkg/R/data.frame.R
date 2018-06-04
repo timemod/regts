@@ -32,9 +32,7 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE) {
 
   # convert the time index to a character vector with period texts
   first_period <- start_period.ts(x)
-  times <- sapply(0 : (NROW(x) - 1),
-                  FUN = function(i) as.character(first_period + i))
-
+  times <- sapply(first_period + (0 : (NROW(x) - 1)), FUN = as.character)
   lbls <- ts_labels(x)
 
   if (rowwise) {
