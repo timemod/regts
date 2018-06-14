@@ -1,6 +1,8 @@
 library(regts)
 library(testthat)
 
+rm(list = ls())
+
 context("data.frame")
 
 test_that("as.regts.data.frame for univariate quarterly timeseries", {
@@ -42,7 +44,12 @@ test_that("as.regts.data.frame for multivariate yearly timeseries", {
 test_that("as.regts.data.frame for multivariate yearly timeseries with labels", {
   df <- data.frame(periods = c(2015, 2016, 2017), a = 1:3, b = 4:6)
   ts_labels <- paste("Timeseries", c("a", "b"))
-  Hmisc::label(df, self = FALSE) <- c("", ts_labels)
+  df <- regts:::set_labels_df(df, c("", ts_labels))
+
+  expected_labels_Hmisc <- c("", ts_labels)
+  names(expected_labels_Hmisc) <- colnames(df)
+  expect_identical(Hmisc::label(df), expected_labels_Hmisc)
+
   ts1 <- as.regts(df, time_column = 1)
   ts2 <- regts(matrix(1:6, ncol =  2), start = "2015", names = c("a", "b"),
                labels = ts_labels)

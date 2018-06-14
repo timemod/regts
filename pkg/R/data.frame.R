@@ -1,10 +1,9 @@
 #' Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}
 #'
 #' @details
-#' If the \code{regts} has labels,
-#' then the labels are added to columns of the data frame using the function
-#' \code{\link[Hmisc]{label}} of package \code{Hmisc}
-#' if argument \code{rowwise} is \code{FALSE}.
+#' If the \code{regts} has labels and argument \code{rowwise} is \code{FALSE},
+#' then the labels are added to columns of the data frame
+#' These labels are visible in the data viewer.
 
 #' @param x a \code{\link{regts}}
 #' @param rowwise a logical value: should the timeseries be stored rowwise
@@ -55,7 +54,9 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE) {
 
     # add labels
     if (!is.null(lbls)) {
-      Hmisc::label(ret, self = FALSE) <- lbls
+      # use as.character to convert a named character vector to a normal
+      # character vector
+      ret <- set_labels_df(ret, as.character(lbls))
     }
 
     if (row_names) {

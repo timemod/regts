@@ -35,9 +35,12 @@ test_that("data frame with a column with column names and no labels", {
 })
 
 test_that("data frame with a column with column names and labels", {
+
   df <- data.frame(a = 1:3, b = 10:12, names = paste0("x", 1:3),
                    lbls = paste("Variable", 1:3))
-  Hmisc::label(df, self = FALSE) <- c(paste("Variable", c("a", "b")), "", "")
+
+  lbls <- c(paste("Variable", c("a", "b")), "", "")
+  df <- regts:::set_labels_df(df, lbls)
   #View(df)
 
   df_t <- transpose_df(df, colname_column = 3, label_column = "lbls")
@@ -46,7 +49,7 @@ test_that("data frame with a column with column names and labels", {
 
   df_t_2 <- transpose_df(df_t, label_column = 1)
   #View(df_t_2)
-  expect_known_value(df_t, file = "expected_output/transpose_df_t_2.rds")
+  expect_known_value(df_t_2, file = "expected_output/transpose_df_t_2.rds")
 })
 
 test_that("data frame with numbers and texts", {
@@ -80,8 +83,9 @@ test_that("data table with numbers, texts and labels", {
   dt <- data.table(name = c("a", "b"),
                    numbers = c(1.000000000123, 10.12345678910111212),
                    texts = c("jan", "piet"), stringsAsFactors = FALSE)
-  Hmisc::label(dt, self = FALSE) <- c("Variable names", "Numeric Data",
-                                      "Character Data")
+
+  lbls <- c("Variable names", "Numeric Data", "Character Data")
+  dt <- regts:::set_labels_df(dt, lbls)
 
   dt_t <- transpose_df(dt, colname_column = "name")
 
@@ -94,7 +98,8 @@ test_that("data table with numbers, texts and labels", {
 
   dt_t_t$numbers <- as.numeric(dt_t_t$numbers)
   # the statement above has removed the label, so restore the label.
-  Hmisc::label(dt_t_t$numbers) <- "Numeric Data"
+  #Hmisc::label(dt_t_t$numbers) <- "Numeric Data"
+  attr(dt_t_t$numbers, "label") <- "Numeric Data"
 
   # dt_t_t has lost the label for variable names (this cannot be avoided),
   # therefore also remove the corresponding label in the expected result.

@@ -19,7 +19,6 @@ Depends:
     xlsx  
 Imports:
     Rcpp,
-    Hmisc,
     data.table,
     readxl,
     cellranger,
@@ -32,6 +31,7 @@ Suggests:
     xts,
     timeSeries,
     tseries,
-    tempdisagg
+    tempdisagg,
+    Hmisc
 LinkingTo: Rcpp
 VignetteBuilder: knitr
