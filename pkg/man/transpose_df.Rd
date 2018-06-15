@@ -25,11 +25,13 @@ By default labels are ignored.}
 the transposed data frame
 }
 \description{
-The function transposes a \code{\link[base]{data.frame}}. If the data frame contains
-labels that have been set by the function \code{\link[Hmisc]{label}} of the
-package \code{Hmisc}, then the first column of the returned data frame will
-contain the labels. Conversely, you can specify the column that contains
-the labels of the transposed data frame.
+The function transposes a \code{\link[base]{data.frame}}.
+If the input data frame has column labels (i. e., column vectors with an
+attribute \code{"label")}), then the first column of the returned data frame
+will contain the labels.
+With argument \code{label_column} you can specify a column that will be
+used to create column labels for the output data frame.
+These labels are visible in de data viewer.
 }
 \examples{
 df <- data.frame(variables = c("a", "b"),
