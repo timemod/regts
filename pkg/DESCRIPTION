@@ -14,11 +14,8 @@ Description: Several tools to work efficiently with
 License: GPL-3
 LazyData: TRUE
 RoxygenNote: 6.0.1
-SystemRequirements: C++11
 Depends:
     xlsx  
-Imports:
-    Rcpp,
     data.table,
     readxl,
     cellranger,

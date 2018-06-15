@@ -34,7 +34,7 @@ NumericVector parse_period_range(const std::string &period_text,
     p2 = NA_REAL;
     f  = NA_REAL;
 
-    const auto pos = period_text.find("/");
+    const size_t pos = period_text.find("/");
     if (pos == string::npos) {
         // no / separator
         parse_single_period(period_text, frequency, p1, f);
@@ -140,11 +140,11 @@ LogicalVector is_period_text_(std::vector<std::string> strings,
 
 static string trim(const string& str) {
     const string whitespace = " \t";
-    const auto strBegin = str.find_first_not_of(whitespace);
+    const size_t strBegin = str.find_first_not_of(whitespace);
     if (strBegin == string::npos) {
         return ""; // no content
     }
-    const auto strEnd = str.find_last_not_of(whitespace);
-    const auto strRange = strEnd - strBegin + 1;
+    const size_t strEnd = str.find_last_not_of(whitespace);
+    const size_t strRange = strEnd - strBegin + 1;
     return str.substr(strBegin, strRange);
 }
