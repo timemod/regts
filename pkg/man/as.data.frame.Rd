@@ -5,7 +5,8 @@
 \alias{as.data.frame.regts}
 \title{Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}}
 \usage{
-\method{as.data.frame}{regts}(x, ..., rowwise = FALSE, row_names = TRUE)
+\method{as.data.frame}{regts}(x, ..., rowwise = FALSE, row_names = TRUE,
+  format = "regts")
 }
 \arguments{
 \item{x}{a \code{\link{regts}}}
@@ -18,6 +19,8 @@ or columnwise in the data frame? Defaults to \code{FALSE}}
 \item{row_names}{Whether to create row names. If \code{FALSE},
 then an additional column with name \code{"period"} or \code{"name"} is created for
 columnwise or rowwise timeseries, respectively.}
+
+\item{format}{period format}
 }
 \value{
 A \code{\link[base]{data.frame}}

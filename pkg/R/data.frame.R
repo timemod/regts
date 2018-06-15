@@ -11,6 +11,7 @@
 #' @param row_names Whether to create row names. If \code{FALSE},
 #' then an additional column with name \code{"period"} or \code{"name"} is created for
 #' columnwise or rowwise timeseries, respectively.
+#' @param format period format
 #' @param ... additional arguments to be passed to methods.
 #' @return A \code{\link[base]{data.frame}}
 #' @name as.data.frame
@@ -19,7 +20,8 @@
 #' ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),
 #'            labels = c("Timeseries a", "Timeseries b"))
 #' print(as.data.frame(ts))
-as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE) {
+as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
+                                format = "regts") {
 
   if (!is.matrix(x)) {
     xsub <- substitute(x)
@@ -31,7 +33,13 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE) {
 
   # convert the time index to a character vector with period texts
   first_period <- start_period.ts(x)
-  times <- sapply(first_period + (0 : (NROW(x) - 1)), FUN = as.character)
+  periods <- first_period + (0 : (NROW(x) - 1))
+  if (format == "regts") {
+    times <- sapply(periods, FUN = as.character)
+  } else {
+    times <- sapply(periods, FUN = function(x) {format(as.Date(x), format)})
+    print(times)
+  }
   lbls <- ts_labels(x)
 
   if (rowwise) {
