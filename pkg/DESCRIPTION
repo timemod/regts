@@ -1,7 +1,7 @@
 Package: regts
 Type: Package
 Title: Regular Timeseries
-Version: 0.2
+Version: 0.3
 Authors@R: c(
  person("Rob", "van Harrevelt", email = "rvanharrevelt@gmail.com", role = c("aut", "cre")),
  person("Anita", "van der Roest", email = "J.C.van.der.Roest@cpb.nl",role = "aut")
@@ -9,13 +9,21 @@ Authors@R: c(
 Author: Rob van Harrevelt [aut, cre],
     Anita van der Roest [aut]
 Maintainer: Rob van Harrevelt <rvanharrevelt@gmail.com>
-Description: Several tools to work efficiently with
-    regular timeseries, in particular monthy, quarterly and yearly timeseries.
+Description: An extension of the ts class with enhanced possibilities for
+             period selection. regts particularly aims at yearly, quarterly and
+             monthly timeseries. It also supports labels that can be used to
+             describe the timeseries in multivariate timeseries objects.
+             The package includes functions for reading and writing
+             timeseries from Excel and csv files, conversion of timeseries to
+             growth series and the inverse transformation, special aggregation
+             methods for growth series, and several other functions.
 License: GPL-3
 LazyData: TRUE
 RoxygenNote: 6.0.1
 Depends:
-    xlsx  
+    xlsx
+Imports:
+    Rcpp,
     data.table,
     readxl,
     cellranger,
