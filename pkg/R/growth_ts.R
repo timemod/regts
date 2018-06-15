@@ -25,21 +25,20 @@ growth_ts <- function(x, lag = 1, keep_range = TRUE) {
   if (!is.ts(x)) {
      stop("Argument x is not a timeseries")
   }
-  range <- get_period_range(x)
-  if (lag >= nperiod(range)){
+
+  if (lag >= NROW(x)){
     stop("Timeseries must have more observations than size of lag")
   }
 
-  data <- (diff(x, lag) / abs(lag(x,-lag)))
+  ret <- (diff(x, lag) / abs(lag(x,-lag)))
 
-  # if keep_range then extend data else adapt period range
+  # if keep_range then extend data with NA at start of period
   if (keep_range) {
-    # extend data with NA at start of period
-    data <- data[range]
-  } else {
-    range <- period_range(start_period(range) + lag, end_period(range))
+    ret <- ret[get_period_range(x)]
   }
 
-  return(regts(data, period = range, names = colnames(x),
-               labels = ts_labels(x)))
+  ts_labels(ret) <- ts_labels(x)
+
+  return(ret)
+
 }
