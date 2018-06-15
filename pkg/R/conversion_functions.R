@@ -31,31 +31,39 @@ NULL
 rel2index <- function(x, base = start_period(x) - 1, scale = 100) {
 
   x <- as.regts(x)
-  is_mat <- is.matrix(x)
 
-  p_start <-  start_period(x) - 1
-
-  if (is_mat) {
-    cum_mat <- apply(1 + x, MARGIN = 2, FUN = cumprod)
-    ret <- regts(rbind(rep(1, ncol(cum_mat)), cum_mat), start = p_start,
-                 labels = ts_labels(x))
-  } else {
-    cum <- cumprod(1 + x)
-    ret <- regts(c(1, cum), start = p_start, labels = ts_labels(x))
+  x_is_matrix <- is.matrix(x)
+  if (!x_is_matrix) {
+    dim(x) <- c(length(x), 1)
   }
 
-  if (missing(base)) {
-    return(scale * ret)
-  } else {
+  # call C++ function rel2index_cpp (in file src/rel2index_cpp.cpp)
+  # to perform the cumulation.
+  data <- rel2index_cpp(x)
+
+  # determine result period range
+  old_range <- get_period_range(x)
+  new_start <- start_period(old_range) - 1
+
+  if (!missing(base)) {
     base <- as.period(base)
-    i <- base - p_start + 1
-    if (is_mat) {
-      ret[] <- apply(ret, MARGIN = 2, FUN = function(x) {scale * x /x[i]})
-    } else {
-      ret[] <-  scale * ret / ret[i]
+    base_index <- base - new_start + 1
+    if (base_index < 1 || base_index > nrow(data)) {
+      stop("The base period is outside the input period range")
     }
-    return(ret)
+    data <- apply(data, MARGIN = 2,
+                  FUN = function(x) {x /x[base_index]})
   }
+
+  if (scale != 1) data <- data * scale
+
+  if (!x_is_matrix) {
+    # convert the vector to data
+    dim(data) <- NULL
+  }
+
+  return(regts(data, start = new_start, names = colnames(x),
+               labels = ts_labels(x)))
 }
 
 #' @describeIn rel2index-slash-pct2index Calculates an index timeseries from a

@@ -6,7 +6,7 @@ context("conversion functions for timeseries")
 set.seed(123)
 
 test_that("rel2index univariate timeseries", {
-  ts1 <- regts(abs(rnorm(10)), start = "2010Q2")
+  ts1 <- regts(rnorm(10), start = "2010Q2")
   ts1 <- 100 * ts1 / ts1[1]
   ts1_rel <- diff(ts1) / abs(lag(ts1, -1))
   ts1_index <- rel2index(ts1_rel)
@@ -18,7 +18,7 @@ test_that("rel2index univariate timeseries", {
 })
 
 test_that("rel2index multivariate timeseries", {
-  ts1 <- regts(matrix(abs(rnorm(20)), ncol = 2), start = "2010Q2",
+  ts1 <- regts(matrix(rnorm(20), ncol = 2), start = "2010Q2",
                names = c("a", "b"), labels = paste("Timeseries", c("a", "b")))
   ts1[] <- apply(ts1, MARGIN = 2, FUN = function(x) {x /x[1]})
   ts1_rel <- diff(ts1) / abs(lag(ts1, -1))
@@ -33,7 +33,7 @@ test_that("rel2index multivariate timeseries", {
 })
 
 test_that("pct2index", {
-  ts1 <- regts(matrix(abs(rnorm(20)), ncol = 2), start = "2010Q2",
+  ts1 <- regts(matrix(rnorm(20), ncol = 2), start = "2010Q2",
                names = c("a", "b"), labels = paste("Timeseries", c("a", "b")))
   ts1[] <- apply(ts1, MARGIN = 2, FUN = function(x) {x /x[1]})
   ts1_rel <- 100 * diff(ts1) / abs(lag(ts1, -1))
