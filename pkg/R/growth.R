@@ -26,6 +26,7 @@
 #' growth(x, keep_range = FALSE)
 #' growth(x, 4)
 
+#' @importFrom stats lag
 #' @export
 # function works for univariate and multivariate regts
 growth <- function(x, n = 1, keep_range = TRUE) {
