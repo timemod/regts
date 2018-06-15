@@ -3,10 +3,10 @@
 #' @description
 #' Function \code{growth} computes the relative change of a timeseries.
 #' The one period relative change of a timeseries is defined as:
-#' growth(x) <- (x[t] - x[t-1]) / |x[t-1]|
+#' \eqn{growth($x$) = ($x$[t] - $x$[t-1]) / |$x$[t-1]|}
 #'
 #' The \code{n} period relative change of a timeseries is defined as:
-#' growth(x) <- (x[t] - x[t-\code{n}]) / |x[t-\code{n}]|
+#' \eqn{growth($x$) = ($x$[t] - $x$[t-\code{n}]) / |$x$[t-\code{n}]|}
 #'
 #' The formula implies that when the timeseries decreases, the result will be
 #' negative regardless of the sign of x. The function also works for
