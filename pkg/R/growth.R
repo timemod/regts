@@ -3,17 +3,17 @@
 #' @description
 #' Function \code{growth} computes the relative change of a timeseries.
 #' The one period relative change of a timeseries is defined as:
-#' \eqn{growth($x$) = ($x$[t] - $x$[t-1]) / |$x$[t-1]|}
+#' \eqn{growth(x) = (x[t] - x[t-1]) / |x[t-1]|}
 #'
 #' The \code{n} period relative change of a timeseries is defined as:
-#' \eqn{growth($x$) = ($x$[t] - $x$[t-\code{n}]) / |$x$[t-\code{n}]|}
+#' \eqn{growth(x) = (x[t] - x[t-\code{n}]) / |x[t-\code{n}]|}
 #'
 #' The formula implies that when the timeseries decreases, the result will be
-#' negative regardless of the sign of x. The function also works for
+#' negative regardless of the sign of \eqn{x}. The function also works for
 #' multivariate timeseries.
 #'
 #' @param x a \code{\link[stats]{ts}} or \code{\link{regts}} object
-#' @param n an integer indicating which lag to use
+#' @param n an integer indicating the period of relative change
 #' @param keep_range If \code{TRUE} (the default), then  the output
 #' timeseries has the same period range as the input timeseries.
 #' Then the result timeseries will have \code{lag} NA values at the start.
