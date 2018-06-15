@@ -47,9 +47,14 @@ rel2index <- function(x, base = start_period(x) - 1, scale = 100) {
 
   if (!missing(base)) {
     base <- as.period(base)
+    if (frequency(base) != frequency(x)) {
+      stop(paste0("The base period ", base, " has a different frequency",
+                  " than the timeseries (", frequency(x), ")."))
+    }
     base_index <- base - new_start + 1
     if (base_index < 1 || base_index > nrow(data)) {
-      stop("The base period is outside the input period range")
+      stop(paste0("The base period should lie between ",
+          new_start, " and ", end_period(old_range), "."))
     }
     data <- apply(data, MARGIN = 2,
                   FUN = function(x) {x /x[base_index]})
