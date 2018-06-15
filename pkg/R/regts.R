@@ -323,7 +323,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
 
   # handle labels
   if (ncol(data) > 0) {
-    lbls <- Hmisc::label(data)
+    lbls <- get_labels_df(data)
     if (!all(nchar(lbls, type = "bytes") == 0)) {
       ts_labels(ret) <- lbls
     }

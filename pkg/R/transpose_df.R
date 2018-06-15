@@ -1,10 +1,12 @@
 #' Transpose a \code{data.frame}
 #'
-#' The function transposes a \code{\link[base]{data.frame}}. If the data frame contains
-#' labels that have been set by the function \code{\link[Hmisc]{label}} of the
-#' package \code{Hmisc}, then the first column of the returned data frame will
-#' contain the labels. Conversely, you can specify the column that contains
-#' the labels of the transposed data frame.
+#' The function transposes a \code{\link[base]{data.frame}}.
+#' If the input data frame has column labels (i. e., column vectors with an
+#' attribute \code{"label")}), then the first column of the returned data frame
+#' will contain the labels.
+#' With argument \code{label_column} you can specify a column that will be
+#' used to create column labels for the output data frame.
+#' These labels are visible in de data viewer.
 #'
 #' @param x a data frame
 #' @param colname_column the name or the index of the column that contains
@@ -62,7 +64,7 @@ transpose_df  <- function(x, colname_column, label_column) {
     x <- x[-columns_to_remove]
   }
 
-  old_labels <- as.character(Hmisc::label(x))
+  old_labels <- get_labels_df(x)
 
   # We need a special treatments for data frames with both numerical and
   # character columns. The function t (transpose) first converts data frame x
@@ -84,7 +86,7 @@ transpose_df  <- function(x, colname_column, label_column) {
     colnames(ret) <- new_colnames
   }
   if (has_labels) {
-    Hmisc::label(ret, self = FALSE) <- labels
+    ret <- set_labels_df(ret, labels)
   }
 
   if (any(nchar(old_labels, type = "bytes") > 0)) {

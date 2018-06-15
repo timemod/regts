@@ -1153,7 +1153,7 @@ The results look similar to `ts`. The timeseries names have become the data fram
 Base R does not have facilities for adding labels to a data frame. However the 
 `Hmisc` package has introduced a function `label` for adding label attributes 
 to data frames columns and to retrieve them. 
-Package `regts` uses this function to preserve the labels, when converting a 
+Package `regts` preserves these labels when converting a 
 `regts` object with labels to a `data frame` or vice versa. 
 
 Consider the following data frame:
