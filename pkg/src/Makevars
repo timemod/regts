@@ -1,7 +1,4 @@
 # compiler flags for C++
-#PKG_CXXFLAGS = -std=c++11
-# NOTE: -std=c++11 does not work on Ubuntu 12.04 LTS.
-PKG_CXX_STD=CXX11
 PKG_CXXFLAGS = `"$(R_HOME)/bin/Rscript" -e "Rcpp:::CxxFlags()"`
 
 # options for lex and yacc
