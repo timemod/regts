@@ -1,23 +1,25 @@
 #' Calculate an index timeseries from a timeseries with relative or
 #' percentage changes.
 #'
-#' The relative change of a timeseries X[t]
-#' is defined as \code{x[t] = (X[t] - X[t-1]) / |X[t-1]|}.
-#' Suppose that \code{x[t]} is given but \code{X[t]} is not known.
+#' This is the inverse of function \code{\link{growth}}.
+#' The relative change, or growth, of a timeseries x[t]
+#' is defined as \code{growth[t] = (x[t] - x[t-1]) / |x[t-1]|}.
+#' Suppose that \code{growth[t]} is given but \code{x[t]} is not known.
 #' Then it is possible to calculate the index series
-#' \code{i[t] = s * X[t] / X[t*]}, where \code{s} is arbitrary scale and
+#' \code{i[t] = s * x[t] / x[t*]}, where \code{s} is arbitrary scale and
 #' \code{t*} an arbitrary base period.
 #' Function \code{rel2index} computes this index series \code{i[t]}
 #' \cr\cr
 #' Similarly, function \code{pct2index} computes the index series
 #' for a timeseries of percentage changes, defined as
-#' \code{x[t] = 100 (X[t] - X[t-1]) / | X[t-1]|}.
+#' \code{100 (x[t] - x[t-1]) / | x[t-1]|}.
 #'
-#' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}}
+#' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a multivariate
+#' timeseries)
 #' @param base base period of the index timeseries (a \code{\link{period}}
 #' object or an object that can be coerced to a \code{period} object)
 #' @param scale the value of the index series at the base period (by default 100)
-#' @seealso \code{\link{index_ts}}
+#' @seealso \code{\link{index_ts}} and \code{\link{growth}}
 #' @examples
 #' ts1 <- regts(abs(rnorm(10)), start = "2010Q2")
 #' print(rel2index(ts1))
