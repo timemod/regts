@@ -88,3 +88,12 @@ test_that("multivariate timeseries with labels", {
                    remove_row_names(transpose_df(multi_df), TRUE))
 })
 
+test_that("date_format argument", {
+
+  a_ts_df <- as.data.frame(a_ts,  period_format = "%d-%m-%Y")
+  print(a_ts_df)
+  a_ts_df_ts <- as.regts(a_ts_df, fun = function(x)
+    {period(as.Date(x, format = "%d-%m-%Y"), frequency = 4)})
+  print(a_ts_df_ts)
+  # TODO: example in as.regts.data.frame met dit voorbeeld
+})

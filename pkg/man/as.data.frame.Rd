@@ -6,7 +6,7 @@
 \title{Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}}
 \usage{
 \method{as.data.frame}{regts}(x, ..., rowwise = FALSE, row_names = TRUE,
-  format = "regts")
+  period_format = "regts")
 }
 \arguments{
 \item{x}{a \code{\link{regts}}}
@@ -20,7 +20,7 @@ or columnwise in the data frame? Defaults to \code{FALSE}}
 then an additional column with name \code{"period"} or \code{"name"} is created for
 columnwise or rowwise timeseries, respectively.}
 
-\item{format}{period format}
+\item{period_format}{period format}
 }
 \value{
 A \code{\link[base]{data.frame}}
