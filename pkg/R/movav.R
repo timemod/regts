@@ -6,11 +6,11 @@
 #'
 #' For example, the backward moving average of order 3 is defined as
 #'
-#' \eqn{A[t] = (x[t-2] + x[t-1] + x[t]) / 3},
+#' \code{A[t] = (x[t-2] + x[t-1] + x[t]) / 3},
 #'
 #' while the centered moving average of order 3 is calculated as
 #'
-#' \eqn{A[t] = (x[t - 1] + x[t] + x[t + 1]) / 3}.
+#' \code{A[t] = (x[t - 1] + x[t] + x[t + 1]) / 3}.
 #'
 #' The calculation of the centered moving average for even orders is somewhat
 #' more complicated, see Details.
@@ -20,7 +20,7 @@
 #' using one more observation than the order and to use weights 0.5 for the
 #' end points. For example, for order 4 we have
 #'
-#' \eqn{A[t] = (0.5 x[t - 2] + x[t - 1] + x[t] + x[t + 1] + 0.5 x[t + 2]) / 4}.
+#' \code{A[t] = (0.5 x[t - 2] + x[t - 1] + x[t] + x[t + 1] + 0.5 x[t + 2]) / 4}.
 #'
 #' In this way the observations are distributed evenly over the past
 #' and future. An alternative approach is to use the same number
