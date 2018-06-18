@@ -45,6 +45,6 @@ test_that("multivariate timeseries", {
 })
 
 test_that("errors", {
-  msg <- "Timeseries must have more observations than size of lag"
+  msg <- "Timeseries must have at least 21 observations"
   expect_error(growth(a, n = 20), msg)
 })
