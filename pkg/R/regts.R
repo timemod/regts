@@ -565,6 +565,18 @@ convert_selection_range <- function(sel_range, ts_range) {
   # replace NA values by values from ts_range
   new_sel_range <- ifelse(is.na(new_sel_range), ts_range, new_sel_range)
 
+  if (new_sel_range[2] < new_sel_range[1]) {
+    # ERROR: the start period is after the end period.
+    if (is.na(sel_range[1])) {
+      pstart <- start_period(ts_range)
+      pend <- end_period(sel_range)
+    } else {
+      pstart <- start_period(ts_range)
+      pend <- end_period(ts_range)
+    }
+    stop(paste0("The start period (", pstart, ") is after the end period (",
+               pend, ")."))
+  }
   return (new_sel_range)
 }
 

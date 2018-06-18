@@ -109,6 +109,12 @@ test_that("period selection in univariate timeseries", {
 
   expect_identical(regts1[3], ts1[3])
   expect_identical(regts1[3:10], ts1[3:10])
+
+  msg <- "The start period \\(2010Q1\\) is after the end period \\(2011Q4\\)."
+  expect_error(regts1["2018Q3/"], msg)
+  expect_error(regts1["2018Q3/"] <- 2, msg)
+  msg <- "The start period \\(2010Q1\\) is after the end period \\(200Q3\\)."
+  expect_error(regts1["/200Q3"] <- 2, msg)
 })
 
 test_that("period / column selection in multivariate timeseries", {
