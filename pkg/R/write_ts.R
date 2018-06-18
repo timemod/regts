@@ -297,22 +297,29 @@ ts2df_ <- function(x, rowwise, label_option, labels_missing) {
   # remove the labels, we don't need them any more
   ts_labels(x) <- NULL
 
-  data <- as.data.frame(x)
+  data <- as.data.frame(x, row_names = FALSE)
 
   if (rowwise) {
+    periods <- data$period
+    data$period <- NULL
     data <- transpose_df(data)
     names <- rownames(data)
     if (label_option == "no") {
       data <- cbind(name = names, data, stringsAsFactors = FALSE)
+      col_headers <- c("name")
     } else if (label_option == "after") {
       data <- cbind(name = names, label = lbls, data, stringsAsFactors = FALSE)
+      col_headers <- c("name", "label")
     } else if (label_option == "before") {
       data <- cbind(label = lbls, name = names, data, stringsAsFactors = FALSE)
+      col_headers <- c("label", "name")
     }
-    column_headers <- as.data.frame(t(colnames(data)), stringsAsFactors = FALSE)
+    n_rowheaders <- ncol(data) - length(periods)
+    column_headers <- as.data.frame(as.list(c(colnames(data)[1:n_rowheaders],
+                                              periods)),
+                                    stringsAsFactors = FALSE)
   } else {
-     # columnwise timeseries
-    data <- cbind(period = rownames(data), data, stringsAsFactors = FALSE)
+    # columnwise timeseries
     column_headers <- as.data.frame(t(colnames(data)), stringsAsFactors = FALSE)
     if (label_option == "after") {
       column_headers <- rbind(c("label", lbls), column_headers,
@@ -327,5 +334,3 @@ ts2df_ <- function(x, rowwise, label_option, labels_missing) {
   return(list(data = data,  column_headers = column_headers,
               has_labels = has_labels))
 }
-
-
