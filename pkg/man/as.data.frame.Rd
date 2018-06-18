@@ -6,7 +6,7 @@
 \title{Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}}
 \usage{
 \method{as.data.frame}{regts}(x, ..., rowwise = FALSE, row_names = TRUE,
-  period_format = "regts")
+  period_as_Date = FALSE)
 }
 \arguments{
 \item{x}{a \code{\link{regts}}}
@@ -17,10 +17,17 @@
 or columnwise in the data frame? Defaults to \code{FALSE}}
 
 \item{row_names}{Whether to create row names. If \code{FALSE},
-then an additional column with name \code{"period"} or \code{"name"} is created for
-columnwise or rowwise timeseries, respectively.}
+then an additional column with name \code{"period"} or \code{"name"} is
+created for columnwise or rowwise timeseries, respectively.}
 
-\item{period_format}{period format}
+\item{period_as_Date}{A logical (default \code{FALSE}).
+If \code{TRUE} the periods are stored as \code{\link[base]{Date}} objects.
+If you use this option it is recommended to use \code{row_names = FALSE},
+since row names are always characters. If row names are used
+the \code{Date} objects are converted to characters,
+using the  standard date format format \code{"\%Y-\%m-\%d"}
+(see the documentation of function \code{\link[base]{strptime}}
+for more information about date formats).}
 }
 \value{
 A \code{\link[base]{data.frame}}

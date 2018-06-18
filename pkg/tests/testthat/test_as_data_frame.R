@@ -8,8 +8,6 @@ context("as.data.frame.regts")
 a_ts <- regts(1:3, start = "2018Q1")
 a_df <- data.frame(a_ts = 1:3, row.names = c("2018Q1", "2018Q2", "2018Q3"))
 
-print(as.data.frame(a_ts, format = "%d-%m-%Y"))
-
 remove_row_names <- function(df, rowwise) {
   rnames <- rownames(df)
   rownames(df) <- NULL
@@ -88,12 +86,28 @@ test_that("multivariate timeseries with labels", {
                    remove_row_names(transpose_df(multi_df), TRUE))
 })
 
-test_that("date_format argument", {
+test_that("period_as_Date", {
 
-  a_ts_df <- as.data.frame(a_ts,  period_format = "%d-%m-%Y")
-  print(a_ts_df)
-  a_ts_df_ts <- as.regts(a_ts_df, fun = function(x)
-    {period(as.Date(x, format = "%d-%m-%Y"), frequency = 4)})
-  print(a_ts_df_ts)
-  # TODO: example in as.regts.data.frame met dit voorbeeld
+  date_periods <- c(as.Date("2018-01-01"), as.Date("2018-04-01"),
+                    as.Date("2018-07-01"))
+
+  a_ts_df <- as.data.frame(a_ts, row_names = FALSE, period_as_Date = TRUE)
+
+  expected_result <- data.frame(period = date_periods, a_ts = as.integer(a_ts))
+  expect_identical(a_ts_df, expected_result)
+
+  expect_identical(as.regts(a_ts_df, time_column = "period", frequency = 4)[, 1],
+                   a_ts)
+
+  a_ts_df2 <- as.data.frame(a_ts, row_names = TRUE, period_as_Date = TRUE)
+
+  expected_result <- data.frame(a_ts = as.integer(1:3))
+  rownames(expected_result) <- date_periods
+  expect_identical(a_ts_df2, expected_result)
+
+  conv_fun <- function(x) {
+    return(period(as.Date(x), frequency = 4))
+  }
+  expect_identical(as.regts(a_ts_df2, fun = conv_fun)[, 1],
+                   a_ts)
 })

@@ -9,9 +9,16 @@
 #' @param rowwise a logical value: should the timeseries be stored rowwise
 #' or columnwise in the data frame? Defaults to \code{FALSE}
 #' @param row_names Whether to create row names. If \code{FALSE},
-#' then an additional column with name \code{"period"} or \code{"name"} is created for
-#' columnwise or rowwise timeseries, respectively.
-#' @param period_format period format
+#' then an additional column with name \code{"period"} or \code{"name"} is
+#' created for columnwise or rowwise timeseries, respectively.
+#' @param period_as_Date A logical (default \code{FALSE}).
+#' If \code{TRUE} the periods are stored as \code{\link[base]{Date}} objects.
+#' If you use this option it is recommended to use \code{row_names = FALSE},
+#' since row names are always characters. If row names are used
+#' the \code{Date} objects are converted to characters,
+#' using the  standard date format format \code{"\%Y-\%m-\%d"}
+#' (see the documentation of function \code{\link[base]{strptime}}
+#' for more information about date formats).
 #' @param ... additional arguments to be passed to methods.
 #' @return A \code{\link[base]{data.frame}}
 #' @name as.data.frame
@@ -21,7 +28,7 @@
 #'            labels = c("Timeseries a", "Timeseries b"))
 #' print(as.data.frame(ts))
 as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
-                                period_format = "regts") {
+                                period_as_Date = FALSE) {
 
   if (!is.matrix(x)) {
     xsub <- substitute(x)
@@ -34,12 +41,14 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
   # convert the time index to a character vector with period texts
   first_period <- start_period.ts(x)
   periods <- first_period + (0 : (NROW(x) - 1))
-  if (period_format == "regts") {
-    times <- sapply(periods, FUN = as.character)
+  if (period_as_Date)  {
+    times <- lapply(periods, FUN = as.Date)
+    # convert list of Dates to a vector of Dates. sapply doesn't work here
+    times <- do.call(c, times)
   } else {
-    times <- sapply(periods, FUN = function(x) {format(as.Date(x),
-                                                       period_format)})
+    times <- sapply(periods, FUN = as.character)
   }
+
   lbls <- ts_labels(x)
 
   if (rowwise) {
