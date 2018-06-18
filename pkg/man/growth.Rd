@@ -23,17 +23,20 @@ a \code{regts} object with relative changes
 \description{
 Function \code{growth} computes the relative change of a timeseries.
 The one period relative change of a timeseries is defined as:
-\eqn{growth(x) = (x[t] - x[t-1]) / |x[t-1]|}
+\code{growth(x) = (x[t] - x[t-1]) / |x[t-1]|}
 
 The \code{n} period relative change of a timeseries is defined as:
-\eqn{growth(x) = (x[t] - x[t-\code{n}]) / |x[t-\code{n}]|}
+\code{growth(x,n) = (x[t] - x[t-n]) / |x[t-n]|}
 
 The formula implies that when the timeseries decreases, the result will be
-negative regardless of the sign of \eqn{x}. The function also works for
+negative regardless of the sign of \code{x}. The function also works for
 multivariate timeseries.
 }
 \examples{
 x <- regts(rnorm(10), start = "2018Q1")
 growth(x, keep_range = FALSE)
 growth(x, 4)
+}
+\seealso{
+\code{\link{rel2index}}
 }
