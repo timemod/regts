@@ -24,6 +24,9 @@ test_that("ts with labels written correctly",  {
   ts1_read <- read_ts_csv(file)
   expect_identical(ts1, ts1_read)
 
+  file <- "csv/ts1_2.csv"
+  write_ts_csv(ts1, file = file, labels = "after", period_format = "%Y-%m")
+
   file <- "csv/ts1_t.csv"
   write_ts_csv(ts1, file = file, rowwise = FALSE, sep = ";", dec = ",")
   ts1_t_read <- read_ts_csv(file, dec = ",")

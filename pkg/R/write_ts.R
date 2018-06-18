@@ -10,10 +10,12 @@
 #' @param dec The decimal separator, by default ".". Cannot be the same as sep.
 #' @param labels should labels we written, and if so before the names or after
 #' the names? By default, labels are written after the names if present.
+#' @param period_format The period format.
 #' @importFrom data.table fwrite
 #' @export
 write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
-                        labels = c("after", "before", "no")) {
+                        labels = c("after", "before", "no"),
+                        period_format = "regts") {
 
   labels_missing <- missing(labels)
 
@@ -25,7 +27,8 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
     x <- univec2unimat(x, deparse(substitute(x)))
   }
 
-  dataframes  <- ts2df_(x, rowwise, labels, labels_missing)
+  dataframes  <- ts2df_(x, rowwise, labels, labels_missing, period_format,
+                        FALSE)
   data <- dataframes$data
   column_headers <- dataframes$column_headers
   has_labels <- dataframes$has_labels
@@ -124,7 +127,7 @@ NULL
 write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           rowwise = TRUE, append = FALSE,
                           labels = c("after", "before", "no"), comments,
-                          number_format) {
+                          number_format, period_as_Date = FALSE) {
 
   if (!is.matrix(x)) {
     x <- univec2unimat(x, deparse(substitute(x)))
@@ -156,7 +159,7 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 
   write_ts_sheet_(x, sheet, rowwise = rowwise,
                   labels = labels, labels_missing = missing(labels), comments,
-                  number_format)
+                  number_format, period_as_Date = period_as_Date)
 
   saveWorkbook(wb, file)
 
@@ -168,20 +171,21 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 #' @export
 write_ts_sheet <- function(x, sheet,  rowwise = TRUE,
                            labels = c("after", "before", "no"),
-                           comments, number_format) {
+                           comments, number_format, period_as_Date = FALSE) {
 
   if (!is.matrix(x)) {
     x <- univec2unimat(x, deparse(substitute(x)))
   }
 
   write_ts_sheet_(x, sheet, rowwise = rowwise, labels = labels,
-                  labels_missing = missing(labels), comments, number_format)
+                  labels_missing = missing(labels), comments, number_format,
+                  period_as_Date = period_as_Date)
 
 }
 
 # internal function to write a timeseries object to a sheet of an Excel workbook
 write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
-                            comments, number_format) {
+                            comments, number_format, period_as_Date) {
 
   # check for comments. The comments are actually written before the
   # autoSizeColumns() command has been executed.
@@ -192,7 +196,8 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
     n_comment_rows <- nrow(comments)
   }
 
-  dataframes  <- ts2df_(x, rowwise, labels, labels_missing)
+  dataframes  <- ts2df_(x, rowwise, labels, labels_missing, "regts",
+                        period_as_Date)
   data <- dataframes$data
   column_headers <- dataframes$column_headers
   has_labels <- dataframes$has_labels
@@ -213,14 +218,20 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
       as.data.frame(lapply(column_headers[, col_sel], FUN = as.numeric))
   }
 
-  # Write the column headers. Use right alignment for the numeric columns
-  wb <- sheet$getWorkbook()
-  right_align_style <- CellStyle(wb, alignment = Alignment(horizontal =
-                                                             "ALIGN_RIGHT"))
-  col_style <- rep(list(right_align_style), ncol(column_headers) - n_text_cols)
-  names(col_style) <- seq(n_text_cols + 1, ncol(column_headers))
+  # Write the column headers. Use right alignment for the column headers
+  # of data columns, except if period_as_Date has been used.
+
+  if (!period_as_Date) {
+    wb <- sheet$getWorkbook()
+    right_align_style <- CellStyle(wb, alignment = Alignment(horizontal =
+                                                               "ALIGN_RIGHT"))
+    col_style <- rep(list(right_align_style), ncol(column_headers) - n_text_cols)
+    names(col_style) <- seq(n_text_cols + 1, ncol(column_headers))
+  } else {
+    col_style <- NULL
+  }
   addDataFrame(column_headers, sheet, col.names = FALSE, row.names = FALSE,
-               colStyle = col_style, startRow = n_comment_rows + 1)
+             colStyle = col_style, startRow = n_comment_rows + 1)
 
   # now write the data part
 
@@ -264,8 +275,11 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
 #                   Otherwise column_headers has 1 row with periods (rowwise
 #                   timeseries) or names (columnwise timeseries)
 #   has_labels:     TRUE if the timeseries will be written with labels.
+#   period_format   period format: regts or for example %Y-%m-%d
+#   period_as_Date
 #
-ts2df_ <- function(x, rowwise, label_option, labels_missing) {
+ts2df_ <- function(x, rowwise, label_option, labels_missing, period_format,
+                   period_as_Date) {
 
   if (!is.ts(x)) {
     stop(paste("Argument x is not a timeseries object but a ", class(x)))
@@ -297,7 +311,11 @@ ts2df_ <- function(x, rowwise, label_option, labels_missing) {
   # remove the labels, we don't need them any more
   ts_labels(x) <- NULL
 
-  data <- as.data.frame(x, row_names = FALSE)
+  period_as_Date <- period_format != "regts" || period_as_Date
+  data <- as.data.frame(x, row_names = FALSE, period_as_Date = period_as_Date)
+  if (period_format != "regts") {
+    data$period <- format(data$period, period_format)
+  }
 
   if (rowwise) {
     periods <- data$period
@@ -315,9 +333,13 @@ ts2df_ <- function(x, rowwise, label_option, labels_missing) {
       col_headers <- c("label", "name")
     }
     n_rowheaders <- ncol(data) - length(periods)
-    column_headers <- as.data.frame(as.list(c(colnames(data)[1:n_rowheaders],
-                                              periods)),
+    column_headers <- as.data.frame(c(as.list(colnames(data)[1:n_rowheaders]),
+                                      as.list(periods)),
                                     stringsAsFactors = FALSE)
+    colnames(column_headers) <- NULL
+
+    cat("column_headers\n")
+    print(column_headers)
   } else {
     # columnwise timeseries
     column_headers <- as.data.frame(t(colnames(data)), stringsAsFactors = FALSE)

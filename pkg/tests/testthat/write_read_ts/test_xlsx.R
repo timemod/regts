@@ -26,6 +26,14 @@ test_that("ts without labels written correctly",  {
 
   write_ts_xlsx(ts1, file, sheet_name = "ts1", labels = "after")
 
+  file <- "xlsx/ts1_2.xlsx"
+
+  # make sure that the file is simply overwritten
+  writeLines(c("Hello","World"), con = file)
+
+  write_ts_xlsx(ts1, file, sheet_name = "ts1", labels = "after", period_as_Date = TRUE)
+
+
   comments <- c("This is a transposed timeseries", "")
   write_ts_xlsx(ts1, file, sheet_name = "ts1_t",  rowwise = FALSE,
                 comments = comments, append = TRUE)
