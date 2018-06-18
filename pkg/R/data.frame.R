@@ -13,10 +13,11 @@
 #' created for columnwise or rowwise timeseries, respectively.
 #' @param period_as_Date A logical (default \code{FALSE}).
 #' If \code{TRUE} the periods are stored as \code{\link[base]{Date}} objects.
-#' If you use this option it is recommended to use \code{row_names = FALSE},
-#' since row names are always characters. If row names are used
-#' the \code{Date} objects are converted to characters,
-#' using the  standard date format format \code{"\%Y-\%m-\%d"}
+#' Note that if you use either \code{rowwise=TRUE} or \code{row_names = FALSE},
+#' these dates are converted to characters, because row
+#' and column names of data frames are always characters.
+#' In that case the dates are formatted according to
+#' the standard date format format \code{"\%Y-\%m-\%d"}
 #' (see the documentation of function \code{\link[base]{strptime}}
 #' for more information about date formats).
 #' @param ... additional arguments to be passed to methods.
