@@ -5,9 +5,8 @@ using namespace Rcpp;
 NumericMatrix rel2index_cpp(NumericMatrix &grts) {
 
     /* Compute index timeseries from a growth timeseries grts.
-     * (grts[t] = X[t] - X_[t-1] / |X[t-1]|.
-     * base_index is the period index of the index series that should
-     * have the value 100, using index base 1 as in R! */
+     * grts[t] = (x[t] - x[t-1]) / |X[t-1]|.
+     */
 
     int ncol = grts.ncol();
     int nrow = grts.nrow();
