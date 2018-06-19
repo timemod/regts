@@ -124,6 +124,7 @@
 #'
 #' @importFrom data.table fread
 #' @importFrom tibble as.tibble
+#' @seealso \code{\link{write_ts_csv}} and \code{\link{read_ts_xlsx}}
 #' @export
 read_ts_csv <- function(filename, rowwise, frequency = NA,
                         skiprow = 0, skipcol = 0,

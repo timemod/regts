@@ -12,7 +12,7 @@
 #' the names? By default, labels are written after the names if present.
 #' @param period_format The period format. By default the
 #' \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}) is used.
-#' Alternatively, it is possible to specify the format employed by base R function
+#' Alternatively, it is possible to specify a format employed by base R function
 #' \code{\link[base]{strptime}}, e.g. \code{"\%Y-\%m-\%d"}.
 #' @importFrom data.table fwrite
 #' @examples
@@ -30,6 +30,7 @@
 #'    unlink("ts1.csv")
 #'    unlink("ts1_2.csv")
 #' }
+#' @seealso \code{\link{read_ts_csv}} and \code{\link{write_ts_xlsx}}
 #' @export
 write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
                         labels = c("after", "before", "no"),
@@ -141,6 +142,7 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #'    unlink("timeseries.xlsx")
 #'    unlink("ts_comments.xlsx")
 #' }
+#' @seealso \code{\link{read_ts_xlsx}} and \code{\link{write_ts_csv}}
 NULL
 
 #' @describeIn write_ts_xlsx-slash-write_ts_sheet writes timeseries to an Excel

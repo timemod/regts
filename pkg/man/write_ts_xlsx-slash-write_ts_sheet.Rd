@@ -102,3 +102,6 @@ write_ts_xlsx(ts1, file = "ts_comments.xlsx", sheet_name = "ts1",
    unlink("ts_comments.xlsx")
 }
 }
+\seealso{
+\code{\link{read_ts_xlsx}} and \code{\link{write_ts_csv}}
+}

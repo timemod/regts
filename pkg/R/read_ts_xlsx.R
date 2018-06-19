@@ -123,6 +123,7 @@
 #' @importFrom readxl read_excel
 #' @importFrom cellranger cell_limits
 #' @importFrom cellranger as.cell_limits
+#' @seealso \code{\link{write_ts_xlsx}} and \code{\link{read_ts_csv}}
 #' @export
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          skiprow = NA, skipcol = NA, rowwise, frequency = NA,

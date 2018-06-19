@@ -23,7 +23,7 @@ the names? By default, labels are written after the names if present.}
 
 \item{period_format}{The period format. By default the
 \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}) is used.
-Alternatively, it is possible to specify the format employed by base R function
+Alternatively, it is possible to specify a format employed by base R function
 \code{\link[base]{strptime}}, e.g. \code{"\%Y-\%m-\%d"}.}
 }
 \description{
@@ -45,4 +45,7 @@ write_ts_csv(ts1, file = "ts1_2.csv", rowwise = FALSE, period_format = "\%Y-\%m-
    unlink("ts1.csv")
    unlink("ts1_2.csv")
 }
+}
+\seealso{
+\code{\link{read_ts_csv}} and \code{\link{write_ts_xlsx}}
 }

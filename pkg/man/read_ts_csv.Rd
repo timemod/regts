@@ -145,3 +145,6 @@ read_ts_csv("data.csv", labels = "after", name_fun = tolower)
 }
 
 }
+\seealso{
+\code{\link{write_ts_csv}} and \code{\link{read_ts_xlsx}}
+}

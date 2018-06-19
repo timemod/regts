@@ -16,9 +16,9 @@
 #' Depending on arguments \code{rowwise} and \code{row_names}
 #' the periods may appear in the row or column names of the result data frame.
 #' In that case the dates are coerced to character vectors,
-#' using the standard date format format \code{"\%Y-\%m-\%d"}
+#' using the standard date format \code{"\%Y-\%m-\%d"}
 #' (see the documentation of function \code{\link[base]{strptime}}
-#' for more information about date formats) is used in the conversion.
+#' for more information about date formats).
 #' @param ... additional arguments to be passed to methods.
 #' @return A \code{\link[base]{data.frame}}
 #' @name as.data.frame

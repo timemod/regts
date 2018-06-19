@@ -141,3 +141,6 @@ read_ts_xlsx("data.xlsx", sheet = "Budget", labels = "after",
 }
 
 }
+\seealso{
+\code{\link{write_ts_xlsx}} and \code{\link{read_ts_csv}}
+}
