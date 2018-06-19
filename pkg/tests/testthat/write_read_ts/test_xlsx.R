@@ -90,8 +90,16 @@ test_that("period_as_date", {
   file <- "xlsx/ts1_date.xlsx"
   write_ts_xlsx(ts1_lbls, file, labels = "after", period_as_date = TRUE)
 
-  # TODO: check that the written file indeed contains date cells
+  # check if the file really contains date objects
+  first_row <- readxl::read_xlsx(file, n_max = 1, col_types = "list",
+                                  col_names = FALSE)
+  periods <- first_row[-c(1,2)]
+  names(periods) <- NULL
+  is_posixt <- sapply(periods, FUN = function(x) {inherits(x[[1]], "POSIXt")},
+                      USE.NAMES = FALSE)
+  expect_identical(is_posixt, rep(TRUE, 5))
 
+  # try to read the file with read_ts_xlsx
   ts1_date_read <- read_ts_xlsx(file, labels = "after", frequency = 4)
 
   expect_identical(ts1_lbls, ts1_date_read)
@@ -100,13 +108,15 @@ test_that("period_as_date", {
   write_ts_xlsx(ts1_lbls, file, labels = "before", rowwise = FALSE,
                 period_as_date = TRUE)
 
-  # TODO: check that the written file indeed contains date cells
+  # check if the file really contains date objects
+  df <- readxl::read_xlsx(file, skip = 2)
+  expect_identical(class(df[[1]]), c("POSIXct", "POSIXt"))
 
   ts1_date_t_read <- read_ts_xlsx(file, labels = "before", frequency = 4)
 
   expect_identical(ts1_lbls, ts1_date_t_read)
 
-  expect_identical(ts1_lbls, ts1_date_t_read)
+
 })
 
 
