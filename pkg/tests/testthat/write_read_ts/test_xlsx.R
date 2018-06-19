@@ -106,7 +106,7 @@ test_that("period_as_date", {
 
   expect_identical(ts1_lbls, ts1_date_t_read)
 
-  expect_identical(ts1_lbls, ts1_date_read)
+  expect_identical(ts1_lbls, ts1_date_t_read)
 })
 
 

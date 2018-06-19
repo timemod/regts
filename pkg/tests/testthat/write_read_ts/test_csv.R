@@ -89,5 +89,32 @@ test_that("no column names", {
 })
 
 
+test_that("period_format", {
+
+  file <- "csv/ts1_period_format.csv"
+  write_ts_csv(ts1_lbls, file, labels = "before", period_format = "%Y-%m-%d")
+
+  # read csv file, this is not (yet) possible with read_ts_csv
+  df <- data.table::fread(file)
+  df_t <- transpose_df(df, colname_column = "name", label_column = "label")
+  ts_read <- as.regts(df_t, time_column = 1, fun = function(x) {
+    period(as.Date(x), frequency = 4)
+  })
+  expect_identical(ts1_lbls, ts_read)
+
+  file <- "csv/ts1_period_format_t.csv"
+  write_ts_csv(ts1_lbls, file, labels = "before", rowwise = FALSE,
+               period_format = "%Y-%m-%d")
+
+  # read csv file, this is not (yet) possible with read_ts_csv
+  df <- data.table::fread(file, skip = 1)
+  ts_read <- as.regts(df, time_column = 1, fun = function(x) {
+    period(as.Date(x), frequency = 4)
+  })
+  # we lost the labels, therefore compare with ts1
+  expect_identical(ts1, ts_read)
+})
+
+
 
 
