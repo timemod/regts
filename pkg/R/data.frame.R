@@ -11,15 +11,14 @@
 #' @param row_names Whether to create row names. If \code{FALSE},
 #' then an additional column with name \code{"period"} or \code{"name"} is
 #' created for columnwise or rowwise timeseries, respectively.
-#' @param period_as_Date A logical (default \code{FALSE}).
+#' @param period_as_date A logical (default \code{FALSE}).
 #' If \code{TRUE} the periods are stored as \code{\link[base]{Date}} objects.
-#' Note that if you use either \code{rowwise=TRUE} or \code{row_names = FALSE},
-#' these dates are converted to characters, because row
-#' and column names of data frames are always characters.
-#' In that case the dates are formatted according to
-#' the standard date format format \code{"\%Y-\%m-\%d"}
+#' Depending on arguments \code{rowwise} and \code{row_names}
+#' the periods may appear in the row or column names of the result data frame.
+#' In that case the dates are coerced to character vectors,
+#' using the standard date format format \code{"\%Y-\%m-\%d"}
 #' (see the documentation of function \code{\link[base]{strptime}}
-#' for more information about date formats).
+#' for more information about date formats) is used in the conversion.
 #' @param ... additional arguments to be passed to methods.
 #' @return A \code{\link[base]{data.frame}}
 #' @name as.data.frame
@@ -29,7 +28,7 @@
 #'            labels = c("Timeseries a", "Timeseries b"))
 #' print(as.data.frame(ts))
 as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
-                                period_as_Date = FALSE) {
+                                period_as_date = FALSE) {
 
   if (!is.matrix(x)) {
     xsub <- substitute(x)
@@ -42,7 +41,7 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
   # convert the time index to a character vector with period texts
   first_period <- start_period.ts(x)
   periods <- first_period + (0 : (NROW(x) - 1))
-  if (period_as_Date)  {
+  if (period_as_date)  {
     times <- lapply(periods, FUN = as.Date)
     # convert list of Dates to a vector of Dates. sapply doesn't work here
     times <- do.call(c, times)

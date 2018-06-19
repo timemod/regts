@@ -8,10 +8,10 @@
 \usage{
 write_ts_xlsx(x, file, sheet_name = "Sheet1", rowwise = TRUE,
   append = FALSE, labels = c("after", "before", "no"), comments,
-  number_format)
+  number_format, period_as_date = FALSE)
 
 write_ts_sheet(x, sheet, rowwise = TRUE, labels = c("after", "before",
-  "no"), comments, number_format)
+  "no"), comments, number_format, period_as_date = FALSE)
 }
 \arguments{
 \item{x}{a \code{\link{ts}} or \code{\link{regts}} object}
@@ -40,6 +40,11 @@ written.}
 For example, \code{"#.00"} corresponds to two decimal spaces.
 For details see the description of the function \code{\link[xlsx]{DataFormat}}
 in the \code{\link[xlsx:xlsx-package]{xlsx}} package.}
+
+\item{period_as_date}{A logical (default \code{FALSE}).
+If \code{TRUE} the periods are written as date values to the Excel file.
+By default the periods are written as characters using the standard
+\code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}).}
 
 \item{sheet}{a \code{\link[xlsx]{Sheet}} object (see the documentation
 of package \code{xlsx})}

@@ -10,8 +10,26 @@
 #' @param dec The decimal separator, by default ".". Cannot be the same as sep.
 #' @param labels should labels we written, and if so before the names or after
 #' the names? By default, labels are written after the names if present.
-#' @param period_format The period format.
+#' @param period_format The period format. By default the
+#' \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}) is used.
+#' Alternatively, it is possible to specify the format employed by base R function
+#' \code{\link[base]{strptime}}, e.g. \code{"\%Y-\%m-\%d"}.
 #' @importFrom data.table fwrite
+#' @examples
+#' # create two timeseries objects
+#' ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
+#'              labels = c("Timeseries a", "Timeseries b"), start = "2017Q2")
+#'
+#' # write timeseries to csv
+#' write_ts_csv(ts1, file = "ts1.csv", labels = "after")
+#'
+#' # write timeseries columnwise to csv, using a specified period_format
+#' write_ts_csv(ts1, file = "ts1_2.csv", rowwise = FALSE, period_format = "%Y-%m-%d")
+#
+#' \dontshow{
+#'    unlink("ts1.csv")
+#'    unlink("ts1_2.csv")
+#' }
 #' @export
 write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
                         labels = c("after", "before", "no"),
@@ -76,6 +94,10 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' For example, \code{"#.00"} corresponds to two decimal spaces.
 #' For details see the description of the function \code{\link[xlsx]{DataFormat}}
 #' in the \code{\link[xlsx:xlsx-package]{xlsx}} package.
+#' @param period_as_date A logical (default \code{FALSE}).
+#' If \code{TRUE} the periods are written as date values to the Excel file.
+#' By default the periods are written as characters using the standard
+#' \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}).
 #' @param comments a character vector or data frame. The comments
 #' are written to the beginning of the sheet, before the timeseries data is
 #' written.
@@ -127,7 +149,7 @@ NULL
 write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           rowwise = TRUE, append = FALSE,
                           labels = c("after", "before", "no"), comments,
-                          number_format, period_as_Date = FALSE) {
+                          number_format, period_as_date = FALSE) {
 
   if (!is.matrix(x)) {
     x <- univec2unimat(x, deparse(substitute(x)))
@@ -159,7 +181,7 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 
   write_ts_sheet_(x, sheet, rowwise = rowwise,
                   labels = labels, labels_missing = missing(labels), comments,
-                  number_format, period_as_Date = period_as_Date)
+                  number_format, period_as_date = period_as_date)
 
   saveWorkbook(wb, file)
 
@@ -171,7 +193,7 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 #' @export
 write_ts_sheet <- function(x, sheet,  rowwise = TRUE,
                            labels = c("after", "before", "no"),
-                           comments, number_format, period_as_Date = FALSE) {
+                           comments, number_format, period_as_date = FALSE) {
 
   if (!is.matrix(x)) {
     x <- univec2unimat(x, deparse(substitute(x)))
@@ -179,13 +201,13 @@ write_ts_sheet <- function(x, sheet,  rowwise = TRUE,
 
   write_ts_sheet_(x, sheet, rowwise = rowwise, labels = labels,
                   labels_missing = missing(labels), comments, number_format,
-                  period_as_Date = period_as_Date)
+                  period_as_date = period_as_date)
 
 }
 
 # internal function to write a timeseries object to a sheet of an Excel workbook
 write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
-                            comments, number_format, period_as_Date) {
+                            comments, number_format, period_as_date) {
 
   # check for comments. The comments are actually written before the
   # autoSizeColumns() command has been executed.
@@ -197,7 +219,7 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
   }
 
   dataframes  <- ts2df_(x, rowwise, labels, labels_missing, "regts",
-                        period_as_Date)
+                        period_as_date)
   data <- dataframes$data
   column_headers <- dataframes$column_headers
   has_labels <- dataframes$has_labels
@@ -219,9 +241,9 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
   }
 
   # Write the column headers. Use right alignment for the column headers
-  # of data columns, except if period_as_Date has been used.
+  # of data columns, except if period_as_date has been used.
 
-  if (!period_as_Date) {
+  if (!period_as_date) {
     wb <- sheet$getWorkbook()
     right_align_style <- CellStyle(wb, alignment = Alignment(horizontal =
                                                                "ALIGN_RIGHT"))
@@ -276,10 +298,10 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
 #                   timeseries) or names (columnwise timeseries)
 #   has_labels:     TRUE if the timeseries will be written with labels.
 #   period_format   period format: regts or for example %Y-%m-%d
-#   period_as_Date
+#   period_as_date  write period as Dates.
 #
 ts2df_ <- function(x, rowwise, label_option, labels_missing, period_format,
-                   period_as_Date) {
+                   period_as_date) {
 
   if (!is.ts(x)) {
     stop(paste("Argument x is not a timeseries object but a ", class(x)))
@@ -295,8 +317,10 @@ ts2df_ <- function(x, rowwise, label_option, labels_missing, period_format,
     if (labels_missing) {
       if (is.null(lbls)) {
         label_option <- "no"
-      } else {
+      } else if (rowwise) {
         label_option <- "after"
+      } else {
+        label_option <- "before"
       }
     } else {
       if (is.null(lbls)) {
@@ -311,8 +335,8 @@ ts2df_ <- function(x, rowwise, label_option, labels_missing, period_format,
   # remove the labels, we don't need them any more
   ts_labels(x) <- NULL
 
-  period_as_Date <- period_format != "regts" || period_as_Date
-  data <- as.data.frame(x, row_names = FALSE, period_as_Date = period_as_Date)
+  period_as_date <- period_format != "regts" || period_as_date
+  data <- as.data.frame(x, row_names = FALSE, period_as_date = period_as_date)
   if (period_format != "regts") {
     data$period <- format(data$period, period_format)
   }
@@ -337,17 +361,14 @@ ts2df_ <- function(x, rowwise, label_option, labels_missing, period_format,
                                       as.list(periods)),
                                     stringsAsFactors = FALSE)
     colnames(column_headers) <- NULL
-
-    cat("column_headers\n")
-    print(column_headers)
   } else {
     # columnwise timeseries
     column_headers <- as.data.frame(t(colnames(data)), stringsAsFactors = FALSE)
-    if (label_option == "after") {
+    if (label_option == "before") {
       column_headers <- rbind(c("label", lbls), column_headers,
                                 stringsAsFactors = FALSE)
-    } else if (label_option == "before") {
-        stop("For columnwise timeseries labels option \"before\" is not allowed")
+    } else if (label_option == "after") {
+        stop("For columnwise timeseries labels option \"after\" is not allowed")
     }
   }
 

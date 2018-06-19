@@ -24,9 +24,6 @@ test_that("ts with labels written correctly",  {
   ts1_read <- read_ts_csv(file)
   expect_identical(ts1, ts1_read)
 
-  file <- "csv/ts1_2.csv"
-  write_ts_csv(ts1, file = file, labels = "after", period_format = "%Y-%m")
-
   file <- "csv/ts1_t.csv"
   write_ts_csv(ts1, file = file, rowwise = FALSE, sep = ";", dec = ",")
   ts1_t_read <- read_ts_csv(file, dec = ",")
@@ -54,9 +51,9 @@ test_that("file with labels with label option before written correctly",  {
   expect_identical(ts1_lbls, ts1_read)
 
   file <- "csv/ts1_lbls_before_t.csv"
-  msg = "For columnwise timeseries labels option \"before\" is not allowed"
+  msg = "For columnwise timeseries labels option \"after\" is not allowed"
   expect_error(write_ts_csv(ts1_lbls, file = file, rowwise = FALSE,
-                            labels = "before"), msg = msg)
+                            labels = "after"), msg = msg)
 })
 
 test_that("file with labels with label option no written correctly",  {

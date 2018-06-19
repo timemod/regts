@@ -157,7 +157,7 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
   not_all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
   tbl <- tbl[ , not_all_na, drop = FALSE]
 
-  period_info <- find_periods(tbl, frequency, rowwise)
+  period_info <- find_periods(tbl, frequency, rowwise, xlsx = FALSE)
 
   if (is.null(period_info)) {
     stop(sprintf("No periods found in file %s\n", filename))
@@ -225,7 +225,7 @@ read_ts_rowwise <- function(tbl, frequency, labels = c("no", "after", "before"),
 
   data_cols <- (max(c(name_col, label_cols)) + 1) : ncol(tbl)
 
-  periods <- tibble_2_char(tbl[1, data_cols])
+  periods <- get_periods_tbl(tbl[1, data_cols], frequency, xlsx = FALSE)
 
   names <- tibble_2_char(tbl[-1, name_col], replace_na = FALSE)
   name_sel <- !is.na(names)
@@ -238,13 +238,13 @@ read_ts_rowwise <- function(tbl, frequency, labels = c("no", "after", "before"),
   # into account
   mat <- numeric_matrix(tbl[, data_cols], dec = dec)
   mat <- t(mat)
-  rownames(mat) <- periods
   colnames(mat) <- names
-
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that df is numeric
-  ret <- as.regts(mat, frequency = frequency, numeric = FALSE)
+  ret <- matrix2regts_(mat, periods, fun = period, numeric = FALSE,
+                       frequency = frequency)
+
 
   if (labels != "no" && length(label_cols) > 0) {
     lbl_data <- tbl[, label_cols]
@@ -333,14 +333,16 @@ read_ts_columnwise <- function(tbl, frequency = NA,
   # stored in variables ts_names and lbls)
   tbl <- tbl[is_period, ]
 
+  periods <- get_periods_tbl(tbl[[1]], frequency, xlsx = FALSE)
+
   # convert data columns to a numeric matrix, employing C++ function
   # list_tbl_2_mat.
   mat <- numeric_matrix(tbl[-1], dec = dec)
-  rownames(mat) <- tibble_2_char(tbl[[1]])
   colnames(mat) <- ts_names
 
   # set numeric = FALSE, because we already know that df is numeric
-  ret <- as.regts(mat, frequency = frequency, numeric = FALSE)
+  ret <- matrix2regts_(mat, periods, fun = period, numeric = FALSE,
+                       frequency = frequency)
 
   if (labels != "no" && any(lbls != "")) {
     ts_labels(ret) <- lbls

@@ -26,14 +26,6 @@ test_that("ts without labels written correctly",  {
 
   write_ts_xlsx(ts1, file, sheet_name = "ts1", labels = "after")
 
-  file <- "xlsx/ts1_2.xlsx"
-
-  # make sure that the file is simply overwritten
-  writeLines(c("Hello","World"), con = file)
-
-  write_ts_xlsx(ts1, file, sheet_name = "ts1", labels = "after", period_as_Date = TRUE)
-
-
   comments <- c("This is a transposed timeseries", "")
   write_ts_xlsx(ts1, file, sheet_name = "ts1_t",  rowwise = FALSE,
                 comments = comments, append = TRUE)
@@ -92,6 +84,29 @@ test_that("univariate timeseries", {
   write_ts_xlsx(a, file = "xlsx/ts1_univec.xlsx")
   expect_identical(a_mat, read_ts_xlsx("xlsx/ts1_unimat.xlsx", labels = "before"))
   expect_identical(a_mat, read_ts_xlsx("xlsx/ts1_univec.xlsx", labels = "after"))
+})
+
+test_that("period_as_date", {
+  file <- "xlsx/ts1_date.xlsx"
+  write_ts_xlsx(ts1_lbls, file, labels = "after", period_as_date = TRUE)
+
+  # TODO: check that the written file indeed contains date cells
+
+  ts1_date_read <- read_ts_xlsx(file, labels = "after", frequency = 4)
+
+  expect_identical(ts1_lbls, ts1_date_read)
+
+  file <- "xlsx/ts1_date_t.xlsx"
+  write_ts_xlsx(ts1_lbls, file, labels = "before", rowwise = FALSE,
+                period_as_date = TRUE)
+
+  # TODO: check that the written file indeed contains date cells
+
+  ts1_date_t_read <- read_ts_xlsx(file, labels = "before", frequency = 4)
+
+  expect_identical(ts1_lbls, ts1_date_t_read)
+
+  expect_identical(ts1_lbls, ts1_date_read)
 })
 
 
