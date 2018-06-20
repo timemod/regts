@@ -270,6 +270,24 @@ get_year <- function(x) {
   return(get_year__(x))
 }
 
+#' @export
+as.Date.period <- function(x, ...) {
+
+  # first change frequency to month
+  freq_x  <- frequency(x)
+
+  if (12 %% freq_x != 0) {
+    stop(sprintf(paste("12 is not divisible by frequency timeseries",
+                       "(%d)."), freq_x))
+  }
+  per_m <- create_period(floor(12 * x[1] / freq_x), 12)
+
+  year <- get_year(per_m)
+  month <- get_subperiod(per_m)
+  date_text <- paste0(year, "-", month, "-01")
+  return(as.Date(date_text))
+}
+
 #' Return the subperiod of a \code{\link{period}}
 #'
 #' This function returns the subperiod within a year.
@@ -301,7 +319,6 @@ create_period <- function(subperiod_count, frequency) {
   return(structure(subperiod_count, class = "period",
                     frequency = frequency))
 }
-
 
 # PRIVATE METHODS THAT COULD BE USEFULL FOR AUTOMATIC CONVERSIONS
 # OF DATA FRAMES to TS

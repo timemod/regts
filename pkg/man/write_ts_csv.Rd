@@ -5,7 +5,7 @@
 \title{Write timeseries to a csv file}
 \usage{
 write_ts_csv(x, file, rowwise = TRUE, sep = ",", dec = ".",
-  labels = c("after", "before", "no"))
+  labels = c("after", "before", "no"), period_format = "regts")
 }
 \arguments{
 \item{x}{a \code{\link{ts}} or \code{\link{regts}} object}
@@ -20,9 +20,32 @@ write_ts_csv(x, file, rowwise = TRUE, sep = ",", dec = ".",
 
 \item{labels}{should labels we written, and if so before the names or after
 the names? By default, labels are written after the names if present.}
+
+\item{period_format}{The period format. By default the
+\code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}) is used.
+Alternatively, it is possible to specify a format employed by base R function
+\code{\link[base]{strptime}}, e.g. \code{"\%Y-\%m-\%d"}.}
 }
 \description{
 This function writes timeseries to a csv file.
 The csv file is actually written by function \code{\link[data.table]{fwrite}}
 of package \code{data.table}.
+}
+\examples{
+# create two timeseries objects
+ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
+             labels = c("Timeseries a", "Timeseries b"), start = "2017Q2")
+
+# write timeseries to csv
+write_ts_csv(ts1, file = "ts1.csv", labels = "after")
+
+# write timeseries columnwise to csv, using a specified period_format
+write_ts_csv(ts1, file = "ts1_2.csv", rowwise = FALSE, period_format = "\%Y-\%m-\%d")
+\dontshow{
+   unlink("ts1.csv")
+   unlink("ts1_2.csv")
+}
+}
+\seealso{
+\code{\link{read_ts_csv}} and \code{\link{write_ts_xlsx}}
 }

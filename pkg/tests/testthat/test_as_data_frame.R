@@ -86,3 +86,28 @@ test_that("multivariate timeseries with labels", {
                    remove_row_names(transpose_df(multi_df), TRUE))
 })
 
+test_that("period_as_date", {
+
+  date_periods <- c(as.Date("2018-01-01"), as.Date("2018-04-01"),
+                    as.Date("2018-07-01"))
+
+  a_ts_df <- as.data.frame(a_ts, row_names = FALSE, period_as_date = TRUE)
+
+  expected_result <- data.frame(period = date_periods, a_ts = as.integer(a_ts))
+  expect_identical(a_ts_df, expected_result)
+
+  expect_identical(as.regts(a_ts_df, time_column = "period", frequency = 4)[, 1],
+                   a_ts)
+
+  a_ts_df2 <- as.data.frame(a_ts, row_names = TRUE, period_as_date = TRUE)
+
+  expected_result <- data.frame(a_ts = as.integer(1:3))
+  rownames(expected_result) <- date_periods
+  expect_identical(a_ts_df2, expected_result)
+
+  conv_fun <- function(x) {
+    return(period(as.Date(x), frequency = 4))
+  }
+  expect_identical(as.regts(a_ts_df2, fun = conv_fun)[, 1],
+                   a_ts)
+})

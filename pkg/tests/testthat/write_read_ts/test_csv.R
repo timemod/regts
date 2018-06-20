@@ -51,9 +51,9 @@ test_that("file with labels with label option before written correctly",  {
   expect_identical(ts1_lbls, ts1_read)
 
   file <- "csv/ts1_lbls_before_t.csv"
-  msg = "For columnwise timeseries labels option \"before\" is not allowed"
+  msg = "For columnwise timeseries labels option \"after\" is not allowed"
   expect_error(write_ts_csv(ts1_lbls, file = file, rowwise = FALSE,
-                            labels = "before"), msg = msg)
+                            labels = "after"), msg = msg)
 })
 
 test_that("file with labels with label option no written correctly",  {
@@ -86,6 +86,33 @@ test_that("no column names", {
   colnames(expected_result) <- c("series1", "series2")
   expect_identical(expected_result, read_ts_csv("csv/ts1_no_colnames.csv",
                                                 labels = "after"))
+})
+
+
+test_that("period_format", {
+
+  file <- "csv/ts1_period_format.csv"
+  write_ts_csv(ts1_lbls, file, labels = "before", period_format = "%Y-%m-%d")
+
+  # read csv file, this is not (yet) possible with read_ts_csv
+  df <- data.table::fread(file)
+  df_t <- transpose_df(df, colname_column = "name", label_column = "label")
+  ts_read <- as.regts(df_t, time_column = 1, fun = function(x) {
+    period(as.Date(x), frequency = 4)
+  })
+  expect_identical(ts1_lbls, ts_read)
+
+  file <- "csv/ts1_period_format_t.csv"
+  write_ts_csv(ts1_lbls, file, labels = "before", rowwise = FALSE,
+               period_format = "%Y-%m-%d")
+
+  # read csv file, this is not (yet) possible with read_ts_csv
+  df <- data.table::fread(file, skip = 1)
+  ts_read <- as.regts(df, time_column = 1, fun = function(x) {
+    period(as.Date(x), frequency = 4)
+  })
+  # we lost the labels, therefore compare with ts1
+  expect_identical(ts1, ts_read)
 })
 
 

@@ -55,12 +55,15 @@ This function attempts to read timeseries from an xls(x) file.
 The xls(x) file is actually read by function \code{\link[readxl]{read_excel}}
 of package \code{readxl}.
 The timeseries can be stored both rowwise or columnwise on the sheet.
-The function tries to find period cells on the sheet.
-Period cells should contain a text with the format recognized by function
-\code{\link{period}}, for example \code{"2010Q2"}, \code{"2010.2Q"},
+The function tries to find period cells on the sheet. Period cells are
+cells containing
+\itemize{
+\item a text with the format recognized by function \code{\link{period}},
+for example \code{"2010Q2"}, \code{"2010.2Q"},
 \code{"2010M2"}, \code{"2011"} or \code{"2011-1"},
-Period cells may also contain an integer value (e.g. \code{2018}), which
-is considered as a year.
+\item an integer value (e.g. \code{2018}), which is considered as a year.
+\item a date
+}
 }
 \details{
 In many cases, this function will read timeseries correctly.
@@ -137,4 +140,7 @@ read_ts_xlsx("data.xlsx", sheet = "Budget", labels = "after",
              name_fun = tolower)
 }
 
+}
+\seealso{
+\code{\link{write_ts_xlsx}} and \code{\link{read_ts_csv}}
 }
