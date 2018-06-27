@@ -5,8 +5,8 @@
 \title{Read timeseries from a sheet of an  xls(x) file}
 \usage{
 read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = NA,
-  skipcol = NA, rowwise, frequency = NA, labels = c("no", "after",
-  "before"), na_string = "", name_fun)
+  skipcol = NA, rowwise, frequency = NA, labels = c("after", "before",
+  "no"), na_string = "", name_fun)
 }
 \arguments{
 \item{filename}{a string with the filename}
@@ -18,11 +18,11 @@ defaults to the first sheet}
 
 \item{range}{A cell range to read from, as described in
 \code{\link[readxl]{cell-specification}}. Includes typical Excel ranges
-like "B3:D87", possibly including the
-sheet name like "Budget!B2:G14", and more.
+like \code{"B3:D87"}, possibly including the
+sheet name like \code{"Budget!B2:G14"}, and more.
 Strictly, even if the range forces the inclusion of leading or trailing
 empty rows or columns.
-Takes precedence over skiprow, skipcol and sheet}
+Takes precedence over \code{skiprow}, \code{skipcol} and \code{sheet}.}
 
 \item{skiprow}{the number of rows to skip, including leading empty rows.
 Ignored if \code{range} is given. By default, all leading empty rows are
@@ -40,7 +40,7 @@ the timeseries are stored rowwise or columnwise.}
 This argument is mandatory if the file contains period texts without
 frequency indicator (for example "2011-1").}
 
-\item{labels}{label option. See details.}
+\item{labels}{label option. See Details.}
 
 \item{na_string}{Character vector of strings to use for missing values.
 By default, \code{read_ts_xlsx} treats blank cells as missing data.}
@@ -48,7 +48,7 @@ By default, \code{read_ts_xlsx} treats blank cells as missing data.}
 \item{name_fun}{function to apply to the names of the timeseries.}
 }
 \value{
-a \code{\link{regts}} object
+a \code{regts} object
 }
 \description{
 This function attempts to read timeseries from an xls(x) file.
@@ -60,7 +60,7 @@ cells containing
 \itemize{
 \item a text with the format recognized by function \code{\link{period}},
 for example \code{"2010Q2"}, \code{"2010.2Q"},
-\code{"2010M2"}, \code{"2011"} or \code{"2011-1"},
+\code{"2010m2"}, \code{"2011"} or \code{"2011-1"},
 \item an integer value (e.g. \code{2018}), which is considered as a year.
 \item a date
 }
@@ -83,41 +83,46 @@ rowwise or columnwise based on the positions of the period cells.
 
 For rowwise timeseries, the function searches for the first
 row with periods.  All rows before the period row are ignored.
-The first non-empty column in the sheet should contain  the timeseries names.
+Columns without a valid period in the period row are also ignored.
+The first non-empty column in the sheet should contain the timeseries names
+(or labels if argument \code{labels = "before"}, see the discussion below).
 Otherwise, use argument \code{skipcol} to specify the number of columns
 to skip.
 
 \if{html}{\figure{xlsschemarowwise.jpg}{options: width=260}}
 \if{latex}{\figure{xlsschemarowwise.jpg}{options: width=5in}}
 
-There may be one or more columns between the column with variable names
-and the columns where the actual timeseries are stored.
-If argument \code{labels = "after"}  then the texts in these
-columns will be used to create timeseries labels. If \code{labels = "before"},
-the last column before the data is supposed to contain
-the variable names. The columns before the variable name column
-now should contain label information.
+There may be more than one column before the columns with timeseries values
+(data columns). In that case one column should contain the variable names.
+The other columns before the first data column are used to create
+timeseries labels (see \code{\link{ts_labels}}). If argument
+\code{labels = "after"} (default), then the first
+column contains the variable names. If \code{labels = "no"} the first column
+also contains variable names but the other columns before the first data
+column are ignored. If argument \code{labels = "before"}, then the variable
+names should be in the last column before the first data column.
 
 \strong{columnwise timeseries}
 
 For columnwise timeseries, the first non-empty row that has been read (see
-argument \code{range} or \code{skiprow}) should contain the variable names.
+argument \code{range} or \code{skiprow}) should contain the variable names
+(or labels if argument \code{labels = "before"}, see the discussion below).
 The periods can be in any column on the sheet.
-All columns to the left of the time column are ignored.
+Rows without a valid period in the period column are ignored.
+All columns to the left of the period column are also ignored.
 
 \if{html}{\figure{xlsschemacolumnwise.jpg}{options: width=240}}
 \if{latex}{\figure{xlsschemacolumnwise.jpg}{options: width=5in}}
 
-There may be one or more rows between the column names and the rows
-where the actual timeseries are stored.
-If argument \code{labels = "after"}  then the texts in these
-rows will be used to create timeseries labels.
- If \code{labels = "before"},
-the last row before the data is supposed to contain
-the variable names. Now the row before the variable name row
-should contain label information. If argument \code{use_colnames = TRUE},
-then the label option \code{"before"} is not allowed for columnwise
-timeseries, since in that case the column names are the timeseries names.
+There may be more than one row before the rows with timeseries values
+(data rows). In that case one row should contain the variable names.
+The other rows before the first data row are used to create
+timeseries labels (see \code{\link{ts_labels}}).
+If argument  \code{labels = "after"} (default), then the first
+row contains the variable names. If \code{labels = "no"} the first row
+also contains variable names but the other rows before the first data
+row are ignored. If argument \code{labels = "before"}, then the variable
+names should be in the last row before the first data row.
 
 By default, the function skips all leading empty rows and columns,
 just as \code{read_excel}. This behaviour can be overruled by specifying
