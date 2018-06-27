@@ -200,6 +200,9 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
   # ignore possible period in the first colum
   first_prd_col <- max(first_prd_col, 2)
 
+  # no labels found, ignore labels
+  if (first_prd_col == 2) labels = "no"
+
   name_col <- if (labels == "before") first_prd_col - 1 else 1
 
   if (labels == "before") {
@@ -274,6 +277,9 @@ read_ts_tbl_columnwise <- function(tbl, frequency = NA,
 
   # ignore possible period in the first row
   first_data_row <- max(first_data_row, 2)
+
+  # no labels found, ignore labels
+  if (first_data_row == 2) labels <- "no"
 
   # compute the row with variable names. 0 means: column names
   # and the label rows
