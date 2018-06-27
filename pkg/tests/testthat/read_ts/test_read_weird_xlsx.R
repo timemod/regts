@@ -1,6 +1,8 @@
 library(regts)
 library(testthat)
 
+rm(list = ls())
+
 context("read_ts_xlsx for weird xlsx files")
 
 
@@ -45,7 +47,7 @@ test_that("weird_2.xlsx is read correctly",  {
   b <- 2 * a
   expected_result1 <- cbind(a, b)
 
-  result1 <- read_ts_xlsx(xlsx_file, frequency = 4)
+  result1 <- read_ts_xlsx(xlsx_file, frequency = 4, labels = "no")
   expect_equal(result1, expected_result1)
 
   a <- regts(sqrt(1:3), start = "2000")

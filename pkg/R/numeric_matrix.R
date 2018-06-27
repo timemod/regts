@@ -26,6 +26,11 @@ numeric_matrix <- function(x, dec = ".") {
     stop("Argument x is not a data frame")
   }
 
+  if (nrow(x) == 0 || ncol(x) == 0) {
+    # no data available
+    return(matrix(0.0, nrow = nrow(x), ncol = ncol(x)))
+  }
+
   # save row and column names
   row_names <- if (.row_names_info(x) <= 0L) {
                  NULL

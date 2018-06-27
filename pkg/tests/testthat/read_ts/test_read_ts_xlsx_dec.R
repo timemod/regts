@@ -1,6 +1,8 @@
 library(regts)
 library(testthat)
 
+rm(list = ls())
+
 context("read_ts_xlsx for xlsx files with many decimals")
 
 prd <- period_range("2010Q2/2010Q3")
@@ -23,7 +25,7 @@ test_that("example6.xlsx is read correctly",  {
 
 test_that("example7.xlsx is read correctly",  {
   xlsx_file <- "xlsx/example7.xlsx"
-  expect_warning(result <- read_ts_xlsx(xlsx_file, labels = "after"), msg)
+  expect_warning(result <- read_ts_xlsx(xlsx_file), msg)
   expect_identical(result, correct_result)
 })
 
