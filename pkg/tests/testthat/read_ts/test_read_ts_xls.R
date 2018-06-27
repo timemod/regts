@@ -20,10 +20,10 @@ test_that("example1.xls is read correctly",  {
 
   xls_file <- "xlsx/example1.xls"
 
-  result <- read_ts_xlsx(xls_file, skiprow = 1)
+  result <- read_ts_xlsx(xls_file, skiprow = 1, labels = "no")
   expect_equal(result, correct_result)
 
-  result2 <- read_ts_xlsx(xls_file, skiprow = 1, labels = "after")
+  result2 <- read_ts_xlsx(xls_file, skiprow = 1)
   expect_identical(result2, correct_result_labels)
 
   correct_result_labels2 <- correct_result[ , "b", drop = FALSE]

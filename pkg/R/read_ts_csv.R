@@ -128,7 +128,7 @@
 #' @export
 read_ts_csv <- function(filename, rowwise, frequency = NA,
                         skiprow = 0, skipcol = 0,
-                        labels = c("no", "after", "before"),
+                        labels = c("after", "before", "no"),
                         sep = "auto", fill = FALSE,
                         dec = if (sep != ".") "." else ",",
                         na_string = "", name_fun) {
@@ -189,7 +189,7 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
 # internal function to read timeseries rowwise from a data frame with
 # the time index in the column header.
 # is numeric = TRUE, then the timeseries are converted to numeric
-read_ts_rowwise <- function(tbl, frequency, labels = c("no", "after", "before"),
+read_ts_rowwise <- function(tbl, frequency, labels = c("after", "before", "no"),
                             name_fun, dec = ".", period_info) {
 
   labels <- match.arg(labels)
@@ -271,7 +271,7 @@ read_ts_rowwise <- function(tbl, frequency, labels = c("no", "after", "before"),
 # Internal function to read timeseries columnwise from a dataframe.
 # This function is used in function read_ts_csv and read_ts_xlsx
 read_ts_columnwise <- function(tbl, frequency = NA,
-                               labels = c("no", "after", "before"),
+                               labels = c("after", "before", "no"),
                                name_fun, dec =  ".", period_info) {
 
   labels <- match.arg(labels)
@@ -342,8 +342,7 @@ read_ts_columnwise <- function(tbl, frequency = NA,
 
   periods <- get_periods_tbl(tbl[[1]], frequency, xlsx = FALSE)
 
-  # convert data columns to a numeric matrix, employing C++ function
-  # list_tbl_2_mat.
+  # convert data columns to a numeric matrix, employing function numeric_matrix
   mat <- numeric_matrix(tbl[-1], dec = dec)
   colnames(mat) <- ts_names
 

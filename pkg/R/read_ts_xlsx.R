@@ -127,7 +127,7 @@
 #' @export
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          skiprow = NA, skipcol = NA, rowwise, frequency = NA,
-                         labels = c("no", "after", "before"),
+                         labels = c("after", "before", "no"),
                          na_string = "", name_fun) {
 
   if (missing(range)) {
@@ -184,7 +184,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 # the time index in the column header.
 # is numeric = TRUE, then the timeseries are converted to numeric
 read_ts_tbl_rowwise <- function(tbl, frequency,
-                                labels = c("no", "after", "before"),
+                                labels = c("after", "before", "no"),
                                 period_info) {
 
   labels <- match.arg(labels)
@@ -266,7 +266,7 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
 # Internal function to read timeseries columnwise from a tibble read in
 # with readxl::read_excel.
 read_ts_tbl_columnwise <- function(tbl, frequency = NA,
-                                   labels = c("no", "after", "before"),
+                                   labels = c("after", "before", "no"),
                                    period_info) {
 
   labels <- match.arg(labels)
