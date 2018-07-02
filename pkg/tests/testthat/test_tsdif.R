@@ -34,8 +34,17 @@ test_that("simple example", {
   expect_equal(res, res_correct)
 })
 
+test_that("argument fun", {
+  res2 <- tsdif(ts1, ts2, fun = function(x1, x2) (sin(x2 - x1)))
+  res2_correct <- res_correct
+  res2_correct$fun <- "function(x1, x2) (sin(x2 - x1))"
+  res2_correct$dif <- sin(-res2_correct$dif)
+  expect_equal(res2, res2_correct)
+})
+
 test_that("check simple output", {
-expect_known_output(tsdif(ts1, ts2), "expected_output/tsdif.txt", print = TRUE)
+  expect_known_output(tsdif(ts1, ts2), "expected_output/tsdif.txt",
+                      print = TRUE)
 })
 
 test_that("no difference", {
@@ -52,6 +61,8 @@ test_that("no difference", {
                              ts_names = c("ts1", "ts1"),
                              tol = 0, fun = NULL)
   expect_equal(res, res_no_dif)
+  expect_known_output(res, "expected_output/tsdif_no_dif.txt",
+                      print = TRUE)
 })
 
 test_that("errors", {
@@ -69,7 +80,7 @@ test_that("errors", {
   tsy <- regts(matrix(data = rep(1:9), nc = 3), start = "2008",
                names = c("a", "b", "c"))
   expect_error(tsdif(ts1, tsy),
-                 "Timeseries x1 and x2 \\(ts1 and tsy\\) have different frequencies")
+               "Timeseries x1 and x2 \\(ts1 and tsy\\) have different frequencies")
 })
 
 test_that("only one NA difference", {
@@ -111,6 +122,7 @@ test_that("two NA differences", {
 
 
 test_that("differences smaller than tol", {
+
   res <- tsdif(ts1, ts2,  tol = 0.1)
   res_tol <- res_correct
   res_tol$tol <- 0.1
@@ -242,7 +254,7 @@ test_that("no overlapping periods", {
 
 test_that("a combination of negative and positive differences", {
   ts1 <- regts(matrix(data = rep(1:9), nc = 3), start = "2008Q4",
-             names = c("a", "b", "c"))
+               names = c("a", "b", "c"))
   ts2 <- ts1
   ts2[, "a"] <- ts1[, "a"] + c(-0.2, 0, 0.1)
   dif_correct <- ts2[, "a", drop = FALSE] - ts1[, "a", drop = FALSE]
@@ -259,7 +271,7 @@ test_that("a combination of negative and positive differences", {
 test_that("NA, NaN, Inf and -Inf values", {
 
   ts1 <- regts(matrix(data = rep(NA, 4), nc = 2), start = "2016",
-             names = c("a", "b"))
+               names = c("a", "b"))
   ts2 <- ts1 + 0.01
   colnames(ts2) <- c("a", "b")
 
@@ -267,7 +279,7 @@ test_that("NA, NaN, Inf and -Inf values", {
   expect_equal(dif1$equal, TRUE)
 
   tsN1 <- regts(matrix(data = rep(NaN, 4), nc = 2), start = "2016",
-               names = c("a", "b"))
+                names = c("a", "b"))
   tsN2 <- tsN1 + 0.01
   colnames(tsN2) <- c("a", "b")
 
@@ -298,16 +310,16 @@ test_that("test combinations of NA, NaN, Inf and proper values", {
                names = c("a", "b", "c"))
 
   res__dif <- create_tsdif(equal = FALSE, difnames = c("a", "b", "c"),
-                             dif = ts1,
-                             common_names = c("a", "b", "c"),
-                             missing_names1 = character(0),
-                             missing_names2 = character(0),
-                             common_range  = get_period_range(ts1),
-                             period_range1 = get_period_range(ts1),
-                             period_range2 = get_period_range(ts1),
-                             ranges_equal = TRUE,
-                             ts_names = c("ts1", "ts2"),
-                             tol = 0, fun = NULL )
+                           dif = ts1,
+                           common_names = c("a", "b", "c"),
+                           missing_names1 = character(0),
+                           missing_names2 = character(0),
+                           common_range  = get_period_range(ts1),
+                           period_range1 = get_period_range(ts1),
+                           period_range2 = get_period_range(ts1),
+                           ranges_equal = TRUE,
+                           ts_names = c("ts1", "ts2"),
+                           tol = 0, fun = NULL )
 
   dif1 <- tsdif(ts1, ts2)
   expect_equal(dif1, res__dif )
@@ -328,5 +340,12 @@ test_that("check more complex output with combinations of NA and proper values",
   ts2["2017q4", "f"] <- NA
   expect_known_output(tsdif(ts1, ts2), "expected_output/tsdif_complex.txt",
                       print = TRUE)
+})
+
+test_that("function cvgdif", {
+  expect_equal(cvgdif(0.12, 0.14), 0.02)
+  expect_equal(cvgdif(0.12, -0.14), 0.26)
+  expect_equal(cvgdif(-0.12, 8.0), 8.12/8)
+  expect_equal(cvgdif(-0.12, -8.0), 7.88/8)
 })
 

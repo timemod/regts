@@ -1,0 +1,4 @@
+
+tsdif timeseries comparison result
+
+The two timeseries objects ts1 and ts1 are equal!
