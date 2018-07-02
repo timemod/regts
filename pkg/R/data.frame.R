@@ -40,7 +40,12 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
 
   # convert the time index to a character vector with period texts
   first_period <- start_period.ts(x)
-  periods <- first_period + (0 : (NROW(x) - 1))
+  if (NROW(x) == 1) {
+    periods <- list(first_period)
+  } else {
+    periods <- first_period + (0 : (NROW(x) - 1))
+  }
+
   if (period_as_date)  {
     times <- lapply(periods, FUN = as.Date)
     # convert list of Dates to a vector of Dates. sapply doesn't work here
