@@ -4,7 +4,7 @@
 #' This function returns the start or end period of a
 #' timeseries object (a \code{\link{regts}} or \code{\link[stats]{ts}})
 #' or a \code{\link{period_range}}.
-#' @param x  a \code{regts}, \code{ts} or \code{period_range} object
+#' @param x  a \code{regts}, \code{ts} or \code{period_range} object.
 #' @return A \code{period} object representing the first or last period of
 #' the range. The return value can be \code{NULL} if argument \code{x} is a
 #' \code{period_range} with no lower or upper boundary.
@@ -26,7 +26,7 @@ NULL
 #'
 #' @export
 start_period <- function(x) {
-    UseMethod("start_period")
+  UseMethod("start_period")
 }
 
 #' @rdname start_period-slash-end_period
@@ -36,43 +36,33 @@ end_period <- function(x) UseMethod("end_period")
 #' @rdname start_period-slash-end_period
 #' @export
 start_period.period_range <- function(x) {
-    if (!is.na(x[1])) {
-        return (create_period(x[1], x[3]))
-    } else {
-        return (NULL)
-    }
+  if (!is.na(x[1])) {
+    return(create_period(x[1], x[3]))
+  } else {
+    return(NULL)
+  }
 }
 
 #' @rdname start_period-slash-end_period
 #' @export
 start_period.ts <- function(x) {
-    r <- get_period_range(x)
-    return (create_period(r[1], r[3]))
-}
-
-#' @export
-start_period.default <- function(x) {
-    stop(paste("start_period not defined for objects of class", class(x)))
+  r <- get_period_range(x)
+  return(create_period(r[1], r[3]))
 }
 
 #' @rdname start_period-slash-end_period
 #' @export
 end_period.period_range <- function(x) {
-    if (!is.na(x[2])) {
-        return (create_period(x[2], x[3]))
-    } else {
-        return (NULL)
-    }
+  if (!is.na(x[2])) {
+    return(create_period(x[2], x[3]))
+  } else {
+    return(NULL)
+  }
 }
 
 #' @rdname start_period-slash-end_period
 #' @export
 end_period.ts <- function(x) {
-    r <- get_period_range(x)
-    return (create_period(r[2], r[3]))
-}
-
-#' @export
-end_period.default <- function(x) {
-    stop(paste("end_period not defined for objects of class", class(x)))
+  r <- get_period_range(x)
+  return(create_period(r[2], r[3]))
 }
