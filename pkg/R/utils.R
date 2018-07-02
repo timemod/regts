@@ -27,7 +27,13 @@ select_columns <- function(x, regex, drop = TRUE, ...) {
     stop("No column names available. No selection possible")
   }
   sel <- grep(regex, cnames, ...)
-  return (x[ , sel, drop = drop])
+  if (length(sel) == 0) {
+    # the result with drop = TRUE is weird, therefore use drop = FALSE
+    # if the selection was not succesfull
+    return(x[ , sel, drop = FALSE])
+  } else {
+    return(x[ , sel, drop = drop])
+  }
 }
 
 # converts an object to a character vector with strings.
