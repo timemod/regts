@@ -19,6 +19,8 @@ test_that("select_columns, univariate timseries", {
                    df[, 'a', drop = FALSE])
   expect_identical(select_columns(df, 'x', drop = FALSE),
                    df[, character(0), drop = FALSE])
+  expect_identical(select_columns(df, 'x', drop = TRUE),
+                   df[, character(0), drop = FALSE])
   expect_identical(select_columns(ts1, 'a', drop = FALSE),
                    ts1[, 1, drop = FALSE])
   expect_identical(select_columns(ts1, 'x', drop = FALSE),
@@ -46,6 +48,8 @@ test_that("select_columns, multivariate timseries", {
   expect_identical(select_columns(ts1, 'b.*', drop = FALSE),
                    ts1[, 'b', drop = FALSE])
   expect_identical(select_columns(ts1, 'x.*', drop = FALSE),
+                   ts1[, character(0), drop = FALSE])
+  expect_identical(select_columns(ts1, 'x.*', drop = TRUE),
                    ts1[, character(0), drop = FALSE])
 
   # test arguments of function grep

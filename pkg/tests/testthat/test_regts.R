@@ -38,6 +38,12 @@ test_that("constructor regts for univariate timeseries", {
   regts1 <- regts(m, start = "2010-1", frequency = 3, names = "a")
   ts1 <- ts(m, start = c(2010, 1), frequency = 3, names = "a")
   expect_identical(as.regts(regts1), as.regts(ts1))
+
+
+  expect_error(regts(numeric(0), start = "2010q1"),
+               "`regts` object must have one or more observations")
+  expect_error(regts(matrix(nrow = 0, ncol = 2), start = "2010q1"),
+               "`regts` object must have one or more observations")
 })
 
 test_that("constructor regts for multivariate time series", {

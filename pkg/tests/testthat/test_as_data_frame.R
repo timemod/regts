@@ -111,3 +111,23 @@ test_that("period_as_date", {
   expect_identical(as.regts(a_ts_df2, fun = conv_fun)[, 1],
                    a_ts)
 })
+
+test_that("single period", {
+
+  a <- a_ts["2018Q1"]
+  expected_result <- a_df[1, , drop = FALSE]
+  colnames(expected_result) <- "a"
+  expect_identical(as.data.frame(a), expected_result)
+
+  ab_ts  <- cbind(a, b = 2 * a)
+  ts_labels(ab_ts) <- c("Var a", "Var b")
+
+  expected_result <- data.frame(period = "2018Q1", a = 1, b = 2,
+                                stringsAsFactors = FALSE)
+  attr(expected_result[[2]], "label") <- "Var a"
+  attr(expected_result[[3]], "label") <- "Var b"
+
+
+  ab_df <- as.data.frame(ab_ts, row_names = FALSE)
+  expect_identical(ab_df, expected_result)
+})
