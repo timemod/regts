@@ -137,6 +137,10 @@ regts <- function(data, start, end, period, frequency = NA,
     }
   }
 
+  if (NROW(data) == 0) {
+    stop("`regts` object must have one or more observations")
+  }
+
   # from now on, work with numerical values (the number of subperiod after
   # Christ), this is more efficient.
   start <- as.numeric(start)
