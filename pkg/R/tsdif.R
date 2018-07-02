@@ -252,7 +252,7 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
 #'
 #' @export
 cvgdif <- function(x1, x2) {
-  x_abs = abs(x2)
+  x_abs <- abs(x2)
   dif <- abs(x1 - x2) / ifelse(x_abs < 1, 1, x_abs)
   return(dif)
 }

@@ -47,4 +47,7 @@ test_that("multivariate timeseries", {
 test_that("errors", {
   msg <- "Timeseries must have at least 21 observations"
   expect_error(growth(a, n = 20), msg)
+
+  msg <- "Argument x is not a timeseries"
+  expect_error(growth("jan", n = 20), msg)
 })

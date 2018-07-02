@@ -175,6 +175,14 @@ test_that("no common columns", {
   expect_equal(res, res_correct2)
 })
 
+test_that("duplicate column names", {
+  x2 <- ts2
+  colnames(x2)[2] <- "a"
+  msg <- "Duplicate column names in timeseries x2"
+  expect_error(tsdif(ts1, x2), msg)
+  expect_error(tsdif(x2, ts1), msg)
+})
+
 
 test_that("single ts as result", {
   sample <- period_range("2008Q4", "2009Q2")
