@@ -30,31 +30,33 @@
 #' @export
 #' @useDynLib regts, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
-aggregate_gr <- function(x, method = c("dif1s", "dif1","pct","rel"), nfrequency = 1) {
-    method <- match.arg(method)
-    if (!is.ts(x)) {
-        stop("Argument x is not a timeseries")
-    }
-    if (!is.numeric(x)) {
-        stop("aggregate_gr is not implemented for non-numeric timeseries")
-    }
-    if (!is.matrix(x)) {
-        is_mat <- FALSE
-        dim(x) <- c(length(x), 1)
-    } else {
-        is_mat <- TRUE
-    }
-    # call C++ function agg_gr (see src/agg_gr.cpp)
-    res <- agg_gr(x, nfrequency, method)
-    data  <- res[[1]]
-    range_new <- res[[2]]
+aggregate_gr <- function(x, method = c("dif1s", "dif1", "pct", "rel"),
+                         nfrequency = 1) {
+  method <- match.arg(method)
+  if (!is.ts(x)) {
+    stop("Argument x is not a timeseries")
+  }
+  if (!is.numeric(x)) {
+    stop("Argument x should be a numeric timeseries")
+  }
+  if (!is.matrix(x)) {
+    is_mat <- FALSE
+    dim(x) <- c(length(x), 1)
+  } else {
+    is_mat <- TRUE
+  }
 
-    if (is_mat) {
-        colnames(data) <- colnames(x)
-    } else {
-        dim(data) <- NULL
-    }
+  # call C++ function agg_gr (see src/agg_gr.cpp)
+  res <- agg_gr(x, nfrequency, method)
+  data  <- res[[1]]
+  range_new <- res[[2]]
 
-    return (create_regts(data, range_new[1], range_new[2], range_new[3],
-                         ts_labels(x)))
+  if (is_mat) {
+    colnames(data) <- colnames(x)
+  } else {
+    dim(data) <- NULL
+  }
+
+  return (create_regts(data, range_new[1], range_new[2], range_new[3],
+                       ts_labels(x)))
 }

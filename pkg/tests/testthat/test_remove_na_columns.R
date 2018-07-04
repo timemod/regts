@@ -24,5 +24,10 @@ test_that("multivariate timeseries, is_na = all or any", {
 	expect_identical(remove_na_columns(rts), rts[, c("a", "c")])
 	rts["2010Q3", ] <- NA
 	expect_identical(remove_na_columns(rts, "any"), NULL)
- })
+})
+
+test_that("errors", {
+  msg <- "Argument x is not a \\(multivariate\\) timeseries"
+  expect_error(remove_na_columns("aap"), msg)
+})
 

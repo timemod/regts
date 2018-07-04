@@ -24,7 +24,7 @@ end_period(x)
 \method{end_period}{ts}(x)
 }
 \arguments{
-\item{x}{a \code{regts}, \code{ts} or \code{period_range} object}
+\item{x}{a \code{regts}, \code{ts} or \code{period_range} object.}
 }
 \value{
 A \code{period} object representing the first or last period of

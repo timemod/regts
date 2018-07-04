@@ -230,7 +230,7 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
 #' Calculate the 'convergence difference'
 #'
 #' \code{cvgdif} calculates the difference  between two numeric vectors
-#' \eqn{x_1} and \eqn{x_2} according to \eqn{|x_1 - x_2|/\max(|x_2|, 1)}.
+#' \code{x1} and \code{x2} according to \code{|x1 - x2| / max(|x2|, 1)}.
 #' This difference is equivalent to the convergence test employed in the
 #' package \code{isismdl}.
 #' @param x1 first numeric vector
@@ -252,7 +252,7 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
 #'
 #' @export
 cvgdif <- function(x1, x2) {
-  x_abs = abs(x2)
+  x_abs <- abs(x2)
   dif <- abs(x1 - x2) / ifelse(x_abs < 1, 1, x_abs)
   return(dif)
 }
