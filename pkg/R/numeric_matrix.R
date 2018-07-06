@@ -3,7 +3,7 @@
 #
 # It returns the matrix obtained by converting all the variables in a data frame
 # to numeric mode and then binding them together as the columns of a matrix.
-# Factors are converted to characters.
+# Factors, Dates and other non-numerical variables are converted to characters.
 #
 # This function is similar to the function data.matrix of the base package,
 # except that:
@@ -25,81 +25,32 @@ numeric_matrix <- function(x, dec = ".") {
     return(matrix(0.0, nrow = nrow(x), ncol = ncol(x)))
   }
 
-  # save row and column names
-  row_names <- if (.row_names_info(x) <= 0L) {
-                 NULL
-               } else {
-                  row.names(x)
-               }
-  col_names <- colnames(x)
+  x <- as.data.frame(x)
 
-  # convert factors, Dates etc. to characters
+  # Convert factors, Dates etc. to characters. Also replace
+  # decimals separator with ".".
   convert_col <- function(x) {
-    if (is.numeric(x) | is.character(x) | is.logical(x)) {
+    if (is.numeric(x) | is.logical(x)) {
       return(x)
     } else {
-      return(as.character(x))
+      x <- as.character(x)
+      x <- ifelse(trimws(x) == "", NA_character_, x)
+      if (dec != ".") {
+        return(sub(dec, ".", x, fixed = TRUE))
+      } else {
+        return(x)
+      }
     }
   }
-  x <- as.data.frame(lapply(x, FUN = convert_col), stringsAsFactors = FALSE)
+  x_converted <- as.data.frame(lapply(x, FUN = convert_col),
+                               stringsAsFactors = FALSE)
 
-  to_numeric <- function(x) {
-    if (is.numeric(x)) {
-      return(x)
-    } else {
-      return(as.numeric(x))
-    }
-  }
+  num_mat <- suppressWarnings(data.matrix(x_converted))
 
-  to_numeric_dec <- function(x) {
-    if (is.numeric(x)) {
-      return(x)
-    } else if (is.character(x)) {
-      return(as.numeric(sub(dec, ".", x, fixed = TRUE)))
-    } else {
-      return(as.numeric(x))
-    }
-  }
+  error_sel <- is.na(num_mat) & !is.na(x_converted)
 
-  if (dec != ".") {
-    to_numeric <- to_numeric_dec
-  } else {
-    to_numeric <- to_numeric
-  }
-
-  warn_msg <- "NAs introduced by coercion"
-
-  warn_function <- function(w) {
-    msg <- w$message
-    if (msg == warn_msg) {
-      convert_problem <<- TRUE
-    } else {
-      warning(msg)
-    }
-  }
-
-
-  convert_cmd <- parse(text = paste("x2 <- sapply(x,", "FUN = to_numeric)"))
-
-  convert_problem <- FALSE
-
-  tryCatch(eval(convert_cmd), warning = warn_function)
-
-  if (convert_problem) {
-
-    x2 <- suppressWarnings(eval(convert_cmd))
-
-    # print message about texts that could not be converted
-
-    is_char <- sapply(x, FUN = is.character)
-    x_test <- x[, is_char]
-    has_text_f <- function(x) {
-      x <- trimws(x)
-      return(!(is.na(x) | x == ""))
-    }
-    has_text <-sapply(x_test, FUN = has_text_f)
-    problem <- has_text & is.na(x2[, is_char])
-    weird_texts <- unique(x_test[problem])
+  if (any(error_sel)) {
+    weird_texts <- unique(x[error_sel])
     nweird <- length(weird_texts)
     NWEIRD_MAX <- 10
     nmax <- min(NWEIRD_MAX, nweird)
@@ -107,8 +58,8 @@ numeric_matrix <- function(x, dec = ".") {
 
     if (nweird <= NWEIRD_MAX) {
       warning(paste0("NAs introduced by coercion\n",
-                    "The following texts could not be converted to numeric:\n",
-                    paste0(weird_texts, collapse = "\n")))
+                     "The following texts could not be converted to numeric:\n",
+                     paste0(weird_texts, collapse = "\n")))
     } else {
       warning(paste0("NAs introduced by coercion.\n",
                      nweird, " texts could not be converted to numeric.\n",
@@ -117,13 +68,5 @@ numeric_matrix <- function(x, dec = ".") {
     }
   }
 
-  if (!is.matrix(x2)) {
-    x2 <- matrix(x2, nrow = nrow(x), ncol = ncol(x))
-  }
-
-  # restore row and column names
-  rownames(x2) <- row_names
-  colnames(x2) <- col_names
-
-  return(x2)
+  return(num_mat)
 }
