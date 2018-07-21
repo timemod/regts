@@ -30,11 +30,11 @@ numeric_matrix <- function(x, dec = ".") {
   # Convert factors, Dates etc. to characters. Also replace
   # decimals separator with ".".
   convert_col <- function(x) {
-    if (is.numeric(x) | is.logical(x)) {
+    if (is.numeric(x) || is.logical(x)) {
       return(x)
     } else {
       x <- as.character(x)
-      x <- ifelse(trimws(x) == "", NA_character_, x)
+      x[trimws(x) == ""] <- NA_character_
       if (dec != ".") {
         return(sub(dec, ".", x, fixed = TRUE))
       } else {
@@ -42,6 +42,7 @@ numeric_matrix <- function(x, dec = ".") {
       }
     }
   }
+
   x_converted <- as.data.frame(lapply(x, FUN = convert_col),
                                stringsAsFactors = FALSE)
 
