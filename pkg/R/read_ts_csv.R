@@ -362,6 +362,9 @@ read_ts_columnwise <- function(tbl, frequency = NA,
 }
 
 # convert a character data frame to a numeric matrix.
+# this function is similar to function numeric_matrix, but more efficient
+# because we already know that x only contains texts and that NA values
+# are treated correctly/
 df_to_numeric_matrix <- function(x, dec) {
 
   if (nrow(x) == 0 || ncol(x) == 0) {
