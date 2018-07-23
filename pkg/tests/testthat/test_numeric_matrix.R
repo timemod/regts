@@ -32,7 +32,7 @@ test_that("weird data frames", {
                         b = posixcts,
                         c = dates, stringsAsFactors = FALSE)
 
-  msg <-paste0("NAs introduced by coercion\n",
+  msg <-paste0("NAs introduced by coercion.\n",
                "The following texts could not be converted to numeric:\n",
                "\"x\"\n\"1969-12-31 23:59:59\"\n\"1969-12-31\"")
 
@@ -62,7 +62,7 @@ test_that("dec separator", {
 
   df <- data.frame(a = c("1,123", "x, en piet", NA), stringsAsFactors = TRUE)
 
-  msg <-paste0("NAs introduced by coercion\n",
+  msg <-paste0("NAs introduced by coercion.\n",
                "The following texts could not be converted to numeric:\n",
                "\"x, en piet\"")
 

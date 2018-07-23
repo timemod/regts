@@ -103,7 +103,7 @@ test_that("as.regts.data.frame with invalid period texts", {
   rownames(df) <- 2015:2017
 
   mat <- suppressWarnings(data.matrix(df))
-  msg <- "NAs introduced by coercion\nThe following texts could not be converted to numeric:\n\"x\""
+  msg <- "NAs introduced by coercion.\nThe following texts could not be converted to numeric:\n\"x\""
   expect_warning(ts1 <- as.regts(df), regexp = msg)
   # use as.numeric to create non integer values, ts1 has also non integer values
   ts2 <- regts(mat, start = "2015")
@@ -121,7 +121,7 @@ test_that("as.regts.data.frame with invalid period texts and with factors", {
   rownames(df_fac) <- 2015:2017
 
 
-  msg <- "NAs introduced by coercion\nThe following texts could not be converted to numeric:\n\"x\""
+  msg <- "NAs introduced by coercion.\nThe following texts could not be converted to numeric:\n\"x\""
   expect_warning(ts1 <- as.regts(df_fac), regexp = msg)
   # use as.numeric to create non integer values, ts1 has also non integer values
   ts2 <- regts(mat, start = "2015")
@@ -152,5 +152,14 @@ test_that("as.regts.data.frame for a data.frame with dates", {
 
   expect_error(as.regts(df, time_column = "period", frequency = 4),
                "Duplicate periods found in data \\(2015Q2\\).")
+})
+
+
+test_that("as.regts.data.frame for column names starting with a number", {
+  df1 <- data.frame(period = c("2015Q3", "2015Q4", "2016Q1"), `3` = 1:3,
+                    stringsAsFactors = FALSE, check.names = FALSE)
+  ts1 <- as.regts(df1, time_column = 1)
+  expected_result <- regts(matrix(1:3, ncol = 1) , start = "2015Q3", names = "3")
+  expect_identical(ts1, expected_result)
 })
 

@@ -364,7 +364,7 @@ read_ts_columnwise <- function(tbl, frequency = NA,
 # convert a character data frame to a numeric matrix.
 # this function is similar to function numeric_matrix, but more efficient
 # because we already know that x only contains texts and that NA values
-# are treated correctly/
+# are treated correctly.
 df_to_numeric_matrix <- function(x, dec) {
 
   if (nrow(x) == 0 || ncol(x) == 0) {
@@ -380,7 +380,7 @@ df_to_numeric_matrix <- function(x, dec) {
       return(sub(dec, ".", x, fixed = TRUE))
     }
     x_converted <- as.data.frame(lapply(x, FUN = convert_col),
-                                 stringsAsFactors = FALSE)
+                                 stringsAsFactors = FALSE, optional = TRUE)
   } else {
     x_converted <- x
   }
@@ -397,7 +397,7 @@ df_to_numeric_matrix <- function(x, dec) {
     weird_texts <- paste0("\"", weird_texts[1:nmax], "\"")
 
     if (nweird <= NWEIRD_MAX) {
-      warning(paste0("NAs introduced by coercion\n",
+      warning(paste0("NAs introduced by coercion.\n",
                      "The following texts could not be converted to numeric:\n",
                      paste0(weird_texts, collapse = "\n")))
     } else {
