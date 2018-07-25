@@ -51,7 +51,7 @@ test_that("change_frequency.period_range", {
   r <- period_range("2017Q1/2018Q1")
   expect_identical(as.character(change_frequency(r, 12)), "2017M01/2018M03")
 
-  r <- period_range("2017")
+  r <- period_range("2017", "2017")
   expect_identical(as.character(change_frequency(r, 1)), "2017")
   expect_identical(as.character(change_frequency(r, 4)), "2017Q1/2017Q4")
   expect_identical(as.character(change_frequency(r, 12)), "2017M01/2017M12")

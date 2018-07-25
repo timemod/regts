@@ -148,9 +148,9 @@ test_that("single period", {
   res <- tsdif(ts1['2008Q4', ], ts2['2008Q4', ])
   res_correct2 <- res_correct
   res_correct2$dif <- difference['2008Q4', ]
-  res_correct2$common_range <- period_range("2008Q4")
-  res_correct2$period_range1 <- period_range("2008Q4")
-  res_correct2$period_range2 <- period_range("2008Q4")
+  res_correct2$common_range <- period_range("2008Q4", "2008Q4")
+  res_correct2$period_range1 <- period_range("2008Q4", "2008Q4")
+  res_correct2$period_range2 <- period_range("2008Q4", "2008Q4")
   res_correct2$ranges_equal <- TRUE
   res_correct2$ts_names <- c("ts1[\"2008Q4\", ]", "ts2[\"2008Q4\", ]")
   expect_equal(res, res_correct2)
@@ -254,7 +254,7 @@ test_that("no overlapping periods", {
   res_correct2$difnames <- character(0)
   res_correct2["common_range"] <- list(NULL)
   res_correct2$period_range1 <- period_range("2008Q4", "2009Q1")
-  res_correct2$period_range2 <- period_range("2009Q2")
+  res_correct2$period_range2 <- period_range("2009Q2", "2009Q2")
   res_correct2$ranges_equal <- FALSE
   res_correct2$ts_names <- c("ts1[\"2008Q4/2009Q1\", ]", "ts2[\"2009Q2\", ]")
   expect_equal(res, res_correct2)
