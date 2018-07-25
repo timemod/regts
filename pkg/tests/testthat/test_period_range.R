@@ -18,11 +18,11 @@ test_that("constructor period_range", {
   expect_error(period_range("2001-4", "2014Q"),
                "Frequency of period 2001-4 unknown. Specify argument frequency.")
   expect_error(period_range("2001", "2014Q4"),
-               "The two periods have different frequency")
+               "Arguments start and end have different frequency")
   expect_error(as.character(period_range("2010Q4", "2010Q2")),
                "The start period \\(2010Q4\\) is after the end period \\(2010Q2\\)")
   expect_error(period_range(NULL, NULL),
-               "At least one of the periods should not be NULL")
+               "Either argument start or end should be specified")
   expect_error(as.character(period_range("2010Q4/2011Q3", "2010Q2")),
                "Argument end should not be specified if start is a period range string")
 

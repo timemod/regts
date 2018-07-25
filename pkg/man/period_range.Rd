@@ -61,8 +61,8 @@ period_range("2010Q2/2016Q3")
 start <- period("2013q3")
 period_range(start, start + 5)
 
-# create a period_range from 2010Q2 with no upper bound
-period_range("2010q2", NULL)
+# create a period_range from 2010Q2 with no lower bound
+period_range(end = "2010q2")
 
 # create a period_range for a timeseries with frequency 2 (half year)
 period_range("2010-2", "2016-2", frequency = 2)
