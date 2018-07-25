@@ -18,17 +18,17 @@
 #' (e.g. \code{"2017Q3/"})), in that case the period range
 #' has no lower or upper bound. The string format is case insensitive.
 #'
-#' @param p1 the first period (a \code{period}, an object that can be coerced
-#' to a \code{period}, or \code{NULL}). If \code{p1} is \code{NULL} the lower
-#' bound of the period range is undetermined. \code{p1} can also be
-#' a character string specifying a period range, for example
+#' @param start the first period (a \code{period}, an object that can be coerced
+#' to a \code{period}, or by default \code{NULL}). If \code{start} is \code{NULL}
+#' the lower bound of the period range is undetermined. \code{start} can also
+#' be a character string specifying a period range, for example
 #' \code{"2010Q2/2011Q3"}).
-#' @param p2 the last period (a \code{period}, an object that can be coerced
-#' to a \code{period}, or \code{NULL}).
-#' If \code{p2} is \code{NULL}, the upper bound of the period range is undetermined.
+#' @param end the last period (a \code{period}, an object that can be coerced
+#' to a \code{period}, or by default \code{NULL}).
+#' If \code{end} is \code{NULL}, the upper bound of the period range is undetermined.
 #' @param x an R object
 #' @param frequency frequency of the period objects. This argument is mandatory
-#' if argument \code{p1} or \code{p2} is a character with general period format
+#' if argument \code{start} or \code{end} is a character with general period format
 #' without frequency indicator (e.g. \code{"2011-1"})
 #' @param ... additional arguments to be passed to or from methods (currently
 #' not used in package \code{regts})
@@ -39,8 +39,8 @@
 #' period_range("2010Q2/2016Q3")
 #'
 #' # create a period_range for the first 5 quarters after 2013Q2
-#' p1 <- period("2013q3")
-#' period_range(p1, p1 + 5)
+#' start <- period("2013q3")
+#' period_range(start, start + 5)
 #'
 #' # create a period_range from 2010Q2 with no upper bound
 #' period_range("2010q2", NULL)
@@ -50,7 +50,7 @@
 #'
 #' # convert a period object to a period_range with equal start and end period
 #' p <- period("2010Q2")
-#' as.period_range(p)
+#' as.period_range(p, p)
 #'
 #' # create a month range starting at the month 1000 days before
 #' # the current day and ending at the current month.
@@ -59,50 +59,57 @@
 #' @seealso \code{\link{period}}, \code{\link{nperiod}},
 #' \code{\link{start_period}} and \code{\link{end_period}}
 #' @export
-period_range <- function(p1, p2 = p1, frequency = NA) {
-  if (is.null(p1) && is.null(p2)) {
+period_range <- function(start = NULL, end = NULL, frequency = NA) {
+
+  if (is.null(start) && is.null(end)) {
     stop("At least one of the periods should not be NULL")
   }
-  if (missing(p2)) {
-    # direct conversion, inputs "2016q1" and "2016q1/2017q1" are possible
-    return(as.period_range(p1, frequency))
-  } else if (!is.null(p1)) {
-    if (is.character(p1) && grepl("/", p1[1])) {
-      stop("Argument p2 should not be specified if p1 is a period range string")
+
+  if (!is.null(start)) {
+    if (is.character(start) && grepl("/", start[1])) {
+      # direct conversion, inputs "2016q1" and "2016q1/2017q1" are possible
+      if (is.null(end)){
+        return(as.period_range(start, frequency))
+      }
+      else {
+        stop("Argument end should not be specified if start is a period range string")
+      }
     }
-    p1 <- as.period(p1, frequency)
-    freq1 <- attr(p1, 'frequency')
+    else{
+      start <- as.period(start, frequency)
+      freq1 <- attr(start, 'frequency')
+    }
   }
-  if (!is.null(p2)) {
-    p2 <- as.period(p2, frequency)
-    freq2 <- attr(p2, 'frequency')
+  if (!is.null(end)) {
+    end <- as.period(end, frequency)
+    freq2 <- attr(end, 'frequency')
   }
-  if ((!(is.null(p1) || is.null(p2)))) {
+  if ((!(is.null(start) || is.null(end)))) {
     if (freq1 != freq2) {
       stop("The two periods have different frequency")
     }
-    if (p2 < p1) {
-      stop(paste0("The start period (", p1, ") is after the end period (", p2, ")"))
+    if (end < start) {
+      stop(paste0("The start period (", start, ") is after the end period (", end, ")"))
     }
   }
-  if (!is.null(p1)) {
+  if (!is.null(start)) {
     freq <- freq1
   } else {
     freq <- freq2
   }
 
   # convert periods to normal numbers
-  if (!is.null(p1)) {
-    p1 <- as.numeric(p1)
+  if (!is.null(start)) {
+    start <- as.numeric(start)
   } else {
-    p1 <- NA_real_
+    start <- NA_real_
   }
-  if (!is.null(p2)) {
-    p2 <- as.numeric(p2)
+  if (!is.null(end)) {
+    end <- as.numeric(end)
   } else {
-    p2 <- NA_real_
+    end <- NA_real_
   }
-  return(create_period_range(p1, p2, freq))
+  return(create_period_range(start, end, freq))
 }
 
 #' @rdname period_range
@@ -131,8 +138,8 @@ as.period_range.period <- function(x, ...) {
 
 #' @export
 as.period_range.numeric <- function(x, frequency = NA, ...) {
-  p1 <- as.period(x, frequency, ...)
-  return(as.period_range(p1))
+  start <- as.period(x, frequency, ...)
+  return(as.period_range(start))
 }
 
 #' @export

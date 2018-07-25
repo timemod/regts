@@ -5,23 +5,23 @@
 \alias{as.period_range}
 \title{Create a \code{\link{period_range}} object.}
 \usage{
-period_range(p1, p2 = p1, frequency = NA)
+period_range(start = NULL, end = NULL, frequency = NA)
 
 as.period_range(x, frequency = NA, ...)
 }
 \arguments{
-\item{p1}{the first period (a \code{period}, an object that can be coerced
-to a \code{period}, or \code{NULL}). If \code{p1} is \code{NULL} the lower
-bound of the period range is undetermined. \code{p1} can also be
-a character string specifying a period range, for example
+\item{start}{the first period (a \code{period}, an object that can be coerced
+to a \code{period}, or by default \code{NULL}). If \code{start} is \code{NULL}
+the lower bound of the period range is undetermined. \code{start} can also
+be a character string specifying a period range, for example
 \code{"2010Q2/2011Q3"}).}
 
-\item{p2}{the last period (a \code{period}, an object that can be coerced
-to a \code{period}, or \code{NULL}).
-If \code{p2} is \code{NULL}, the upper bound of the period range is undetermined.}
+\item{end}{the last period (a \code{period}, an object that can be coerced
+to a \code{period}, or by default \code{NULL}).
+If \code{end} is \code{NULL}, the upper bound of the period range is undetermined.}
 
 \item{frequency}{frequency of the period objects. This argument is mandatory
-if argument \code{p1} or \code{p2} is a character with general period format
+if argument \code{start} or \code{end} is a character with general period format
 without frequency indicator (e.g. \code{"2011-1"})}
 
 \item{x}{an R object}
@@ -58,8 +58,8 @@ period_range("2010Q2", "2016Q3")
 period_range("2010Q2/2016Q3")
 
 # create a period_range for the first 5 quarters after 2013Q2
-p1 <- period("2013q3")
-period_range(p1, p1 + 5)
+start <- period("2013q3")
+period_range(start, start + 5)
 
 # create a period_range from 2010Q2 with no upper bound
 period_range("2010q2", NULL)
@@ -69,7 +69,7 @@ period_range("2010-2", "2016-2", frequency = 2)
 
 # convert a period object to a period_range with equal start and end period
 p <- period("2010Q2")
-as.period_range(p)
+as.period_range(p, p)
 
 # create a month range starting at the month 1000 days before
 # the current day and ending at the current month.
