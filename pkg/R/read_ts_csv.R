@@ -244,7 +244,7 @@ read_ts_rowwise <- function(tbl, frequency, labels = c("after", "before", "no"),
 
   # convert all data columns to numerical columns, taking the decimal separator
   # into account
-  mat <- numeric_matrix(tbl[, data_cols], dec = dec)
+  mat <- df_to_numeric_matrix(tbl[, data_cols], dec = dec)
   mat <- t(mat)
   colnames(mat) <- names
 
@@ -346,8 +346,8 @@ read_ts_columnwise <- function(tbl, frequency = NA,
 
   periods <- get_periods_tbl(tbl[[1]], frequency, xlsx = FALSE)
 
-  # convert data columns to a numeric matrix, employing function numeric_matrix
-  mat <- numeric_matrix(tbl[-1], dec = dec)
+  # convert data columns to a numeric matrix, employing function df_to_numeric_matrix
+  mat <- df_to_numeric_matrix(tbl[-1], dec = dec)
   colnames(mat) <- ts_names
 
   # set numeric = FALSE, because we already know that df is numeric
@@ -359,4 +359,54 @@ read_ts_columnwise <- function(tbl, frequency = NA,
   }
 
   return(ret)
+}
+
+# convert a character data frame to a numeric matrix.
+# this function is similar to function numeric_matrix, but more efficient
+# because we already know that x only contains texts and that NA values
+# are treated correctly.
+df_to_numeric_matrix <- function(x, dec) {
+
+  if (nrow(x) == 0 || ncol(x) == 0) {
+    # no data available
+    return(matrix(0.0, nrow = nrow(x), ncol = ncol(x)))
+  }
+
+  x <- as.data.frame(x)
+
+  if (dec != ".") {
+    # convert decimal separator
+    convert_col <- function(x) {
+      return(sub(dec, ".", x, fixed = TRUE))
+    }
+    x_converted <- as.data.frame(lapply(x, FUN = convert_col),
+                                 stringsAsFactors = FALSE, optional = TRUE)
+  } else {
+    x_converted <- x
+  }
+
+  num_mat <- suppressWarnings(data.matrix(x_converted))
+
+  error_sel <- is.na(num_mat) & !is.na(x_converted)
+
+  if (any(error_sel)) {
+    weird_texts <- unique(x[error_sel])
+    nweird <- length(weird_texts)
+    NWEIRD_MAX <- 10
+    nmax <- min(NWEIRD_MAX, nweird)
+    weird_texts <- paste0("\"", weird_texts[1:nmax], "\"")
+
+    if (nweird <= NWEIRD_MAX) {
+      warning(paste0("NAs introduced by coercion.\n",
+                     "The following texts could not be converted to numeric:\n",
+                     paste0(weird_texts, collapse = "\n")))
+    } else {
+      warning(paste0("NAs introduced by coercion.\n",
+                     nweird, " texts could not be converted to numeric.\n",
+                     "The first ", NWEIRD_MAX, " texts that gave problems are:\n",
+                     paste0(weird_texts, collapse = "\n")))
+    }
+  }
+
+  return(num_mat)
 }
