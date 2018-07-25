@@ -42,7 +42,7 @@
 #' start <- period("2013q3")
 #' period_range(start, start + 5)
 #'
-#' # create a period_range from 2010Q2 with no lower bound
+#' # create a period_range up to 2010Q2 with no lower bound
 #' period_range(end = "2010q2")
 #'
 #' # create a period_range for a timeseries with frequency 2 (half year)
@@ -73,7 +73,7 @@ period_range <- function(start = NULL, end = NULL, frequency = NA) {
       } else {
         stop("Argument end should not be specified if start is a period range string")
       }
-    } else{
+    } else {
       start <- as.period(start, frequency)
       freq1 <- attr(start, 'frequency')
     }
