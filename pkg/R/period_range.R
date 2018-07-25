@@ -42,8 +42,8 @@
 #' start <- period("2013q3")
 #' period_range(start, start + 5)
 #'
-#' # create a period_range from 2010Q2 with no upper bound
-#' period_range("2010q2", NULL)
+#' # create a period_range from 2010Q2 with no lower bound
+#' period_range(end = "2010q2")
 #'
 #' # create a period_range for a timeseries with frequency 2 (half year)
 #' period_range("2010-2", "2016-2", frequency = 2)
@@ -62,7 +62,7 @@
 period_range <- function(start = NULL, end = NULL, frequency = NA) {
 
   if (is.null(start) && is.null(end)) {
-    stop("At least one of the periods should not be NULL")
+    stop("Either argument start or end should be specified")
   }
 
   if (!is.null(start)) {
@@ -70,12 +70,10 @@ period_range <- function(start = NULL, end = NULL, frequency = NA) {
       # direct conversion, inputs "2016q1" and "2016q1/2017q1" are possible
       if (is.null(end)){
         return(as.period_range(start, frequency))
-      }
-      else {
+      } else {
         stop("Argument end should not be specified if start is a period range string")
       }
-    }
-    else{
+    } else{
       start <- as.period(start, frequency)
       freq1 <- attr(start, 'frequency')
     }
@@ -86,7 +84,7 @@ period_range <- function(start = NULL, end = NULL, frequency = NA) {
   }
   if ((!(is.null(start) || is.null(end)))) {
     if (freq1 != freq2) {
-      stop("The two periods have different frequency")
+      stop("Arguments start and end have different frequency")
     }
     if (end < start) {
       stop(paste0("The start period (", start, ") is after the end period (", end, ")"))
