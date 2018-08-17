@@ -5,8 +5,8 @@
 \title{Read timeseries from a sheet of an  xls(x) file}
 \usage{
 read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = NA,
-  skipcol = NA, rowwise, frequency = NA, labels = c("after", "before",
-  "no"), na_string = "", name_fun)
+  skipcol = NA, rowwise, frequency = NA, labels = c("after",
+  "before", "no"), na_string = "", name_fun)
 }
 \arguments{
 \item{filename}{a string with the filename}
