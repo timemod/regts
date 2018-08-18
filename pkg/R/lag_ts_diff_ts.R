@@ -71,9 +71,11 @@ shift_ts <- function(x, k, keep_range) {
 
 #' Lagged differences
 #'
-#' Returns suitaly lagged and iterated differences.
+#' Returns suitably lagged and iterated differences.
 #' This function works similar as \code{\link[base]{diff}},
-#' except that the function has an additional argument \code{keep_range}.
+#' except that the period range of the result is the same as that
+#' of the input timeseries. This behaviour can be changed by specifying
+#' argument \code{keep_range}.
 #'
 #' @param x A univariate or multivariate timeseries
 #' @param lag an integer indicating which lag to use
@@ -82,8 +84,8 @@ shift_ts <- function(x, k, keep_range) {
 #' timeseries has the same period range as the input timeseries.
 #' Then the result timeseries will have \code{lag + differences - 1}
 #' \code{NA} values at the beginning (\code{lead_ts}) or the end (\code{lag_ts}).
-#' If \code{FALSE} then the result timeseries is \code{lag + differences - 1}
-#' periods shorted.
+#' If \code{FALSE} then the result timeseries starts \code{lag + differences - 1}
+#' periods later than the input timeseries.
 #' @export
 #' @examples
 #' x <- regts(1:10, start = "2018q3")
@@ -95,6 +97,12 @@ diff_ts <- function(x, lag = 1, differences = 1, keep_range = TRUE) {
     stop("Argument x is not a timeseries")
   }
 
+  k <- lag + differences - 1
+  n <- NROW(x)
+  if (n < k + 1) {
+    stop("Timeseries x has too few observations")
+  }
+
   diff_result <- diff(x, lag = lag, differences = differences)
 
   if (keep_range) {
@@ -102,6 +110,7 @@ diff_ts <- function(x, lag = 1, differences = 1, keep_range = TRUE) {
     k <- lag + differences - 1
     x_sel_na <- seq(1, k)
     x_sel <- seq(k + 1, n)
+
     if (is.matrix(x)) {
       x[x_sel_na, ] <- NA
       x[x_sel, ]  <- diff_result
