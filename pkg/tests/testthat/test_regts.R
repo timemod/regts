@@ -121,6 +121,9 @@ test_that("period selection in univariate timeseries", {
   expect_error(regts1["2018Q3/"] <- 2, msg)
   msg <- "The start period \\(2010Q1\\) is after the end period \\(200Q3\\)."
   expect_error(regts1["/200Q3"] <- 2, msg)
+
+  # period selection outside range
+  expect_identical(regts1["2018Q1"], regts(NA_integer_, period = "2018q1"))
 })
 
 test_that("period / column selection in multivariate timeseries", {
@@ -320,4 +323,38 @@ test_that("start and end/prd_range, multivariate (1 column)", {
                    regts(rbind(data[1, , drop=FALSE], data[1, , drop = FALSE]),
                          start = 1, end = 2))
 
+})
+
+test_that("period selection exotic timeseries", {
+
+  num_ts <- regts(matrix(c(1, 2), ncol = 1), period = "2014q1/2014q2",
+                  names = "a")
+  txt_ts <- regts(matrix(c("x", "y"), ncol = 1), period = "2014q1/2014q2",
+                  names = "a")
+  logi_ts <- regts(matrix(c(FALSE, TRUE), ncol = 1), period = "2014q1/2014q2",
+                   names = "a")
+
+  expect_identical(num_ts["2018Q1", 1], regts(NA_real_, period = "2018Q1"))
+  expect_identical(logi_ts["2013Q4/2014Q1"][, 1], regts(c(NA, FALSE),
+                                                   period = "2013q4/2014q1"))
+  expect_identical(logi_ts["2018Q1/2018Q2"][, 1], regts(NA,
+                                                        period = "2018q1/2018q2"))
+
+  expect_identical(txt_ts["2018Q1/2018Q2"][, 1], regts(NA_character_,
+                                                        period = "2018q1/2018q2"))
+
+  expect_identical(txt_ts["2014Q2/2014Q3"][, 1], regts(c("y", NA),
+                                                       period = "2014q2/2014q3"))
+
+  expect_identical(txt_ts["2018Q1/2018Q2", 1], regts(NA_character_,
+                                                       period = "2018q1/2018q2"))
+
+  # factor timeseries (behaves a little bit strangely)
+  factors <- as.factor(c("x", "y"))
+  factor_regts <- regts(factors, period = "2014q1/2014q2")
+  factor_ts <- ts(factors, start = 2014, frequency = 4)
+  expect_identical(as.ts(factor_ts), factor_ts)
+  expect_identical(as.ts(factor_regts["2018Q1/2018Q2"]),
+                   window(factor_ts, start = c(2018,1), end = c(2018, 2),
+                          extend = TRUE))
 })
