@@ -669,21 +669,34 @@ window_regts <- function(x, sel_range) {
   shift <- sel_range[1] - ts_range[1]
   rmin <- max(1, 1 - shift)
   rmax <- min(nper_new, nperiod__(ts_range) - shift)
+
+  # Create NA with the correct type, this is necessary when the period
+  # selection lies completely outside the period range of the timeseries.
+  if (is.integer(x)) {
+    na_val <- NA_integer_
+  } else if (is.numeric(x)) {
+    na_val <- NA_real_
+  } else if (is.character(x)) {
+    na_val <- NA_character_
+  } else {
+    na_val <- NA
+  }
+
   if (is.matrix(x)) {
-    data <- matrix(NA, nrow = nper_new, ncol = ncol(x))
+    data <- matrix(na_val, nrow = nper_new, ncol = ncol(x))
     if (rmax >= rmin) {
       data[rmin:rmax, ] <- x[(rmin+shift):(rmax+shift), ]
     }
     colnames(data) <- colnames(x)
   } else {
     data <- logical(nper_new)
-    data[] <- NA
+    data[] <- na_val
     if (rmax >= rmin) {
       data[rmin:rmax] <- x[(rmin+shift):(rmax+shift)]
     }
   }
-  return (create_regts(data, sel_range[1], sel_range[2], sel_range[3],
-                       ts_labels(x)))
+  return(create_regts(data, sel_range[1], sel_range[2], sel_range[3],
+                     ts_labels(x)))
 }
 
 #' @export
