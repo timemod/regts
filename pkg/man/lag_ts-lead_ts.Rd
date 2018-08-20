@@ -6,25 +6,33 @@
 \alias{lead_ts}
 \title{Lag or Lead a Timeseries}
 \usage{
-lag_ts(x, k = 1, keep_range = TRUE)
+lag_ts(x, n = 1, keep_range = TRUE)
 
-lead_ts(x, k = 1, keep_range = TRUE)
+lead_ts(x, n = 1, keep_range = TRUE)
 }
 \arguments{
 \item{x}{A univariate or multivariate timeseries}
 
-\item{k}{The number of lags or leads (in units of observations).
+\item{n}{The number of lags or leads (in units of observations).
 Must be a positive number.}
 
 \item{keep_range}{If \code{TRUE} (the default), then  the output
 timeseries has the same period range as the input timeseries.
-Then the result timeseries will have \code{k} \code{NA} values at the
-beginning (\code{lead_ts}) or the end (\code{lag_ts}). For
-If \code{FALSE} then the result timeseries has a shifter period range.}
+Then the result timeseries will have \code{n} \code{NA} values at the
+beginning (\code{lag_ts}) or the end (\code{lead_ts}).
+If \code{FALSE} the period range of the result timeseries is shifted
+by \code{n} periods. For example, for \code{lag_ts} the result timeseries
+starts and ends \code{n} periods later.}
 }
 \description{
-Computes the lag or lead of a timeseries by shifting the observations
+Computes the lag or lead of a timeseries, shifting the observations
 by a given number of periods.
+}
+\details{
+\code{lag_ts} and \code{lead_ts} differ from \code{\link[stats]{lag}}
+in the \code{stats} package in that the specified number of lags or leads
+is positive, and that by default the resulting timeseries has the same
+period range as the input timeseries.
 }
 \section{Functions}{
 \itemize{
@@ -35,6 +43,6 @@ by a given number of periods.
 
 \examples{
 x <- regts(1:10, start = "2018q3")
-lag_ts(x, 1)    # calculate x[t+1]
-lead_ts(x, 1)   # return x[t-1]
+lag_ts(x, 1)                        # calculate x[t-1]
+lead_ts(x, 1, keep_range = FALSE)   # calculate x[t+1]
 }

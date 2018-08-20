@@ -16,8 +16,8 @@
 #' @param n an integer indicating the period of relative change
 #' @param keep_range If \code{TRUE} (the default), then  the output
 #' timeseries has the same period range as the input timeseries.
-#' Then the result timeseries will have \code{lag} NA values at the start.
-#' If \code{FALSE} then the result timeseries is \code{lag} periods
+#' Then the result timeseries will have \code{n} \code{NA} values at the start.
+#' If \code{FALSE} then the result timeseries is \code{n} periods
 #' shorter than the input timeseries.
 #'
 #' @return a \code{regts} object with relative changes
@@ -40,15 +40,8 @@ growth <- function(x, n = 1, keep_range = TRUE) {
     stop(paste("Timeseries must have at least", n+1, "observations"))
   }
 
-  ret <- diff(x, n) / abs(lag(x, -n))
-
-  # if keep_range then extend data with NA at start of period
-  if (keep_range) {
-    ret <- ret[get_period_range(x)]
-  }
-
-  ts_labels(ret) <- ts_labels(x)
+  ret <- diff_ts(x, n, keep_range = keep_range) / abs(lag_ts(x, n,
+                                                  keep_range = keep_range))
 
   return(ret)
-
 }

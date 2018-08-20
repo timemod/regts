@@ -1,44 +1,52 @@
 #' Lag or Lead a Timeseries
 #'
-#' Computes the lag or lead of a timeseries by shifting the observations
+#' Computes the lag or lead of a timeseries, shifting the observations
 #' by a given number of periods.
+#'
+#' \code{lag_ts} and \code{lead_ts} differ from \code{\link[stats]{lag}}
+#' in the \code{stats} package in that the specified number of lags or leads
+#' is positive, and that by default the resulting timeseries has the same
+#' period range as the input timeseries.
+#'
 #' @param x A univariate or multivariate timeseries
-#' @param k The number of lags or leads (in units of observations).
+#' @param n The number of lags or leads (in units of observations).
 #'          Must be a positive number.
 #' @param keep_range If \code{TRUE} (the default), then  the output
 #' timeseries has the same period range as the input timeseries.
-#' Then the result timeseries will have \code{k} \code{NA} values at the
-#' beginning (\code{lead_ts}) or the end (\code{lag_ts}). For
-#' If \code{FALSE} then the result timeseries has a shifter period range.
+#' Then the result timeseries will have \code{n} \code{NA} values at the
+#' beginning (\code{lag_ts}) or the end (\code{lead_ts}).
+#' If \code{FALSE} the period range of the result timeseries is shifted
+#' by \code{n} periods. For example, for \code{lag_ts} the result timeseries
+#' starts and ends \code{n} periods later.
 #' @examples
 #' x <- regts(1:10, start = "2018q3")
-#' lag_ts(x, 1)    # calculate x[t+1]
-#' lead_ts(x, 1)   # return x[t-1]
+#' lag_ts(x, 1)                        # calculate x[t-1]
+#' lead_ts(x, 1, keep_range = FALSE)   # calculate x[t+1]
 #' @name lag_ts-lead_ts
 NULL
 
 #' @describeIn lag_ts-lead_ts Lag a timeseries
 #' @export
-lag_ts <- function(x, k = 1, keep_range = TRUE) {
+lag_ts <- function(x, n = 1, keep_range = TRUE) {
 
   if (!is.ts(x)) {
     stop("Argument x is not a timeseries")
   }
-  if (k < 0) stop("Argument k should be positive")
+  if (n < 0) stop("Argument n should be positive")
 
-  return(shift_ts(x, k = -k, keep_range = keep_range))
+  return(shift_ts(x, k = -n, keep_range = keep_range))
 }
 
 #' @describeIn lag_ts-lead_ts Lead a timeseries
 #' @export
-lead_ts <- function(x, k = 1, keep_range = TRUE) {
+lead_ts <- function(x, n = 1, keep_range = TRUE) {
 
   if (!is.ts(x)) {
     stop("Argument x is not a timeseries")
   }
-  if (k < 0) stop("Argument k should be positive")
+  if (n < 0) stop("Argument n should be positive")
 
-  return(shift_ts(x, k = k, keep_range = keep_range))
+  return(shift_ts(x, k = n, keep_range = keep_range))
 }
 
 # internal function used by both lag_ts and lead_ts
@@ -69,9 +77,9 @@ shift_ts <- function(x, k, keep_range) {
   }
 }
 
-#' Lagged differences
+#' Lagged differences of a timeseries
 #'
-#' Returns suitably lagged and iterated differences.
+#' Returns suitably lagged and iterated differences of a timeseries.
 #' This function works similar as \code{\link[base]{diff}},
 #' except that the period range of the result is the same as that
 #' of the input timeseries. This behaviour can be changed by specifying
@@ -83,7 +91,7 @@ shift_ts <- function(x, k, keep_range) {
 #' @param keep_range If \code{TRUE} (the default), then  the output
 #' timeseries has the same period range as the input timeseries.
 #' Then the result timeseries will have \code{lag + differences - 1}
-#' \code{NA} values at the beginning (\code{lead_ts}) or the end (\code{lag_ts}).
+#' \code{NA} values at the beginning.
 #' If \code{FALSE} then the result timeseries starts \code{lag + differences - 1}
 #' periods later than the input timeseries.
 #' @export
@@ -106,8 +114,6 @@ diff_ts <- function(x, lag = 1, differences = 1, keep_range = TRUE) {
   diff_result <- diff(x, lag = lag, differences = differences)
 
   if (keep_range) {
-    n <- NROW(x)
-    k <- lag + differences - 1
     x_sel_na <- seq(1, k)
     x_sel <- seq(k + 1, n)
 

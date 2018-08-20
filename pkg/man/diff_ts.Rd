@@ -2,7 +2,7 @@
 % Please edit documentation in R/lag_ts_diff_ts.R
 \name{diff_ts}
 \alias{diff_ts}
-\title{Lagged differences}
+\title{Lagged differences of a timeseries}
 \usage{
 diff_ts(x, lag = 1, differences = 1, keep_range = TRUE)
 }
@@ -16,12 +16,12 @@ diff_ts(x, lag = 1, differences = 1, keep_range = TRUE)
 \item{keep_range}{If \code{TRUE} (the default), then  the output
 timeseries has the same period range as the input timeseries.
 Then the result timeseries will have \code{lag + differences - 1}
-\code{NA} values at the beginning (\code{lead_ts}) or the end (\code{lag_ts}).
+\code{NA} values at the beginning.
 If \code{FALSE} then the result timeseries starts \code{lag + differences - 1}
 periods later than the input timeseries.}
 }
 \description{
-Returns suitably lagged and iterated differences.
+Returns suitably lagged and iterated differences of a timeseries.
 This function works similar as \code{\link[base]{diff}},
 except that the period range of the result is the same as that
 of the input timeseries. This behaviour can be changed by specifying
