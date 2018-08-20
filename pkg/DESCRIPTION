@@ -19,7 +19,7 @@ Description: An extension of the ts class with enhanced possibilities for
              methods for growth series, and several other functions.
 License: GPL-3
 LazyData: TRUE
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Depends:
     xlsx
 Imports:

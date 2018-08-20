@@ -8,7 +8,8 @@
 \usage{
 movavb(x, order, keep_range = TRUE)
 
-movavc(x, order, keep_range = TRUE, method = c("centre", "left", "right"))
+movavc(x, order, keep_range = TRUE, method = c("centre", "left",
+  "right"))
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object}

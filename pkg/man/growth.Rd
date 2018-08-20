@@ -11,10 +11,10 @@ growth(x, n = 1, keep_range = TRUE)
 
 \item{n}{an integer indicating the period of relative change}
 
-\item{keep_range}{If \code{TRUE} (the default), then  the output
+\item{keep_range}{if \code{TRUE} (the default), then the output
 timeseries has the same period range as the input timeseries.
-Then the result timeseries will have \code{lag} NA values at the start.
-If \code{FALSE} then the result timeseries is \code{lag} periods
+Then the result timeseries will have \code{n} \code{NA} values at the start.
+If \code{FALSE} then the result timeseries is \code{n} periods
 shorter than the input timeseries.}
 }
 \value{

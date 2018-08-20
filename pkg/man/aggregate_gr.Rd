@@ -5,7 +5,8 @@
 \title{Convert timeseries with absolute or relative growth rates to a lower
 frequency}
 \usage{
-aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"), nfrequency = 1)
+aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"),
+  nfrequency = 1)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} of \code{\link{regts}} object}
