@@ -22,10 +22,10 @@
 #' x <- regts(1:10, start = "2018q3")
 #' lag_ts(x, 1)                        # calculate x[t-1]
 #' lead_ts(x, 1, keep_range = FALSE)   # calculate x[t+1]
-#' @name lag_ts-lead_ts
+#' @name lag_ts/lead_ts
 NULL
 
-#' @describeIn lag_ts-lead_ts Lag a timeseries
+#' @describeIn lag_ts-slash-lead_ts Lag a timeseries
 #' @export
 lag_ts <- function(x, n = 1, keep_range = TRUE) {
 
@@ -37,7 +37,7 @@ lag_ts <- function(x, n = 1, keep_range = TRUE) {
   return(shift_ts(x, k = -n, keep_range = keep_range))
 }
 
-#' @describeIn lag_ts-lead_ts Lead a timeseries
+#' @describeIn lag_ts-slash-lead_ts Lead a timeseries
 #' @export
 lead_ts <- function(x, n = 1, keep_range = TRUE) {
 
