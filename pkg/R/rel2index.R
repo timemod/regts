@@ -19,18 +19,23 @@
 #' @param base base period of the index timeseries (a \code{\link{period}}
 #' object or an object that can be coerced to a \code{period} object)
 #' @param scale the value of the index series at the base period (by default 100)
+#' @param keep_range if \code{TRUE} (the default), then the output
+#' timeseries has the same period range as the input timeseries.
+#' If \code{FALSE} then the result timeseries starts 1 period earlier.
+#'
 #' @seealso \code{\link{index_ts}} and \code{\link{growth}}
 #' @examples
 #' ts1 <- regts(abs(rnorm(10)), start = "2010Q2")
 #' print(rel2index(ts1))
-#' print(rel2index(ts1, base = "2010Q3", scale = 1))
+#' print(rel2index(ts1, base = "2010Q3", scale = 1, keep_range = TRUE))
 #' @name rel2index/pct2index
 NULL
 
 #' @describeIn rel2index-slash-pct2index Calculates an index timeseries from a
 #' timeseries with relative changes
 #' @export
-rel2index <- function(x, base = start_period(x) - 1, scale = 100) {
+rel2index <- function(x, base = start_period(x) - 1, scale = 100,
+                      keep_range = TRUE) {
 
   x <- as.regts(x)
 
@@ -45,7 +50,7 @@ rel2index <- function(x, base = start_period(x) - 1, scale = 100) {
 
   # determine result period range
   old_range <- get_period_range(x)
-  new_start <- start_period(old_range) - 1
+  new_start <- start_period(x) - 1
 
   if (!missing(base)) {
     base <- as.period(base)
@@ -64,10 +69,18 @@ rel2index <- function(x, base = start_period(x) - 1, scale = 100) {
 
   if (scale != 1) data <- data * scale
 
+  if (keep_range) {
+    # remove first row
+    data <- data[-1, ]
+    new_start = new_start + 1
+  }
+
   if (!x_is_matrix) {
     # convert the vector to data
     dim(data) <- NULL
   }
+
+
 
   return(regts(data, start = new_start, names = colnames(x),
                labels = ts_labels(x)))
@@ -76,8 +89,9 @@ rel2index <- function(x, base = start_period(x) - 1, scale = 100) {
 #' @describeIn rel2index-slash-pct2index Calculates an index timeseries from a
 #' timeseries with percentage changes
 #' @export
-pct2index <- function(x, base = start_period(x) - 1, scale = 100) {
-  return(rel2index(x/100, base = base, scale = scale))
+pct2index <- function(x, base = start_period(x) - 1, scale = 100,
+                      keep_range = TRUE) {
+  return(rel2index(x/100, base = base, scale = scale, keep_range = keep_range))
 }
 
 

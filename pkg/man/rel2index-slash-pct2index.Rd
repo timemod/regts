@@ -7,9 +7,11 @@
 \title{Calculate an index timeseries from a timeseries with relative or
 percentage changes.}
 \usage{
-rel2index(x, base = start_period(x) - 1, scale = 100)
+rel2index(x, base = start_period(x) - 1, scale = 100,
+  keep_range = TRUE)
 
-pct2index(x, base = start_period(x) - 1, scale = 100)
+pct2index(x, base = start_period(x) - 1, scale = 100,
+  keep_range = TRUE)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a multivariate
@@ -19,6 +21,10 @@ timeseries)}
 object or an object that can be coerced to a \code{period} object)}
 
 \item{scale}{the value of the index series at the base period (by default 100)}
+
+\item{keep_range}{if \code{TRUE} (the default), then the output
+timeseries has the same period range as the input timeseries.
+If \code{FALSE} then the result timeseries starts 1 period earlier.}
 }
 \description{
 This is the inverse of function \code{\link{growth}}.
@@ -46,7 +52,7 @@ timeseries with percentage changes
 \examples{
 ts1 <- regts(abs(rnorm(10)), start = "2010Q2")
 print(rel2index(ts1))
-print(rel2index(ts1, base = "2010Q3", scale = 1))
+print(rel2index(ts1, base = "2010Q3", scale = 1, keep_range = TRUE))
 }
 \seealso{
 \code{\link{index_ts}} and \code{\link{growth}}
