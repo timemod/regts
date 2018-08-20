@@ -22,20 +22,14 @@ test_that("lag_ts", {
   expect_identical(lag_ts(qts, n = 2, keep_range = FALSE), lag(qts, -2))
   expect_identical(lag_ts(qts[, 1], n = 2), lag(qts[, 1], -2)[qp])
 
-  expected_result <- lag(qts, -10)[qp]
-  # expected_result is logical, therefore convert to integer
-  expected_result[] <- as.integer(expected_result)
-  expect_identical(lag_ts(qts, n = 10), expected_result)
+  expect_identical(lag_ts(qts, n = 10), lag(qts, -10)[qp])
 
   expect_identical(lag_ts(qts, n = 10, keep_range = FALSE), lag(qts, -10))
 
   qts2 <- qts["/2019Q1"]
   qp2 <- get_period_range(qts2)
 
-  expected_result <- lag(qts2, -2)[qp2]
-  # expected_result is logical, therefore convert to integer
-  expected_result[] <- as.integer(expected_result)
-  expect_identical(lag_ts(qts2, n = 2), expected_result)
+  expect_identical(lag_ts(qts2, n = 2),  lag(qts2, -2)[qp2])
 
   expect_identical(lag_ts(qts2, n = 2, keep_range = FALSE), lag(qts2, -2))
 

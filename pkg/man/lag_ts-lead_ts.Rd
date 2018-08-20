@@ -11,12 +11,12 @@ lag_ts(x, n = 1, keep_range = TRUE)
 lead_ts(x, n = 1, keep_range = TRUE)
 }
 \arguments{
-\item{x}{A univariate or multivariate timeseries}
+\item{x}{a univariate or multivariate timeseries}
 
-\item{n}{The number of lags or leads (in units of observations).
+\item{n}{the number of lags or leads (in units of observations).
 Must be a positive number.}
 
-\item{keep_range}{If \code{TRUE} (the default), then  the output
+\item{keep_range}{if \code{TRUE} (the default), then the output
 timeseries has the same period range as the input timeseries.
 Then the result timeseries will have \code{n} \code{NA} values at the
 beginning (\code{lag_ts}) or the end (\code{lead_ts}).
@@ -25,7 +25,7 @@ by \code{n} periods. For example, for \code{lag_ts} the result timeseries
 starts and ends \code{n} periods later.}
 }
 \description{
-Computes the lag or lead of a timeseries, shifting the observations
+Compute the lag or lead of a timeseries, shifting the observations
 by a given number of periods.
 }
 \details{

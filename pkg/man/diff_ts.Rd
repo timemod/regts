@@ -7,13 +7,13 @@
 diff_ts(x, lag = 1, differences = 1, keep_range = TRUE)
 }
 \arguments{
-\item{x}{A univariate or multivariate timeseries}
+\item{x}{a univariate or multivariate timeseries}
 
 \item{lag}{an integer indicating which lag to use}
 
 \item{differences}{an integer indicating the order of the difference.}
 
-\item{keep_range}{If \code{TRUE} (the default), then  the output
+\item{keep_range}{if \code{TRUE} (the default), then the output
 timeseries has the same period range as the input timeseries.
 Then the result timeseries will have \code{lag + differences - 1}
 \code{NA} values at the beginning.
@@ -22,7 +22,7 @@ periods later than the input timeseries.}
 }
 \description{
 Returns suitably lagged and iterated differences of a timeseries.
-This function works similar as \code{\link[base]{diff}},
+This function works similarly as \code{\link[base]{diff}},
 except that the period range of the result is the same as that
 of the input timeseries. This behaviour can be changed by specifying
 argument \code{keep_range}.
