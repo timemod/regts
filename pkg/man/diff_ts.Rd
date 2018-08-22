@@ -15,7 +15,8 @@ diff_ts(x, lag = 1, differences = 1, keep_range = TRUE, ...)
   keep_range = TRUE, ...)
 }
 \arguments{
-\item{x}{a univariate or multivariate timeseries}
+\item{x}{a univariate or multivariate timeseries.
+Can also be a vector, matrix or data frame (see details).}
 
 \item{lag}{an integer indicating which lag to use}
 

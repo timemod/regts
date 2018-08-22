@@ -10,7 +10,8 @@ lag_ts(x, n = 1, keep_range = TRUE, ...)
 \method{lag_ts}{ts}(x, n = 1, keep_range = TRUE, ...)
 }
 \arguments{
-\item{x}{a univariate or multivariate timeseries}
+\item{x}{a univariate or multivariate timeseries.
+Can also be a vector, matrix or data frame (see details).}
 
 \item{n}{the number of lags (in units of observations).
 Must be a positive number.}

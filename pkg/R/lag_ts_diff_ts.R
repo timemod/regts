@@ -12,7 +12,8 @@
 #' is positive, and that by default the resulting timeseries has the same
 #' period range as the input timeseries.
 #'
-#' @param x a univariate or multivariate timeseries
+#' @param x a univariate or multivariate timeseries.
+#' Can also be a vector, matrix or data frame (see details).
 #' @param n the number of lags (in units of observations).
 #'          Must be a positive number.
 #' @param keep_range if \code{TRUE} (the default), then the output
@@ -57,7 +58,9 @@ lag_ts.default <- function(x, n = 1, keep_range = TRUE, ...) {
 #' with function \code{\link{regts}}. This conversion results in a timeseries
 #' with frequency 1 and starting at year 1.
 #'
-#' @param x a univariate or multivariate timeseries
+#' @param x a univariate or multivariate timeseries.
+#' Can also be a vector, matrix or data frame (see details).
+#
 #' @param n the number leads (in units of observations).
 #'          Must be a positive number.
 #' @param keep_range if \code{TRUE} (the default), then the output
@@ -132,7 +135,8 @@ shift_ts <- function(x, k, keep_range) {
 #' with function \code{\link{regts}}. This conversion results in a timeseries
 #' with frequency 1 and starting at year 1.
 #'
-#' @param x a univariate or multivariate timeseries
+#' @param x a univariate or multivariate timeseries.
+#' Can also be a vector, matrix or data frame (see details).
 #' @param lag an integer indicating which lag to use
 #' @param differences an integer indicating the order of the difference.
 #' @param keep_range if \code{TRUE} (the default), then the output
