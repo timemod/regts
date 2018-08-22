@@ -1,60 +1,106 @@
-#' Lag or Lead a Timeseries
+#' Lag a Timeseries
 #'
-#' Compute the lag or lead of a timeseries, shifting the observations
-#' by a given number of periods.
+#' Compute the lag of a timeseries, shifting the observations
+#' forwards by a given number of periods.
 #'
-#' \code{lag_ts} and \code{lead_ts} differ from \code{\link[stats]{lag}}
+#' Vector, matrix and data frame arguments are first converted to a \code{regts}
+#' with function \code{\link{regts}}. This conversion results in a timeseries
+#' with frequency 1 and starting at year 1.
+#'
+#' \code{lag_ts} differs from \code{\link[stats]{lag}}
 #' in the \code{stats} package in that the specified number of lags or leads
 #' is positive, and that by default the resulting timeseries has the same
 #' period range as the input timeseries.
 #'
-#' @param x a univariate or multivariate timeseries
-#' @param n the number of lags or leads (in units of observations).
+#' @param x a univariate or multivariate timeseries.
+#' Can also be a vector, matrix or data frame (see details).
+#' @param n the number of lags (in units of observations).
 #'          Must be a positive number.
 #' @param keep_range if \code{TRUE} (the default), then the output
 #' timeseries has the same period range as the input timeseries.
 #' Then the result timeseries will have \code{n} \code{NA} values at the
-#' beginning (\code{lag_ts}) or the end (\code{lead_ts}).
-#' If \code{FALSE} the period range of the result timeseries is shifted
-#' by \code{n} periods. For example, for \code{lag_ts} the result timeseries
+#' beginning. If \code{FALSE} the period range of the result timeseries is
+#' shifted by \code{n} periods. The result timeseries
 #' starts and ends \code{n} periods later.
+#' @param ... further arguments to be passed to or from methods
+#'            (currently not used in package \code{regts})
+#' @seealso \code{\link{lead_ts}} and \code{\link{diff_ts}}
 #' @examples
 #' x <- regts(1:10, start = "2018q3")
-#' lag_ts(x, 1)                        # calculate x[t-1]
-#' lead_ts(x, 1, keep_range = FALSE)   # calculate x[t+1]
-#' @name lag_ts/lead_ts
-NULL
-
-#' @describeIn lag_ts-slash-lead_ts Lag a timeseries
+#' lag_ts(x)
+#' lag_ts(x, k = 2, keep_range = FALSE)
 #' @export
-lag_ts <- function(x, n = 1, keep_range = TRUE) {
+lag_ts <- function(x, n = 1, keep_range = TRUE, ...) {
+  UseMethod("lag_ts")
+}
 
-  if (!is.ts(x)) {
-    stop("Argument x is not a timeseries")
-  }
+#' @rdname lag_ts
+#' @export
+lag_ts.ts <- function(x, n = 1, keep_range = TRUE, ...) {
+
   if (n < 0) stop("Argument n should be positive")
 
   return(shift_ts(x, k = -n, keep_range = keep_range))
 }
 
-#' @describeIn lag_ts-slash-lead_ts Lead a timeseries
+# @rdname lag_ts
 #' @export
-lead_ts <- function(x, n = 1, keep_range = TRUE) {
+lag_ts.default <- function(x, n = 1, keep_range = TRUE, ...) {
+  return(lag_ts(regts(x), n = n, keep_range = keep_range, ...))
+}
 
-  if (!is.ts(x)) {
-    stop("Argument x is not a timeseries")
-  }
+#' Lead a Timeseries
+#'
+#' Compute the lead of a timeseries, shifting the observations
+#' backwards by a given number of periods.
+#'
+#' Vector, matrix and data frame arguments are first converted to a \code{regts}
+#' with function \code{\link{regts}}. This conversion results in a timeseries
+#' with frequency 1 and starting at year 1.
+#'
+#' @param x a univariate or multivariate timeseries.
+#' Can also be a vector, matrix or data frame (see details).
+#
+#' @param n the number leads (in units of observations).
+#'          Must be a positive number.
+#' @param keep_range if \code{TRUE} (the default), then the output
+#' timeseries has the same period range as the input timeseries.
+#' Then the result timeseries will have \code{n} \code{NA} values at the
+#' beginning end.
+#' If \code{FALSE} the period range of the result timeseries is shifted
+#' by \code{n} periods. The result timeseries
+#' starts and ends \code{n} periods earlier.
+#' @param ... further arguments to be passed to or from methods
+#'            (currently not used in package \code{regts})
+#' @examples
+#' x <- regts(1:10, start = "2018q3")
+#' lead_ts(x)
+#' lead_ts(x, k = 2, keep_range = FALSE)
+#' @seealso \code{\link{lag_ts}} and \code{\link{diff_ts}}
+#' @export
+lead_ts <- function(x, n = 1, keep_range = TRUE, ...) {
+  UseMethod("lead_ts")
+}
+
+#' @rdname lead_ts
+#' @export
+lead_ts.ts <- function(x, n = 1, keep_range = TRUE, ...) {
+
   if (n < 0) stop("Argument n should be positive")
 
   return(shift_ts(x, k = n, keep_range = keep_range))
 }
 
-# internal function used by both lag_ts and lead_ts
-shift_ts <- function(x, k, keep_range) {
+#' @rdname lead_ts
+#' @export
+lead_ts.default <- function(x, n = 1, keep_range = TRUE, ...) {
+  return(lead_ts(regts(x), n = n, keep_range = keep_range, ...))
+}
 
-  if (!is.ts(x)) {
-    stop("Argument x is not a timeseries")
-  }
+#
+# internal function used by both lag_ts and lead_ts
+#
+shift_ts <- function(x, k, keep_range) {
 
   if (k == 0) return(x)
 
@@ -85,7 +131,12 @@ shift_ts <- function(x, k, keep_range) {
 #' of the input timeseries. This behaviour can be changed by specifying
 #' argument \code{keep_range}.
 #'
-#' @param x a univariate or multivariate timeseries
+#' Vector, matrix and data frame arguments are first converted to a \code{regts}
+#' with function \code{\link{regts}}. This conversion results in a timeseries
+#' with frequency 1 and starting at year 1.
+#'
+#' @param x a univariate or multivariate timeseries.
+#' Can also be a vector, matrix or data frame (see details).
 #' @param lag an integer indicating which lag to use
 #' @param differences an integer indicating the order of the difference.
 #' @param keep_range if \code{TRUE} (the default), then the output
@@ -94,16 +145,21 @@ shift_ts <- function(x, k, keep_range) {
 #' \code{NA} values at the beginning.
 #' If \code{FALSE} then the result timeseries starts \code{lag + differences - 1}
 #' periods later than the input timeseries.
+#' @param ... further arguments to be passed to or from methods
+#'            (currently not used in package \code{regts})
 #' @export
 #' @examples
 #' x <- regts(1:10, start = "2018q3")
 #' diff_ts(x)
 #' diff_ts(x, lag = 2, keep_range = FALSE)
-diff_ts <- function(x, lag = 1, differences = 1, keep_range = TRUE) {
+#' @seealso \code{\link{lag_ts}} and \code{\link{lead_ts}}
+diff_ts <- function(x, lag = 1, differences = 1, keep_range = TRUE, ...) {
+  UseMethod("diff_ts")
+}
 
-  if (!is.ts(x)) {
-    stop("Argument x is not a timeseries")
-  }
+#' @rdname diff_ts
+#' @export
+diff_ts.ts <- function(x, lag = 1, differences = 1, keep_range = TRUE, ...) {
 
   k <- lag + differences - 1
   n <- NROW(x)
@@ -128,4 +184,11 @@ diff_ts <- function(x, lag = 1, differences = 1, keep_range = TRUE) {
   } else {
     return(diff_result)
   }
+}
+
+#' @rdname diff_ts
+#' @export
+diff_ts.default <- function(x, lag = 1, differences = 1, keep_range = TRUE, ...) {
+  return(diff_ts(regts(x), lag = lag, differences = differences,
+                 keep_range = keep_range, ...))
 }

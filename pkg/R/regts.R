@@ -696,7 +696,7 @@ window_regts <- function(x, sel_range) {
     }
   }
   return(create_regts(data, sel_range[1], sel_range[2], sel_range[3],
-                     ts_labels(x)))
+                      ts_labels(x)))
 }
 
 #' @export

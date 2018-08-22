@@ -61,3 +61,40 @@ test_that("diff_ts", {
                "Timeseries x has too few observations")
 })
 
+
+test_that("vector argument", {
+  v <- 1:3
+  expect_identical(lag_ts(v), regts(c(NA, 1:2), period = "1/3"))
+  expect_identical(lag_ts(v, n = 2, keep_range = FALSE),
+                   regts(v, period = "3/5"))
+  expect_identical(lead_ts(v), regts(c(2:3, NA), period = "1/3"))
+  expect_identical(lead_ts(v, n = 2, keep_range = FALSE),
+                   regts(v, start = -1))
+
+  expect_identical(diff_ts(v, lag = 2), regts(c(NA, NA, 2L), period = "1/3"))
+
+  # function diff creates a name e1 here, I have no idea why
+  expected_result <- regts(0L, period = "3")
+  names(expected_result) <- "e1"
+  expect_identical(diff_ts(v, differences =  2, keep_range = FALSE),
+                   expected_result)
+
+  mat <- matrix(c("a", "b", "c", "d"), nrow = 2)
+  expect_identical(lag_ts(mat), regts(matrix(c(NA, "a", NA, "c"), ncol = 2),
+                                      period = "1/2"))
+  expect_identical(lag_ts(mat, n = 2, keep_range = FALSE),
+                   regts(mat, period = "3/4"))
+  expect_identical(lead_ts(mat), regts(matrix(c("b", NA, "d", NA), ncol = 2),
+                                              period = "1/2"))
+  expect_identical(lead_ts(mat, n = 2, keep_range = FALSE),
+                   regts(mat, start = -1))
+
+  expect_error(diff_ts(mat), "non-numeric argument to binary operator")
+
+  mat2 <- matrix(as.numeric(1:4), nrow = 2)
+  expect_identical(diff_ts(mat2), regts(matrix(c(NA, 1, NA, 1), ncol = 2),
+                                        period = "1/2"))
+  expect_identical(diff_ts(mat2, keep_range = FALSE),
+                   regts(matrix(1, ncol = 2), period = "2"))
+})
+

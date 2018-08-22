@@ -2,12 +2,21 @@
 % Please edit documentation in R/lag_ts_diff_ts.R
 \name{diff_ts}
 \alias{diff_ts}
+\alias{diff_ts.ts}
+\alias{diff_ts.default}
 \title{Lagged differences of a timeseries}
 \usage{
-diff_ts(x, lag = 1, differences = 1, keep_range = TRUE)
+diff_ts(x, lag = 1, differences = 1, keep_range = TRUE, ...)
+
+\method{diff_ts}{ts}(x, lag = 1, differences = 1, keep_range = TRUE,
+  ...)
+
+\method{diff_ts}{default}(x, lag = 1, differences = 1,
+  keep_range = TRUE, ...)
 }
 \arguments{
-\item{x}{a univariate or multivariate timeseries}
+\item{x}{a univariate or multivariate timeseries.
+Can also be a vector, matrix or data frame (see details).}
 
 \item{lag}{an integer indicating which lag to use}
 
@@ -19,6 +28,9 @@ Then the result timeseries will have \code{lag + differences - 1}
 \code{NA} values at the beginning.
 If \code{FALSE} then the result timeseries starts \code{lag + differences - 1}
 periods later than the input timeseries.}
+
+\item{...}{further arguments to be passed to or from methods
+(currently not used in package \code{regts})}
 }
 \description{
 Returns suitably lagged and iterated differences of a timeseries.
@@ -27,8 +39,16 @@ except that the period range of the result is the same as that
 of the input timeseries. This behaviour can be changed by specifying
 argument \code{keep_range}.
 }
+\details{
+Vector, matrix and data frame arguments are first converted to a \code{regts}
+with function \code{\link{regts}}. This conversion results in a timeseries
+with frequency 1 and starting at year 1.
+}
 \examples{
 x <- regts(1:10, start = "2018q3")
 diff_ts(x)
 diff_ts(x, lag = 2, keep_range = FALSE)
+}
+\seealso{
+\code{\link{lag_ts}} and \code{\link{lead_ts}}
 }
