@@ -68,9 +68,8 @@ test_that("vector argument", {
   expect_identical(lag_ts(v, n = 2, keep_range = FALSE),
                    regts(v, period = "3/5"))
   expect_identical(lead_ts(v), regts(c(2:3, NA), period = "1/3"))
-  # regts does not yet support negative periods
   expect_identical(lead_ts(v, n = 2, keep_range = FALSE),
-                   as.regts(ts(v, start = -1)))
+                   regts(v, start = -1))
 
   expect_identical(diff_ts(v, lag = 2), regts(c(NA, NA, 2L), period = "1/3"))
 
@@ -87,11 +86,8 @@ test_that("vector argument", {
                    regts(mat, period = "3/4"))
   expect_identical(lead_ts(mat), regts(matrix(c("b", NA, "d", NA), ncol = 2),
                                               period = "1/2"))
-  # regts does not yet support negative periods
-  expected_result <- as.regts(ts(mat, start = -1))
-  colnames(expected_result) <- NULL
   expect_identical(lead_ts(mat, n = 2, keep_range = FALSE),
-                   expected_result)
+                   regts(mat, start = -1))
 
   expect_error(diff_ts(mat), "non-numeric argument to binary operator")
 
