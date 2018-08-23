@@ -50,7 +50,7 @@ test_that("ts without labels written correctly",  {
 test_that("ts with labels written correctly",  {
 
   file <- "xlsx/ts1_lbls.xlsx"
-  file.copy("xlsx_org/ts1_lbls.xlsx", file)
+  file.copy("xlsx_org/ts1_lbls.xlsx", file, overwrite = TRUE)
 
   write_ts_xlsx(ts1_lbls, file, sheet_name = "ts1", append = TRUE,
                 number_format = "00.00")
