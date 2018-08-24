@@ -1,16 +1,17 @@
 #' Update a timeseries with another timeseries object
 #'
-#' This function can be used to update, replace or extend a (reg)ts
-#' object with another (reg)ts object.
+#' This function can be used to update, replace or extend a \code{(reg)ts}
+#' object with another \code{(reg)ts} object.
 #' The result is an updated \code{\link{regts}} object.
 #'
 #' @details
-#' The timeseries can be updated in four different ways:
-#'
-#' \code{upd} the first timeseries are updated with the second timeseries.
 #' The two timeseries must have the same frequency, but may have a different
-#' period range. The update is computed for the union of the two period ranges
-#' (for the non-overlapping periods the result will be \code{NA}).
+#' period range.
+#' The common columns in the timeseries can be updated in four different ways:
+#'
+#' \code{upd} the first timeseries are updated with the second timeseries for the
+#' total period range of the second timeseries. Outside this period the values
+#' in the first timeseries do not change.
 #'
 #' \code{updna} if method \code{updna} is selected instead of \code{upd},
 #' only NA values in the first timeseries will be updated
@@ -19,11 +20,19 @@
 #' the values in the first timeseries are only replaced with valid (i.e. non-NA)
 #' values from the second timeseries.
 #'
-#' \code{replace} if method \code{replace} is selected the values in the first
-#' timeseries are replaced by the values in the second timeseries for the whole period.
+#' \code{replace} like method \code{upd}, the values in the first
+#' timeseries are replaced by the values in the second timeseries for the total
+#' period range of these second timeseries.
+#' Outside this period the values in the first timeseries will become
+#' \code{NA}).
 #'
 #' The non overlapping columns in both timeseries are added to the result.
-#' The overlapping columns in both timeseries are updated with the different methods.
+#'
+#' The period range of the result is the union of the period ranges of the
+#' first and second timeseries, except for the \code{updval} method.
+#' For this method the result period range is the union of the first timeseries
+#' and the timeseries obtained by applying function \code{na_trim} to the
+#' second timeseries.
 #'
 #' @param x1 the first timeseries (a \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
