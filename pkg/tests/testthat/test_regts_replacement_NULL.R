@@ -120,10 +120,7 @@ test_that("errors", {
   msg <- "replacement has length zero"
   expect_error(t2[2] <- NULL, msg)
 
-
   t3 <- regts1
-  msg <- paste("missing values are not allowed in subscripted assignments of",
-               "regts objects")
-  expect_error(t3[, NA_character_] <- NULL, msg)
+  expect_silent(t3[, NA_character_] <- NULL)
 })
 
