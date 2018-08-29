@@ -512,11 +512,6 @@ add_columns <- function(x, new_colnames) {
 #' @export
 "[<-.regts" <- function (x, i, j, value) {
 
-  if ((!missing(i) && any(is.na(i))) || !missing(j) && any(is.na(j))) {
-    stop(paste("missing values are not allowed in subscripted assignments of",
-               "regts objects"))
-  }
-
   if (is.null(value) && is.matrix(x)) {
     # remove columns
     if (!missing(i)) {
