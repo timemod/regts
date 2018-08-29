@@ -181,6 +181,21 @@ test_that("period selection at the lhs of a univariate timeseries", {
       window(ts1, start = c(2010, 2), end = c(2011,2))
   })
   expect_equivalent(regts2, as.regts(ts2))
+
+  # with period extension and period_range objects
+  regts2 <- regts1
+  range1 <- period_range(NULL, "2013Q2")
+  regts2[range1] <- 9
+  range2 <- period_range('2008Q2/2009Q2')
+  range3 <- period_range('2010Q2/2011Q2')
+  regts2[range2] <- regts1[range3]
+  ts2 <- ts1
+  suppressWarnings({
+    window(ts2, end = c(2013,2), extend = TRUE) <- 9
+    window(ts2, start = c(2008, 2), end = c(2009, 2), extend = TRUE) <-
+      window(ts1, start = c(2010, 2), end = c(2011,2))
+  })
+  expect_equivalent(regts2, as.regts(ts2))
 })
 
 
@@ -358,3 +373,50 @@ test_that("period selection exotic timeseries", {
                    window(factor_ts, start = c(2018,1), end = c(2018, 2),
                           extend = TRUE))
 })
+
+
+test_that("row selection with NA", {
+
+  regts1a <- regts(matrix(1:10, ncol = 1), start = "2010Q4", names = "a")
+  regts1b <- regts1a[, 1]
+
+  ts1a <- as.ts(regts1a)
+  ts1b <- as.ts(regts1b)
+
+  expect_identical(regts1a[NA, ], ts1a[NA, ])
+  expect_identical(regts1b[NA], ts1b[NA])
+
+  regts2a <- regts1a
+  regts2a[NA] <- 2L
+  expect_identical(regts2a, regts1a)
+
+  regts2b <- regts1b
+  regts2b[NA] <- 2L
+  expect_identical(regts2b, regts1b)
+
+  msg <- "Illegal period NA."
+  expect_error(regts1a[NA_character_, ], msg)
+  expect_error(regts1b[NA_character_], msg)
+
+  expect_error(regts1a[NA_character_, ] <- 999, msg)
+  expect_error(regts1b[NA_character_] <- 999, msg)
+})
+
+test_that("column selection with NA", {
+  regts1 <- regts(matrix(1:10, ncol = 1), start = "2010Q4", names = "a")
+  ts1 <- as.ts(regts1)
+  expect_identical(regts1[, NA], as.regts(ts1[, NA]))
+  expect_error(regts1[, NA_character_], "subscript out of bounds")
+
+  regts2 <- regts1
+  regts2[, NA] <- 2L
+  expect_identical(regts1, regts2)
+  expect_error(regts1[, NA_character_] <- 9, "subscript out of bounds")
+
+  regts3 <- regts1
+  regts3[, c(NA, 1)] <- 3
+  expected_result <- regts1
+  expected_result[] <- 3
+  expect_identical(regts3, expected_result)
+})
+
