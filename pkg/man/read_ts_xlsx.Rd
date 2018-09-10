@@ -47,7 +47,9 @@ By default, \code{read_ts_xlsx} treats blank cells as missing data.}
 
 \item{name_fun}{function to apply to the names of the timeseries.}
 
-\item{period_fun}{function to apply to the cells containing periods}
+\item{period_fun}{function applied to period texts.
+Use this argument if the period texts do not have a standard format
+(see Description).}
 }
 \value{
 a \code{regts} object
@@ -63,9 +65,11 @@ cells containing
 \item a text with the format recognized by function \code{\link{period}},
 for example \code{"2010Q2"}, \code{"2010.2Q"},
 \code{"2010m2"}, \code{"2011"} or \code{"2011-1"},
-\item an integer value (e.g. \code{2018}), which is considered as a year.
+\item an integer value (e.g. \code{2018}), which is considered as a year,
 \item a date
 }
+Use argument \code{period_fun} if the period cells contain a text with a
+format not recognized by function \code{period}.
 }
 \details{
 In many cases, this function will read timeseries correctly.
