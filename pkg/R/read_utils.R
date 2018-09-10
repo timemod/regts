@@ -11,8 +11,10 @@ tibble_2_char <- function(tbl, replace_na = TRUE) {
 
 # return a logical vector, where each element indicates whether the
 # corresponding element in tbl is a period
-is_period_tbl <- function(tbl, frequency, xlsx) {
-  is_per_text <- is_period_text(tibble_2_char(tbl), frequency)
+is_period_tbl <- function(tbl, frequency, xlsx, period_fun) {
+  period_texts <- tibble_2_char(tbl)
+  if (!missing(period_fun)) period_texts <- period_fun(period_texts)
+  is_per_text <- is_period_text(period_texts, frequency)
   if (xlsx && (!is.na(frequency) && 12 %% frequency == 0)) {
     # When read from an xlsx file the tbl may contain  POSIXt values.
     # POSIXt values are possible periods if the frequency is a divisor of 12.
@@ -25,7 +27,7 @@ is_period_tbl <- function(tbl, frequency, xlsx) {
 }
 
 # Returns the periods as either a character or Date vector
-get_periods_tbl <- function(tbl, frequency, xlsx) {
+get_periods_tbl <- function(tbl, frequency, xlsx, period_fun) {
   if (xlsx &&  (!is.na(frequency) && 12 %% frequency == 0)) {
     # when read from xlsx the tbl may contain POSIXt data
     is_posixt <- sapply(tbl, FUN = function(x) {inherits(x[[1]], "POSIXt")})
@@ -36,12 +38,14 @@ get_periods_tbl <- function(tbl, frequency, xlsx) {
   }
   if (has_posixt) {
     # convert all periods to Dates, and return a Date vector
+    period_fun_given <- !missing(period_fun)
     conv_date <- function(x) {
       x <- x[[1]]
       if (inherits(x, "POSIXt")) {
         return(as.Date(x))
       } else {
         # convert string to period object and then to POSIXct
+        if (period_fun_given) x <- period_fun(x)
         return(as.Date(period(x, frequency)))
       }
     }
@@ -50,14 +54,16 @@ get_periods_tbl <- function(tbl, frequency, xlsx) {
     return(do.call(c, date_list))
   } else {
     # return a character vector
-    return(tibble_2_char(tbl, FALSE))
+    ret <- tibble_2_char(tbl, FALSE)
+    if (!missing(period_fun)) ret <- period_fun(ret)
+    return(ret)
   }
 }
 
 
 # internal function: find the first row or column containing a period in the
-# tibble read by read_excel. Returns NULL if no period has been found
-find_periods <- function(tbl, frequency, rowwise, xlsx) {
+# tibble read by read_excel of fread. Returns NULL if no period has been found
+find_periods <- function(tbl, frequency, rowwise, xlsx, period_fun) {
 
   found <- FALSE
 
@@ -65,7 +71,7 @@ find_periods <- function(tbl, frequency, rowwise, xlsx) {
     # columnwise
 
     for (col_nr in 1:ncol(tbl)) {
-      is_period <- is_period_tbl(tbl[[col_nr]], frequency, xlsx)
+      is_period <- is_period_tbl(tbl[[col_nr]], frequency, xlsx, period_fun)
       if (any(is_period)) {
         last_col <- Position(function(x) {x}, is_period, right = TRUE)
         if (last_col > 1) {
@@ -82,14 +88,15 @@ find_periods <- function(tbl, frequency, rowwise, xlsx) {
 
     # first search for a period rowwise
     for (row_nr in 1:nrow(tbl)) {
-      is_period_row <- is_period_tbl(tbl[row_nr, ], frequency, xlsx)
+      is_period_row <- is_period_tbl(tbl[row_nr, ], frequency, xlsx, period_fun)
       if (any(is_period_row)) {
         col_nr <- Position(function(x) {x}, is_period_row)
         if (missing(rowwise)) {
           if (row_nr == 1) {
             rowwise <- TRUE
           } else {
-            is_period_col <- is_period_tbl(tbl[[col_nr]], frequency, xlsx)
+            is_period_col <- is_period_tbl(tbl[[col_nr]], frequency, xlsx,
+                                           period_fun)
             rowwise <- col_nr != 1  && sum(is_period_row) > sum(is_period_col)
           }
         }

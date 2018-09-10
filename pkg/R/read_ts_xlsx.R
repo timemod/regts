@@ -114,6 +114,7 @@
 #' @param na_string Character vector of strings to use for missing values.
 #' By default, \code{read_ts_xlsx} treats blank cells as missing data.
 #' @param name_fun function to apply to the names of the timeseries.
+#' @param period_fun function to apply to the cells containing periods
 #' @return a \code{regts} object
 #'
 #' @examples
@@ -131,7 +132,7 @@
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          skiprow = NA, skipcol = NA, rowwise, frequency = NA,
                          labels = c("after", "before", "no"),
-                         na_string = "", name_fun) {
+                         na_string = "", name_fun, period_fun) {
 
   if (missing(range)) {
     range <- cell_limits()
@@ -142,6 +143,13 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   }
 
   na_string <- union(na_string, "")
+
+  if (!missing(name_fun) && !is.function(name_fun)) {
+      stop("argument name_fun is not a function")
+  }
+  if (!missing(period_fun) && !is.function(period_fun)) {
+    stop("argument period_fun is not a function")
+  }
 
   tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
                     col_types = "list", na = na_string)
@@ -156,7 +164,8 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   not_all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
   tbl <- tbl[ , not_all_na]
 
-  period_info <- find_periods(tbl, frequency, rowwise, xlsx = TRUE)
+  period_info <- find_periods(tbl, frequency, rowwise, xlsx = TRUE,
+                              period_fun = period_fun)
 
   if (is.null(period_info)) {
     stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
@@ -165,19 +174,13 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 
   if (period_info$rowwise) {
     ret <- read_ts_tbl_rowwise(tbl, frequency = frequency, labels = labels,
-                               period_info = period_info)
+                               period_info = period_info, name_fun = name_fun,
+                               period_fun = period_fun)
   } else {
     ret <- read_ts_tbl_columnwise(tbl, frequency = frequency, labels = labels,
-                                  period_info = period_info)
-  }
-
-
-  # apply function to column names if given
-  if (!missing(name_fun)) {
-    if (!is.function(name_fun)) {
-      stop("argument name_fun is not a function")
-    }
-    colnames(ret) <- name_fun(colnames(ret))
+                                  period_info = period_info,
+                                  name_fun = name_fun,
+                                  period_fun = period_fun)
   }
 
   return(ret)
@@ -188,7 +191,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 # is numeric = TRUE, then the timeseries are converted to numeric
 read_ts_tbl_rowwise <- function(tbl, frequency,
                                 labels = c("after", "before", "no"),
-                                period_info) {
+                                period_info, name_fun, period_fun) {
 
   labels <- match.arg(labels)
 
@@ -227,9 +230,11 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
 
   data_cols <- (max(name_col, label_cols) + 1) : ncol(tbl)
 
-  periods <- get_periods_tbl(tbl[1, data_cols], frequency, xlsx = TRUE)
+  periods <- get_periods_tbl(tbl[1, data_cols], frequency, xlsx = TRUE,
+                             period_fun)
 
   names <- tibble_2_char(tbl[-1, name_col], replace_na = FALSE)
+  if (!missing(name_fun)) names <- name_fun(names)
   name_sel <- !is.na(names)
   names <- names[name_sel]
 
@@ -270,7 +275,7 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
 # with readxl::read_excel.
 read_ts_tbl_columnwise <- function(tbl, frequency = NA,
                                    labels = c("after", "before", "no"),
-                                   period_info) {
+                                   period_info, name_fun, period_fun) {
 
   labels <- match.arg(labels)
 
@@ -313,6 +318,7 @@ read_ts_tbl_columnwise <- function(tbl, frequency = NA,
 
   # get variable names
   ts_names <- unlist(tbl[name_row, -1], use.names = FALSE)
+  if (!missing(name_fun)) ts_names <- name_fun(ts_names)
   name_sel <- which(!is.na(ts_names))
   ts_names <- ts_names[name_sel]
 

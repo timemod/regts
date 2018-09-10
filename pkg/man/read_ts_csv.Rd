@@ -7,7 +7,7 @@
 read_ts_csv(filename, rowwise, frequency = NA, skiprow = 0,
   skipcol = 0, labels = c("after", "before", "no"), sep = "auto",
   fill = FALSE, dec = if (sep != ".") "." else ",", na_string = "",
-  name_fun)
+  name_fun, period_fun)
 }
 \arguments{
 \item{filename}{a string with the filename}
@@ -45,6 +45,8 @@ If not "." (default) then usually ",".}
 By default, \code{read_ts_csv} treats blank cells as missing data.}
 
 \item{name_fun}{function to apply to the names of the timeseries.}
+
+\item{period_fun}{function to apply to the cells containing periods}
 }
 \value{
 a \code{regts} object

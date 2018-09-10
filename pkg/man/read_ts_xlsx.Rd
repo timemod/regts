@@ -6,7 +6,7 @@
 \usage{
 read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = NA,
   skipcol = NA, rowwise, frequency = NA, labels = c("after",
-  "before", "no"), na_string = "", name_fun)
+  "before", "no"), na_string = "", name_fun, period_fun)
 }
 \arguments{
 \item{filename}{a string with the filename}
@@ -46,6 +46,8 @@ frequency indicator (for example "2011-1").}
 By default, \code{read_ts_xlsx} treats blank cells as missing data.}
 
 \item{name_fun}{function to apply to the names of the timeseries.}
+
+\item{period_fun}{function to apply to the cells containing periods}
 }
 \value{
 a \code{regts} object
