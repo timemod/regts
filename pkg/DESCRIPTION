@@ -37,6 +37,7 @@ Suggests:
     timeSeries,
     tseries,
     tempdisagg,
-    Hmisc
+    Hmisc,
+    lubridate
 LinkingTo: Rcpp
 VignetteBuilder: knitr

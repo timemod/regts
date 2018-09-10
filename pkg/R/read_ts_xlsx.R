@@ -327,7 +327,7 @@ read_ts_columnwise_xlsx <- function(tbl, frequency, labels, name_fun,
   if (labels != "no" && length(label_rows) > 0) {
     lbl_data <- tbl[label_rows, -1]
     lbl_data[] <- lapply(lbl_data, FUN = function(x)
-    {ifelse(is.na(x),  "", as.character(x))})
+                              {ifelse(is.na(x),  "", as.character(x))})
     if (length(label_rows) == 1) {
       lbls <- unlist(lbl_data, use.names = FALSE)
     } else {
@@ -341,7 +341,8 @@ read_ts_columnwise_xlsx <- function(tbl, frequency, labels, name_fun,
   # stored in variables ts_names and lbls)
   tbl <- tbl[is_period, ]
 
-  periods <- get_periods_tbl(tbl[[1]], frequency, xlsx = TRUE)
+  periods <- get_periods_tbl(tbl[[1]], frequency, xlsx = TRUE,
+                             period_fun = period_fun)
 
   # convert data columns to a numeric matrix, employing C++ function
   # list_tbl_2_mat.
