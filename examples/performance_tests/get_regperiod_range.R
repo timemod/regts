@@ -1,6 +1,6 @@
 # test the performance of get_period_range and a number of alternatives.
 library(regts)
-source("tests/performance_tests/time_commands.R")
+source("examples/performance_tests/time_commands.R")
 
 regts1 <- regts(as.numeric(1:30), start = "2010Q2")
 

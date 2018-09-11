@@ -1,6 +1,6 @@
 library(regts)
 library(zoo)
-source("tests/performance_tests/time_commands.R")
+source("examples/performance_tests/time_commands.R")
 
 set.seed(12345)
 aantal_variabelen <- 5000
@@ -15,8 +15,8 @@ data <- matrix(rnorm(n  = aantal_variabelen * aantal_perioden),
 colnames(data) <- namen
 
 regts1 <- regts(data, start = "2010Q2")
-#ts_labels(regts1) <- namen
-ts1 <- regts:::unregts(regts1)
+ts_labels(regts1) <- namen
+ts1 <- as.ts(regts1)
 zoo1 <- as.zoo(ts1)
 
 lts <- as.list(ts1)
