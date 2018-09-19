@@ -1,5 +1,5 @@
 library(regts)
-source("performance_tests/time_commands.R")
+source("examples/performance_tests/time_commands.R")
 
 convert_range_selector_alt <- function(range, ts_range) {
 
@@ -39,8 +39,10 @@ modify_frequency_alt <- function(x, new_freq) {
 
 ts_range <- period_range("2010Q2", "2014Q2")
 p1 <- as.period_range("2011/2012")
-commands <- c("regts:::convert_range_selector(p1, ts_range)",
+commands <- c("regts:::convert_selection_range(p1, ts_range)",
               "convert_range_selector_alt(p1, ts_range)"
 )
 
 print(time_commands(commands))
+
+print(identical(r1, r2))

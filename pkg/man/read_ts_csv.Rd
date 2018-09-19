@@ -7,7 +7,7 @@
 read_ts_csv(filename, rowwise, frequency = NA, skiprow = 0,
   skipcol = 0, labels = c("after", "before", "no"), sep = "auto",
   fill = FALSE, dec = if (sep != ".") "." else ",", na_string = "",
-  name_fun)
+  name_fun, period_fun)
 }
 \arguments{
 \item{filename}{a string with the filename}
@@ -45,6 +45,9 @@ If not "." (default) then usually ",".}
 By default, \code{read_ts_csv} treats blank cells as missing data.}
 
 \item{name_fun}{function to apply to the names of the timeseries.}
+
+\item{period_fun}{function applied to period texts. Use this argument
+if the period texts do not have a standard format (see Description).}
 }
 \value{
 a \code{regts} object
@@ -57,7 +60,8 @@ The timeseries can be stored both rowwise or columnwise.
 The function tries to find fields with valid period texts.
 Period texts should have the format recognized by function
 \code{\link{period}}, for example \code{"2010Q2"}, \code{"2010.2Q"},
-\code{"2010m2"}, \code{"2011"} or \code{"2011-1"}.
+\code{"2010m2"}, \code{"2011"} or \code{"2011-1"}. Use argument
+\code{period_fun} if the period texts have a different format.
 }
 \details{
 In many cases, this function will read timeseries correctly.

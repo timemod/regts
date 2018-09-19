@@ -1,6 +1,7 @@
 library(regts)
 library(zoo)
-source("tests/performance_tests/time_commands.R")
+source("examples/performance_tests/time_commands.R")
+
 
 set.seed(12345)
 aantal_variabelen <- 50000
@@ -11,8 +12,8 @@ data <- matrix(rnorm(n  = aantal_variabelen * aantal_perioden), ncol = aantal_va
 colnames(data) <- namen
 
 regts1 <- regts(data, start = "2010Q2")
-ts1 <- regts:::unregts(regts1)
-zoo1 <- as.zoo(ts1)
+ts1 <- as.regts(regts1)
+zoo1 <- as.zooreg(ts1)
 
 commands <- c("ts1[ , \"ts_3400\"]",
               "regts1[ , \"ts_3400\"]",

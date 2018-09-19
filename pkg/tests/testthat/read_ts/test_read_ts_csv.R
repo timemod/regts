@@ -14,6 +14,13 @@ correct_result <- cbind(a, b)
 correct_result_labels <- correct_result
 ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b (EUR)")
 
+period_fun <- function(x) {
+  x <- paste("1", x)
+  x <- lubridate::dmy(x, quiet = TRUE)
+  ret <- paste(lubridate::year(x), "Q", (lubridate::month(x) %/% 3 + 1))
+  return(ret)
+}
+
 test_that("rowwise1.csv is read correctly",  {
 
   csv_file <- "csv/rowwise1.csv"
@@ -150,7 +157,8 @@ test_that("example3.csv is read correctly",  {
                "The following texts could not be converted to numeric:\n",
                "\"x,jan\"")
   expect_warning({
-    result <- read_ts_csv(csv_file, skipcol = 1, dec = ",")
+    result <- read_ts_csv(csv_file, skipcol = 1, dec = ",",
+                          period_fun = period_fun)
   }, msg = msg)
   expect_identical(result, correct_result_tmp)
 })
@@ -167,7 +175,8 @@ test_that("example4.csv is read correctly",  {
                "The following texts could not be converted to numeric:\n",
                "\"aap,x\"")
   expect_warning({
-    result <- read_ts_csv(csv_file, skiprow = 1, dec = ",")
+    result <- read_ts_csv(csv_file, skiprow = 1, dec = ",",
+                          period_fun = period_fun)
   }, msg = msg)
   expect_identical(result, correct_result_tmp)
 })

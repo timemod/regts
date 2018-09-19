@@ -10,9 +10,11 @@
 #' \item a text with the format recognized by function \code{\link{period}},
 #' for example \code{"2010Q2"}, \code{"2010.2Q"},
 #' \code{"2010m2"}, \code{"2011"} or \code{"2011-1"},
-#' \item an integer value (e.g. \code{2018}), which is considered as a year.
+#' \item an integer value (e.g. \code{2018}), which is considered as a year,
 #' \item a date
 #' }
+#' Use argument \code{period_fun} if the period cells contain a text with a
+#' format not recognized by function \code{period}.
 #'
 #' In many cases, this function will read timeseries correctly.
 #' However, \emph{you should always carefully check the results of this
@@ -114,6 +116,9 @@
 #' @param na_string Character vector of strings to use for missing values.
 #' By default, \code{read_ts_xlsx} treats blank cells as missing data.
 #' @param name_fun function to apply to the names of the timeseries.
+#' @param period_fun function applied to period texts.
+#' Use this argument if the period texts do not have a standard format
+#' (see Description).
 #' @return a \code{regts} object
 #'
 #' @examples
@@ -131,7 +136,7 @@
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          skiprow = NA, skipcol = NA, rowwise, frequency = NA,
                          labels = c("after", "before", "no"),
-                         na_string = "", name_fun) {
+                         na_string = "", name_fun, period_fun) {
 
   if (missing(range)) {
     range <- cell_limits()
@@ -142,6 +147,15 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   }
 
   na_string <- union(na_string, "")
+
+  labels <- match.arg(labels)
+
+  if (!missing(name_fun) && !is.function(name_fun)) {
+      stop("argument name_fun is not a function")
+  }
+  if (!missing(period_fun) && !is.function(period_fun)) {
+    stop("argument period_fun is not a function")
+  }
 
   tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
                     col_types = "list", na = na_string)
@@ -156,7 +170,8 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   not_all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
   tbl <- tbl[ , not_all_na]
 
-  period_info <- find_periods(tbl, frequency, rowwise, xlsx = TRUE)
+  period_info <- find_periods(tbl, frequency, rowwise, xlsx = TRUE,
+                              period_fun = period_fun)
 
   if (is.null(period_info)) {
     stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
@@ -164,33 +179,21 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   }
 
   if (period_info$rowwise) {
-    ret <- read_ts_tbl_rowwise(tbl, frequency = frequency, labels = labels,
-                               period_info = period_info)
+    ret <- read_ts_rowwise_xlsx(tbl, frequency = frequency, labels = labels,
+                                name_fun = name_fun, period_fun = period_fun,
+                                period_info = period_info)
   } else {
-    ret <- read_ts_tbl_columnwise(tbl, frequency = frequency, labels = labels,
+    ret <- read_ts_columnwise_xlsx(tbl, frequency = frequency, labels = labels,
+                                  name_fun = name_fun, period_fun = period_fun,
                                   period_info = period_info)
   }
-
-
-  # apply function to column names if given
-  if (!missing(name_fun)) {
-    if (!is.function(name_fun)) {
-      stop("argument name_fun is not a function")
-    }
-    colnames(ret) <- name_fun(colnames(ret))
-  }
-
   return(ret)
 }
 
-# internal function to read timeseries rowwise from a data frame with
-# the time index in the column header.
-# is numeric = TRUE, then the timeseries are converted to numeric
-read_ts_tbl_rowwise <- function(tbl, frequency,
-                                labels = c("after", "before", "no"),
-                                period_info) {
-
-  labels <- match.arg(labels)
+# Internal function to read timeseries rowwise from a tibble, used by
+# read_ts_xlsx
+read_ts_rowwise_xlsx <- function(tbl, frequency, labels, name_fun, period_fun,
+                                 period_info) {
 
   # remove all rows before the period row
   if (period_info$row_nr > 1) {
@@ -227,9 +230,11 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
 
   data_cols <- (max(name_col, label_cols) + 1) : ncol(tbl)
 
-  periods <- get_periods_tbl(tbl[1, data_cols], frequency, xlsx = TRUE)
+  periods <- get_periods_tbl(tbl[1, data_cols], frequency, xlsx = TRUE,
+                             period_fun)
 
   names <- tibble_2_char(tbl[-1, name_col], replace_na = FALSE)
+  if (!missing(name_fun)) names <- name_fun(names)
   name_sel <- !is.na(names)
   names <- names[name_sel]
 
@@ -266,13 +271,10 @@ read_ts_tbl_rowwise <- function(tbl, frequency,
   return(ret)
 }
 
-# Internal function to read timeseries columnwise from a tibble read in
-# with readxl::read_excel.
-read_ts_tbl_columnwise <- function(tbl, frequency = NA,
-                                   labels = c("after", "before", "no"),
-                                   period_info) {
-
-  labels <- match.arg(labels)
+# Internal function to read timeseries columnwise from a tibble, used in
+# read_ts_xlsx.
+read_ts_columnwise_xlsx <- function(tbl, frequency, labels, name_fun,
+                                    period_fun, period_info) {
 
   time_column <- period_info$col_nr
   is_period <- period_info$is_period
@@ -313,6 +315,7 @@ read_ts_tbl_columnwise <- function(tbl, frequency = NA,
 
   # get variable names
   ts_names <- unlist(tbl[name_row, -1], use.names = FALSE)
+  if (!missing(name_fun)) ts_names <- name_fun(ts_names)
   name_sel <- which(!is.na(ts_names))
   ts_names <- ts_names[name_sel]
 
@@ -324,7 +327,7 @@ read_ts_tbl_columnwise <- function(tbl, frequency = NA,
   if (labels != "no" && length(label_rows) > 0) {
     lbl_data <- tbl[label_rows, -1]
     lbl_data[] <- lapply(lbl_data, FUN = function(x)
-    {ifelse(is.na(x),  "", as.character(x))})
+                              {ifelse(is.na(x),  "", as.character(x))})
     if (length(label_rows) == 1) {
       lbls <- unlist(lbl_data, use.names = FALSE)
     } else {
@@ -338,7 +341,8 @@ read_ts_tbl_columnwise <- function(tbl, frequency = NA,
   # stored in variables ts_names and lbls)
   tbl <- tbl[is_period, ]
 
-  periods <- get_periods_tbl(tbl[[1]], frequency, xlsx = TRUE)
+  periods <- get_periods_tbl(tbl[[1]], frequency, xlsx = TRUE,
+                             period_fun = period_fun)
 
   # convert data columns to a numeric matrix, employing C++ function
   # list_tbl_2_mat.

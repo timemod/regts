@@ -1,13 +1,13 @@
 # test the performance of the function regts, create_regts and an alternative
 library(regts)
 library(zoo)
-source("tests/performance_tests/time_commands.R")
+source("examples/performance_tests/time_commands.R")
 
 regts1 <- regts(as.numeric(1:300), start = "2010Q2", labels = "aap")
-ts1 <- regts:::unregts(regts1)
+ts1 <- as.regts(regts1)
 zoo1 <- as.zooreg(ts1)
 regts2 <- regts(as.numeric(1:300), start = "2010Q2")
-ts2 <- regts:::unregts(regts2)
+ts2 <- as.regts(regts2)
 zoo2 <- as.zooreg(ts2)
 
 commands <- c("ts1 + 1",

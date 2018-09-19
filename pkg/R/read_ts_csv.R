@@ -7,7 +7,8 @@
 #' The function tries to find fields with valid period texts.
 #' Period texts should have the format recognized by function
 #' \code{\link{period}}, for example \code{"2010Q2"}, \code{"2010.2Q"},
-#' \code{"2010m2"}, \code{"2011"} or \code{"2011-1"}.
+#' \code{"2010m2"}, \code{"2011"} or \code{"2011-1"}. Use argument
+#' \code{period_fun} if the period texts have a different format.
 #'
 #' In many cases, this function will read timeseries correctly.
 #' However, \emph{you should always carefully check the results of this
@@ -118,6 +119,8 @@
 #' @param na_string Character vector of strings to use for missing values.
 #' By default, \code{read_ts_csv} treats blank cells as missing data.
 #' @param name_fun function to apply to the names of the timeseries.
+#' @param period_fun function applied to period texts. Use this argument
+#' if the period texts do not have a standard format (see Description).
 #' @return a \code{regts} object
 #'
 #' @examples
@@ -135,7 +138,7 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
                         labels = c("after", "before", "no"),
                         sep = "auto", fill = FALSE,
                         dec = if (sep != ".") "." else ",",
-                        na_string = "", name_fun) {
+                        na_string = "", name_fun, period_fun) {
 
   if (!missing(skiprow)) {
     skip <- skiprow
@@ -144,6 +147,15 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
   }
 
   na_string <- union(na_string, "")
+
+  labels <- match.arg(labels)
+
+  if (!missing(name_fun) && !is.function(name_fun)) {
+    stop("argument name_fun is not a function")
+  }
+  if (!missing(period_fun) && !is.function(period_fun)) {
+    stop("argument period_fun is not a function")
+  }
 
   df <- fread(filename, skip = skip, header = FALSE, data.table = FALSE,
               sep = sep, dec = dec, fill = fill, colClasses = "character",
@@ -162,7 +174,8 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
   not_all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
   tbl <- tbl[ , not_all_na, drop = FALSE]
 
-  period_info <- find_periods(tbl, frequency, rowwise, xlsx = FALSE)
+  period_info <- find_periods(tbl, frequency, rowwise, xlsx = FALSE,
+                              period_fun = period_fun)
 
   if (is.null(period_info)) {
     stop(sprintf("No periods found in file %s\n", filename))
@@ -171,32 +184,21 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
   if (period_info$rowwise) {
     ret <- read_ts_rowwise(tbl, frequency = frequency, labels = labels,
                            dec = dec, name_fun = name_fun,
-                           period_info = period_info)
+                           period_fun = period_fun, period_info = period_info)
   } else {
     ret <- read_ts_columnwise(tbl, frequency = frequency, labels = labels,
-                             dec = dec, name_fun = name_fun,
-                             period_info = period_info)
-  }
-
-  # apply function to columnnames if given
-  if (!missing(name_fun)) {
-    if (!is.function(name_fun)) {
-      stop("argument name_fun is not a function")
-    }
-    colnames(ret) <- name_fun(colnames(ret))
+                              dec = dec, name_fun = name_fun,
+                              period_fun = period_fun,
+                              period_info = period_info)
   }
 
   return(ret)
-
 }
 
-# internal function to read timeseries rowwise from a data frame with
-# the time index in the column header.
-# is numeric = TRUE, then the timeseries are converted to numeric
-read_ts_rowwise <- function(tbl, frequency, labels = c("after", "before", "no"),
-                            name_fun, dec = ".", period_info) {
-
-  labels <- match.arg(labels)
+# Internal function to read timeseries rowwise from a tibble, used by
+# read_ts_csv.
+read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
+                            period_info) {
 
   # remove all rows before the period row
   if (period_info$row_nr > 1) {
@@ -233,9 +235,11 @@ read_ts_rowwise <- function(tbl, frequency, labels = c("after", "before", "no"),
 
   data_cols <- (max(c(name_col, label_cols)) + 1) : ncol(tbl)
 
-  periods <- get_periods_tbl(tbl[1, data_cols], frequency, xlsx = FALSE)
+  periods <- get_periods_tbl(tbl[1, data_cols], frequency, xlsx = FALSE,
+                             period_fun = period_fun)
 
   names <- tibble_2_char(tbl[-1, name_col], replace_na = FALSE)
+  if (!missing(name_fun)) names <- name_fun(names)
   name_sel <- !is.na(names)
   names <- names[name_sel]
 
@@ -272,13 +276,10 @@ read_ts_rowwise <- function(tbl, frequency, labels = c("after", "before", "no"),
   return(ret)
 }
 
-# Internal function to read timeseries columnwise from a dataframe.
-# This function is used in function read_ts_csv and read_ts_xlsx
-read_ts_columnwise <- function(tbl, frequency = NA,
-                               labels = c("after", "before", "no"),
-                               name_fun, dec =  ".", period_info) {
-
-  labels <- match.arg(labels)
+# Internal function to read timeseries columnwise from a tibble, used
+# by function read_ts_csv.
+read_ts_columnwise <- function(tbl, frequency, labels, dec, name_fun,
+                               period_fun, period_info) {
 
   time_column <- period_info$col_nr
   is_period <- period_info$is_period
@@ -319,6 +320,7 @@ read_ts_columnwise <- function(tbl, frequency = NA,
 
   # get variable names
   ts_names <- unlist(tbl[name_row, -1], use.names = FALSE)
+  if (!missing(name_fun)) ts_names <- name_fun(ts_names)
   name_sel <- which(!is.na(ts_names))
   ts_names <- ts_names[name_sel]
 
@@ -344,7 +346,8 @@ read_ts_columnwise <- function(tbl, frequency = NA,
   # stored in variables ts_names and lbls)
   tbl <- tbl[is_period, ]
 
-  periods <- get_periods_tbl(tbl[[1]], frequency, xlsx = FALSE)
+  periods <- get_periods_tbl(tbl[[1]], frequency, xlsx = FALSE,
+                             period_fun = period_fun)
 
   # convert data columns to a numeric matrix, employing function df_to_numeric_matrix
   mat <- df_to_numeric_matrix(tbl[-1], dec = dec)
