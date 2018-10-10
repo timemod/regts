@@ -1,14 +1,11 @@
-#' Join a timeseries object with another timeseries object
+#' Join timeseries object with different but overlapping period range
 #'
-#' This function can be used to join a \code{(reg)ts}
-#' object with another \code{(reg)ts} object.
-#' The result is a joined \code{\link{regts}} object.
-#'
-#' @details
 #' This function creates a new timeseries from two (partially) overlapping
-#' timeseries. The two timeseries must have the same frequency.
-#' The first timeseries must contain the most recent data.
-#' All observations from the second timeseries are scaled in such a way that
+#' timeseries with the same frequency.
+#' The second timeseries must contain the most recent data.
+#' When determining the overlap period also NA values are considered.
+#'
+#' All observations from the first timeseries are scaled in such a way that
 #' the overlapping observations from the two timeseries have the same value
 #' (on average). Scaling methods are:
 #'
@@ -19,140 +16,152 @@
 #' The period range of the result is the union of the period ranges of the
 #' first and second timeseries.
 #'
-#' In case of multivariate regts only the common columns are joined.
+#' In case of multivariate regts only the common columns are joined. For each
+#' common timeseries a check is done whether an overlapping period exists
+#' (consdiering NA values).
 #' The non overlapping columns in both timeseries are added to the result.
 #' If both input timeseries are vectors (no column names), the result is also a vector.
 #'
-#' @param x1 the first timeseries (a \code{\link{regts}} or
+#' @param old the first timeseries (a \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
-#' @param x2 the second timeseries (a \code{regts} or \code{ts} object).
+#' @param new the second timeseries (a \code{regts} or \code{ts} object).
 #' @param method two different ways to join the timeseries.
 #' By default the timeseries are joined multiplicatively. This behaviour can be
 #' changed by using method \code{add}.
 #' @return a \code{\link{regts}} object.
 #'
 #' @examples
-#' x1 <- regts(matrix(data = rep(1:9), nc = 3), period = "2000/2002",
-#'             names = c("a", "b", "c"))
-#' x2 <- regts(matrix(data = rep(10:15), nc = 3), period = "2000/2001",
-#'             names = c("a", "c", "d"))
-#' join_ts(x1, x2, method = "add", period = "first")
+#' x1 <- regts(rnorm(40), start = "2012q1")
+#' x2 <- regts(rnorm(30), start = "2018q4")
+#' res <- join_ts(x1, x2)
 #'
-#' @seealso
-#'\code{\link{regts}}
+#' x_old <- regts(matrix(data = rep(10:15), nc = 3), period = "2000/2001",
+#'             names = c("a", "c", "d"))
+#' x_new <- regts(matrix(data = rep(1:9), nc = 3), period = "2000/2002",
+#'             names = c("a", "b", "c"))
+
+#' join_ts(x_old, x_new, method = "add")
+#'
+#' @seealso '\code{\link{regts}} and \code{\link{update_ts}}
 #'
 #' @export
-join_ts <- function(x1, x2, method = c("mult", "add")) {
+join_ts <- function(old, new, method = c("mult", "add")) {
 
-  series_name1 <- deparse(substitute(x1))
-  series_name2 <- deparse(substitute(x2))
+  x_old <- old
+  x_new <- new
+
+  series_name_new <- deparse(substitute(new))
+  series_name_old <- deparse(substitute(old))
 
   method <- match.arg(method)
 
-  if (!is.ts(x1)) {
-    stop(paste0("Argument x1 (", series_name1,
+  if (!is.ts(x_new)) {
+    stop(paste0("Argument new (", series_name_new,
                 ") is not a timeseries"))
   }
-  if (!is.ts(x2)) {
-    stop(paste0("Argument x2 (", series_name2,
+  if (!is.ts(x_old)) {
+    stop(paste0("Argument old (", series_name_old,
                ") is not a timeseries"))
   }
 
-  if (frequency(x1) != frequency(x2)) {
-    stop(paste0("Timeseries x1 and x2 (", series_name1, " and ", series_name2,
-               ") have different frequencies"))
+  if (frequency(x_new) != frequency(x_old)) {
+    stop(paste0("Timeseries old and new (", series_name_new, " and ",
+                series_name_old, ") have different frequencies"))
   }
 
-  x1 <- as.regts(x1)
-  x2 <- as.regts(x2)
+  x_new <- as.regts(x_new)
+  x_old <- as.regts(x_old)
 
-  names1 <- colnames(x1)
-  names2 <- colnames(x2)
+  names_new <- colnames(x_new)
+  names_old <- colnames(x_old)
 
-  vector1 <- FALSE
-  vector2 <- FALSE
+  vector_new <- FALSE
+  vector_old <- FALSE
 
-  # create colnames if x1 or x2 are vectors and do not have colnames
-  if (is.null(names1)) {
-    if (is.matrix(x1)) {
-      names1 <- paste("column", 1 : ncol(x1))
+  # create colnames if x_new or x_old are vectors and do not have column names
+  if (is.null(names_new)) {
+    if (is.matrix(x_new)) {
+      names_new <- paste("column", 1 : ncol(x_new))
     } else {
       # adapt (vector) timeseries: use timeseries names and give matrix dimension
-      names1 <- paste(series_name1, series_name2, sep = "_")
-      dim(x1) <- c(length(x1), 1)
-      vector1 <- TRUE
+      names_new <- paste(series_name_old, series_name_new, sep = "_")
+      dim(x_new) <- c(length(x_new), 1)
+      vector_new <- TRUE
+
     }
-    colnames(x1) <- names1
+    colnames(x_new) <- names_new
   }
-  if (is.null(names2)) {
-    if (is.matrix(x2)) {
-      names2 <- paste("column", 1 : ncol(x2))
+  if (is.null(names_old)) {
+    if (is.matrix(x_old)) {
+      names_old <- paste("column", 1 : ncol(x_old))
     } else {
-      # adapt (vector) timeseries: use timeseries name and give matrix dimension
-      names2 <- paste(series_name1, series_name2, sep = "_")
-      dim(x2) <- c(length(x2), 1)
-      vector2 <- TRUE
+      # adapt (vector) timeseries: use timeseries names and give matrix dimension
+      names_old <- paste(series_name_old, series_name_new, sep = "_")
+      dim(x_old) <- c(length(x_old), 1)
+      vector_old <- TRUE
     }
-    colnames(x2) <- names2
+    colnames(x_old) <- names_old
   }
 
-  if (vector1 != vector2){
-    stop("Both timeseries must be vectors or both should have column names")
+  if (vector_new != vector_old){
+    stop("A combination of a vector and a multivariate (reg)ts is not possible")
   }
 
-  common_names <- intersect(names1, names2)
-  missing_names1 <- setdiff(names2, names1)
-  missing_names2 <- setdiff(names1, names2)
+  common_names <- intersect(names_new, names_old)
+  missing_names_new <- setdiff(names_old, names_new)
+  missing_names_old <- setdiff(names_new, names_old)
 
   if (length(common_names) == 0) {
-    warning("No common names in two timeseries, first timeseries is returned!")
-    return(x1)
+    warning("No common names in two timeseries, new timeseries is returned!")
+    return(x_new)
   }
 
-  p1 <- get_period_range(x1)
-  p2 <- get_period_range(x2)
+  p_new <- get_period_range(x_new)
+  p_old <- get_period_range(x_old)
 
   # check periods (must be overlapping)
-  sp1 <- start_period(p1)
-  sp2 <- start_period(p2)
-  ep1 <- end_period(p1)
-  ep2 <- end_period(p2)
-  if (ep1 < sp1){stop("End period first timeseries must be after start period")}
-  if (ep2 < sp2){stop("End period second timeseries must be after start period")}
-  if (sp1 < sp2 || ep1 < ep2){stop("Timeseries are in wrong order!")}
-  if (sp1 > ep2){stop("Timeseries have no overlap!")}
+  sp_new <- start_period(p_new)
+  sp_old <- start_period(p_old)
+  ep_new <- end_period(p_new)
+  ep_old <- end_period(p_old)
 
-  distance <- sp1 - sp2
+  if (sp_new < sp_old || ep_new < ep_old){
+    stop("Timeseries are in wrong order, old series should start before new!")
+  }
+  if (sp_new > ep_old){stop("Timeseries have no overlap!")}
 
-  join <- calculate_join(x1, x2, common_names, p1, p2, method, distance, vector1)
+  distance <- sp_new - sp_old
+
+  join <- calculate_join(x_old, x_new, common_names, p_old, p_new, method,
+                         distance, vector_new)
 
   # update for multivariate timeseries
-  if (!vector1){
+  if (!vector_new){
     # update result with non common names
-    if (length(missing_names1) > 0) {
-      join[p2, missing_names1] <- x2[p2, missing_names1]
+    if (length(missing_names_new) > 0) {
+      join[p_old, missing_names_new] <- x_old[p_old, missing_names_new]
 
-      # add labels of missing_names1 in x2 to the result
-      lbls <- ts_labels(x2)
+      # add labels of missing_names_new in x_old to the result
+      lbls <- ts_labels(x_old)
       if (!is.null(lbls)) {
-        lbls <- lbls[missing_names1]
+        lbls <- lbls[missing_names_new]
         join <- update_ts_labels(join, lbls)
       }
     }
-    if (length(missing_names2) > 0) {
-      join[p1, missing_names2] <- x1[p1, missing_names2]
+    if (length(missing_names_old) > 0) {
+      join[p_new, missing_names_old] <- x_new[p_new, missing_names_old]
 
-      # add labels of missing_names2 in x1 to the result
-      lbls <- ts_labels(x1)
+      # add labels of missing_names_old in x_new to the result
+      lbls <- ts_labels(x_new)
       if (!is.null(lbls)) {
-        lbls <- lbls[missing_names2]
+        lbls <- lbls[missing_names_old]
         join <- update_ts_labels(join, lbls)
       }
     }
 
     # sort columns of join
     if (!is.null(join)) {
-      join <- join[, sort(colnames(join)), drop = FALSE]
+      join <- join[, order(colnames(join)), drop = FALSE]
     }
   }
 
@@ -160,80 +169,92 @@ join_ts <- function(x1, x2, method = c("mult", "add")) {
 }
 
 # Schematic overview of periods
-# ---------------------------------------------------------
-# first timeseries                  [     |        ]
-#                                   sp1   s1       ep1
+# -----------------------------------------------------------------------------
+# new timeseries                    [      |                           ]
+#                                   sp_new f_new                       ep_new
 #
-# indices in matrix m1              1     1+o
+# indices in matrix m_new                  1       l_old-d (=l_new)
 #
-# second timeseries      [          |     ]
-#                        sp2        s2    ep2
+# old timeseries           [                       |      ]
+#                          sp_old                  l_old  ep_old
 #
-# indices in matrix m2   1          1+d
+# indices in matrix m_old  1               f_new+d (=f_old)
 #
-# indices in result      [          |     |        ]
-#                        1          1+d   1+d+o    nper
+# indices in result        [               |       |                    ]
+#                          1        1+d    f_old   l_old                nper
 #
-# o, overlapping period   : s1 - s2 = ep2 - sp1
-# d, distance startperiods: sp1 - sp2
+#                          [--fill_prd_1-- |--fill_prd_2----------------]
+#
+# f_new is first not NA in new timeseries
+# l_old is last not NA in old timeseries
+#
+# o, overlapping period   : [f_old : f_new]  = [l_old : l_new]
+# d, distance startperiods: sp_new - sp_old
 
 # Result series contain
-#   original values of first timeseries for overlap period till end of first ts
-#   calculated values for period starting in first period second ts till overlap
+#   original values of new timeseries for overlap period till end of new ts
+#   calculated values for period starting in first period old ts till overlap
 
 # Result series is a multivariate regts or (if both inputs are vectors) a vector.
 
 # In calculate_join an extra check is done on NA values at the edges of the
-# overlap period. Based on the (new) overlap the filling periods are calculated.
+# overlap period. Based on this new overlap the filling periods are calculated.
 
 
-calculate_join <- function(x1, x2, common_names, p1, p2, method, distance, vector){
-  # Calculate the joined timeseries for the common columns in x1 and x2
+calculate_join <- function(x_old, x_new, common_names, p_old, p_new, method,
+                           distance, vector){
+  # Calculate the joined timeseries for the common columns in x_new and x_old
   # and return a regts for the union of periods
   # use matrix to fasten calculations (same code with regts functions is much slower)
 
   # create result matrix with NA values for whole period and all common names
-  p <- range_union(p1, p2)
+  p <- range_union(p_old, p_new)
   nper <- nperiod(p)
   ncol <- length(common_names)
   ret_matrix <- matrix(nrow = nper, ncol = ncol)
 
-  m1 <- x1[, common_names, drop = FALSE]
-  m2 <- x2[, common_names, drop = FALSE]
+  m_new <- x_new[, common_names, drop = FALSE]
+  m_old <- x_old[, common_names, drop = FALSE]
 
   for (ix in 1:ncol){
 
     # trim individual series to see if there is still an overlapping period
-    # 1 is index in first series, 2 is index in second series
-    first_not_NA1 <- Position(function(x){x}, !is.na(m1[, ix]))
-    first_not_NA2 <- first_not_NA1 + distance
-    last_not_NA2  <- Position(function(x){x}, !is.na(m2[, ix]), right = TRUE)
-    last_not_NA1  <- last_not_NA2 - distance
+    # f_new is first not NA in new series, l_old is last not NA in old series
+    f_new <- Position(function(x){x}, !is.na(m_new[, ix]))
+    f_old <- f_new + distance
+    l_old  <- Position(function(x){x}, !is.na(m_old[, ix]), right = TRUE)
+    l_new  <- l_old - distance
 
-    if (first_not_NA1 > last_not_NA1){
-      name <- common_names[ix]
-      stop(paste("Timeseries", name, "has no valid values in overlapping period!"))
+    if (f_new > l_new){
+      if (vector){
+        stop(paste("Combination of old and new timeseries has no valid values
+                   in overlapping period!"))
+      } else{
+        name <- common_names[ix]
+        stop(paste("In old and new series, combination of timeseries", name,
+             "has no valid values in overlapping period!"))
+      }
     }
     # overlap ranges in matrices have the same lengths but are shifted
-    rng_m1 <- first_not_NA1:last_not_NA1
-    rng_m2 <- first_not_NA2:last_not_NA2
+    rng_m_new <- f_new : l_new
+    rng_m_old <- f_old : l_old
 
-    fill_prd1 <- 1:(first_not_NA2 - 1)
-    fill_prd2 <- first_not_NA2:nper
+    mn_new <- mean( m_new[rng_m_new, ix] )
+    mn_old <- mean( m_old[rng_m_old, ix] )
 
-    mn1 <- mean(m1[rng_m1, ix])
-    mn2 <- mean(m2[rng_m2, ix])
+    fill_prd_1 <- 1 : (f_old - 1)
+    fill_prd_2 <- f_old : nper
 
     if (method == "mult"){
-      factor <- mn1/mn2
-      ret_matrix[fill_prd1, ix] <- m2[fill_prd1, ix] * factor
+      factor <- mn_new/mn_old
+      ret_matrix[fill_prd_1, ix] <- m_old[fill_prd_1, ix] * factor
 
     } else{
-      factor <- mn1 - mn2
-      ret_matrix[fill_prd1, ix] <- m2[fill_prd1, ix] + factor
+      factor <- mn_new - mn_old
+      ret_matrix[fill_prd_1, ix] <- m_old[fill_prd_1, ix] + factor
     }
 
-    ret_matrix[fill_prd2, ix] <- m1[(fill_prd2 - distance), ix]
+    ret_matrix[fill_prd_2, ix] <- m_new[(fill_prd_2 - distance), ix]
   }
 
   if (vector){

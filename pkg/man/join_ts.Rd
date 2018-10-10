@@ -2,15 +2,15 @@
 % Please edit documentation in R/join_ts.R
 \name{join_ts}
 \alias{join_ts}
-\title{Join a timeseries object with another timeseries object}
+\title{Join timeseries object with different but overlapping period range}
 \usage{
-join_ts(x1, x2, method = c("mult", "add"))
+join_ts(old, new, method = c("mult", "add"))
 }
 \arguments{
-\item{x1}{the first timeseries (a \code{\link{regts}} or
+\item{old}{the first timeseries (a \code{\link{regts}} or
 \code{\link[stats]{ts}} object).}
 
-\item{x2}{the second timeseries (a \code{regts} or \code{ts} object).}
+\item{new}{the second timeseries (a \code{regts} or \code{ts} object).}
 
 \item{method}{two different ways to join the timeseries.
 By default the timeseries are joined multiplicatively. This behaviour can be
@@ -20,15 +20,13 @@ changed by using method \code{add}.}
 a \code{\link{regts}} object.
 }
 \description{
-This function can be used to join a \code{(reg)ts}
-object with another \code{(reg)ts} object.
-The result is a joined \code{\link{regts}} object.
+This function creates a new timeseries from two (partially) overlapping
+timeseries with the same frequency.
+The second timeseries must contain the most recent data.
+When determining the overlap period also NA values are considered.
 }
 \details{
-This function creates a new timeseries from two (partially) overlapping
-timeseries. The two timeseries must have the same frequency.
-The first timeseries must contain the most recent data.
-All observations from the second timeseries are scaled in such a way that
+All observations from the first timeseries are scaled in such a way that
 the overlapping observations from the two timeseries have the same value
 (on average). Scaling methods are:
 
@@ -39,18 +37,24 @@ the overlapping observations from the two timeseries have the same value
 The period range of the result is the union of the period ranges of the
 first and second timeseries.
 
-In case of multivariate regts only the common columns are joined.
+In case of multivariate regts only the common columns are joined. For each
+common timeseries a check is done whether an overlapping period exists
+(consdiering NA values).
 The non overlapping columns in both timeseries are added to the result.
 If both input timeseries are vectors (no column names), the result is also a vector.
 }
 \examples{
-x1 <- regts(matrix(data = rep(1:9), nc = 3), period = "2000/2002",
-            names = c("a", "b", "c"))
-x2 <- regts(matrix(data = rep(10:15), nc = 3), period = "2000/2001",
+x1 <- regts(rnorm(40), start = "2012q1")
+x2 <- regts(rnorm(30), start = "2018q4")
+res <- join_ts(x1, x2)
+
+x_old <- regts(matrix(data = rep(10:15), nc = 3), period = "2000/2001",
             names = c("a", "c", "d"))
-join_ts(x1, x2, method = "add", period = "first")
+x_new <- regts(matrix(data = rep(1:9), nc = 3), period = "2000/2002",
+            names = c("a", "b", "c"))
+join_ts(x_old, x_new, method = "add")
 
 }
 \seealso{
-\code{\link{regts}}
+'\code{\link{regts}} and \code{\link{update_ts}}
 }
