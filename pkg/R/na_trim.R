@@ -49,26 +49,46 @@ na_trim <- function (x, method = c("both", "first","last"),
     side <- match.arg(method)
     isna <- match.arg(is_na)
 
-    if (!is.matrix(x)) {
-        elem <- which(!is.na(x))
-        len <- length(x)
-    } else {
-        if (isna == "all") {
-            elem <-   which(!apply(is.na(x), 1, all))
-        } else {
-            elem <-   which(!apply(is.na(x), 1, any))
-        }
-        len <- nrow(x)
+    fst_not_NA <- function(x){
+      ret <- Position(function(x){x}, !is.na(x))
+      if (is.na(ret)){ ret <- length(x) + 1}
+      return(ret)
     }
-    if (length(elem) == 0) {
+    lst_not_NA <- function(x){
+      ret <-Position(function(x){x}, !is.na(x), right = TRUE)
+      if (is.na(ret)){ ret <- 0}
+      return(ret)
+    }
+
+    if (!is.matrix(x)) {
+      first <- fst_not_NA(x)
+      last <- lst_not_NA(x)
+      len <- length(x)
+
+    } else {
+      first <- apply(x, 2, fst_not_NA)
+      last  <- apply(x, 2, lst_not_NA)
+
+      if (isna == "any") {
+        first <- max(first)
+        last <- min(last)
+      } else {
+        first <- min(first)
+        last <- max(last)
+      }
+      len <- nrow(x)
+    }
+
+    if (first > last) {
         return(NULL)
     }
+
     if (side == "both") {
-        sel <- min(elem) : max(elem)
+        sel <- first : last
     } else if (side == "first") {
-        sel <- min(elem) : len
+        sel <- first : len
     } else {
-        sel <- 1 : max(elem)
+        sel <- 1 : last
     }
 
     per <- start_period(get_period_range(x)) + sel[1] - 1

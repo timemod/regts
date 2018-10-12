@@ -2,7 +2,7 @@
 % Please edit documentation in R/join_ts.R
 \name{join_ts}
 \alias{join_ts}
-\title{Join timeseries object with different but overlapping period range}
+\title{Join timeseries object with different but overlapping period ranges}
 \usage{
 join_ts(old, new, method = c("mult", "add"))
 }
@@ -12,9 +12,8 @@ join_ts(old, new, method = c("mult", "add"))
 
 \item{new}{the second timeseries (a \code{regts} or \code{ts} object).}
 
-\item{method}{two different ways to join the timeseries.
-By default the timeseries are joined multiplicatively. This behaviour can be
-changed by using method \code{add}.}
+\item{method}{two different ways to join the timeseries: \code{mult} and
+\code{add}. By default the timeseries are joined multiplicatively.}
 }
 \value{
 a \code{\link{regts}} object.
@@ -22,37 +21,42 @@ a \code{\link{regts}} object.
 \description{
 This function creates a new timeseries from two (partially) overlapping
 timeseries with the same frequency.
-The second timeseries must contain the most recent data.
-When determining the overlap period also NA values are considered.
-}
-\details{
 All observations from the first timeseries are scaled in such a way that
 the overlapping observations from the two timeseries have the same value
-(on average). Scaling methods are:
-
-\code{mult} multiplicative joining (default)
-
-\code{add} additive joining
-
+(on average). The second timeseries must contain the most recent data.
+}
+\details{
 The period range of the result is the union of the period ranges of the
 first and second timeseries.
 
+When the overlap period is determined, the trailing NA values of the old
+timeseries and the leading NA values of the new timeseries are ignored.
+
 In case of multivariate regts only the common columns are joined. For each
 common timeseries a check is done whether an overlapping period exists
-(consdiering NA values).
+(ignoring the NA values as described above).
 The non overlapping columns in both timeseries are added to the result.
-If both input timeseries are vectors (no column names), the result is also a vector.
+If both input timeseries are vectors (i.e. no column names), the result is
+also a vector.
 }
 \examples{
-x1 <- regts(rnorm(40), start = "2012q1")
-x2 <- regts(rnorm(30), start = "2018q4")
+x1 <- regts((1:15)/10, start = "2016q1")
+x2 <- regts(1:10, start = "2018q4")
 res <- join_ts(x1, x2)
 
-x_old <- regts(matrix(data = rep(10:15), nc = 3), period = "2000/2001",
-            names = c("a", "c", "d"))
-x_new <- regts(matrix(data = rep(1:9), nc = 3), period = "2000/2002",
-            names = c("a", "b", "c"))
+data <- (1:10)/10
+x_old <- regts(cbind(data, data*2), period = "2001/2010",
+            names = c("a", "b"))
+x_new <- regts(cbind(10*data, 20*data), period = "2008/2017",
+            names = c("a", "b"))
 join_ts(x_old, x_new, method = "add")
+
+# join timeseries with different column names
+x_old <- regts(matrix(rep(10:15, 3), nc = 3), period = "2010/2015",
+            names = c("a", "c", "d"))
+x_new <- regts(matrix(rep(17:20, 3), nc = 3), period = "2014/2017",
+            names = c("a", "b", "c"))
+join_ts(x_old, x_new)
 
 }
 \seealso{

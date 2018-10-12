@@ -1,46 +1,49 @@
-#' Join timeseries object with different but overlapping period range
+#' Join timeseries object with different but overlapping period ranges
 #'
 #' This function creates a new timeseries from two (partially) overlapping
 #' timeseries with the same frequency.
-#' The second timeseries must contain the most recent data.
-#' When determining the overlap period also NA values are considered.
-#'
 #' All observations from the first timeseries are scaled in such a way that
 #' the overlapping observations from the two timeseries have the same value
-#' (on average). Scaling methods are:
-#'
-#' \code{mult} multiplicative joining (default)
-#'
-#' \code{add} additive joining
+#' (on average). The second timeseries must contain the most recent data.
 #'
 #' The period range of the result is the union of the period ranges of the
 #' first and second timeseries.
 #'
+#' When the overlap period is determined, the trailing NA values of the old
+#' timeseries and the leading NA values of the new timeseries are ignored.
+#'
 #' In case of multivariate regts only the common columns are joined. For each
 #' common timeseries a check is done whether an overlapping period exists
-#' (consdiering NA values).
+#' (ignoring the NA values as described above).
 #' The non overlapping columns in both timeseries are added to the result.
-#' If both input timeseries are vectors (no column names), the result is also a vector.
+#' If both input timeseries are vectors (i.e. no column names), the result is
+#' also a vector.
 #'
 #' @param old the first timeseries (a \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
 #' @param new the second timeseries (a \code{regts} or \code{ts} object).
-#' @param method two different ways to join the timeseries.
-#' By default the timeseries are joined multiplicatively. This behaviour can be
-#' changed by using method \code{add}.
+#' @param method two different ways to join the timeseries: \code{mult} and
+#' \code{add}. By default the timeseries are joined multiplicatively.
 #' @return a \code{\link{regts}} object.
 #'
 #' @examples
-#' x1 <- regts(rnorm(40), start = "2012q1")
-#' x2 <- regts(rnorm(30), start = "2018q4")
+#' x1 <- regts((1:15)/10, start = "2016q1")
+#' x2 <- regts(1:10, start = "2018q4")
 #' res <- join_ts(x1, x2)
 #'
-#' x_old <- regts(matrix(data = rep(10:15), nc = 3), period = "2000/2001",
-#'             names = c("a", "c", "d"))
-#' x_new <- regts(matrix(data = rep(1:9), nc = 3), period = "2000/2002",
-#'             names = c("a", "b", "c"))
-
+#' data <- (1:10)/10
+#' x_old <- regts(cbind(data, data*2), period = "2001/2010",
+#'             names = c("a", "b"))
+#' x_new <- regts(cbind(10*data, 20*data), period = "2008/2017",
+#'             names = c("a", "b"))
 #' join_ts(x_old, x_new, method = "add")
+#'
+#' # join timeseries with different column names
+#' x_old <- regts(matrix(rep(10:15, 3), nc = 3), period = "2010/2015",
+#'             names = c("a", "c", "d"))
+#' x_new <- regts(matrix(rep(17:20, 3), nc = 3), period = "2014/2017",
+#'             names = c("a", "b", "c"))
+#' join_ts(x_old, x_new)
 #'
 #' @seealso '\code{\link{regts}} and \code{\link{update_ts}}
 #'
@@ -104,7 +107,7 @@ join_ts <- function(old, new, method = c("mult", "add")) {
   }
 
   if (vector_new != vector_old){
-    stop("A combination of a vector and a multivariate (reg)ts is not possible")
+    stop("Combinations of timeseries with and without column names are not possible")
   }
 
   common_names <- intersect(names_new, names_old)
@@ -125,10 +128,13 @@ join_ts <- function(old, new, method = c("mult", "add")) {
   ep_new <- end_period(p_new)
   ep_old <- end_period(p_old)
 
-  if (sp_new < sp_old || ep_new < ep_old){
-    stop("Timeseries are in wrong order, old series should start before new!")
+  if (sp_new < sp_old){
+    stop("Timeseries are in wrong order, old series should start before new series!")
+  } else if (ep_new < ep_old){
+    stop("Timeseries are in wrong order, old series should end before new series!")
+  } else if (sp_new > ep_old){
+    stop("Timeseries have no overlap!")
   }
-  if (sp_new > ep_old){stop("Timeseries have no overlap!")}
 
   distance <- sp_new - sp_old
 
@@ -168,44 +174,17 @@ join_ts <- function(old, new, method = c("mult", "add")) {
   return (join)
 }
 
-# Schematic overview of periods
-# -----------------------------------------------------------------------------
-# new timeseries                    [      |                           ]
-#                                   sp_new f_new                       ep_new
-#
-# indices in matrix m_new                  1       l_old-d (=l_new)
-#
-# old timeseries           [                       |      ]
-#                          sp_old                  l_old  ep_old
-#
-# indices in matrix m_old  1               f_new+d (=f_old)
-#
-# indices in result        [               |       |                    ]
-#                          1        1+d    f_old   l_old                nper
-#
-#                          [--fill_prd_1-- |--fill_prd_2----------------]
-#
-# f_new is first not NA in new timeseries
-# l_old is last not NA in old timeseries
-#
-# o, overlapping period   : [f_old : f_new]  = [l_old : l_new]
-# d, distance startperiods: sp_new - sp_old
-
-# Result series contain
-#   original values of new timeseries for overlap period till end of new ts
-#   calculated values for period starting in first period old ts till overlap
-
-# Result series is a multivariate regts or (if both inputs are vectors) a vector.
-
-# In calculate_join an extra check is done on NA values at the edges of the
-# overlap period. Based on this new overlap the filling periods are calculated.
-
 
 calculate_join <- function(x_old, x_new, common_names, p_old, p_new, method,
                            distance, vector){
   # Calculate the joined timeseries for the common columns in x_new and x_old
   # and return a regts for the union of periods
   # use matrix to fasten calculations (same code with regts functions is much slower)
+  # Result series is a multivariate regts or (if both inputs are vectors) a vector.
+
+  # Trailing NA values in old timeseries and leading NA values
+  # in new timeseries are removed.
+  # Based on this new overlap the filling periods are calculated.
 
   # create result matrix with NA values for whole period and all common names
   p <- range_union(p_old, p_new)
@@ -221,18 +200,19 @@ calculate_join <- function(x_old, x_new, common_names, p_old, p_new, method,
     # trim individual series to see if there is still an overlapping period
     # f_new is first not NA in new series, l_old is last not NA in old series
     f_new <- Position(function(x){x}, !is.na(m_new[, ix]))
+    if (is.na(f_new)){ f_new <- nperiod(p_new) + 1}
     f_old <- f_new + distance
     l_old  <- Position(function(x){x}, !is.na(m_old[, ix]), right = TRUE)
+    if (is.na(l_old)){ l_old <- 0}
     l_new  <- l_old - distance
 
     if (f_new > l_new){
       if (vector){
-        stop(paste("Combination of old and new timeseries has no valid values
-                   in overlapping period!"))
+        stop("No overlapping period! (when NA values are taken into account)")
       } else{
         name <- common_names[ix]
-        stop(paste("In old and new series, combination of timeseries", name,
-             "has no valid values in overlapping period!"))
+        stop(paste("No overlapping period in combination of timeseries", name,
+             "(when NA values are taken into account)"))
       }
     }
     # overlap ranges in matrices have the same lengths but are shifted
@@ -264,3 +244,33 @@ calculate_join <- function(x_old, x_new, common_names, p_old, p_new, method,
   }
   return(ret)
 }
+
+# Schematic overview of periods
+# -----------------------------------------------------------------------------
+#
+# f_new is first not NA in new timeseries
+# l_old is last not NA in old timeseries
+#
+# old timeseries           [                       |      ]
+#                          sp_old                  l_old  ep_old
+#
+# indices in matrix m_old  1               f_new+d (=f_old)
+#
+# new timeseries                    [      |                           ]
+#                                   sp_new f_new                       ep_new
+#
+# indices in matrix m_new                  1       l_old-d (=l_new)
+#
+
+# indices in result        [               |       |                    ]
+#                          1        1+d    f_old   l_old                nper
+#
+#                          [--fill_prd_1-- |--fill_prd_2----------------]
+
+#
+# o, overlapping period   : [f_old : f_new]  = [l_old : l_new]
+# d, distance startperiods: sp_new - sp_old
+
+# Result series contain
+#   original values of new timeseries for overlap period till end of new ts
+#   calculated values for period starting in first period old ts till overlap
