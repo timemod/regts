@@ -122,7 +122,7 @@ join_ts <- function(old, new, method = c("mult", "add")) {
   p_new <- get_period_range(x_new)
   p_old <- get_period_range(x_old)
 
-  # check periods (must be overlapping)
+  # check periods (must be overlapping)  (see also scheme at the end)
   sp_new <- start_period(p_new)
   sp_old <- start_period(p_old)
   ep_new <- end_period(p_new)
@@ -164,17 +164,21 @@ join_ts <- function(old, new, method = c("mult", "add")) {
       join <- update_ts_labels(join, lbls)
     }
 
-    # check for empty labels, fill them with old labels if possible
-    sel <- ts_labels(join) == ""
-    if (any(sel)){
-      cnames <- intersect(colnames(join[, sel, drop = FALSE]), colnames(x_old))
-      join <- update_ts_labels(join, ts_labels(x_old[, cnames, drop = FALSE]))
+    # check for empty labels, fill them with old labels if available
+    lbls <- ts_labels(x_old)
+    if (!is.null(lbls)) {
+      sel <- ts_labels(join) == ""
+      if (any(sel)){
+        cnames <- intersect(names(lbls), names(sel[sel]))
+        if (length(cnames) > 0){
+         join <- update_ts_labels(join, ts_labels(x_old[, cnames, drop = FALSE]))
+        }
+      }
     }
 
     # sort columns of join
-    if (!is.null(join)) {
-      join <- join[, order(colnames(join)), drop = FALSE]
-    }
+    join <- join[, order(colnames(join)), drop = FALSE]
+
   }
 
   return (join)
@@ -191,6 +195,7 @@ calculate_join <- function(x_old, x_new, common_names, p_old, p_new, method,
   # Trailing NA values in old timeseries and leading NA values
   # in new timeseries are removed.
   # Based on this new overlap the filling periods are calculated.
+  # See also scheme below
 
   # create result matrix with NA values for whole period and all common names
   p <- range_union(p_old, p_new)
@@ -214,7 +219,7 @@ calculate_join <- function(x_old, x_new, common_names, p_old, p_new, method,
 
     if (f_new > l_new){
       if (vector){
-        stop("No overlapping period! (when NA values are taken into account)")
+        stop("No overlapping period (when NA values are taken into account)")
       } else{
         name <- common_names[ix]
         stop(paste("No overlapping period in combination of timeseries", name,

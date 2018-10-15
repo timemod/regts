@@ -117,6 +117,13 @@ test_that("labels", {
   expect_equal(ts_labels(xtsres),
                c(a = "a_old", b = "b_old", c = "c_old", d = "d_new", e = "e_new"))
 
+  # no labels in old
+  xts_old <- regts(matrix(data = rep(data, 3), nc = 3), start = "2010",
+                   names = c("a", "b", "c"))
+  xtsres <- join_ts(xts_old, xts4)
+  expect_equal(ts_labels(xtsres),
+               c(a = "", b = "", c = "", d = "d_new", e = "e_new"))
+
 })
 
 test_that("errors", {
@@ -141,9 +148,9 @@ test_that("errors", {
 
   # NA timeseries
   expect_error(join_ts(ts_old, ts_NA),
-               "No overlapping period! \\(when NA values are taken into account\\)")
+               "No overlapping period \\(when NA values are taken into account\\)")
   expect_error(join_ts(ts_NA, ts_new),
-               "No overlapping period! \\(when NA values are taken into account\\)")
+               "No overlapping period \\(when NA values are taken into account\\)")
 
 
 })
