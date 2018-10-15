@@ -32,9 +32,9 @@
 #' res <- join_ts(x1, x2)
 #'
 #' data <- (1:10)/10
-#' x_old <- regts(cbind(data, data*2), period = "2001/2010",
+#' x_old <- regts(cbind(data, 2 * data), period = "2001/2010",
 #'             names = c("a", "b"))
-#' x_new <- regts(cbind(10*data, 20*data), period = "2008/2017",
+#' x_new <- regts(cbind(10 * data, 20 * data), period = "2008/2017",
 #'             names = c("a", "b"))
 #' join_ts(x_old, x_new, method = "add")
 #'
@@ -45,7 +45,7 @@
 #'             names = c("a", "b", "c"))
 #' join_ts(x_old, x_new)
 #'
-#' @seealso '\code{\link{regts}} and \code{\link{update_ts}}
+#' @seealso \code{\link{regts}} and \code{\link{update_ts}}
 #'
 #' @export
 join_ts <- function(old, new, method = c("mult", "add")) {
@@ -156,13 +156,19 @@ join_ts <- function(old, new, method = c("mult", "add")) {
     }
     if (length(missing_names_old) > 0) {
       join[p_new, missing_names_old] <- x_new[p_new, missing_names_old]
+    }
 
-      # add labels of missing_names_old in x_new to the result
-      lbls <- ts_labels(x_new)
-      if (!is.null(lbls)) {
-        lbls <- lbls[missing_names_old]
-        join <- update_ts_labels(join, lbls)
-      }
+    # add labels of x_new to the result
+    lbls <- ts_labels(x_new)
+    if (!is.null(lbls)) {
+      join <- update_ts_labels(join, lbls)
+    }
+
+    # check for empty labels, fill them with old labels if possible
+    sel <- ts_labels(join) == ""
+    if (any(sel)){
+      cnames <- intersect(colnames(join[, sel, drop = FALSE]), colnames(x_old))
+      join <- update_ts_labels(join, ts_labels(x_old[, cnames, drop = FALSE]))
     }
 
     # sort columns of join
@@ -219,8 +225,8 @@ calculate_join <- function(x_old, x_new, common_names, p_old, p_new, method,
     rng_m_new <- f_new : l_new
     rng_m_old <- f_old : l_old
 
-    mn_new <- mean( m_new[rng_m_new, ix] )
-    mn_old <- mean( m_old[rng_m_old, ix] )
+    mn_new <- mean(m_new[rng_m_new, ix])
+    mn_old <- mean(m_old[rng_m_old, ix])
 
     fill_prd_1 <- 1 : (f_old - 1)
     fill_prd_2 <- f_old : nper

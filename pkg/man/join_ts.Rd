@@ -45,9 +45,9 @@ x2 <- regts(1:10, start = "2018q4")
 res <- join_ts(x1, x2)
 
 data <- (1:10)/10
-x_old <- regts(cbind(data, data*2), period = "2001/2010",
+x_old <- regts(cbind(data, 2 * data), period = "2001/2010",
             names = c("a", "b"))
-x_new <- regts(cbind(10*data, 20*data), period = "2008/2017",
+x_new <- regts(cbind(10 * data, 20 * data), period = "2008/2017",
             names = c("a", "b"))
 join_ts(x_old, x_new, method = "add")
 
@@ -60,5 +60,5 @@ join_ts(x_old, x_new)
 
 }
 \seealso{
-'\code{\link{regts}} and \code{\link{update_ts}}
+\code{\link{regts}} and \code{\link{update_ts}}
 }

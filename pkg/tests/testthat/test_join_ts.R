@@ -104,6 +104,21 @@ test_that("NA's in common period", {
 
 })
 
+test_that("labels", {
+  ts_labels(xts_old) <- c("a_old", "b_old", "c_old")
+  ts_labels(xts_new) <- c("a_new", "b_new", "c_new")
+  xtsres <- join_ts(xts_old, xts_new)
+  expect_equal(ts_labels(xtsres), ts_labels(xts_new))
+
+  # and with non common columnns
+  xts4 <- regts(matrix(data = rep(data, 3), nc = 3), start = "2017",
+                   names = c("d", "b", "e"), labels = c("d_new", "", "e_new"))
+  xtsres <- join_ts(xts_old, xts4)
+  expect_equal(ts_labels(xtsres),
+               c(a = "a_old", b = "b_old", c = "c_old", d = "d_new", e = "e_new"))
+
+})
+
 test_that("errors", {
 
   expect_error(join_ts("bla", xts_old), "Argument old \\(\"bla\"\\) is not a timeseries")
