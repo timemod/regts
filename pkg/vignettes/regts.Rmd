@@ -617,7 +617,7 @@ Variable `dflabel` is read from the file as a `data frame` using function
 
 
 ```{r}
-dflabel <- read.csv("label.csv")
+dflabel <- read.csv("label.csv", stringsAsFactors = FALSE)
 dflabel
 ```
 

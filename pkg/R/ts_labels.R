@@ -64,19 +64,27 @@ ts_labels <- function(x) {
 #' @seealso \code{\link{ts_labels}}
 #' @export
 update_ts_labels <- function(x, labels) {
-  if (is.null(labels)) {
-    ts_labels(x) <- NULL
-    return (x)
-  }
   if (is.null(colnames(x))) {
     stop(paste("x does not have column names. update_labels requires a",
                "regts object with named columns"))
   }
+  if (is.null(labels)) {
+    ts_labels(x) <- NULL
+    return (x)
+  }
+  if (is.factor(labels)){
+    # convert to character, first save the names
+    names <- names(labels)
+    labels <- as.character(labels)
+    names(labels) <- names
+  }
+
   lbls <- ts_labels(x)
   if (is.null(lbls)) {
     lbls <- rep("", NCOL(x))
     names(lbls) <- colnames(x)
   }
+
   sel <- which(colnames(x) %in% names(labels))
   lbls[sel] <- labels[colnames(x)[sel]]
   ts_labels(x) <- lbls
