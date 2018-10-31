@@ -35,7 +35,11 @@ ts_labels <- function(x) {
 `ts_labels<-` <- function(x, value) {
   if (!is.null(value)) {
     if (!is.character(value)) {
-      stop("value should be a character vector")
+      if (is.factor(value)){
+        value <- as.character(value)
+      } else{
+        stop("value should be a character vector")
+      }
     }
     if (length(value) != NCOL(x)) {
       stop(paste("The length of the labels argument should be equal",

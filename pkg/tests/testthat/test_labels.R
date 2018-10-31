@@ -55,6 +55,12 @@ test_that("constructor regts for multivariate timeseries", {
     regts2 <- update_ts_labels(regts1, NULL)
     expect_identical(ts_labels(regts2), NULL)
 
+    # names and labels as factors
+    regts3 <- regts(matrix(rep(1:10), ncol = 2), start = "2010Q4",
+                    names = as.factor(c("a", "b")),
+                    labels = as.factor(c("Timeseries a", "Timeseries b")))
+    expect_identical(ts_labels(regts1), ts_labels(regts3))
+    expect_identical(regts1, regts3)
 })
 
 
