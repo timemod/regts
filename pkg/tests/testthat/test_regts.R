@@ -48,8 +48,7 @@ test_that("constructor regts for univariate timeseries", {
 
 test_that("constructor regts for multivariate time series", {
   data <- matrix(1: 9, ncol = 3)
-  # extra test with names as factors
-  colnames(data) <- as.factor(c("a", "b", "c"))
+  colnames(data) <- c("a", "b", "c")
   regts1 <- regts(data, start = "2010Q4")
   ts1 <- ts(data, start = c(2010,4), frequency = 4)
   expect_identical(regts1, as.regts(ts1))
