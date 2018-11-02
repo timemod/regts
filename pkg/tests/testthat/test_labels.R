@@ -55,6 +55,12 @@ test_that("constructor regts for multivariate timeseries", {
     regts2 <- update_ts_labels(regts1, NULL)
     expect_identical(ts_labels(regts2), NULL)
 
+    # names and labels as factors
+    regts3 <- regts(matrix(rep(1:10), ncol = 2), start = "2010Q4",
+                    names = as.factor(c("a", "b")),
+                    labels = as.factor(c("Timeseries a", "Timeseries b")))
+    expect_identical(ts_labels(regts1), ts_labels(regts3))
+    expect_identical(regts1, regts3)
 })
 
 
@@ -167,4 +173,23 @@ test_that("labels ok after renaming columns", {
 
   sel <- regts1[, "b", drop = FALSE]
   expect_identical(ts_labels(sel), res["b"])
+})
+
+test_that("read labels from file, this can be factors", {
+  ts <- regts(matrix(1:4, ncol=2), names = c("c","b"), start = "2016")
+
+  # read labels as characters
+  dflabel <- read.csv("csv/label.csv", stringsAsFactors = FALSE)
+  labels <- dflabel[[2]]
+  names(labels) <- dflabel[[1]]
+  ts1 <- update_ts_labels(ts, labels)
+
+  # read labels as factors
+  dflabel <- read.csv("csv/label.csv")
+  labels <- dflabel[[2]]
+  names(labels) <- dflabel[[1]]
+  ts2 <- update_ts_labels(ts, labels)
+
+  expect_identical(ts1, ts2)
+
 })

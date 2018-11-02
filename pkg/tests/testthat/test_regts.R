@@ -419,4 +419,3 @@ test_that("column selection with NA", {
   expected_result[] <- 3
   expect_identical(regts3, expected_result)
 })
-
