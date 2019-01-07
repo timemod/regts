@@ -1,7 +1,7 @@
 library(regts)
 
-nseries <- 1000
-nperiod <- 100
+nseries <- 10000
+nperiod <- 200
 
 set.seed(123)
 
@@ -19,14 +19,5 @@ t1 <- system.time({
 
 })
 print(t1)
-
-t2 <- system.time({
-  write_ts_xlsx2(x, file = "test3_openxlsx.xlsx", sheet_name = "testje",
-                number_format = "#.00", append = TRUE)
-  write_ts_xlsx2(x2, file = "test3_openxlsx.xlsx", sheet_name = "testje2",
-                 append = TRUE)
-
-})
-print(t2)
 
 

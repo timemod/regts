@@ -31,6 +31,17 @@
 #'    unlink("ts1_2.csv")
 #' }
 #' @seealso \code{\link{read_ts_csv}} and \code{\link{write_ts_xlsx}}
+#' @importFrom openxlsx createWorkbook
+#' @importFrom openxlsx loadWorkbook
+#' @importFrom openxlsx saveWorkbook
+#' @importFrom openxlsx addWorksheet
+#' @importFrom openxlsx writeData
+#' @importFrom openxlsx removeWorksheet
+#' @importFrom openxlsx worksheetOrder<-
+#' @importFrom openxlsx createStyle
+#' @importFrom openxlsx addStyle
+#' @importFrom openxlsx setColWidths
+#' @importFrom openxlsx freezePane
 #' @export
 write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
                         labels = c("after", "before", "no"),
@@ -66,11 +77,13 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' xlsx file. \code{write_ts_xlsx} creates or opens an Excel workbook
 #' (depending on argument \code{append}) and writes the timeseries to
 #' a sheet with a specified name.
-#' \code{write_ts_sheet} writes timeseries to a \code{\link[xlsx]{Sheet}}
-#' object.
+#' \code{write_ts_sheet} writes timeseries to a sheet of a workbook
+#' created with \code{\link[openxlsx]{createWorkbook}} (see the example
+#' below).
 #'
-#' The functions employ function \code{\link[xlsx]{addDataFrame}}
-#' from the \code{\link[xlsx:xlsx-package]{xlsx}} package for writing the Excel file.
+#' The functions employ package
+#' \code{\link[openxlsx:openxlsx-package]{openxlsx}}
+#' package for writing the Excel file.
 #'
 #' If you want to write multiple timeseries objects to different
 #' sheets, you can use \code{write_ts_xlsx} with argument
@@ -79,9 +92,9 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #'
 #' @param x a \code{\link{ts}} or \code{\link{regts}} object
 #' @param file the filename of the output file
+#' @param wb a \code{Workbook} object created with function
+#' \code{\link[openxlsx]{createWorkbook}} or \code{\link[openxlsx]{loadWorkbook}}
 #' @param sheet_name the sheet name
-#' @param sheet a \code{\link[xlsx]{Sheet}} object (see the documentation
-#' of package \code{xlsx})
 #' @param append If \code{FALSE} (the default), then the original file,
 #' if it exists, is replaced with the new file. All original data is lost.
 #' If \code{TRUE}, then only data on the sheet with
@@ -93,8 +106,8 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' the names? By default, labels are written after the names if present
 #' @param number_format a character value specifying the number format.
 #' For example, \code{"#.00"} corresponds to two decimal spaces.
-#' For details see the description of the function \code{\link[xlsx]{DataFormat}}
-#' in the \code{\link[xlsx:xlsx-package]{xlsx}} package.
+#' For details see the description of the function \code{\link[xlsx]{createStyle}}
+#' in the \code{\link[openxlsx:openxlsx-package]{openxlsx}} package.
 #' @param period_as_date A logical (default \code{FALSE}).
 #' If \code{TRUE} the periods are written as date values to the Excel file.
 #' By default the periods are written as characters using the standard
@@ -102,19 +115,7 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @param comments a character vector or data frame. The comments
 #' are written to the beginning of the sheet, before the timeseries data is
 #' written.
-#' @importFrom xlsx loadWorkbook
-#' @importFrom xlsx getSheets
-#' @importFrom xlsx removeRow
-#' @importFrom xlsx createSheet
-#' @importFrom xlsx createWorkbook
-#' @importFrom xlsx CellStyle
-#' @importFrom xlsx Alignment
-#' @importFrom xlsx addDataFrame
-#' @importFrom xlsx saveWorkbook
-#' @importFrom xlsx createFreezePane
-#' @importFrom xlsx autoSizeColumn
-#' @importFrom xlsx removeRow
-#' @importFrom xlsx DataFormat
+
 #' @name write_ts_xlsx/write_ts_sheet
 #' @examples
 #' # create two timeseries objects
@@ -125,13 +126,12 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' write_ts_xlsx(ts1, file = "ts1.xlsx", sheet_name = "ts1", labels = "after")
 #'
 #' # write two sheets using write_ts_sheet
-#' wb <- xlsx::createWorkbook()
-#' sheet <- xlsx::createSheet(wb, "ts1")
-#' write_ts_sheet(ts1, sheet, labels = "after")
-#' sheet <- xlsx::createSheet(wb, "ts1_times_100")
-#' write_ts_sheet(ts1 * 100, sheet = sheet, labels = "after")
-#' xlsx::saveWorkbook(wb, "timeseries.xlsx")
-#' #
+#' library(openxlsx)
+#' wb <- createWorkbook()
+#' write_ts_sheet(ts1, wb, "ts1", labels = "after")
+#' write_ts_sheet(ts1 * 100, wb, "ts1_times_100", labels = "after")
+#' saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE)
+#'
 #' # write a timeseries with comments
 #' comments <- c("Timeseries ts1 is created on the Central Bureau of Policy Analysis",
 #'               "using a random number generator")
@@ -170,46 +170,66 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
     wb <- createWorkbook()
   }
 
-  nsheet <- wb$getNumberOfSheets()
-  if (nsheet > 0) {
-    sheets <- getSheets(wb)
+  if (append) {
+    sheet_names <- names(wb)
+    sheet_exists <- sheet_name %in% sheet_names
+    if (sheet_exists) {
+      sheet_names_old <- sheet_names
+      removeWorksheet(wb, sheet_name)
+    }
   }
-  if (nsheet > 0 && sheet_name %in% names(sheets)) {
-    sheet <- sheets[[sheet_name]]
-    removeRow(sheet)
-  } else {
-    sheet <- createSheet(wb, sheetName = sheet_name)
+  addWorksheet(wb, sheetName = sheet_name, gridLines = TRUE)
+
+
+  write_ts_sheet_(x, wb, sheet_name, rowwise = rowwise,
+                   labels = labels, labels_missing = missing(labels), comments,
+                   number_format, period_as_date = period_as_date)
+
+  if (append && sheet_exists) {
+    # if the sheet already existed, then keep the original ordering
+    order <- match(sheet_names_old, names(wb))
+    worksheetOrder(wb) <- order
   }
 
-  write_ts_sheet_(x, sheet, rowwise = rowwise,
-                  labels = labels, labels_missing = missing(labels), comments,
-                  number_format, period_as_date = period_as_date)
-
-  saveWorkbook(wb, file)
+  saveWorkbook(wb, file, overwrite = TRUE)
 
   return(invisible(NULL))
 }
 
 #' @describeIn write_ts_xlsx-slash-write_ts_sheet writes a timeseries to a
-#' \code{Sheet} object
+#' \code{Workbook} object
 #' @export
-write_ts_sheet <- function(x, sheet,  rowwise = TRUE,
-                           labels = c("after", "before", "no"),
-                           comments, number_format, period_as_date = FALSE) {
+write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
+                          labels = c("after", "before", "no"),
+                          comments, number_format, period_as_date = FALSE) {
+
+
+  sheet_exists <- sheet_name %in% names(wb)
+
+  if (sheet_exists) {
+    sheetnames_old <- names(wb)
+    removeWorksheet(wb, sheet_name)
+  }
+  addWorksheet(wb, sheet_name)
 
   if (!is.matrix(x)) {
     x <- univec2unimat(x, deparse(substitute(x)))
   }
 
-  write_ts_sheet_(x, sheet, rowwise = rowwise, labels = labels,
-                  labels_missing = missing(labels), comments, number_format,
-                  period_as_date = period_as_date)
+  write_ts_sheet_(x, wb, sheet_name, rowwise = rowwise, labels = labels,
+                   labels_missing = missing(labels), comments, number_format,
+                   period_as_date = period_as_date)
 
+  if (sheet_exists) {
+    # if the sheet already existed, then keep the original ordering
+    order <- match(sheetnames_old, names(wb))
+    worksheetOrder(wb) <- order
+  }
 }
 
 # internal function to write a timeseries object to a sheet of an Excel workbook
-write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
-                            comments, number_format, period_as_date) {
+write_ts_sheet_ <- function(x, wb, sheet, rowwise, labels, labels_missing,
+                             comments, number_format, period_as_date) {
 
   # check for comments. The comments are actually written before the
   # autoSizeColumns() command has been executed.
@@ -244,45 +264,44 @@ write_ts_sheet_ <- function(x, sheet, rowwise, labels, labels_missing,
 
   # Write the column headers. Use right alignment for the column headers
   # of data columns, except if period_as_date has been used.
-
+  writeData(wb, sheet, column_headers, colNames = FALSE,
+                      rowNames = FALSE, startRow = n_comment_rows + 1)
   if (!period_as_date) {
-    wb <- sheet$getWorkbook()
-    right_align_style <- CellStyle(wb, alignment = Alignment(horizontal =
-                                                               "ALIGN_RIGHT"))
-    col_style <- rep(list(right_align_style), ncol(column_headers) - n_text_cols)
-    names(col_style) <- seq(n_text_cols + 1, ncol(column_headers))
-  } else {
-    col_style <- NULL
+    style <- createStyle(halign = "right")
+    cols <- seq(n_text_cols + 1, ncol(column_headers))
+    addStyle(wb, sheet, style = style,
+                       rows = n_comment_rows + 1, cols = cols,
+                       gridExpand = TRUE)
   }
-  addDataFrame(column_headers, sheet, col.names = FALSE, row.names = FALSE,
-             colStyle = col_style, startRow = n_comment_rows + 1)
+
 
   # now write the data part
-
-  if (missing(number_format)) {
-    col_style <- NULL
-  } else {
-    cs <- CellStyle(wb, dataFormat = DataFormat(number_format))
-    ndata <- ncol(data)
-    col_style <- rep(list(cs), ndata)
-    names(col_style) <- seq(n_text_cols + 1, n_text_cols + ndata)
-  }
 
   if (!rowwise && frequency(x) == 1) {
     # convert strings representing years to numeric
     data[1] <- as.numeric(data[[1]])
   }
-  addDataFrame(data, sheet, col.names = FALSE, row.names = FALSE,
-               startRow = n_text_rows + n_comment_rows + 1,
-               colStyle = col_style)
 
-  autoSizeColumn(sheet, seq_len(ncol(data)))
-
-  if (!missing(comments)) {
-    addDataFrame(comments, sheet, col.names = FALSE, row.names = FALSE)
+  start_row <- n_text_rows + n_comment_rows + 1
+  writeData(wb, sheet, data, colNames = FALSE, rowNames = FALSE,
+                      startRow = start_row)
+  if (!missing(number_format)) {
+    style <- createStyle(numFmt = number_format)
+    addStyle(wb, sheet, style = style,
+                       rows = start_row - 1+ seq_len(nrow(data)), cols = 2 : ncol(data),
+                       gridExpand = TRUE)
   }
 
-  createFreezePane(sheet, rowSplit = row_split, colSplit = col_split)
+  setColWidths(wb, sheet, 1:ncol(data), widths = "auto")
+
+  if (!missing(comments)) {
+    writeData(wb, sheet, comments, colNames = FALSE,
+                        rowNames = FALSE)
+  }
+
+
+  freezePane(wb, sheet, firstActiveRow = row_split,
+                       firstActiveCol = col_split)
 
 
   return(invisible(NULL))

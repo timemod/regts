@@ -30,12 +30,14 @@ test_that("ts without labels written correctly",  {
   write_ts_xlsx(ts1, file, sheet_name = "ts1_t",  rowwise = FALSE,
                 comments = comments, append = TRUE)
 
-  wb <- xlsx::loadWorkbook(file)
-  sheet <- xlsx::createSheet(wb, "ts1_times_2")
+  wb <- openxlsx::loadWorkbook(file)
+  # the next statement is redundant, but lets check it
+  openxlsx::addWorksheet(wb, "ts1_times_2")
   comments <- data.frame(col1 = "Timeseries ts1",
                          col2 = "(times 2)")
-  write_ts_sheet(ts1 * 2, sheet,  comments = comments, rowwise = TRUE)
-  xlsx::saveWorkbook(wb, file)
+  write_ts_sheet(ts1 * 2, wb, sheet_name = "ts1_times_2",
+                 comments = comments, rowwise = TRUE)
+  openxlsx::saveWorkbook(wb, file, overwrite = TRUE)
 
   ts1_read <- read_ts_xlsx(file, sheet = "ts1")
   expect_identical(ts1, ts1_read)
@@ -54,6 +56,7 @@ test_that("ts with labels written correctly",  {
 
   write_ts_xlsx(ts1_lbls, file, sheet_name = "ts1", append = TRUE,
                 number_format = "00.00")
+
   write_ts_xlsx(ts1_lbls, file, sheet_name = "ts1_t",  rowwise = FALSE,
                 append = TRUE, number_format = "#.000")
 
@@ -66,8 +69,9 @@ test_that("ts with labels written correctly",  {
   expect_identical(ts1_lbls, ts1_t_read)
 
   # check that all sheet names still exists
-  wb <- xlsx::loadWorkbook(file)
-  sheetnames <- names(xlsx::getSheets(wb))
+  wb <- openxlsx::loadWorkbook(file)
+  sheetnames <- names(wb)
+
   expect_identical(sheetnames, c("sheet_before", "ts1", "ts1_t", "sheet_after"))
 
   df1 <- as.data.frame(readxl::read_excel(file, sheet = "sheet_before"))
@@ -116,8 +120,6 @@ test_that("period_as_date", {
   ts1_date_t_read <- read_ts_xlsx(file, labels = "before", frequency = 4)
 
   expect_identical(ts1_lbls, ts1_date_t_read)
-
-
 })
 
 

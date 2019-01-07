@@ -26,7 +26,6 @@ Imports:
     readxl,
     cellranger,
     tibble,
-    xlsx,
     openxlsx
 Suggests:
     testthat,

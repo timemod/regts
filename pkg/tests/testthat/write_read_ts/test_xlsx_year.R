@@ -30,12 +30,12 @@ test_that("ts without labels written correctly",  {
   write_ts_xlsx(ts2, file, sheet_name = "ts2_t",  rowwise = FALSE,
                 comments = comments, append = TRUE)
 
-  wb <- xlsx::loadWorkbook(file)
-  sheet <- xlsx::createSheet(wb, "ts2_times_2")
+  wb <- openxlsx::loadWorkbook(file)
   comments <- data.frame(col1 = "Timeseries ts2",
                          col2 = "(times 2)")
-  write_ts_sheet(ts2 * 2, sheet,  comments = comments, rowwise = TRUE)
-  xlsx::saveWorkbook(wb, file)
+  write_ts_sheet(ts2 * 2, wb, sheet_name = "ts2_times_2",
+                 comments = comments, rowwise = TRUE)
+  openxlsx::saveWorkbook(wb, file, overwrite = TRUE)
 
   ts2_read <- read_ts_xlsx(file, sheet = "ts2")
   expect_identical(ts2, ts2_read)
@@ -68,8 +68,8 @@ test_that("ts with labels written correctly",  {
   expect_identical(ts2_lbls, ts2_t_read)
 
   # check that all sheet names still exists
-  wb <- xlsx::loadWorkbook(file)
-  sheetnames <- names(xlsx::getSheets(wb))
+  wb <- openxlsx::loadWorkbook(file)
+  sheetnames <- names(wb)
   expect_identical(sheetnames, c("ts2", "ts2_t"))
 })
 

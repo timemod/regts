@@ -10,8 +10,9 @@ write_ts_xlsx(x, file, sheet_name = "Sheet1", rowwise = TRUE,
   append = FALSE, labels = c("after", "before", "no"), comments,
   number_format, period_as_date = FALSE)
 
-write_ts_sheet(x, sheet, rowwise = TRUE, labels = c("after", "before",
-  "no"), comments, number_format, period_as_date = FALSE)
+write_ts_sheet(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
+  labels = c("after", "before", "no"), comments, number_format,
+  period_as_date = FALSE)
 }
 \arguments{
 \item{x}{a \code{\link{ts}} or \code{\link{regts}} object}
@@ -38,28 +39,30 @@ written.}
 
 \item{number_format}{a character value specifying the number format.
 For example, \code{"#.00"} corresponds to two decimal spaces.
-For details see the description of the function \code{\link[xlsx]{DataFormat}}
-in the \code{\link[xlsx:xlsx-package]{xlsx}} package.}
+For details see the description of the function \code{\link[xlsx]{createStyle}}
+in the \code{\link[openxlsx:openxlsx-package]{openxlsx}} package.}
 
 \item{period_as_date}{A logical (default \code{FALSE}).
 If \code{TRUE} the periods are written as date values to the Excel file.
 By default the periods are written as characters using the standard
 \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}).}
 
-\item{sheet}{a \code{\link[xlsx]{Sheet}} object (see the documentation
-of package \code{xlsx})}
+\item{wb}{a \code{Workbook} object created with function
+\code{\link[openxlsx]{createWorkbook}} or \code{\link[openxlsx]{loadWorkbook}}}
 }
 \description{
 These functions can be used to write timeseries to a sheet of an
 xlsx file. \code{write_ts_xlsx} creates or opens an Excel workbook
 (depending on argument \code{append}) and writes the timeseries to
 a sheet with a specified name.
-\code{write_ts_sheet} writes timeseries to a \code{\link[xlsx]{Sheet}}
-object.
+\code{write_ts_sheet} writes timeseries to a sheet of a workbook
+created with \code{\link[openxlsx]{createWorkbook}} (see the example
+below).
 }
 \details{
-The functions employ function \code{\link[xlsx]{addDataFrame}}
-from the \code{\link[xlsx:xlsx-package]{xlsx}} package for writing the Excel file.
+The functions employ package
+\code{\link[openxlsx:openxlsx-package]{openxlsx}}
+package for writing the Excel file.
 
 If you want to write multiple timeseries objects to different
 sheets, you can use \code{write_ts_xlsx} with argument
@@ -72,7 +75,7 @@ is more efficient.
 workbook
 
 \item \code{write_ts_sheet}: writes a timeseries to a
-\code{Sheet} object
+\code{Workbook} object
 }}
 
 \examples{
@@ -84,13 +87,12 @@ ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
 write_ts_xlsx(ts1, file = "ts1.xlsx", sheet_name = "ts1", labels = "after")
 
 # write two sheets using write_ts_sheet
-wb <- xlsx::createWorkbook()
-sheet <- xlsx::createSheet(wb, "ts1")
-write_ts_sheet(ts1, sheet, labels = "after")
-sheet <- xlsx::createSheet(wb, "ts1_times_100")
-write_ts_sheet(ts1 * 100, sheet = sheet, labels = "after")
-xlsx::saveWorkbook(wb, "timeseries.xlsx")
-#
+library(openxlsx)
+wb <- createWorkbook()
+write_ts_sheet(ts1, wb, "ts1", labels = "after")
+write_ts_sheet(ts1 * 100, wb, "ts1_times_100", labels = "after")
+saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE)
+
 # write a timeseries with comments
 comments <- c("Timeseries ts1 is created on the Central Bureau of Policy Analysis",
               "using a random number generator")
