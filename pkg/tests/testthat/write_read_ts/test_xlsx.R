@@ -92,11 +92,12 @@ test_that("period_as_date", {
 
   # check if the file really contains date objects
   first_row <- readxl::read_xlsx(file, n_max = 1, col_types = "list",
-                                  col_names = FALSE)
+                                  col_names = FALSE,
+                                 .name_repair = function(x) {x})
   periods <- first_row[-c(1,2)]
-  names(periods) <- NULL
   is_posixt <- sapply(periods, FUN = function(x) {inherits(x[[1]], "POSIXt")},
                       USE.NAMES = FALSE)
+  names(is_posixt) <- NULL
   expect_identical(is_posixt, rep(TRUE, 5))
 
   # try to read the file with read_ts_xlsx
