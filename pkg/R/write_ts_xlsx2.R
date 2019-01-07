@@ -22,7 +22,7 @@ write_ts_xlsx2 <- function(x, file, sheet_name = "Sheet1",
   }
 
   if (append) {
-    sheet_names <- openxlsx::getSheetNames()
+    sheet_names <- openxlsx::getSheetNames(file)
     if (sheet_name %in% sheet_names) {
       openxlsx::removeWorksheet(wb, sheet_name)
     }
@@ -33,7 +33,7 @@ write_ts_xlsx2 <- function(x, file, sheet_name = "Sheet1",
                   labels = labels, labels_missing = missing(labels), comments,
                   number_format, period_as_date = period_as_date)
 
-  openxlsx::saveWorkbook(wb, file)
+  openxlsx::saveWorkbook(wb, file, overwrite = TRUE)
 
   return(invisible(NULL))
 }
@@ -94,9 +94,9 @@ write_ts_sheet2_ <- function(x, wb, sheet_name, rowwise, labels, labels_missing,
                       rowNames = FALSE, startRow = n_comment_rows + 1)
   if (!period_as_date) {
     style <- openxlsx::createStyle(halign = "right")
+    cols <- seq(n_text_cols + 1, ncol(column_headers))
     openxlsx::addStyle(wb, sheet_name, style = style,
-                       rows = n_comment_rows + 1,
-                       cols = seq_along(column_headers),
+                       rows = n_comment_rows + 1, cols = cols,
                        gridExpand = TRUE)
   }
 
@@ -119,11 +119,14 @@ write_ts_sheet2_ <- function(x, wb, sheet_name, rowwise, labels, labels_missing,
              gridExpand = TRUE)
   }
 
+  openxlsx::setColWidths(wb, sheet_name, 1:ncol(data), widths = "auto")
 
   if (!missing(comments)) {
      openxlsx::writeData(wb, sheet_name, comments, colNames = FALSE,
                          rowNames = FALSE)
   }
+
+
 
   openxlsx::freezePane(wb, sheet_name, firstActiveRow = row_split,
              firstActiveCol = col_split)
