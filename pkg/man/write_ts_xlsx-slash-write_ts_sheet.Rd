@@ -84,12 +84,12 @@ ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
 write_ts_xlsx(ts1, file = "ts1.xlsx", sheet_name = "ts1", labels = "after")
 
 # write two sheets using write_ts_sheet
-wb <- createWorkbook()
-sheet <- createSheet(wb, "ts1")
+wb <- xlsx::createWorkbook()
+sheet <- xlsx::createSheet(wb, "ts1")
 write_ts_sheet(ts1, sheet, labels = "after")
-sheet <- createSheet(wb, "ts1_times_100")
+sheet <- xlsx::createSheet(wb, "ts1_times_100")
 write_ts_sheet(ts1 * 100, sheet = sheet, labels = "after")
-saveWorkbook(wb, "timeseries.xlsx")
+xlsx::saveWorkbook(wb, "timeseries.xlsx")
 #
 # write a timeseries with comments
 comments <- c("Timeseries ts1 is created on the Central Bureau of Policy Analysis",
