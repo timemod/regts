@@ -39,7 +39,8 @@ written.}
 
 \item{number_format}{a character value specifying the number format.
 For example, \code{"#.00"} corresponds to two decimal spaces.
-For details see the description of the function \code{\link[xlsx]{createStyle}}
+For details see the description of the function
+\code{\link[openxlsx]{createStyle}}
 in the \code{\link[openxlsx:openxlsx-package]{openxlsx}} package.}
 
 \item{period_as_date}{A logical (default \code{FALSE}).
@@ -66,8 +67,15 @@ package for writing the Excel file.
 
 If you want to write multiple timeseries objects to different
 sheets, you can use \code{write_ts_xlsx} with argument
-\code{append = TRUE}, or \code{write_ts_sheet}. The latter approach
-is more efficient.
+\code{append = TRUE}. Alternatively,
+you can create a \code{Workbook} object with
+function \code{\link[openxlsx]{createWorkbook}} of package
+\code{openxlsx} and then add a sheet with \code{write_ts_sheet}.
+The latter approach is more efficient.
+When the workbook is written to a file with function
+ \code{\link[openxlsx]{saveWorkbook}}, is is often useful to
+set the minimum column width option of package \code{openxlsx},
+as is shown is the example below.
 }
 \section{Functions}{
 \itemize{
@@ -91,6 +99,11 @@ library(openxlsx)
 wb <- createWorkbook()
 write_ts_sheet(ts1, wb, "ts1", labels = "after")
 write_ts_sheet(ts1 * 100, wb, "ts1_times_100", labels = "after")
+# Set the minimum column width. saveWorkbook will adjust
+# the column widths for the sheets written by write_ts_xlsx,
+# Setting a minimum column width prevents that some columns are very
+# narrow.
+options("openxlsx.minWidth" = 8.43)
 saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE)
 
 # write a timeseries with comments

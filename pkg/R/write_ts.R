@@ -87,8 +87,15 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #'
 #' If you want to write multiple timeseries objects to different
 #' sheets, you can use \code{write_ts_xlsx} with argument
-#' \code{append = TRUE}, or \code{write_ts_sheet}. The latter approach
-#' is more efficient.
+#' \code{append = TRUE}. Alternatively,
+#' you can create a \code{Workbook} object with
+#' function \code{\link[openxlsx]{createWorkbook}} of package
+#' \code{openxlsx} and then add a sheet with \code{write_ts_sheet}.
+#' The latter approach is more efficient.
+#' When the workbook is written to a file with function
+#'  \code{\link[openxlsx]{saveWorkbook}}, is is often useful to
+#' set the minimum column width option of package \code{openxlsx},
+#' as is shown is the example below.
 #'
 #' @param x a \code{\link{ts}} or \code{\link{regts}} object
 #' @param file the filename of the output file
@@ -106,7 +113,8 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' the names? By default, labels are written after the names if present
 #' @param number_format a character value specifying the number format.
 #' For example, \code{"#.00"} corresponds to two decimal spaces.
-#' For details see the description of the function \code{\link[xlsx]{createStyle}}
+#' For details see the description of the function
+#' \code{\link[openxlsx]{createStyle}}
 #' in the \code{\link[openxlsx:openxlsx-package]{openxlsx}} package.
 #' @param period_as_date A logical (default \code{FALSE}).
 #' If \code{TRUE} the periods are written as date values to the Excel file.
@@ -130,6 +138,13 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' wb <- createWorkbook()
 #' write_ts_sheet(ts1, wb, "ts1", labels = "after")
 #' write_ts_sheet(ts1 * 100, wb, "ts1_times_100", labels = "after")
+
+#' # Set the minimum column width. saveWorkbook will adjust
+#' # the column widths for the sheets written by write_ts_xlsx,
+#' # Setting a minimum column width prevents that some columns are very
+#' # narrow.
+#' options("openxlsx.minWidth" = 8.43)
+
 #' saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE)
 #'
 #' # write a timeseries with comments
@@ -191,7 +206,12 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
     worksheetOrder(wb) <- order
   }
 
+  minWidth_old <- options("openxlsx.minWidth")[[1]]
+  options("openxlsx.minWidth" = 8.43)
+
   saveWorkbook(wb, file, overwrite = TRUE)
+
+  options("openxlsx.minWidth" = minWidth_old)
 
   return(invisible(NULL))
 }
@@ -262,17 +282,20 @@ write_ts_sheet_ <- function(x, wb, sheet, rowwise, labels, labels_missing,
       as.data.frame(lapply(column_headers[, col_sel], FUN = as.numeric))
   }
 
-  # Write the column headers. Use right alignment for the column headers
-  # of data columns, except if period_as_date has been used.
-  writeData(wb, sheet, column_headers, colNames = FALSE,
-                      rowNames = FALSE, startRow = n_comment_rows + 1)
-  if (!period_as_date) {
+  # Write the column headers.
+  writeData(wb, sheet, column_headers, colNames = FALSE, rowNames = FALSE,
+            startRow = n_comment_rows + 1)
+
+  # Set style of the column headers of data columns.
+  # Use right alignment, except if period_as_date has been used.
+  if (!(rowwise && period_as_date)) {
     style <- createStyle(halign = "right")
     cols <- seq(n_text_cols + 1, ncol(column_headers))
-    addStyle(wb, sheet, style = style,
-                       rows = n_comment_rows + 1, cols = cols,
-                       gridExpand = TRUE)
+    rows <- seq(n_comment_rows + 1, n_comment_rows + nrow(column_headers))
+    addStyle(wb, sheet, style = style, rows = rows, cols = cols,
+             gridExpand = TRUE)
   }
+
 
 
   # now write the data part
@@ -292,7 +315,9 @@ write_ts_sheet_ <- function(x, wb, sheet, rowwise, labels, labels_missing,
                        gridExpand = TRUE)
   }
 
+
   setColWidths(wb, sheet, 1:ncol(data), widths = "auto")
+
 
   if (!missing(comments)) {
     writeData(wb, sheet, comments, colNames = FALSE,
