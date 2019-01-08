@@ -49,7 +49,7 @@ test_that("ts without labels written correctly",  {
   expect_identical(ts1 * 2, ts1_times_2_read)
 })
 
-test_that("ts with labels written correctly",  {
+test_that("ts with labels written correctly (1)",  {
 
   file <- "xlsx/ts1_lbls.xlsx"
   file.copy("xlsx_org/ts1_lbls.xlsx", file, overwrite = TRUE)
@@ -72,7 +72,127 @@ test_that("ts with labels written correctly",  {
   wb <- openxlsx::loadWorkbook(file)
   sheetnames <- names(wb)
 
-  expect_identical(sheetnames, c("sheet_before", "ts1", "ts1_t", "sheet_after"))
+  expect_identical(sheetnames, c("sheet_before", "ts1", "ts1_t",
+                                 "sheet_after"))
+
+  df1 <- as.data.frame(readxl::read_excel(file, sheet = "sheet_before"))
+  expect_equal(df1, data.frame(x = 10, y = 20))
+
+  df2 <- as.data.frame(readxl::read_excel(file, sheet = "sheet_after"))
+  expect_equal(df2, data.frame(x = 1, y = 2))
+})
+
+
+test_that("ts with labels written correctly (2)",  {
+
+  file <- "xlsx/ts1_lbls_2.xlsx"
+  file.copy("xlsx_org/ts1_lbls.xlsx", file, overwrite = TRUE)
+
+  write_ts_xlsx(ts1_lbls, file, sheet_name = "ts1_t",  rowwise = FALSE,
+                append = TRUE, number_format = "#.000")
+
+  write_ts_xlsx(ts1_lbls, file, sheet_name = "extra", append = TRUE,
+                number_format = "00.00")
+
+  write_ts_xlsx(ts1_lbls, file, sheet_name = "ts1", append = TRUE,
+                number_format = "00.00")
+
+
+  ts1_read <- read_ts_xlsx(file, sheet = "ts1", labels = "after")
+
+  expect_identical(ts1_lbls, ts1_read)
+
+  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "before")
+
+  expect_identical(ts1_lbls, ts1_t_read)
+
+  # check that all sheet names still exists
+  wb <- openxlsx::loadWorkbook(file)
+  sheetnames <- names(wb)
+
+  expect_identical(sheetnames, c("sheet_before", "ts1", "ts1_t",
+                                 "sheet_after", "extra"))
+
+  df1 <- as.data.frame(readxl::read_excel(file, sheet = "sheet_before"))
+  expect_equal(df1, data.frame(x = 10, y = 20))
+
+  df2 <- as.data.frame(readxl::read_excel(file, sheet = "sheet_after"))
+  expect_equal(df2, data.frame(x = 1, y = 2))
+})
+
+
+
+test_that("ts with labels written correctly (3)",  {
+
+  file <- "xlsx/ts1_lbls_3.xlsx"
+
+  wb <- openxlsx::loadWorkbook("xlsx_org/ts1_lbls.xlsx")
+
+  write_ts_sheet(ts1_lbls, wb, sheet_name = "ts1",
+                 number_format = "00.00")
+
+  openxlsx::addWorksheet(wb, "dummy")
+
+  write_ts_sheet(ts1_lbls, wb, sheet_name = "ts1_t",  rowwise = FALSE,
+                 number_format = "#.000")
+
+  openxlsx::saveWorkbook(wb, file, overwrite  = TRUE)
+
+  ts1_read <- read_ts_xlsx(file, sheet = "ts1", labels = "after")
+
+  expect_identical(ts1_lbls, ts1_read)
+
+  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "before")
+
+  expect_identical(ts1_lbls, ts1_t_read)
+
+  # check that all sheet names still exists
+  wb <- openxlsx::loadWorkbook(file)
+  sheetnames <- names(wb)
+
+  expect_identical(sheetnames, c("sheet_before", "ts1", "ts1_t",
+                                 "sheet_after", "dummy"))
+
+  df1 <- as.data.frame(readxl::read_excel(file, sheet = "sheet_before"))
+  expect_equal(df1, data.frame(x = 10, y = 20))
+
+  df2 <- as.data.frame(readxl::read_excel(file, sheet = "sheet_after"))
+  expect_equal(df2, data.frame(x = 1, y = 2))
+})
+
+
+
+test_that("ts with labels written correctly (4)",  {
+
+  file <- "xlsx/ts1_lbls_4.xlsx"
+
+  wb <- openxlsx::loadWorkbook("xlsx_org/ts1_lbls.xlsx")
+
+  write_ts_sheet(ts1_lbls, wb, sheet_name = "ts1_t",  rowwise = FALSE,
+                 number_format = "#.000")
+
+  openxlsx::addWorksheet(wb, "dummy")
+
+  write_ts_sheet(ts1_lbls, wb, sheet_name = "ts1",
+                 number_format = "00.00")
+
+
+  openxlsx::saveWorkbook(wb, file, overwrite  = TRUE)
+
+  ts1_read <- read_ts_xlsx(file, sheet = "ts1", labels = "after")
+
+  expect_identical(ts1_lbls, ts1_read)
+
+  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "before")
+
+  expect_identical(ts1_lbls, ts1_t_read)
+
+  # check that all sheet names still exists
+  wb <- openxlsx::loadWorkbook(file)
+  sheetnames <- names(wb)
+
+  expect_identical(sheetnames, c("sheet_before", "ts1", "ts1_t",
+                                 "sheet_after", "dummy"))
 
   df1 <- as.data.frame(readxl::read_excel(file, sheet = "sheet_before"))
   expect_equal(df1, data.frame(x = 10, y = 20))

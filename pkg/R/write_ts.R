@@ -31,17 +31,6 @@
 #'    unlink("ts1_2.csv")
 #' }
 #' @seealso \code{\link{read_ts_csv}} and \code{\link{write_ts_xlsx}}
-#' @importFrom openxlsx createWorkbook
-#' @importFrom openxlsx loadWorkbook
-#' @importFrom openxlsx saveWorkbook
-#' @importFrom openxlsx addWorksheet
-#' @importFrom openxlsx writeData
-#' @importFrom openxlsx removeWorksheet
-#' @importFrom openxlsx worksheetOrder<-
-#' @importFrom openxlsx createStyle
-#' @importFrom openxlsx addStyle
-#' @importFrom openxlsx setColWidths
-#' @importFrom openxlsx freezePane
 #' @export
 write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
                         labels = c("after", "before", "no"),
@@ -162,6 +151,18 @@ NULL
 
 #' @describeIn write_ts_xlsx-slash-write_ts_sheet writes timeseries to an Excel
 #' workbook
+#' @importFrom openxlsx createWorkbook
+#' @importFrom openxlsx loadWorkbook
+#' @importFrom openxlsx saveWorkbook
+#' @importFrom openxlsx addWorksheet
+#' @importFrom openxlsx writeData
+#' @importFrom openxlsx removeWorksheet
+#' @importFrom openxlsx worksheetOrder
+#' @importFrom openxlsx worksheetOrder<-
+#' @importFrom openxlsx createStyle
+#' @importFrom openxlsx addStyle
+#' @importFrom openxlsx setColWidths
+#' @importFrom openxlsx freezePane
 #' @export
 write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           rowwise = TRUE, append = FALSE,
@@ -223,11 +224,10 @@ write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
                           labels = c("after", "before", "no"),
                           comments, number_format, period_as_date = FALSE) {
 
-
   sheet_exists <- sheet_name %in% names(wb)
 
   if (sheet_exists) {
-    sheetnames_old <- names(wb)
+    sheetnames_old <- names(wb)[worksheetOrder(wb)]
     removeWorksheet(wb, sheet_name)
   }
   addWorksheet(wb, sheet_name)
@@ -295,8 +295,6 @@ write_ts_sheet_ <- function(x, wb, sheet, rowwise, labels, labels_missing,
     addStyle(wb, sheet, style = style, rows = rows, cols = cols,
              gridExpand = TRUE)
   }
-
-
 
   # now write the data part
 
