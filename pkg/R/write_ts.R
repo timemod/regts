@@ -33,8 +33,8 @@
 #' @seealso \code{\link{read_ts_csv}} and \code{\link{write_ts_xlsx}}
 #' @export
 write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
-                        labels = c("after", "before", "no"),
-                        period_format = "regts") {
+                         labels = c("after", "before", "no"),
+                         period_format = "regts") {
 
   labels_missing <- missing(labels)
 
@@ -198,8 +198,8 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 
 
   write_ts_sheet_(x, wb, sheet_name, rowwise = rowwise,
-                   labels = labels, labels_missing = missing(labels), comments,
-                   number_format, period_as_date = period_as_date)
+                  labels = labels, labels_missing = missing(labels), comments,
+                  number_format, period_as_date = period_as_date)
 
   if (append && sheet_exists) {
     # if the sheet already existed, then keep the original ordering
@@ -221,8 +221,8 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 #' \code{Workbook} object
 #' @export
 write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
-                          labels = c("after", "before", "no"),
-                          comments, number_format, period_as_date = FALSE) {
+                           labels = c("after", "before", "no"),
+                           comments, number_format, period_as_date = FALSE) {
 
   sheet_exists <- sheet_name %in% names(wb)
 
@@ -237,8 +237,8 @@ write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
   }
 
   write_ts_sheet_(x, wb, sheet_name, rowwise = rowwise, labels = labels,
-                   labels_missing = missing(labels), comments, number_format,
-                   period_as_date = period_as_date)
+                  labels_missing = missing(labels), comments, number_format,
+                  period_as_date = period_as_date)
 
   if (sheet_exists) {
     # if the sheet already existed, then keep the original ordering
@@ -249,7 +249,7 @@ write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
 
 # internal function to write a timeseries object to a sheet of an Excel workbook
 write_ts_sheet_ <- function(x, wb, sheet, rowwise, labels, labels_missing,
-                             comments, number_format, period_as_date) {
+                            comments, number_format, period_as_date) {
 
   # check for comments. The comments are actually written before the
   # autoSizeColumns() command has been executed.
@@ -272,14 +272,18 @@ write_ts_sheet_ <- function(x, wb, sheet, rowwise, labels, labels_missing,
     n_text_cols <- 1
   }
   n_text_rows <- nrow(column_headers)
-  row_split <- n_text_rows + 1 + n_comment_rows
-  col_split <- n_text_cols + 1
+
 
   # convert strings representing years to numeric
   if (rowwise && frequency(x) == 1) {
     col_sel <- - seq_len(n_text_cols)
     column_headers[, col_sel] <-
       as.data.frame(lapply(column_headers[, col_sel], FUN = as.numeric))
+  }
+
+  # write comments
+  if (!missing(comments)) {
+    writeData(wb, sheet, comments, colNames = FALSE, rowNames = FALSE)
   }
 
   # Write the column headers.
@@ -305,26 +309,22 @@ write_ts_sheet_ <- function(x, wb, sheet, rowwise, labels, labels_missing,
 
   start_row <- n_text_rows + n_comment_rows + 1
   writeData(wb, sheet, data, colNames = FALSE, rowNames = FALSE,
-                      startRow = start_row)
+            startRow = start_row)
+
   if (!missing(number_format)) {
     style <- createStyle(numFmt = number_format)
-    addStyle(wb, sheet, style = style,
-                       rows = start_row - 1+ seq_len(nrow(data)), cols = 2 : ncol(data),
-                       gridExpand = TRUE)
+    rows <- start_row : (start_row + nrow(data) - 1)
+    cols <- (n_text_cols + 1) : ncol(data)
+    addStyle(wb, sheet, style = style, rows = rows, cols = cols,
+             gridExpand = TRUE)
   }
-
 
   setColWidths(wb, sheet, 1:ncol(data), widths = "auto")
 
-
-  if (!missing(comments)) {
-    writeData(wb, sheet, comments, colNames = FALSE,
-                        rowNames = FALSE)
-  }
-
-
+  row_split <- n_text_rows + n_comment_rows + 1
+  col_split <- n_text_cols + 1
   freezePane(wb, sheet, firstActiveRow = row_split,
-                       firstActiveCol = col_split)
+             firstActiveCol = col_split)
 
 
   return(invisible(NULL))
@@ -410,9 +410,9 @@ ts2df_ <- function(x, rowwise, label_option, labels_missing, period_format,
     column_headers <- as.data.frame(t(colnames(data)), stringsAsFactors = FALSE)
     if (label_option == "before") {
       column_headers <- rbind(c("label", lbls), column_headers,
-                                stringsAsFactors = FALSE)
+                              stringsAsFactors = FALSE)
     } else if (label_option == "after") {
-        stop("For columnwise timeseries labels option \"after\" is not allowed")
+      stop("For columnwise timeseries labels option \"after\" is not allowed")
     }
   }
 
