@@ -28,8 +28,8 @@ Alternatively, it is possible to specify a format employed by base R function
 }
 \description{
 This function writes timeseries to a csv file.
-The csv file is actually written by function \code{\link[data.table]{fwrite}}
-of package \code{data.table}.
+The csv file is actually written by function
+\code{\link[data.table]{fwrite}} of package \code{data.table}.
 }
 \examples{
 # create two timeseries objects

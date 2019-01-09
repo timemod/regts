@@ -49,16 +49,19 @@ By default the periods are written as characters using the standard
 \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}).}
 
 \item{wb}{a \code{Workbook} object created with function
-\code{\link[openxlsx]{createWorkbook}} or \code{\link[openxlsx]{loadWorkbook}}}
+\code{\link[openxlsx]{createWorkbook}} or
+\code{\link[openxlsx]{loadWorkbook}}
+of package \code{\link[openxlsx:openxlsx-package]{openxlsx}}}
 }
 \description{
 These functions can be used to write timeseries to a sheet of an
 xlsx file. \code{write_ts_xlsx} creates or opens an Excel workbook
 (depending on argument \code{append}) and writes the timeseries to
 a sheet with a specified name.
-\code{write_ts_sheet} writes timeseries to a sheet of a workbook
-created with \code{\link[openxlsx]{createWorkbook}} (see the example
-below).
+\code{write_ts_sheet} writes timeseries to a sheet of a \code{Workbook}
+object created with function \code{\link[openxlsx]{createWorkbook}}
+or \code{\link[openxlsx]{loadWorkbook}}
+of package \code{\link[openxlsx:openxlsx-package]{openxlsx}}.
 }
 \details{
 The functions employ package
@@ -73,9 +76,9 @@ function \code{\link[openxlsx]{createWorkbook}} of package
 \code{openxlsx} and then add a sheet with \code{write_ts_sheet}.
 The latter approach is more efficient.
 When the workbook is written to a file with function
- \code{\link[openxlsx]{saveWorkbook}}, is is often useful to
-set the minimum column width option of package \code{openxlsx},
-as is shown is the example below.
+ \code{\link[openxlsx]{saveWorkbook}}, it is often useful to
+set the minimum column width option for package \code{openxlsx},
+as shown in the example below.
 }
 \section{Functions}{
 \itemize{
@@ -87,7 +90,7 @@ workbook
 }}
 
 \examples{
-# create two timeseries objects
+# create a timeseries object
 ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
              labels = c("Timeseries a", "Timeseries b"), start = "2017Q2")
 
@@ -99,11 +102,13 @@ library(openxlsx)
 wb <- createWorkbook()
 write_ts_sheet(ts1, wb, "ts1", labels = "after")
 write_ts_sheet(ts1 * 100, wb, "ts1_times_100", labels = "after")
+
 # Set the minimum column width. saveWorkbook will adjust
 # the column widths for the sheets written by write_ts_xlsx,
 # Setting a minimum column width prevents that some columns are very
 # narrow.
 options("openxlsx.minWidth" = 8.43)
+
 saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE)
 
 # write a timeseries with comments

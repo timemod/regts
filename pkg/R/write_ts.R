@@ -1,8 +1,8 @@
 #' Write timeseries to a csv file
 #'
 #' This function writes timeseries to a csv file.
-#' The csv file is actually written by function \code{\link[data.table]{fwrite}}
-#' of package \code{data.table}.
+#' The csv file is actually written by function
+#' \code{\link[data.table]{fwrite}} of package \code{data.table}.
 #' @param x a \code{\link{ts}} or \code{\link{regts}} object
 #' @param file a \code{regts} object
 #' @param rowwise a logical value: should the timeseries be written rowwise?
@@ -66,9 +66,10 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' xlsx file. \code{write_ts_xlsx} creates or opens an Excel workbook
 #' (depending on argument \code{append}) and writes the timeseries to
 #' a sheet with a specified name.
-#' \code{write_ts_sheet} writes timeseries to a sheet of a workbook
-#' created with \code{\link[openxlsx]{createWorkbook}} (see the example
-#' below).
+#' \code{write_ts_sheet} writes timeseries to a sheet of a \code{Workbook}
+#' object created with function \code{\link[openxlsx]{createWorkbook}}
+#' or \code{\link[openxlsx]{loadWorkbook}}
+#' of package \code{\link[openxlsx:openxlsx-package]{openxlsx}}.
 #'
 #' The functions employ package
 #' \code{\link[openxlsx:openxlsx-package]{openxlsx}}
@@ -82,14 +83,16 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' \code{openxlsx} and then add a sheet with \code{write_ts_sheet}.
 #' The latter approach is more efficient.
 #' When the workbook is written to a file with function
-#'  \code{\link[openxlsx]{saveWorkbook}}, is is often useful to
-#' set the minimum column width option of package \code{openxlsx},
-#' as is shown is the example below.
+#'  \code{\link[openxlsx]{saveWorkbook}}, it is often useful to
+#' set the minimum column width option for package \code{openxlsx},
+#' as shown in the example below.
 #'
 #' @param x a \code{\link{ts}} or \code{\link{regts}} object
 #' @param file the filename of the output file
 #' @param wb a \code{Workbook} object created with function
-#' \code{\link[openxlsx]{createWorkbook}} or \code{\link[openxlsx]{loadWorkbook}}
+#' \code{\link[openxlsx]{createWorkbook}} or
+#' \code{\link[openxlsx]{loadWorkbook}}
+#' of package \code{\link[openxlsx:openxlsx-package]{openxlsx}}
 #' @param sheet_name the sheet name
 #' @param append If \code{FALSE} (the default), then the original file,
 #' if it exists, is replaced with the new file. All original data is lost.
@@ -115,7 +118,7 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 
 #' @name write_ts_xlsx/write_ts_sheet
 #' @examples
-#' # create two timeseries objects
+#' # create a timeseries object
 #' ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
 #'              labels = c("Timeseries a", "Timeseries b"), start = "2017Q2")
 #'
@@ -127,13 +130,13 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' wb <- createWorkbook()
 #' write_ts_sheet(ts1, wb, "ts1", labels = "after")
 #' write_ts_sheet(ts1 * 100, wb, "ts1_times_100", labels = "after")
-
+#'
 #' # Set the minimum column width. saveWorkbook will adjust
 #' # the column widths for the sheets written by write_ts_xlsx,
 #' # Setting a minimum column width prevents that some columns are very
 #' # narrow.
 #' options("openxlsx.minWidth" = 8.43)
-
+#'
 #' saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE)
 #'
 #' # write a timeseries with comments
