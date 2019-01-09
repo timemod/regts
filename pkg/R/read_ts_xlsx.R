@@ -157,8 +157,10 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     stop("argument period_fun is not a function")
   }
 
+
   tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
-                    col_types = "list", na = na_string)
+                    col_types = "list", na = na_string,
+                    .name_repair = identity)
 
   sheetname <- if (is.null(sheet)) "1" else as.character(sheet)
 
@@ -187,6 +189,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                                   name_fun = name_fun, period_fun = period_fun,
                                   period_info = period_info)
   }
+
   return(ret)
 }
 

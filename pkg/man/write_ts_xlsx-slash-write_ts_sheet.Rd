@@ -10,8 +10,9 @@ write_ts_xlsx(x, file, sheet_name = "Sheet1", rowwise = TRUE,
   append = FALSE, labels = c("after", "before", "no"), comments,
   number_format, period_as_date = FALSE)
 
-write_ts_sheet(x, sheet, rowwise = TRUE, labels = c("after", "before",
-  "no"), comments, number_format, period_as_date = FALSE)
+write_ts_sheet(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
+  labels = c("after", "before", "no"), comments, number_format,
+  period_as_date = FALSE)
 }
 \arguments{
 \item{x}{a \code{\link{ts}} or \code{\link{regts}} object}
@@ -38,33 +39,46 @@ written.}
 
 \item{number_format}{a character value specifying the number format.
 For example, \code{"#.00"} corresponds to two decimal spaces.
-For details see the description of the function \code{\link[xlsx]{DataFormat}}
-in the \code{\link[xlsx:xlsx-package]{xlsx}} package.}
+For details see the description of the function
+\code{\link[openxlsx]{createStyle}}
+in the \code{\link[openxlsx:openxlsx-package]{openxlsx}} package.}
 
 \item{period_as_date}{A logical (default \code{FALSE}).
 If \code{TRUE} the periods are written as date values to the Excel file.
 By default the periods are written as characters using the standard
 \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}).}
 
-\item{sheet}{a \code{\link[xlsx]{Sheet}} object (see the documentation
-of package \code{xlsx})}
+\item{wb}{a \code{Workbook} object created with function
+\code{\link[openxlsx]{createWorkbook}} or
+\code{\link[openxlsx]{loadWorkbook}}
+of package \code{\link[openxlsx:openxlsx-package]{openxlsx}}}
 }
 \description{
 These functions can be used to write timeseries to a sheet of an
 xlsx file. \code{write_ts_xlsx} creates or opens an Excel workbook
 (depending on argument \code{append}) and writes the timeseries to
 a sheet with a specified name.
-\code{write_ts_sheet} writes timeseries to a \code{\link[xlsx]{Sheet}}
-object.
+\code{write_ts_sheet} writes timeseries to a sheet of a \code{Workbook}
+object created with function \code{\link[openxlsx]{createWorkbook}}
+or \code{\link[openxlsx]{loadWorkbook}}
+of package \code{\link[openxlsx:openxlsx-package]{openxlsx}}.
 }
 \details{
-The functions employ function \code{\link[xlsx]{addDataFrame}}
-from the \code{\link[xlsx:xlsx-package]{xlsx}} package for writing the Excel file.
+The functions employ package
+\code{\link[openxlsx:openxlsx-package]{openxlsx}}
+package for writing the Excel file.
 
 If you want to write multiple timeseries objects to different
 sheets, you can use \code{write_ts_xlsx} with argument
-\code{append = TRUE}, or \code{write_ts_sheet}. The latter approach
-is more efficient.
+\code{append = TRUE}. Alternatively,
+you can create a \code{Workbook} object with
+function \code{\link[openxlsx]{createWorkbook}} of package
+\code{openxlsx} and then add a sheet with \code{write_ts_sheet}.
+The latter approach is more efficient.
+When the workbook is written to a file with function
+ \code{\link[openxlsx]{saveWorkbook}}, it is often useful to
+set the minimum column width option for package \code{openxlsx},
+as shown in the example below.
 }
 \section{Functions}{
 \itemize{
@@ -72,11 +86,11 @@ is more efficient.
 workbook
 
 \item \code{write_ts_sheet}: writes a timeseries to a
-\code{Sheet} object
+\code{Workbook} object
 }}
 
 \examples{
-# create two timeseries objects
+# create a timeseries object
 ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
              labels = c("Timeseries a", "Timeseries b"), start = "2017Q2")
 
@@ -84,13 +98,19 @@ ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
 write_ts_xlsx(ts1, file = "ts1.xlsx", sheet_name = "ts1", labels = "after")
 
 # write two sheets using write_ts_sheet
+library(openxlsx)
 wb <- createWorkbook()
-sheet <- createSheet(wb, "ts1")
-write_ts_sheet(ts1, sheet, labels = "after")
-sheet <- createSheet(wb, "ts1_times_100")
-write_ts_sheet(ts1 * 100, sheet = sheet, labels = "after")
-saveWorkbook(wb, "timeseries.xlsx")
-#
+write_ts_sheet(ts1, wb, "ts1", labels = "after")
+write_ts_sheet(ts1 * 100, wb, "ts1_times_100", labels = "after")
+
+# Set the minimum column width. saveWorkbook will adjust
+# the column widths for the sheets written by write_ts_xlsx,
+# Setting a minimum column width prevents that some columns are very
+# narrow.
+options("openxlsx.minWidth" = 8.43)
+
+saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE)
+
 # write a timeseries with comments
 comments <- c("Timeseries ts1 is created on the Central Bureau of Policy Analysis",
               "using a random number generator")
