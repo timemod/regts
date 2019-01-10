@@ -1,7 +1,7 @@
 Package: regts
 Type: Package
 Title: Regular Timeseries
-Version: 0.6
+Version: 0.7
 Authors@R: c(
  person("Rob", "van Harrevelt", email = "rvanharrevelt@gmail.com", role = c("aut", "cre")),
  person("Anita", "van der Roest", email = "J.C.van.der.Roest@cpb.nl",role = "aut")
@@ -23,7 +23,7 @@ RoxygenNote: 6.1.1
 Imports:
     Rcpp,
     data.table,
-    readxl,
+    readxl (>= 1.2.0),
     cellranger,
     tibble,
     openxlsx
