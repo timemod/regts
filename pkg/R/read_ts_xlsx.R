@@ -160,7 +160,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 
   tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
                     col_types = "list", na = na_string,
-                    .name_repair = identity)
+                    .name_repair = "minimal")
 
   sheetname <- if (is.null(sheet)) "1" else as.character(sheet)
 
