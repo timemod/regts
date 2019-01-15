@@ -461,7 +461,7 @@ Special functions have been developed for `regts` objects
 * `read_ts_xlsx` (employing the `read_excel` function in package `readxl`) for 
 reading an Excel file, both for `xls` and `xlsx` format
 
-* `write_ts_xlsx` for writing an xlsx file employing package `xlsx`
+* `write_ts_xlsx` for writing an xlsx file employing package `openxlsx`
 
 Like the corresponding csv function, `read_ts_xlsx` has arguments for skipping
 rows or columns, orientation and frequency. Besides that you can
