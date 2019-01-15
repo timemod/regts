@@ -69,10 +69,10 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' \code{write_ts_sheet} writes timeseries to a sheet of a \code{Workbook}
 #' object created with function \code{\link[openxlsx]{createWorkbook}}
 #' or \code{\link[openxlsx]{loadWorkbook}}
-#' of package \code{\link[openxlsx:openxlsx-package]{openxlsx}}.
+#' of package \code{\link[openxlsx]{openxlsx}}.
 #'
 #' The functions employ package
-#' \code{\link[openxlsx:openxlsx-package]{openxlsx}}
+#' \code{\link[openxlsx]{openxlsx}}
 #' package for writing the Excel file.
 #'
 #' If you want to write multiple timeseries objects to different
@@ -92,7 +92,7 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @param wb a \code{Workbook} object created with function
 #' \code{\link[openxlsx]{createWorkbook}} or
 #' \code{\link[openxlsx]{loadWorkbook}}
-#' of package \code{\link[openxlsx:openxlsx-package]{openxlsx}}
+#' of package \code{\link[openxlsx]{openxlsx}}
 #' @param sheet_name the sheet name
 #' @param append If \code{FALSE} (the default), then the original file,
 #' if it exists, is replaced with the new file. All original data is lost.
@@ -107,7 +107,7 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' For example, \code{"#.00"} corresponds to two decimal spaces.
 #' For details see the description of the function
 #' \code{\link[openxlsx]{createStyle}}
-#' in the \code{\link[openxlsx:openxlsx-package]{openxlsx}} package.
+#' in the \code{\link[openxlsx]{openxlsx}} package.
 #' @param period_as_date A logical (default \code{FALSE}).
 #' If \code{TRUE} the periods are written as date values to the Excel file.
 #' By default the periods are written as characters using the standard
