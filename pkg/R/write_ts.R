@@ -251,8 +251,12 @@ write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
 }
 
 # internal function to write a timeseries object to a sheet of an Excel workbook
-write_ts_sheet_ <- function(x, wb, sheet, rowwise, labels, labels_missing,
-                            comments, number_format, period_as_date) {
+write_ts_sheet_ <- function(x, wb, sheet, rowwise,
+                            labels = c("after", "before", "no"),
+                            labels_missing, comments, number_format,
+                            period_as_date) {
+
+  labels <- match.arg(labels)
 
   # check for comments. The comments are actually written before the
   # autoSizeColumns() command has been executed.
