@@ -134,3 +134,35 @@ test_that("example8.xlsx is read correctly (names to lowercase)",  {
   result2 <- read_ts_xlsx(xlsx_file, name_fun = tolower, labels = "before")
   expect_identical(result2, correct_result)
 })
+
+test_that("example11.xlsx is read correctly",  {
+
+  xlsx_file <- "xlsx/example11.xlsx"
+
+  result <- read_ts_xlsx(xlsx_file, skiprow = 1, labels = "no")
+  expect_identical(result, correct_result)
+})
+
+test_that("example12.xlsx is read correctly",  {
+
+  xlsx_file <- "xlsx/example12.xlsx"
+
+  result <- read_ts_xlsx(xlsx_file)
+  expect_identical(result, correct_result_labels)
+})
+
+test_that("example13.xlsx is read correctly",  {
+
+  xlsx_file <- "xlsx/example13.xlsx"
+  result <- read_ts_xlsx(xlsx_file, skiprow = 1)
+  expect_identical(result, correct_result_labels)
+})
+
+test_that("example14.xlsx is read correctly",  {
+
+  xlsx_file <- "xlsx/example14.xlsx"
+
+  result <- read_ts_xlsx(xlsx_file)
+  expect_identical(result, correct_result_labels)
+})
+

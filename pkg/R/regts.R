@@ -461,7 +461,7 @@ matrix2regts_ <- function(x, periods, numeric, fun, ...) {
                paste(period_strings, collapse = ", "), ")."))
   }
 
-  if (identical(subp, subp[1]:subp[nrow(x)])) {
+  if (identical(subp, sort(subp[1]:subp[nrow(x)]))) {
     # normal regular timeseries, no missing periods and periods
     # are ordered synchronically
     ret <- regts(x, start = create_period(subp[1], freq))
