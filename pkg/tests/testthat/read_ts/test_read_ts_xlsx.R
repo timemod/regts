@@ -168,7 +168,7 @@ test_that("example14.xlsx is read correctly",  {
 
 
 # test with strict parameter, by default = TRUE
-msg <- "Missing periods found in file \\(2010Q3, 2010Q4\\). Use parameter strict!"
+msg <- "Missing periods found \\(2010Q3, 2010Q4\\). Use parameter strict!"
 
 test_that("example5.xlsx, missing periods",  {
 

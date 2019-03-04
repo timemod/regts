@@ -476,12 +476,10 @@ matrix2regts_ <- function(x, periods, numeric, fun, strict, ...) {
       dif <- setdiff(sorted_subp, subp)
 
       if (length(dif) > 0){
-        p1 <- create_period(sorted_subp[1], frequency = freq)
-        pos <- match(dif, sorted_subp)
-
-        missing_periods <- sapply(p1 + (pos - 1), FUN = as.character)
+        missing_periods <- sapply(dif,
+                           FUN = function(x)as.character(create_period(x, freq)))
         mp <- paste(missing_periods, collapse = ", ")
-        stop(paste0("Missing periods found in file (", mp, "). Use parameter strict!"))
+        stop(paste0("Missing periods found (", mp, "). Use parameter strict!"))
       }
     }
 
