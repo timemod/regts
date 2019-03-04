@@ -21,8 +21,6 @@ period_fun <- function(x) {
 correct_result_labels <- correct_result
 ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b (EUR)")
 
-msg <- "Missing periods found in file \\(2010Q3, 2010Q4\\). Use parameter strict!"
-
 
 test_that("example1.xlsx is read correctly",  {
 
@@ -149,7 +147,7 @@ test_that("example12.xlsx is read correctly",  {
 
   xlsx_file <- "xlsx/example12.xlsx"
 
-  result <- read_ts_xlsx(xlsx_file, strict = FALSE)
+  result <- read_ts_xlsx(xlsx_file)
   expect_identical(result, correct_result_labels)
 })
 
@@ -170,6 +168,7 @@ test_that("example14.xlsx is read correctly",  {
 
 
 # test with strict parameter, by default = TRUE
+msg <- "Missing periods found in file \\(2010Q3, 2010Q4\\). Use parameter strict!"
 
 test_that("example5.xlsx, missing periods",  {
 

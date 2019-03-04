@@ -119,9 +119,9 @@
 #' @param period_fun function applied to period texts.
 #' Use this argument if the period texts do not have a standard format
 #' (see Description).
-#' @param strict a logical value to control period object. By default
-#' (\code{TRUE}) the period must be complete. Otherwise the timeseries are
-#' filled with NA for missing periods
+#' @param strict A logical. If \code{TRUE} (the default) all periods between the
+#' start and the end period in the file must be present.
+#' Otherwise the timeseries are filled with \code{NA} for the missing periods
 #'
 
 #' @return a \code{regts} object

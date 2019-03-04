@@ -469,16 +469,19 @@ matrix2regts_ <- function(x, periods, numeric, fun, strict, ...) {
     # are ordered synchronically
     ret <- regts(x, start = create_period(subp[1], freq))
   } else {
-    # irregular timeseries in data frame (missing periods or
-    # unordered time index.
+    # irregular timeseries in data frame (missing periods or unordered time index.
     # stop if strict and missing periods
     if (strict){
-      subp_ok <- sort(subp[1]:subp[nrow(x)])
-      dif <- setdiff(subp_ok, subp)
+      sorted_subp <- sort(subp[1]:subp[nrow(x)])
+      dif <- setdiff(sorted_subp, subp)
+
       if (length(dif) > 0){
-        dif_strings <- create_period(dif, frequency = freq)
-        stop(paste0("Missing periods found in file (",
-                    paste(dif_strings, collapse = ", "), "). Use parameter strict!"))
+        p1 <- create_period(sorted_subp[1], frequency = freq)
+        pos <- match(dif, sorted_subp)
+
+        missing_periods <- sapply(p1 + (pos - 1), FUN = as.character)
+        mp <- paste(missing_periods, collapse = ", ")
+        stop(paste0("Missing periods found in file (", mp, "). Use parameter strict!"))
       }
     }
 
