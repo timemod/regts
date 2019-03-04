@@ -121,6 +121,11 @@
 #' @param name_fun function to apply to the names of the timeseries.
 #' @param period_fun function applied to period texts. Use this argument
 #' if the period texts do not have a standard format (see Description).
+#' @param strict a logical value to control period object. By default
+#' (\code{TRUE}) the period must be complete. Otherwise the timeseries are
+#' filled with NA for missing periods
+
+#'
 #' @return a \code{regts} object
 #'
 #' @examples
@@ -138,7 +143,7 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
                         labels = c("after", "before", "no"),
                         sep = "auto", fill = FALSE,
                         dec = if (sep != ".") "." else ",",
-                        na_string = "", name_fun, period_fun) {
+                        na_string = "", name_fun, period_fun, strict = TRUE) {
 
   if (!missing(skiprow)) {
     skip <- skiprow
@@ -184,12 +189,13 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
   if (period_info$rowwise) {
     ret <- read_ts_rowwise(tbl, frequency = frequency, labels = labels,
                            dec = dec, name_fun = name_fun,
-                           period_fun = period_fun, period_info = period_info)
+                           period_fun = period_fun, period_info = period_info,
+                           strict = strict)
   } else {
     ret <- read_ts_columnwise(tbl, frequency = frequency, labels = labels,
                               dec = dec, name_fun = name_fun,
-                              period_fun = period_fun,
-                              period_info = period_info)
+                              period_fun = period_fun, period_info = period_info,
+                              strict = strict)
   }
 
   return(ret)
@@ -198,7 +204,7 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
 # Internal function to read timeseries rowwise from a tibble, used by
 # read_ts_csv.
 read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
-                            period_info) {
+                            period_info, strict) {
 
   # remove all rows before the period row
   if (period_info$row_nr > 1) {
@@ -255,7 +261,7 @@ read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that df is numeric
   ret <- matrix2regts_(mat, periods, fun = period, numeric = FALSE,
-                       frequency = frequency)
+                       frequency = frequency, strict = strict)
 
 
   if (labels != "no" && length(label_cols) > 0) {
@@ -279,7 +285,7 @@ read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
 # Internal function to read timeseries columnwise from a tibble, used
 # by function read_ts_csv.
 read_ts_columnwise <- function(tbl, frequency, labels, dec, name_fun,
-                               period_fun, period_info) {
+                               period_fun, period_info, strict) {
 
   time_column <- period_info$col_nr
   is_period <- period_info$is_period
@@ -355,7 +361,7 @@ read_ts_columnwise <- function(tbl, frequency, labels, dec, name_fun,
 
   # set numeric = FALSE, because we already know that df is numeric
   ret <- matrix2regts_(mat, periods, fun = period, numeric = FALSE,
-                       frequency = frequency)
+                       frequency = frequency, strict = strict)
 
   if (labels != "no" && any(lbls != "")) {
     ts_labels(ret) <- lbls

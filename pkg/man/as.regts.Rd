@@ -13,9 +13,10 @@ as.regts(x, ...)
 \method{as.regts}{ts}(x, ...)
 
 \method{as.regts}{data.frame}(x, time_column = 0, numeric = TRUE,
-  fun = period, ...)
+  fun = period, strict = TRUE, ...)
 
-\method{as.regts}{matrix}(x, numeric = TRUE, fun = period, ...)
+\method{as.regts}{matrix}(x, numeric = TRUE, fun = period,
+  strict = TRUE, ...)
 
 \method{as.regts}{default}(x, ...)
 }
@@ -34,6 +35,10 @@ By default they are converted to numeric. This can be changed by setting
 
 \item{fun}{a function for converting values in the time column to
 \code{\link{period}} objects}
+
+\item{strict}{a logical value to control period object. By default
+(\code{TRUE}) the period must be complete. Otherwise the timeseries are
+filled with NA for missing periods}
 }
 \value{
 a \code{regts} object

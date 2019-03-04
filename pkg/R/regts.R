@@ -230,6 +230,9 @@ is.regts <- function(x) {
 #' \code{numeric = FALSE}.
 #' @param fun a function for converting values in the time column to
 #' \code{\link{period}} objects
+#' @param strict a logical value to control period object. By default
+#' (\code{TRUE}) the period must be complete. Otherwise the timeseries are
+#' filled with NA for missing periods
 #' @param ... arguments passed to \code{fun}
 #' @return a \code{regts} object
 #' @seealso \code{\link{regts}}, \code{\link{is.regts}},
@@ -288,7 +291,7 @@ as.ts.regts <- function(x, ...) {
 #' of the matrix
 #' @export
 as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
-                                fun = period, ...) {
+                                fun = period, strict = TRUE, ...) {
 
   # extract time column(s) and data from the input data frame,
   # and convert to a matrix. data are converted to numeric if necessary
@@ -323,7 +326,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   # Use numeric == FALSE, because the data has already been converted
   # to numeric when needed
   ret <- matrix2regts_(datamat, periods = periods, numeric = FALSE, fun = fun,
-                       ...)
+                       strict = strict, ...)
 
   # handle labels
   if (ncol(data) > 0) {
@@ -339,7 +342,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
 #' @describeIn as.regts Convert a \code{\link{matrix}} to a
 #' \code{regts}
 #' @export
-as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
+as.regts.matrix <- function(x, numeric = TRUE, fun = period, strict = TRUE, ...) {
 
   if (nrow(x) == 0) {
     stop("'regts' object must have one or more observations")
@@ -347,7 +350,7 @@ as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
 
   # we assume that the periods are in the rownames of the matrix
   return(matrix2regts_(x, periods = rownames(x), numeric = numeric, fun = fun,
-                       ...))
+                       strict = strict, ...))
 }
 
 
@@ -426,7 +429,7 @@ numeric_matrix <- function(x, dec = ".") {
 
 
 # internal function to convert a matrix to a regts.
-matrix2regts_ <- function(x, periods, numeric, fun, ...) {
+matrix2regts_ <- function(x, periods, numeric, fun, strict, ...) {
 
   if (numeric && !is.numeric(x)) {
     x <- as.numeric(x)
@@ -467,7 +470,18 @@ matrix2regts_ <- function(x, periods, numeric, fun, ...) {
     ret <- regts(x, start = create_period(subp[1], freq))
   } else {
     # irregular timeseries in data frame (missing periods or
-    # unorderered time index)
+    # unordered time index.
+    # stop if strict and missing periods
+    if (strict){
+      subp_ok <- sort(subp[1]:subp[nrow(x)])
+      dif <- setdiff(subp_ok, subp)
+      if (length(dif) > 0){
+        dif_strings <- create_period(dif, frequency = freq)
+        stop(paste0("Missing periods found in file (",
+                    paste(dif_strings, collapse = ", "), "). Use parameter strict!"))
+      }
+    }
+
     subp_min <- min(subp)
     subp_max <- max(subp)
     per_count <- subp_max - subp_min + 1
@@ -477,8 +491,8 @@ matrix2regts_ <- function(x, periods, numeric, fun, ...) {
     ret <- regts(mat, start = pmin)
     rows <- subp - subp_min +1
     ret[rows, ] <- x
-  }
 
+  }
   return (ret)
 }
 

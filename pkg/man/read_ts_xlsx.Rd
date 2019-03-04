@@ -6,7 +6,7 @@
 \usage{
 read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = NA,
   skipcol = NA, rowwise, frequency = NA, labels = c("after",
-  "before", "no"), na_string = "", name_fun, period_fun)
+  "before", "no"), na_string = "", name_fun, period_fun, strict = TRUE)
 }
 \arguments{
 \item{filename}{a string with the filename}
@@ -50,6 +50,10 @@ By default, \code{read_ts_xlsx} treats blank cells as missing data.}
 \item{period_fun}{function applied to period texts.
 Use this argument if the period texts do not have a standard format
 (see Description).}
+
+\item{strict}{a logical value to control period object. By default
+(\code{TRUE}) the period must be complete. Otherwise the timeseries are
+filled with NA for missing periods}
 }
 \value{
 a \code{regts} object
