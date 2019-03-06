@@ -20,17 +20,17 @@ test_that("example1.xls is read correctly",  {
 
   xls_file <- "xlsx/example1.xls"
 
-  result <- read_ts_xlsx(xls_file, skiprow = 1, labels = "no")
+  result <- read_ts_xlsx(xls_file, skiprow = 1, labels = "no", strict = FALSE)
   expect_equal(result, correct_result)
 
-  result2 <- read_ts_xlsx(xls_file, skiprow = 1)
+  result2 <- read_ts_xlsx(xls_file, skiprow = 1, strict = FALSE)
   expect_identical(result2, correct_result_labels)
 
   correct_result_labels2 <- correct_result[ , "b", drop = FALSE]
   colnames(correct_result_labels2) <- "(EUR)"
   ts_labels(correct_result_labels2) <- "b Timeseries b"
 
-  result3 <- read_ts_xlsx(xls_file, skiprow = 1, labels = "before")
+  result3 <- read_ts_xlsx(xls_file, skiprow = 1, labels = "before", strict = FALSE)
   expect_identical(result3, correct_result_labels2)
 })
 

@@ -6,15 +6,15 @@
 \usage{
 read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = NA,
   skipcol = NA, rowwise, frequency = NA, labels = c("after",
-  "before", "no"), na_string = "", name_fun, period_fun)
+  "before", "no"), na_string = "", name_fun, period_fun, strict = TRUE)
 }
 \arguments{
-\item{filename}{a string with the filename}
+\item{filename}{a string with the filename.}
 
 \item{sheet}{Sheet to read. Either a string (the name of a sheet),
 or an integer (the position of the sheet). Ignored if the sheet is
 specified via range. If neither argument specifies the sheet,
-defaults to the first sheet}
+defaults to the first sheet.}
 
 \item{range}{A cell range to read from, as described in
 \code{\link[readxl]{cell-specification}}. Includes typical Excel ranges
@@ -50,6 +50,10 @@ By default, \code{read_ts_xlsx} treats blank cells as missing data.}
 \item{period_fun}{function applied to period texts.
 Use this argument if the period texts do not have a standard format
 (see Description).}
+
+\item{strict}{A logical. If \code{TRUE} (the default) all periods between the
+start and the end period must be present.
+Otherwise the timeseries are filled with \code{NA} for the missing periods.}
 }
 \value{
 a \code{regts} object

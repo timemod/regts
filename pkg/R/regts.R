@@ -12,18 +12,18 @@
 #' @param start the starting period as a  \code{\link{period}} object or a
 #' character string that can be converted to a \code{period} object.
 #' If not specified, then the start period is calculated
-#' from argument \code{end} and the dimension of \code{data}
+#' from argument \code{end} and the dimension of \code{data}.
 #' @param end the end period as a  \code{\link{period}} object or a character
 #' string that can be converted to a \code{period} object. If not
 #' specified, then the end period is calculated from argument \code{start} and
-#' the dimension of \code{data}
+#' the dimension of \code{data}.
 #' @param period the period range as a \code{\link{period_range}} object or a
 #' character string that can be converted to a \code{period_range} object.
 #' This argument replaces arguments \code{start} and \code{end}.
 #' @param frequency the frequency of the timeseries. This argument should only be
 #' specified if the \code{start}, \code{end} or \code{period} argument is
 #' specified with a general period format without period indicator,
-#' e.g. \code{"2011-3"}
+#' e.g. \code{"2011-3"}.
 
 #' @param names a character vector with the column names for the series
 #' if \code{data} is a matrix or data frame. Defaults to the column names of data.
@@ -207,7 +207,7 @@ create_regts <- function(data, startp, endp, freq, labels) {
 }
 
 #' Test whether an object is a \code{\link{regts}} timeseries object
-#' @param x any R object
+#' @param x any R object.
 #' @return \code{TRUE} if \code{x} is a \code{regts}
 #' @seealso
 #' \code{\link{regts}} and  \code{\link{as.regts}}
@@ -221,16 +221,19 @@ is.regts <- function(x) {
 
 #' Coerce an object to a \code{\link{regts}} timeseries object
 #'
-#' @param x an arbitrary R object
+#' @param x an arbitrary R object.
 #' @param time_column the column names or numbers of the data frame
 #' in which the time (periods) is stored. Specify \code{0} if the index is in
-#' the row names of the data frame
+#' the row names of the data frame.
 #' @param numeric logical: should non numeric values be converted to numeric data.
 #' By default they are converted to numeric. This can be changed by setting
 #' \code{numeric = FALSE}.
 #' @param fun a function for converting values in the time column to
-#' \code{\link{period}} objects
-#' @param ... arguments passed to \code{fun}
+#' \code{\link{period}} objects.
+#' @param strict A logical. If \code{TRUE} (the default) all periods between the
+#' start and the end period must be present.
+#' Otherwise the timeseries are filled with \code{NA} for the missing periods.
+#' @param ... arguments passed to \code{fun}.
 #' @return a \code{regts} object
 #' @seealso \code{\link{regts}}, \code{\link{is.regts}},
 #' \code{\link{as.data.frame}},
@@ -288,7 +291,7 @@ as.ts.regts <- function(x, ...) {
 #' of the matrix
 #' @export
 as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
-                                fun = period, ...) {
+                                fun = period, strict = TRUE, ...) {
 
   # extract time column(s) and data from the input data frame,
   # and convert to a matrix. data are converted to numeric if necessary
@@ -323,7 +326,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   # Use numeric == FALSE, because the data has already been converted
   # to numeric when needed
   ret <- matrix2regts_(datamat, periods = periods, numeric = FALSE, fun = fun,
-                       ...)
+                       strict = strict, ...)
 
   # handle labels
   if (ncol(data) > 0) {
@@ -339,7 +342,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
 #' @describeIn as.regts Convert a \code{\link{matrix}} to a
 #' \code{regts}
 #' @export
-as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
+as.regts.matrix <- function(x, numeric = TRUE, fun = period, strict = TRUE, ...) {
 
   if (nrow(x) == 0) {
     stop("'regts' object must have one or more observations")
@@ -347,7 +350,7 @@ as.regts.matrix <- function(x, numeric = TRUE, fun = period, ...) {
 
   # we assume that the periods are in the rownames of the matrix
   return(matrix2regts_(x, periods = rownames(x), numeric = numeric, fun = fun,
-                       ...))
+                       strict = strict, ...))
 }
 
 
@@ -426,7 +429,7 @@ numeric_matrix <- function(x, dec = ".") {
 
 
 # internal function to convert a matrix to a regts.
-matrix2regts_ <- function(x, periods, numeric, fun, ...) {
+matrix2regts_ <- function(x, periods, numeric, fun, strict, ...) {
 
   if (numeric && !is.numeric(x)) {
     x <- as.numeric(x)
@@ -461,13 +464,24 @@ matrix2regts_ <- function(x, periods, numeric, fun, ...) {
                paste(period_strings, collapse = ", "), ")."))
   }
 
-  if (identical(subp, sort(subp[1]:subp[nrow(x)]))) {
+  sorted_subp <- sort(subp[1]:subp[nrow(x)])
+  if (identical(subp, sorted_subp)) {
     # normal regular timeseries, no missing periods and periods
     # are ordered synchronically
     ret <- regts(x, start = create_period(subp[1], freq))
   } else {
-    # irregular timeseries in data frame (missing periods or
-    # unorderered time index)
+    # irregular timeseries in data frame (missing periods or unordered time index.
+    # stop if strict and missing periods
+    if (strict){
+      dif <- setdiff(sorted_subp, subp)
+      if (length(dif) > 0){
+        missing_periods <- sapply(dif,
+                           FUN = function(x)as.character(create_period(x, freq)))
+        mp <- paste(missing_periods, collapse = ", ")
+        stop(paste0("Missing periods found (", mp, "). Use parameter strict!"))
+      }
+    }
+
     subp_min <- min(subp)
     subp_max <- max(subp)
     per_count <- subp_max - subp_min + 1
@@ -477,8 +491,8 @@ matrix2regts_ <- function(x, periods, numeric, fun, ...) {
     ret <- regts(mat, start = pmin)
     rows <- subp - subp_min +1
     ret[rows, ] <- x
-  }
 
+  }
   return (ret)
 }
 

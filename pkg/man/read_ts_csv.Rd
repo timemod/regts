@@ -7,10 +7,10 @@
 read_ts_csv(filename, rowwise, frequency = NA, skiprow = 0,
   skipcol = 0, labels = c("after", "before", "no"), sep = "auto",
   fill = FALSE, dec = if (sep != ".") "." else ",", na_string = "",
-  name_fun, period_fun)
+  name_fun, period_fun, strict = TRUE)
 }
 \arguments{
-\item{filename}{a string with the filename}
+\item{filename}{a string with the filename.}
 
 \item{rowwise}{a logical value: are the timeseries stored rowwise?
 If not specified, then \code{read_ts_csv} tries to figure out itself if
@@ -25,7 +25,7 @@ If 0 (default) and if argument \code{fill} is \code{FALSE},
 then comment rows are automatically skipped.
 See Details.}
 
-\item{skipcol}{the number of columns to skip}
+\item{skipcol}{the number of columns to skip.}
 
 \item{labels}{label option. See Details.}
 
@@ -48,6 +48,10 @@ By default, \code{read_ts_csv} treats blank cells as missing data.}
 
 \item{period_fun}{function applied to period texts. Use this argument
 if the period texts do not have a standard format (see Description).}
+
+\item{strict}{A logical. If \code{TRUE} (the default) all periods between the
+start and the end period must be present.
+Otherwise the timeseries are filled with \code{NA} for the missing periods.}
 }
 \value{
 a \code{regts} object

@@ -41,7 +41,7 @@ test_that("example9.xlsx is read correctly",  {
 
 test_that("example10.xlsx is read correctly",  {
   xlsx_file <- "xlsx/example10.xlsx"
-  result <- read_ts_xlsx(xlsx_file, labels = "after", skipcol = 1)
+  result <- read_ts_xlsx(xlsx_file, labels = "after", skipcol = 1, strict = FALSE)
   expected_result <- regts(matrix(c(1.12345678901234, NA, NA, 5, 6,
                                     10.123, NA, NA, 50, 60), ncol = 2),
                            names = c("a", "b"),

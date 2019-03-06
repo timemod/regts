@@ -415,11 +415,13 @@ cat(readLines("transpose.csv"), sep = "\n")
 
 Now the periods are in the first row (column headers), the next rows contain the 
 timeseries. Note that `;` is the field separator and that quarter `2017q3` is
-missing in the file.
+missing in the file, which is why parameter `strict is needed. By default 
+(`strict = TRUE`) is checked if the period is complete. When  `strict = FALSE`
+NA's are filled in for the missing periods.
 
 
 ```{r}
-read_ts_csv("transpose.csv")
+read_ts_csv("transpose.csv", strict = FALSE)
 ```
 The `sep` argument is not needed, separator `;` (as well as `,` and `tab`) is recognised by the function. By default the separator is determined automatically.
 
@@ -431,7 +433,7 @@ The timeseries names in this file are in uppercase. You can convert them while
 reading:
 
 ```{r}
-read_ts_csv("transpose.csv", name_fun = tolower)
+read_ts_csv("transpose.csv", name_fun = tolower, strict = FALSE)
 ```
 
 Files may be more complicated then the examples shown above. Possibly there 

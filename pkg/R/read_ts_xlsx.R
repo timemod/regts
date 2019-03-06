@@ -88,11 +88,11 @@
 #' With \code{name_fun} a function can be applied to names of the timeseries,
 #' e.g. \code{\link{tolower}}.
 #'
-#' @param filename  a string with the filename
+#' @param filename  a string with the filename.
 #' @param sheet Sheet to read. Either a string (the name of a sheet),
 #' or an integer (the position of the sheet). Ignored if the sheet is
 #' specified via range. If neither argument specifies the sheet,
-#' defaults to the first sheet
+#' defaults to the first sheet.
 #' @param  range	A cell range to read from, as described in
 #' \code{\link[readxl]{cell-specification}}. Includes typical Excel ranges
 #' like \code{"B3:D87"}, possibly including the
@@ -119,6 +119,11 @@
 #' @param period_fun function applied to period texts.
 #' Use this argument if the period texts do not have a standard format
 #' (see Description).
+#' @param strict A logical. If \code{TRUE} (the default) all periods between the
+#' start and the end period must be present.
+#' Otherwise the timeseries are filled with \code{NA} for the missing periods.
+#'
+
 #' @return a \code{regts} object
 #'
 #' @examples
@@ -136,7 +141,7 @@
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          skiprow = NA, skipcol = NA, rowwise, frequency = NA,
                          labels = c("after", "before", "no"),
-                         na_string = "", name_fun, period_fun) {
+                         na_string = "", name_fun, period_fun, strict = TRUE) {
 
   if (missing(range)) {
     range <- cell_limits()
@@ -183,11 +188,11 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   if (period_info$rowwise) {
     ret <- read_ts_rowwise_xlsx(tbl, frequency = frequency, labels = labels,
                                 name_fun = name_fun, period_fun = period_fun,
-                                period_info = period_info)
+                                period_info = period_info, strict = strict)
   } else {
     ret <- read_ts_columnwise_xlsx(tbl, frequency = frequency, labels = labels,
                                   name_fun = name_fun, period_fun = period_fun,
-                                  period_info = period_info)
+                                  period_info = period_info, strict = strict)
   }
 
   return(ret)
@@ -196,7 +201,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 # Internal function to read timeseries rowwise from a tibble, used by
 # read_ts_xlsx
 read_ts_rowwise_xlsx <- function(tbl, frequency, labels, name_fun, period_fun,
-                                 period_info) {
+                                 period_info, strict) {
 
   # remove all rows before the period row
   if (period_info$row_nr > 1) {
@@ -254,7 +259,7 @@ read_ts_rowwise_xlsx <- function(tbl, frequency, labels, name_fun, period_fun,
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
   ret <- matrix2regts_(mat, periods, fun = period, numeric = FALSE,
-                       frequency = frequency)
+                       frequency = frequency, strict = strict)
 
   if (labels != "no" && length(label_cols) > 0) {
     lbl_data <- tbl[, label_cols]
@@ -277,7 +282,7 @@ read_ts_rowwise_xlsx <- function(tbl, frequency, labels, name_fun, period_fun,
 # Internal function to read timeseries columnwise from a tibble, used in
 # read_ts_xlsx.
 read_ts_columnwise_xlsx <- function(tbl, frequency, labels, name_fun,
-                                    period_fun, period_info) {
+                                    period_fun, period_info, strict) {
 
   time_column <- period_info$col_nr
   is_period <- period_info$is_period
@@ -357,7 +362,7 @@ read_ts_columnwise_xlsx <- function(tbl, frequency, labels, name_fun,
   # know that mat is numeric
 
   ret <- matrix2regts_(mat, periods, fun = period, numeric = FALSE,
-                       frequency = frequency)
+                       frequency = frequency, strict = strict)
 
   if (labels != "no" && length(label_rows) > 0 && any(lbls != "")) {
       ts_labels(ret) <- lbls

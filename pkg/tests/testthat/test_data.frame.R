@@ -63,7 +63,7 @@ test_that("as.regts.data.frame for multivariate yearly timeseries with labels", 
 test_that("as.regts.data.frame for multivariate quarterly irregular timeseries", {
   df <- data.frame(a = 1:3, b = 4:6)
   rownames(df) <- c("2016Q2", "2015Q3", "2015Q4")
-  ts1 <- as.regts(df)
+  ts1 <- as.regts(df, strict = FALSE)
   # convert ts1 from integer to double
   ts1[, ] <- as.numeric(ts1)
   ts2 <- regts(matrix(c(2,3,NA,1,5,6,NA,4), ncol =  2), start = "2015Q3",
@@ -163,3 +163,11 @@ test_that("as.regts.data.frame for column names starting with a number", {
   expect_identical(ts1, expected_result)
 })
 
+
+test_that("as.regts.data.frame for irregular timeseries with strict", {
+  df <- data.frame(a = 1:3, b = 4:6)
+  rownames(df) <- c("2016Q2", "2015Q3", "2015Q4")
+
+  msg <- "Missing periods found \\(2016Q1\\). Use parameter strict!"
+  expect_error(as.regts(df), msg)
+})
