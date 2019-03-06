@@ -464,7 +464,8 @@ matrix2regts_ <- function(x, periods, numeric, fun, strict, ...) {
                paste(period_strings, collapse = ", "), ")."))
   }
 
-  if (identical(subp, sort(subp[1]:subp[nrow(x)]))) {
+  sorted_subp <- sort(subp[1]:subp[nrow(x)])
+  if (identical(subp, sorted_subp)) {
     # normal regular timeseries, no missing periods and periods
     # are ordered synchronically
     ret <- regts(x, start = create_period(subp[1], freq))
@@ -472,9 +473,7 @@ matrix2regts_ <- function(x, periods, numeric, fun, strict, ...) {
     # irregular timeseries in data frame (missing periods or unordered time index.
     # stop if strict and missing periods
     if (strict){
-      sorted_subp <- sort(subp[1]:subp[nrow(x)])
       dif <- setdiff(sorted_subp, subp)
-
       if (length(dif) > 0){
         missing_periods <- sapply(dif,
                            FUN = function(x)as.character(create_period(x, freq)))
