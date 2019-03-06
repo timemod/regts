@@ -17,12 +17,12 @@ function \code{\link[stats]{ts}} of the \code{\link{stats}} package).}
 \item{start}{the starting period as a  \code{\link{period}} object or a
 character string that can be converted to a \code{period} object.
 If not specified, then the start period is calculated
-from argument \code{end} and the dimension of \code{data}}
+from argument \code{end} and the dimension of \code{data}.}
 
 \item{end}{the end period as a  \code{\link{period}} object or a character
 string that can be converted to a \code{period} object. If not
 specified, then the end period is calculated from argument \code{start} and
-the dimension of \code{data}}
+the dimension of \code{data}.}
 
 \item{period}{the period range as a \code{\link{period_range}} object or a
 character string that can be converted to a \code{period_range} object.
@@ -31,7 +31,7 @@ This argument replaces arguments \code{start} and \code{end}.}
 \item{frequency}{the frequency of the timeseries. This argument should only be
 specified if the \code{start}, \code{end} or \code{period} argument is
 specified with a general period format without period indicator,
-e.g. \code{"2011-3"}}
+e.g. \code{"2011-3"}.}
 
 \item{names}{a character vector with the column names for the series
 if \code{data} is a matrix or data frame. Defaults to the column names of data.}

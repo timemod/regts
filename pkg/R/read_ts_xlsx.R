@@ -88,11 +88,11 @@
 #' With \code{name_fun} a function can be applied to names of the timeseries,
 #' e.g. \code{\link{tolower}}.
 #'
-#' @param filename  a string with the filename
+#' @param filename  a string with the filename.
 #' @param sheet Sheet to read. Either a string (the name of a sheet),
 #' or an integer (the position of the sheet). Ignored if the sheet is
 #' specified via range. If neither argument specifies the sheet,
-#' defaults to the first sheet
+#' defaults to the first sheet.
 #' @param  range	A cell range to read from, as described in
 #' \code{\link[readxl]{cell-specification}}. Includes typical Excel ranges
 #' like \code{"B3:D87"}, possibly including the
@@ -120,8 +120,8 @@
 #' Use this argument if the period texts do not have a standard format
 #' (see Description).
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
-#' start and the end period in the file must be present.
-#' Otherwise the timeseries are filled with \code{NA} for the missing periods
+#' start and the end period must be present.
+#' Otherwise the timeseries are filled with \code{NA} for the missing periods.
 #'
 
 #' @return a \code{regts} object

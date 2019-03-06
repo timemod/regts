@@ -7,7 +7,7 @@
 is.regts(x)
 }
 \arguments{
-\item{x}{any R object}
+\item{x}{any R object.}
 }
 \value{
 \code{TRUE} if \code{x} is a \code{regts}

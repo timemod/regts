@@ -21,24 +21,24 @@ as.regts(x, ...)
 \method{as.regts}{default}(x, ...)
 }
 \arguments{
-\item{x}{an arbitrary R object}
+\item{x}{an arbitrary R object.}
 
-\item{...}{arguments passed to \code{fun}}
+\item{...}{arguments passed to \code{fun}.}
 
 \item{time_column}{the column names or numbers of the data frame
 in which the time (periods) is stored. Specify \code{0} if the index is in
-the row names of the data frame}
+the row names of the data frame.}
 
 \item{numeric}{logical: should non numeric values be converted to numeric data.
 By default they are converted to numeric. This can be changed by setting
 \code{numeric = FALSE}.}
 
 \item{fun}{a function for converting values in the time column to
-\code{\link{period}} objects}
+\code{\link{period}} objects.}
 
-\item{strict}{a logical value to control period object. By default
-(\code{TRUE}) the period must be complete. Otherwise the timeseries are
-filled with NA for missing periods}
+\item{strict}{A logical. If \code{TRUE} (the default) all periods between the
+start and the end period must be present.
+Otherwise the timeseries are filled with \code{NA} for the missing periods.}
 }
 \value{
 a \code{regts} object

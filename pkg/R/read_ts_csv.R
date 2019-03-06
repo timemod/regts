@@ -94,7 +94,7 @@
 #' number of columns, and automatic row skipping is therefore
 #' disabled.
 #'
-#' @param filename  a string with the filename
+#' @param filename  a string with the filename.
 #' @param rowwise a logical value: are the timeseries stored rowwise?
 #' If not specified, then \code{read_ts_csv} tries to figure out itself if
 #' the timeseries are stored rowwise or columnwise.
@@ -105,7 +105,7 @@
 #' If 0 (default) and if argument \code{fill} is \code{FALSE},
 #' then comment rows are automatically skipped.
 #' See Details.
-#' @param skipcol the number of columns to skip
+#' @param skipcol the number of columns to skip.
 #' @param labels label option. See Details.
 #' @param sep the separator between columns. If not specified, then
 #' the separator is determined automatically by inspecting the
@@ -122,8 +122,8 @@
 #' @param period_fun function applied to period texts. Use this argument
 #' if the period texts do not have a standard format (see Description).
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
-#' start and the end period in the file must be present.
-#' Otherwise the timeseries are filled with \code{NA} for the missing periods
+#' start and the end period must be present.
+#' Otherwise the timeseries are filled with \code{NA} for the missing periods.
 #'
 #' @return a \code{regts} object
 #'

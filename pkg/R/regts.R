@@ -12,18 +12,18 @@
 #' @param start the starting period as a  \code{\link{period}} object or a
 #' character string that can be converted to a \code{period} object.
 #' If not specified, then the start period is calculated
-#' from argument \code{end} and the dimension of \code{data}
+#' from argument \code{end} and the dimension of \code{data}.
 #' @param end the end period as a  \code{\link{period}} object or a character
 #' string that can be converted to a \code{period} object. If not
 #' specified, then the end period is calculated from argument \code{start} and
-#' the dimension of \code{data}
+#' the dimension of \code{data}.
 #' @param period the period range as a \code{\link{period_range}} object or a
 #' character string that can be converted to a \code{period_range} object.
 #' This argument replaces arguments \code{start} and \code{end}.
 #' @param frequency the frequency of the timeseries. This argument should only be
 #' specified if the \code{start}, \code{end} or \code{period} argument is
 #' specified with a general period format without period indicator,
-#' e.g. \code{"2011-3"}
+#' e.g. \code{"2011-3"}.
 
 #' @param names a character vector with the column names for the series
 #' if \code{data} is a matrix or data frame. Defaults to the column names of data.
@@ -207,7 +207,7 @@ create_regts <- function(data, startp, endp, freq, labels) {
 }
 
 #' Test whether an object is a \code{\link{regts}} timeseries object
-#' @param x any R object
+#' @param x any R object.
 #' @return \code{TRUE} if \code{x} is a \code{regts}
 #' @seealso
 #' \code{\link{regts}} and  \code{\link{as.regts}}
@@ -221,19 +221,19 @@ is.regts <- function(x) {
 
 #' Coerce an object to a \code{\link{regts}} timeseries object
 #'
-#' @param x an arbitrary R object
+#' @param x an arbitrary R object.
 #' @param time_column the column names or numbers of the data frame
 #' in which the time (periods) is stored. Specify \code{0} if the index is in
-#' the row names of the data frame
+#' the row names of the data frame.
 #' @param numeric logical: should non numeric values be converted to numeric data.
 #' By default they are converted to numeric. This can be changed by setting
 #' \code{numeric = FALSE}.
 #' @param fun a function for converting values in the time column to
-#' \code{\link{period}} objects
-#' @param strict a logical value to control period object. By default
-#' (\code{TRUE}) the period must be complete. Otherwise the timeseries are
-#' filled with NA for missing periods
-#' @param ... arguments passed to \code{fun}
+#' \code{\link{period}} objects.
+#' @param strict A logical. If \code{TRUE} (the default) all periods between the
+#' start and the end period must be present.
+#' Otherwise the timeseries are filled with \code{NA} for the missing periods.
+#' @param ... arguments passed to \code{fun}.
 #' @return a \code{regts} object
 #' @seealso \code{\link{regts}}, \code{\link{is.regts}},
 #' \code{\link{as.data.frame}},
