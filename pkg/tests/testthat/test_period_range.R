@@ -32,6 +32,17 @@ test_that("constructor period_range", {
                    "2010Q2/2010Q3")
   expect_identical(as.character(period_range(d, NULL, frequency = 4)),
                    "2010Q2/")
+
+  d2 <- period(NA, frequency = 4)
+  expect_identical(as.character(period_range(d, d2, frequency = 4)),
+                   "2010Q2/")
+
+  d2 <- period(NA, frequency = 12)
+  expect_error(period_range(d, d2, frequency = 4),
+               "Arguments start and end have different frequency")
+
+  expect_error(period_range(d2, d2, frequency = 4),
+               "Both the start and end period of the period range are NA.")
 })
 
 test_that("as.period_range.character", {

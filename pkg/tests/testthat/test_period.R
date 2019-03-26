@@ -24,6 +24,12 @@ test_that("constructor period", {
   expect_identical(as.character(period(as.POSIXct(d), frequency = 1)), "2010")
   expect_identical(as.character(period(as.POSIXlt(d), frequency = 3)), "2010-2")
   expect_identical(as.character(period("2001-3", frequency = 9999)), "2001-0003")
+
+  p <- period(as.Date(NA))
+  expect_identical(as.numeric(p), NA_real_)
+  expect_identical(p, period(NA, frequency = 12))
+  expect_identical(p, period(NA_character_, frequency = 12))
+  expect_identical(p, period(NA_real_, frequency = 12))
 })
 
 
@@ -101,6 +107,10 @@ test_that("logical operators", {
   expect_false(period("2010Q2") != period("2010Q2"))
   expect_false(period("2010Q1") == period("2010M1"))
 
+  expect_true(is.na(period(NA, frequency = 12) == period(NA, frequency = 12)))
+  expect_false(period(NA, frequency = 12) == period(NA, frequency = 4))
+  expect_true(period(NA, frequency = 12) != period(NA, frequency = 4))
+
   expect_error(period("2010Q1") > period("2010M1"),
                "Illegal logical operation, only == and != allowed")
 })
@@ -117,6 +127,12 @@ test_that("arithmetic operators: only + and - allowed", {
   expect_identical(period("2010") - 1:3,
                    list(period("2009"), period("2008"), period("2007")))
 
+  expect_identical(period("2010Q1") + NA, period(NA, frequency = 4))
+  expect_identical(NA + period("2010Q1"), period(NA, frequency = 4))
+  expect_identical(period(NA, frequency = 4) + 2, period(NA, frequency = 4))
+
+  expect_identical(period("2010Q1") - period(NA, frequency = 4), NA_real_)
+
   # errors
   expect_error(period("2010Q1") * 2,
                "Illegal arithmetic operation, only \\+ and \\- allowed")
@@ -127,7 +143,7 @@ test_that("arithmetic operators: only + and - allowed", {
                      "frequencies are not allowed"))
   expect_error(period("2010Q1") + 0.1,
                "Second operand \\(0.1\\) is not an integer")
-  expect_identical(period("2010Q1") + NA, period(NA, frequency = 4))
+
 })
 
 test_that("as.period", {

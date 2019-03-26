@@ -86,8 +86,9 @@ period_range <- function(start = NULL, end = NULL, frequency = NA) {
     if (freq1 != freq2) {
       stop("Arguments start and end have different frequency")
     }
-    if (end < start) {
-      stop(paste0("The start period (", start, ") is after the end period (", end, ")"))
+    if (!is.na(start) && !is.na(end) && end < start) {
+      stop(paste0("The start period (", start, ") is after the end period (",
+                  end, ")"))
     }
   }
   if (!is.null(start)) {
@@ -107,6 +108,11 @@ period_range <- function(start = NULL, end = NULL, frequency = NA) {
   } else {
     end <- NA_real_
   }
+
+  if (is.na(start) && is.na(end)) {
+    stop("Both the start and end period of the period range are NA.")
+  }
+
   return(create_period_range(start, end, freq))
 }
 
