@@ -597,39 +597,56 @@ add_columns <- function(x, new_colnames) {
 #' @export
 "[.regts" <- function(x, i, j, drop = TRUE) {
 
-  if (missing(i)) {
-    lbls <- ts_labels(x)
-    if (!is.null(lbls) && !missing(j)) {
-      lbls <- lbls[j]
-    }
-    if (is.matrix(x) && nrow(x) == 1 && (missing(j) || length(j) > 1)) {
-      # the result is very weird is the timeseries has a single row
-      # and if drop = TRUE is used
-      ret <- NextMethod(.Generic, drop = FALSE)
-    } else {
-      ret <- NextMethod(.Generic)
-    }
-    ret <- as.regts(ret)
-    if (!is.null(lbls)) {
-      ts_labels(ret) <- lbls
-    }
-    return (ret)
-  } else {
-    # row selection present
-    if (is.character(i) || inherits(i, "period") ||
-        inherits(i, "period_range")) {
-      # first select columns
-      if (!missing(j)) {
-        x <- x[, j, drop = drop]
+  j_missing <- missing(j)
+
+  tryCatch({
+    if (missing(i)) {
+      lbls <- ts_labels(x)
+      if (!is.null(lbls) && !missing(j)) {
+        lbls <- lbls[j]
       }
-      # the row selector is a period_range. Use window_regts
-      return (window_regts(x, as.period_range(i)))
-    } else  {
-      # numeric / logical row selection: the result is a  matrix or vector
-      # (no longer a ts)
-      return (NextMethod(.Generic))
+      if (is.matrix(x) && nrow(x) == 1 && (missing(j) || length(j) > 1)) {
+        # the result is very weird is the timeseries has a single row
+        # and if drop = TRUE is used
+        ret <- NextMethod(.Generic, drop = FALSE)
+      } else {
+        ret <- NextMethod(.Generic)
+      }
+      ret <- as.regts(ret)
+      if (!is.null(lbls)) {
+        ts_labels(ret) <- lbls
+      }
+      return(ret)
+    } else {
+      # row selection present
+      if (is.character(i) || inherits(i, "period") ||
+          inherits(i, "period_range")) {
+        # first select columns
+        if (!missing(j)) {
+          x <- x[ , j, drop = drop]
+        }
+        # the row selector is a period_range. Use window_regts
+        return(window_regts(x, as.period_range(i)))
+      } else  {
+        # numeric / logical row selection: the result is a  matrix or vector
+        # (no longer a ts)
+        return(NextMethod(.Generic))
+      }
     }
-  }
+  }, warning = function(w) {
+    warning(w)
+  }, error = function(err) {
+    if (!j_missing && is.character(j) && err$message == "subscript out of bounds") {
+      missing_cols <- setdiff(j, colnames(x))
+      col_text <- paste(missing_cols, collapse = ", ")
+      col_text <- strwrap(col_text, width = 80)
+      col_text <- paste(col_text, collapse = "\n")
+      msg <- paste0("Undefined columns:\n", col_text, ".")
+      stop(msg)
+    } else {
+      stop(err)
+    }
+  })
 }
 
 # This function converts period_range object sel_range so that it is a valid

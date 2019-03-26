@@ -406,7 +406,10 @@ test_that("column selection with NA", {
   regts1 <- regts(matrix(1:10, ncol = 1), start = "2010Q4", names = "a")
   ts1 <- as.ts(regts1)
   expect_identical(regts1[, NA], as.regts(ts1[, NA]))
-  expect_error(regts1[, NA_character_], "subscript out of bounds")
+  expect_error(regts1[, NA_character_], "Undefined columns:\nNA.")
+  expect_error(regts1[, c("a", "z", "p", "g")], "Undefined columns:\nz, p, g.")
+  expect_error(regts1[, paste0("x",  1:10)])
+
 
   regts2 <- regts1
   regts2[, NA] <- 2L
