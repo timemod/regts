@@ -165,11 +165,13 @@ test_that("get_year / get_subperiod", {
 
 test_that("as.period.numeric", {
   expect_identical(as.period(2010), period("2010"))
-  expect_identical(as.period(2010.001, frequency = 1), period("2010"))
   expect_identical(as.period(as.integer(2010)), period("2010"))
   expect_identical(as.period(2010, frequency = 4), period("2010Q1"))
   expect_identical(as.period(2010.75, frequency = 4), period("2010Q4"))
+
   expect_error(as.period(2010.75), "Argument frequency should be specified")
+  expect_error(as.period(2010.001, frequency = 1),
+               "If frequency == 1, then x should be an integer.")
 })
 
 

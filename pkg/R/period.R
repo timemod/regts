@@ -134,15 +134,18 @@ as.period.numeric <- function(x, frequency = NA, ...) {
     } else {
       frequency <- 1
     }
+  } else if (frequency == 1 && x %%1 != 0) {
+    stop("If frequency == 1, then x should be an integer.")
   }
 
-  if (is.na(x)) {
-    return(create_period(x, frequency))
+  if (frequency == 1 || is.na(x)) {
+    subp_count <- x
   } else {
     year <- floor(x)
     subp <- floor(frequency * (x %% 1))
-    return(create_period(year * frequency + subp , frequency))
+    subp_count <- year * frequency + subp
   }
+  return(create_period(subp_count, frequency))
 }
 
 #' @export
