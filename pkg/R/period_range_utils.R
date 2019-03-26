@@ -30,9 +30,9 @@ range_intersect <- function(range1, range2) {
   p_end   <- min(res$p1_end, res$p2_end)
 
   if (p_end >= p_start) {
-      return (create_period_range(p_start, p_end, res$freq))
+    return(create_period_range(p_start, p_end, res$freq))
   } else {
-      return (NULL)
+    return(NULL)
   }
 }
 
@@ -50,27 +50,28 @@ range_union <- function(range1, range2) {
   p_start <- min(res$p1_start, res$p2_start)
   p_end   <- max(res$p1_end, res$p2_end)
 
-  return (create_period_range(p_start, p_end, res$freq))
+  return(create_period_range(p_start, p_end, res$freq))
 }
 
 # internal function that checks the ranges and returns information about them
 range_check <- function(range1, range2) {
 
-    p1_start <- start_period(range1)
-    p1_end   <- end_period(range1)
-    p2_start <- start_period(range2)
-    p2_end   <- end_period(range2)
+  p1_start <- start_period(range1)
+  p1_end   <- end_period(range1)
+  p2_start <- start_period(range2)
+  p2_end   <- end_period(range2)
 
-    if (is.null(p1_start) | is.null(p1_end) |
-        is.null(p2_start) | is.null(p2_end)) {
-        stop("Start and end periods of both ranges should not be NULL")
-    }
+  if (is.null(p1_start) | is.null(p1_end) |
+      is.null(p2_start) | is.null(p2_end)) {
+    stop("Start and end periods of both ranges should not be NULL")
+  }
 
-    freq1    <- frequency.period(p1_start)
-    freq2    <- frequency.period(p2_start)
-    if (freq1 != freq2) {
-        stop("The two periods have different frequency")
-    }
-    return(list(p1_start = p1_start, p1_end = p1_end, p2_start = p2_start,
-                p2_end = p2_end, freq = freq1))
+  freq1    <- frequency.period(p1_start)
+  freq2    <- frequency.period(p2_start)
+  if (freq1 != freq2) {
+    stop("The two period ranges have different frequencies")
+  }
+  return(list(p1_start = as.numeric(p1_start), p1_end = as.numeric(p1_end),
+              p2_start = as.numeric(p2_start), p2_end = as.numeric(p2_end),
+              freq = freq1))
 }

@@ -87,8 +87,11 @@
 #' # example with a Date object
 #' d <- Sys.Date()
 #' period(d)
+#'
+#' # create a sequence of period objects
+#' seq(period("2018q2"), period("2019q4"))
 #' @importFrom Rcpp sourceCpp
-#' @seealso \code{\link{period_range}}
+#' @seealso \code{\link{period_range}} and \code{\link{seq}}
 #' @export
 period <- function(x, frequency = NA) {
   return(as.period(x, frequency = frequency))
@@ -312,12 +315,17 @@ print.period <- function(x, ...) {
 }
 
 
-
 # Create a period object based on the number of subperiods after Christ.
 # Internal function.
 create_period <- function(subperiod_count, frequency) {
   return(structure(subperiod_count, class = "period",
                     frequency = frequency))
+}
+
+# Internal function that creates a list of period objects based
+# on a vector with the number of subperiods after Christ.
+create_periods <- function(subperiod_count, frequency) {
+  return(lapply(subperiod_count, FUN = create_period, frequency = frequency))
 }
 
 # PRIVATE METHODS THAT COULD BE USEFULL FOR AUTOMATIC CONVERSIONS
@@ -370,4 +378,80 @@ Summary.period <- function(..., na.rm = FALSE){
 }
 
 
+#' Generates a sequence of periods
+#'
+#' Generate a regular sequence of \code{\link[regts]{period}} objects. The
+#' function returns the sequence as a \code{\link{list}}.
+#' @param from from a \code{period} object specifying the first period of the
+#'   sequence.
+#' @param to a \code{period} object (or an object that can be coerced to a
+#'   \code{period} object, specifying the last period of the sequence
+#' @param by an integer number, the increment of the sequence.
+#' @param length.out the desired length of the sequence. A non-negative number.
+#'   If both \code{from} and \code{to} have been specified, and if
+#'   \code{length.out} > 1, then the number of periods between \code{from} and
+#'   \code{to} should be divisible by \code{length.out - 1}.
+#' @param ... arguments passed to or from methods (not used)
+#' @return a \code{\link{list}} with period objects
+#' @name seq
+#' @examples
+#' p1 <- period("2018q2")
+#' seq(p1, length.out = 4)
+#' seq(p1, "2019q4")
+#' seq(p1, "2019q4", by = 2)
+#' @export
+seq.period <- function(from, to, by, length.out, ...) {
+
+  from_missing <- missing(from)
+  to_missing <- missing(to)
+
+  if (from_missing && to_missing) {
+    stop("For seq.period, either from or to must be specified")
+  }
+
+  if (!from_missing) {
+    f_from <- frequency(from)
+    per_from <- from
+    from <- as.numeric(from)
+  }
+  if (!to_missing) {
+    to <- as.period(to)
+    f_to <- frequency(to)
+    per_to <- to
+    to <- as.numeric(to)
+  }
+
+  freq <- if (to_missing) f_from else f_to
+
+  if (!from_missing && !to_missing && f_from != f_to) {
+    stop(sprintf(paste("Argument to has a different frequency (%d) than",
+                       "argument from (%d)"), f_to, f_from))
+  }
+
+  if (!missing(by)) {
+     if (as.integer(by) != by) {
+       stop("Argument by is not an integer")
+     }
+  } else if (!missing(length.out) && length.out > 1 && !from_missing
+             && !to_missing) {
+    if ((to - from) %% (length.out - 1) != 0) {
+      stop(sprintf(paste("The number of periods (%d) between %s and %s",
+                  "is not divisible by\nlength.out - 1 = %d."),
+                 to - from, as.character(per_from), as.character(per_to),
+                 length.out - 1))
+    }
+    by <- (to - from) / (length.out - 1)
+  }
+
+
+  # subperiod_count is the number of subperiods since Christ
+  subperiod_count <- NextMethod(.Generic)
+
+  return(create_periods(as.numeric(subperiod_count), frequency = freq))
+}
+
+#' @export
+c.period <- function(...) {
+  return(list(...))
+}
 

@@ -103,7 +103,10 @@ as.period(p)
 # example with a Date object
 d <- Sys.Date()
 period(d)
+
+# create a sequence of period objects
+seq(period("2018q2"), period("2019q4"))
 }
 \seealso{
-\code{\link{period_range}}
+\code{\link{period_range}} and \code{\link{seq}}
 }
