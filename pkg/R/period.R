@@ -111,6 +111,11 @@ as.period.character <- function(x, frequency = NA, ...) {
   if (length(x) != 1) {
     stop("x should be a single character string")
   }
+
+  if (is.na(x)) {
+    return(as.period.logical(NA, frequency = frequency))
+  }
+
   return(parse_period(x, frequency = frequency))
 }
 
@@ -119,16 +124,30 @@ as.period.numeric <- function(x, frequency = NA, ...) {
   if (length(x) != 1) {
     stop("x should be a numeric scalar")
   }
-  if (all.equal(x, as.integer(x)) == TRUE) {
-    if (is.na(frequency) || frequency == 1) {
-      return (create_period(as.numeric(x) , 1))
+  x <- as.numeric(x)
+
+  x_is_int <- x %% 1 == 0
+
+  if (is.na(frequency)) {
+    if (is.na(x) || !x_is_int) {
+      stop("Argument frequency should be specified")
+    } else {
+      frequency <- 1
     }
-  } else if (is.na(frequency)) {
-    stop("Argument frequency should be specified")
   }
-  year <- floor(x)
-  subp <- floor(frequency * (x %% 1))
-  return(create_period(year * frequency + subp , frequency))
+
+  if (is.na(x)) {
+    return(create_period(x, frequency))
+  } else {
+    year <- floor(x)
+    subp <- floor(frequency * (x %% 1))
+    return(create_period(year * frequency + subp , frequency))
+  }
+}
+
+#' @export
+as.period.logical <- function(x, frequency = NA, ...) {
+  return(as.period.numeric(as.numeric(x), frequency = frequency, ...))
 }
 
 #' @export
@@ -143,6 +162,10 @@ as.period.POSIXct <- function(x, frequency = NA, ...) {
 
 #' @export
 as.period.POSIXlt <- function(x, frequency = NA, ...) {
+
+  if (length(x) != 1) {
+    stop("x should be a vector with length 1")
+  }
 
   if (is.na(frequency)) {
     frequency <- 12
@@ -195,34 +218,41 @@ Ops.period <- function(e1, e2) {
       }
     }
     return(NextMethod(.Generic))
+
   } else if (.Generic %in% c("+", "-")) {
     # arithmetic operator + or -
-    retval <- NextMethod(.Generic)
-    if (is.period(e1) && is.period(e2)) {
+
+    e1_is_per <- is.period(e1)
+    e2_is_per <- is.period(e2)
+
+    if (e1_is_per && e2_is_per) {
       if (attr(e1, 'frequency') != attr(e2, 'frequency')) {
         stop(paste("Arithmetic operations on periods with different",
                    "frequencies are not allowed"))
       }
-      if (.Generic == "-") {
-        # if the second operand is also a period, then the result
-        # is an ordinary number.
-        retval <- as.numeric(retval)
-      } else {
+      if (.Generic == "+") {
         stop("Arithmetic operation + on two periods is not allowed")
       }
     } else {
-      # one of the operands is not a period object
-      if (anyNA(retval)) {
-        stop("NA values in arithmetic operations with period objects")
+      # check if supplied numeric arguments are integers
+      if (!e1_is_per && is.numeric(e1) &&  !all(is.na(e1) | e1 %% 1 == 0)) {
+        stop(sprintf("First operand (%g) is not an integer", e1))
+      } else if (!e2_is_per && is.numeric(e2) && !all(is.na(e2) | e2 %% 1 == 0)) {
+        stop(sprintf("Second operand (%g) is not an integer", e2))
       }
-      if (!all(retval == round(retval))) {
-          stop(paste("Arithmetic operations with periods are only possible",
-                     "with integer operands"))
-      }
-      if (length(retval) > 1) {
-        frequency <- if (is.period(e1)) frequency(e1) else frequency(e2)
-        retval <- lapply(retval, FUN = create_period, frequency = frequency)
-      }
+    }
+
+    # perform the actual arithmetic operation
+    retval <- NextMethod(.Generic)
+
+    if (e1_is_per && e2_is_per && .Generic == "-") {
+      # if the second operand is also a period, then the result
+      # is an ordinary number.
+      retval <- as.numeric(retval)
+    } else if (length(retval) > 1) {
+      # the result is a list of periods
+      frequency <- if (e1_is_per) frequency(e1) else frequency(e2)
+      retval <- lapply(retval, FUN = create_period, frequency = frequency)
     }
     return(retval)
   } else {
@@ -311,14 +341,18 @@ get_subperiod <- function(x) {
 
 #' @export
 print.period <- function(x, ...) {
-  print(as.character(x))
+  if (is.na(x)) {
+    print(as.numeric(x))
+  } else {
+    print(as.character(x))
+  }
 }
 
 
 # Create a period object based on the number of subperiods after Christ.
 # Internal function.
 create_period <- function(subperiod_count, frequency) {
-  return(structure(subperiod_count, class = "period",
+  return(structure(subperiod_count[1], class = "period",
                     frequency = frequency))
 }
 

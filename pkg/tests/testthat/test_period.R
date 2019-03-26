@@ -126,9 +126,8 @@ test_that("arithmetic operators: only + and - allowed", {
                paste("Arithmetic operations on periods with different",
                      "frequencies are not allowed"))
   expect_error(period("2010Q1") + 0.1,
-               "Arithmetic operations with periods are only possible with integer operands")
-  expect_error(period("2010Q1") + NA,
-               "NA values in arithmetic operations with period objects")
+               "Second operand \\(0.1\\) is not an integer")
+  expect_identical(period("2010Q1") + NA, period(NA, frequency = 4))
 })
 
 test_that("as.period", {

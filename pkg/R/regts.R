@@ -455,7 +455,7 @@ matrix2regts_ <- function(x, periods, numeric, fun, strict, ...) {
   }
 
   # compute times as the number of subperiods since AD 0.
-  subp <- as.integer(unlist(periods))
+  subp <- as.numeric(unlist(periods))
 
   if (anyDuplicated(subp)) {
     dupl <- duplicated(subp)
@@ -475,8 +475,8 @@ matrix2regts_ <- function(x, periods, numeric, fun, strict, ...) {
     if (strict){
       dif <- setdiff(sorted_subp, subp)
       if (length(dif) > 0){
-        missing_periods <- sapply(dif,
-                           FUN = function(x)as.character(create_period(x, freq)))
+        dif_periods <- create_periods(dif, freq)
+        missing_periods <- sapply(dif_periods, FUN = as.character)
         mp <- paste(missing_periods, collapse = ", ")
         stop(paste0("Missing periods found (", mp, "). Use parameter strict!"))
       }

@@ -119,8 +119,9 @@
 #' @param na_string Character vector of strings to use for missing values.
 #' By default, \code{read_ts_csv} treats blank cells as missing data.
 #' @param name_fun function to apply to the names of the timeseries.
-#' @param period_fun function applied to period texts. Use this argument
-#' if the period texts do not have a standard format (see Description).
+#' @param period_fun function applied to period texts. This should be a function
+#' that converts a character vector of length 1 to a character vector of length 1.
+#' Use this argument if the period texts do not have a standard format (see Description).
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
 #' start and the end period must be present.
 #' Otherwise the timeseries are filled with \code{NA} for the missing periods.

@@ -47,9 +47,9 @@ By default, \code{read_ts_xlsx} treats blank cells as missing data.}
 
 \item{name_fun}{function to apply to the names of the timeseries.}
 
-\item{period_fun}{function applied to period texts.
-Use this argument if the period texts do not have a standard format
-(see Description).}
+\item{period_fun}{function applied to period texts. This should be a function
+that converts a character vector of length 1 to a character vector of length 1.
+Use this argument if the period texts do not have a standard format (see Description).}
 
 \item{strict}{A logical. If \code{TRUE} (the default) all periods between the
 start and the end period must be present.
