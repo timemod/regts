@@ -216,9 +216,8 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 #' \code{Workbook} object
 #' @export
 write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
-                           labels = c("after", "before", "no"),
-                           labels_missing, comments, number_format,
-                           period_as_date = FALSE) {
+                           labels = c("after", "before", "no"), comments,
+                           number_format, period_as_date = FALSE) {
 
   sheet_exists <- sheet_name %in% names(wb)
 
@@ -231,7 +230,6 @@ write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
   if (!is.matrix(x)) {
     x <- univec2unimat(x, deparse(substitute(x)))
   }
-
 
   write_ts_sheet_(x, wb, sheet_name, rowwise, labels, missing(labels),
                   comments, number_format, period_as_date)
