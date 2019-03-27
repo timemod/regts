@@ -455,7 +455,7 @@ matrix2regts_ <- function(x, periods, numeric, fun, strict, ...) {
   }
 
   # compute times as the number of subperiods since AD 0.
-  subp <- as.numeric(unlist(periods))
+  subp <- unlist(periods)
 
   if (anyDuplicated(subp)) {
     dupl <- duplicated(subp)

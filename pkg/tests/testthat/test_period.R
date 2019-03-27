@@ -198,15 +198,15 @@ test_that("regts:::is_period_text", {
 
 test_that("c and seq", {
 
+  pq <- period("2018q2")
+  py <- period(2016)
+  expect_identical(c(pq, py), list(pq, py))
+  expect_identical(c(pq, py, 3, "xxx"), list(pq, py, 3, "xxx"))
+
   p <- period("2018q2")
-
-  expect_identical(c(p, p), list(p, p))
-
   expect_identical(seq(p, p + 2), p + 0:2)
   expect_identical(seq(p, p + 8, by = 3), p + c(0, 3, 6))
-  expect_identical(seq(p, p + 8, length.out = 3), p + c(0, 4, 8))
-
-
+  expect_identical(seq(p, "2020q2", length.out = 3), p + c(0, 4, 8))
 
   # errors
   msg <- paste("The number of periods \\(8\\) between 2018Q2 and 2020Q2",
@@ -219,4 +219,7 @@ test_that("c and seq", {
   expect_error(seq(p, p + 2, by = 0.5), "Argument by is not an integer")
 
   expect_error(seq(p, p + 8, by = 3, length.out = 3))
+
+  expect_error(seq(p, "2012m2"), paste("Argument to has a different frequency",
+               "\\(12\\) than argument from \\(4\\)"))
 })
