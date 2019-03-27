@@ -1,6 +1,8 @@
 library(regts)
 library(testthat)
 
+rm(list = ls())
+
 context("period")
 
 test_that("constructor period", {
@@ -111,8 +113,12 @@ test_that("logical operators", {
   expect_false(period(NA, frequency = 12) == period(NA, frequency = 4))
   expect_true(period(NA, frequency = 12) != period(NA, frequency = 4))
 
-  expect_error(period("2010Q1") > period("2010M1"),
-               "Illegal logical operation, only == and != allowed")
+  msg <- paste("Illegal logical operator >, only == and != allowed if the two",
+               "periods have different frequencies.")
+  expect_error(period("2010Q1") > period("2010M1"), msg)
+
+  expect_error(period("2010q1") | period("2010q2"),
+               "Operator \\| not implemented for period objects.")
 })
 
 test_that("arithmetic operators: only + and - allowed", {
@@ -127,22 +133,28 @@ test_that("arithmetic operators: only + and - allowed", {
   expect_identical(period("2010") - 1:3,
                    list(period("2009"), period("2008"), period("2007")))
 
-  expect_identical(period("2010Q1") + NA, period(NA, frequency = 4))
-  expect_identical(NA + period("2010Q1"), period(NA, frequency = 4))
+  p <- period("2010q1")
+  expect_identical(p + NA, period(NA, frequency = 4))
+  expect_identical(NA + p, period(NA, frequency = 4))
   expect_identical(period(NA, frequency = 4) + 2, period(NA, frequency = 4))
 
   expect_identical(period("2010Q1") - period(NA, frequency = 4), NA_real_)
 
+  expect_identical(p + c(1, NA, 0),
+                   list(p + 1, period(NA, frequency = 4), p))
+
   # errors
   expect_error(period("2010Q1") * 2,
-               "Illegal arithmetic operation, only \\+ and \\- allowed")
+               "Operator \\* not implemented for period objects.")
   expect_error(period("2010Q1") + period("2010Q2"),
                "Arithmetic operation \\+ on two periods is not allowed")
   expect_error(period("2010Q1") - period("2010M1"),
                paste("Arithmetic operations on periods with different",
-                     "frequencies are not allowed"))
+                     "frequencies are not allowed."))
   expect_error(period("2010Q1") + 0.1,
-               "Second operand \\(0.1\\) is not an integer")
+               "Second operand contains non-integer values")
+  expect_error(c(5, 5.1) + period("2010Q1"),
+               "First operand contains non-integer values")
 
 })
 

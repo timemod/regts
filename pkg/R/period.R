@@ -207,6 +207,7 @@ is.period <- function(x) {
 # binary operators (arithmetic and logical)
 #' @export
 Ops.period <- function(e1, e2) {
+
   if (.Generic %in% c("==", "!=", "<", ">", "<=", ">=")) {
     # logical operator
     if (is.period(e1) && is.period(e2) &&
@@ -215,9 +216,11 @@ Ops.period <- function(e1, e2) {
       # the operators == and != are meaningful, but comparison
       # operators such as > do not make sense.
       if (.Generic %in% c("==", "!=")) {
-        return (.Generic != "==")
+        return(.Generic != "==")
       } else {
-        stop("Illegal logical operation, only == and != allowed")
+        stop(sprintf(paste("Illegal logical operator %s, only == and !=",
+                           "allowed if the two periods have different",
+                           "frequencies."), .Generic))
       }
     }
     return(NextMethod(.Generic))
@@ -231,17 +234,17 @@ Ops.period <- function(e1, e2) {
     if (e1_is_per && e2_is_per) {
       if (attr(e1, 'frequency') != attr(e2, 'frequency')) {
         stop(paste("Arithmetic operations on periods with different",
-                   "frequencies are not allowed"))
+                   "frequencies are not allowed."))
       }
       if (.Generic == "+") {
-        stop("Arithmetic operation + on two periods is not allowed")
+        stop("Arithmetic operation + on two periods is not allowed.")
       }
     } else {
       # check if supplied numeric arguments are integers
       if (!e1_is_per && is.numeric(e1) &&  !all(is.na(e1) | e1 %% 1 == 0)) {
-        stop(sprintf("First operand (%g) is not an integer", e1))
+        stop("First operand contains non-integer values.")
       } else if (!e2_is_per && is.numeric(e2) && !all(is.na(e2) | e2 %% 1 == 0)) {
-        stop(sprintf("Second operand (%g) is not an integer", e2))
+        stop("Second operand contains non-integer values.")
       }
     }
 
@@ -249,17 +252,18 @@ Ops.period <- function(e1, e2) {
     retval <- NextMethod(.Generic)
 
     if (e1_is_per && e2_is_per && .Generic == "-") {
-      # if the second operand is also a period, then the result
-      # is an ordinary number.
+      # if both operands are periods, then the result is an ordinary numeric.
       retval <- as.numeric(retval)
     } else if (length(retval) > 1) {
       # the result is a list of periods
       frequency <- if (e1_is_per) frequency(e1) else frequency(e2)
-      retval <- lapply(retval, FUN = create_period, frequency = frequency)
+      retval <- create_periods(as.numeric(retval), frequency = frequency)
     }
     return(retval)
+
   } else {
-    stop("Illegal arithmetic operation, only + and - allowed")
+
+    stop(sprintf("Operator %s not implemented for period objects.", .Generic))
   }
 }
 
