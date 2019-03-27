@@ -49,6 +49,22 @@ test_that("ts without labels written correctly",  {
   expect_identical(ts1 * 2, ts1_times_2_read)
 })
 
+test_that("ts with empty labels written correctly",  {
+  ts1_el <- ts1
+  ts_labels(ts1_el) <- rep("", 2)
+
+  file <- "xlsx/ts1_el.xlsx"
+  write_ts_xlsx(ts1_el, file = file)
+  ts1_el_read <- read_ts_xlsx(file, labels = "no")
+  expect_identical(ts1, ts1_el_read)
+
+  file <- "xlsx/ts1_el_t.xlsx"
+  write_ts_xlsx(ts1_el, file = file, rowwise = FALSE)
+  ts1_el_t_read <- read_ts_xlsx(file)
+  expect_identical(ts1, ts1_el_t_read)
+})
+
+
 test_that("ts with labels written correctly (1)",  {
 
   file <- "xlsx/ts1_lbls.xlsx"
@@ -67,7 +83,7 @@ test_that("ts with labels written correctly (1)",  {
   expect_error(
     dum <- read_ts_xlsx(file, sheet = "ts1", labels = "rig"))
 
-  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "before")
+  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "after")
 
   expect_identical(ts1_lbls, ts1_t_read)
 
@@ -105,7 +121,7 @@ test_that("ts with labels written correctly (2)",  {
 
   expect_identical(ts1_lbls, ts1_read)
 
-  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "before")
+  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "after")
 
   expect_identical(ts1_lbls, ts1_t_read)
 
@@ -145,7 +161,7 @@ test_that("ts with labels written correctly (3)",  {
 
   expect_identical(ts1_lbls, ts1_read)
 
-  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "before")
+  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "after")
 
   expect_identical(ts1_lbls, ts1_t_read)
 
@@ -186,7 +202,7 @@ test_that("ts with labels written correctly (4)",  {
 
   expect_identical(ts1_lbls, ts1_read)
 
-  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "before")
+  ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "after")
 
   expect_identical(ts1_lbls, ts1_t_read)
 
@@ -209,7 +225,7 @@ test_that("univariate timeseries", {
   write_ts_xlsx(a_mat, file = "xlsx/ts1_unimat.xlsx", rowwise = FALSE)
   a <- ts1_lbls[, "a"]
   write_ts_xlsx(a, file = "xlsx/ts1_univec.xlsx")
-  expect_identical(a_mat, read_ts_xlsx("xlsx/ts1_unimat.xlsx", labels = "before"))
+  expect_identical(a_mat, read_ts_xlsx("xlsx/ts1_unimat.xlsx", labels = "after"))
   expect_identical(a_mat, read_ts_xlsx("xlsx/ts1_univec.xlsx", labels = "after"))
 })
 

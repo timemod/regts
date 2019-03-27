@@ -36,18 +36,12 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
                          labels = c("after", "before", "no"),
                          period_format = "regts") {
 
-  labels_missing <- missing(labels)
-
-  if (!labels_missing) {
-    labels <- match.arg(labels)
-  }
-
   if (!is.matrix(x)) {
     x <- univec2unimat(x, deparse(substitute(x)))
   }
 
-  dataframes  <- ts2df_(x, rowwise, labels, labels_missing, period_format,
-                        FALSE)
+  dataframes  <- ts2df_(x, rowwise, labels, missing(labels),
+                        period_format, FALSE)
   data <- dataframes$data
   column_headers <- dataframes$column_headers
   has_labels <- dataframes$has_labels
@@ -199,10 +193,8 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   }
   addWorksheet(wb, sheetName = sheet_name, gridLines = TRUE)
 
-
-  write_ts_sheet_(x, wb, sheet_name, rowwise = rowwise,
-                  labels = labels, labels_missing = missing(labels), comments,
-                  number_format, period_as_date = period_as_date)
+  write_ts_sheet_(x, wb, sheet_name, rowwise, labels, missing(labels),
+                  comments, number_format, period_as_date)
 
   if (append && sheet_exists) {
     # if the sheet already existed, then keep the original ordering
@@ -225,7 +217,8 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 #' @export
 write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
                            labels = c("after", "before", "no"),
-                           comments, number_format, period_as_date = FALSE) {
+                           labels_missing, comments, number_format,
+                           period_as_date = FALSE) {
 
   sheet_exists <- sheet_name %in% names(wb)
 
@@ -239,9 +232,9 @@ write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
     x <- univec2unimat(x, deparse(substitute(x)))
   }
 
-  write_ts_sheet_(x, wb, sheet_name, rowwise = rowwise, labels = labels,
-                  labels_missing = missing(labels), comments, number_format,
-                  period_as_date = period_as_date)
+
+  write_ts_sheet_(x, wb, sheet_name, rowwise, labels, missing(labels),
+                  comments, number_format, period_as_date)
 
   if (sheet_exists) {
     # if the sheet already existed, then keep the original ordering
@@ -251,12 +244,9 @@ write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
 }
 
 # internal function to write a timeseries object to a sheet of an Excel workbook
-write_ts_sheet_ <- function(x, wb, sheet, rowwise,
-                            labels = c("after", "before", "no"),
-                            labels_missing, comments, number_format,
-                            period_as_date) {
+write_ts_sheet_ <- function(x, wb, sheet, rowwise, labels, labels_missing,
+                            comments, number_format, period_as_date) {
 
-  labels <- match.arg(labels)
 
   # check for comments. The comments are actually written before the
   # autoSizeColumns() command has been executed.
@@ -267,8 +257,8 @@ write_ts_sheet_ <- function(x, wb, sheet, rowwise,
     n_comment_rows <- nrow(comments)
   }
 
-  dataframes  <- ts2df_(x, rowwise, labels, labels_missing, "regts",
-                        period_as_date)
+  dataframes <- ts2df_(x, rowwise, labels, labels_missing, "regts",
+                       period_as_date)
   data <- dataframes$data
   column_headers <- dataframes$column_headers
   has_labels <- dataframes$has_labels
@@ -351,37 +341,31 @@ write_ts_sheet_ <- function(x, wb, sheet, rowwise,
 #   period_format   period format: regts or for example %Y-%m-%d
 #   period_as_date  write period as Dates.
 #
-ts2df_ <- function(x, rowwise, label_option, labels_missing, period_format,
-                   period_as_date) {
+ts2df_ <- function(x, rowwise, labels = c("after", "before", "no"),
+                   labels_missing, period_format, period_as_date) {
 
   if (!is.ts(x)) {
     stop(paste("Argument x is not a timeseries object but a ", class(x)))
   }
+
+  labels <- match.arg(labels)
 
   if (is.null(colnames(x))) {
     colnames(x) <- paste0("series", 1:ncol(x))
   }
 
   # collect labels
-  if (labels_missing || label_option != "no") {
+  if (labels != "no") {
     lbls <- ts_labels(x)
-    if (labels_missing) {
-      if (is.null(lbls)) {
-        label_option <- "no"
-      } else if (rowwise) {
-        label_option <- "after"
-      } else {
-        label_option <- "before"
-      }
-    } else {
-      if (is.null(lbls)) {
-        lbls <- rep("", NCOL(x))
-      }
+    if (labels_missing && (is.null(lbls) || !any(nzchar(trimws(lbls))))) {
+      # if argument labels has not been specified and if there are no labels,
+      # then set labels to "no".
+      labels <- "no"
+    } else if (is.null(lbls)) {
+      lbls <- rep("", NCOL(x))
     }
-    has_labels = !is.null(lbls)
-  } else {
-    has_labels = FALSE
   }
+  has_labels <- labels != "no"
 
   # remove the labels, we don't need them any more
   ts_labels(x) <- NULL
@@ -397,13 +381,13 @@ ts2df_ <- function(x, rowwise, label_option, labels_missing, period_format,
     data$period <- NULL
     data <- transpose_df(data)
     names <- rownames(data)
-    if (label_option == "no") {
+    if (labels == "no") {
       data <- cbind(name = names, data, stringsAsFactors = FALSE)
       col_headers <- c("name")
-    } else if (label_option == "after") {
+    } else if (labels == "after") {
       data <- cbind(name = names, label = lbls, data, stringsAsFactors = FALSE)
       col_headers <- c("name", "label")
-    } else if (label_option == "before") {
+    } else if (labels == "before") {
       data <- cbind(label = lbls, name = names, data, stringsAsFactors = FALSE)
       col_headers <- c("label", "name")
     }
@@ -414,12 +398,15 @@ ts2df_ <- function(x, rowwise, label_option, labels_missing, period_format,
     colnames(column_headers) <- NULL
   } else {
     # columnwise timeseries
-    column_headers <- as.data.frame(t(colnames(data)), stringsAsFactors = FALSE)
-    if (label_option == "before") {
+    column_headers <- as.data.frame(t(colnames(data)),
+                                    stringsAsFactors = FALSE)
+    column_headers[1] <- "name"
+    if (labels == "before") {
       column_headers <- rbind(c("label", lbls), column_headers,
                               stringsAsFactors = FALSE)
-    } else if (label_option == "after") {
-      stop("For columnwise timeseries labels option \"after\" is not allowed")
+    } else if (labels == "after") {
+      column_headers <- rbind(column_headers, c("label", lbls),
+                              stringsAsFactors = FALSE)
     }
   }
 
