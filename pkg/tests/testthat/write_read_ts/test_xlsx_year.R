@@ -51,7 +51,7 @@ test_that("ts with labels written correctly",  {
 
   file <- "xlsx/ts2_lbls.xlsx"
   if (file.exists(file)) {
-    file.remove(file)
+    ok <- file.remove(file)
   }
 
   write_ts_xlsx(ts2_lbls, file, sheet_name = "ts2",
@@ -63,7 +63,7 @@ test_that("ts with labels written correctly",  {
 
   expect_identical(ts2_lbls, ts2_read)
 
-  ts2_t_read <- read_ts_xlsx(file, sheet = "ts2_t", labels = "before")
+  ts2_t_read <- read_ts_xlsx(file, sheet = "ts2_t", labels = "after")
 
   expect_identical(ts2_lbls, ts2_t_read)
 
