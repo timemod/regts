@@ -421,13 +421,14 @@ Summary.period <- function(..., na.rm = FALSE){
 
 #' Generates a sequence of periods
 #'
-#' Generate a regular sequence of \code{\link[regts]{period}} objects. The
+#' Generates a regular sequence of \code{\link[regts]{period}} objects. The
 #' function returns the sequence as a \code{\link{list}}.
-#' @param from from a \code{period} object specifying the first period of the
+#' @param from a \code{period} object specifying the first period of the
 #'   sequence.
 #' @param to a \code{period} object (or an object that can be coerced to a
-#'   \code{period} object, specifying the last period of the sequence
-#' @param by an integer number, the increment of the sequence.
+#'   \code{period} object) specifying the last period of the sequence
+#' @param by an integer number, the increment of the sequence (the number of
+#' periods between each period in the sequence).
 #' @param length.out the desired length of the sequence. A non-negative number.
 #'   If both \code{from} and \code{to} have been specified, and if
 #'   \code{length.out} > 1, then the number of periods between \code{from} and
@@ -440,6 +441,7 @@ Summary.period <- function(..., na.rm = FALSE){
 #' seq(p1, length.out = 4)
 #' seq(p1, "2019q4")
 #' seq(p1, "2019q4", by = 2)
+#' @seealso \code{\link[regts]{period}} and \code{\link[regts]{period_range}}
 #' @export
 seq.period <- function(from, to, by, length.out, ...) {
 
@@ -470,7 +472,7 @@ seq.period <- function(from, to, by, length.out, ...) {
   }
 
   if (!missing(by)) {
-     if (as.integer(by) != by) {
+     if (by %% 1 != 0) {
        stop("Argument by is not an integer")
      }
   } else if (!missing(length.out) && length.out > 1 && !from_missing

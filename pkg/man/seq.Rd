@@ -8,13 +8,14 @@
 \method{seq}{period}(from, to, by, length.out, ...)
 }
 \arguments{
-\item{from}{from a \code{period} object specifying the first period of the
+\item{from}{a \code{period} object specifying the first period of the
 sequence.}
 
 \item{to}{a \code{period} object (or an object that can be coerced to a
-\code{period} object, specifying the last period of the sequence}
+\code{period} object) specifying the last period of the sequence}
 
-\item{by}{an integer number, the increment of the sequence.}
+\item{by}{an integer number, the increment of the sequence (the number of
+periods between each period in the sequence).}
 
 \item{length.out}{the desired length of the sequence. A non-negative number.
 If both \code{from} and \code{to} have been specified, and if
@@ -27,7 +28,7 @@ If both \code{from} and \code{to} have been specified, and if
 a \code{\link{list}} with period objects
 }
 \description{
-Generate a regular sequence of \code{\link[regts]{period}} objects. The
+Generates a regular sequence of \code{\link[regts]{period}} objects. The
 function returns the sequence as a \code{\link{list}}.
 }
 \examples{
@@ -35,4 +36,7 @@ p1 <- period("2018q2")
 seq(p1, length.out = 4)
 seq(p1, "2019q4")
 seq(p1, "2019q4", by = 2)
+}
+\seealso{
+\code{\link[regts]{period}} and \code{\link[regts]{period_range}}
 }

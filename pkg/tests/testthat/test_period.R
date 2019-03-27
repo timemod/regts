@@ -222,6 +222,9 @@ test_that("c and seq", {
   expect_identical(seq(p, p + 8, by = 3), p + c(0, 3, 6))
   expect_identical(seq(p, "2020q2", length.out = 3), p + c(0, 4, 8))
 
+  expect_identical(seq(to = p + 8, by = 3, length.out = 3), p + c(2, 5, 8))
+  expect_identical(seq(to = p + 8, length.out = 3), p + c(6, 7, 8))
+
   # errors
   msg <- paste("The number of periods \\(8\\) between 2018Q2 and 2020Q2",
                "is not divisible by\nlength.out - 1 = 3.")
