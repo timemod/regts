@@ -249,12 +249,8 @@ read_ts_rowwise_xlsx <- function(tbl, frequency, labels, name_fun, period_fun,
   # remove rows without names, including the row with the period
   tbl <- tbl[c(FALSE, name_sel), ]
 
-  # convert data columns to a numeric matrix, employing C++ function
-  # list_tbl_2_mat.
-  mat <- list_tbl_2_mat(tbl[, data_cols])
-
-  mat <- t(mat)
-  colnames(mat) <- names
+  # convert data columns to a numeric matrix
+  mat <- convert_data_tbl(tbl[ , data_cols], transpose = TRUE, colnames = names)
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
@@ -352,11 +348,8 @@ read_ts_columnwise_xlsx <- function(tbl, frequency, labels, name_fun,
   periods <- get_periods_tbl(tbl[[1]], frequency, xlsx = TRUE,
                              period_fun = period_fun)
 
-  # convert data columns to a numeric matrix, employing C++ function
-  # list_tbl_2_mat.
-  mat <- list_tbl_2_mat(tbl[-1])
-
-  colnames(mat) <- ts_names
+  # convert data columns to a numeric matrix
+  mat <- convert_data_tbl(tbl[-1], transpose = FALSE, colnames = ts_names)
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
@@ -371,3 +364,28 @@ read_ts_columnwise_xlsx <- function(tbl, frequency, labels, name_fun,
   return(ret)
 }
 
+convert_data_tbl <- function(tbl, transpose, colnames) {
+  # This function converts the part of the tibble that should contain data
+  # values to a numerical matrix.
+
+  # First check if the tbl contains POSIXt or Date objects.
+  # These cannot be handled correctly, so we should give an error.
+  check_col <- function(x) {
+    x <- sapply(x, FUN = function(x) {inherits(x, "POSIXt") |
+                                      inherits(x, "Date")})
+    return(any(x))
+  }
+
+  problem_cols <- sapply(tbl, FUN = check_col)
+  if (any(problem_cols)) {
+    stop(paste("Found Date values in cells were numerical values are expected"))
+  }
+
+  # convert the tbl to a numeric matrix, employing C++ function list_tbl_2_mat
+  mat <- list_tbl_2_mat(tbl)
+
+  if (transpose) mat <- t(mat)
+
+  colnames(mat) <- colnames
+  return(mat)
+}
