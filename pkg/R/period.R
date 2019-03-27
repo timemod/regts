@@ -134,7 +134,7 @@ as.period.numeric <- function(x, frequency = NA, ...) {
     } else {
       frequency <- 1
     }
-  } else if (frequency == 1 && x %%1 != 0) {
+  } else if (frequency == 1 && !(is.na(x) || x %%1 == 0)) {
     stop("If frequency == 1, then x should be an integer.")
   }
 
@@ -348,7 +348,7 @@ get_subperiod <- function(x) {
 
 #' @export
 print.period <- function(x, ...) {
-  if (is.na(x)) {
+  if (frequency(x) == 1) {
     print(as.numeric(x))
   } else {
     print(as.character(x))

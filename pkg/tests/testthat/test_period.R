@@ -27,6 +27,8 @@ test_that("constructor period", {
   expect_identical(as.character(period(as.POSIXlt(d), frequency = 3)), "2010-2")
   expect_identical(as.character(period("2001-3", frequency = 9999)), "2001-0003")
 
+
+
   p <- period(as.Date(NA))
   expect_identical(as.numeric(p), NA_real_)
   expect_identical(p, period(NA, frequency = 12))
@@ -234,4 +236,22 @@ test_that("c and seq", {
 
   expect_error(seq(p, "2012m2"), paste("Argument to has a different frequency",
                "\\(12\\) than argument from \\(4\\)"))
+})
+
+test_that("as.character and print", {
+
+  # NA timeseries
+  py <- period(NA, frequency = 1)
+  pm <- period(NA, frequency = 12)
+  expect_identical(as.character(py), NA_character_)
+  expect_identical(as.character(pm), "NAMNA")
+  expect_output(print(py), "\\[1\\] NA")
+  expect_output(print(pm), "\\[1\\] \"NAMNA\"")
+
+  py <- period(12, frequency = 1)
+  pm <- period(12, frequency = 12)
+  expect_identical(as.character(py), "12")
+  expect_identical(as.character(pm), "12M01")
+  expect_output(print(py), "\\[1\\] 12")
+  expect_output(print(pm), "\\[1\\] \"12M01\"")
 })
