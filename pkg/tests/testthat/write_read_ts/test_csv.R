@@ -97,7 +97,6 @@ test_that("period_format", {
   period_fun <- function(x) {
     x <- as.Date(x, format = "%Y-%m-%d")
     return(as.character(period(x, frequency = 4)))
-    return(ret)
   }
 
   ts_read <- read_ts_csv(file, period_fun = period_fun, labels = "before")

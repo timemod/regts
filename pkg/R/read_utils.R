@@ -12,8 +12,13 @@ tibble_2_char <- function(tbl, replace_na = TRUE) {
 # return a logical vector, where each element indicates whether the
 # corresponding element in tbl is a period
 is_period_tbl <- function(tbl, frequency, xlsx, period_fun) {
+
   period_texts <- tibble_2_char(tbl)
-  if (!missing(period_fun)) period_texts <- period_fun(period_texts)
+
+  if (!missing(period_fun)) {
+    period_texts <- sapply(period_texts, FUN = period_fun, USE.NAMES = FALSE)
+  }
+
   is_per_text <- is_period_text(period_texts, frequency)
   if (xlsx && (!is.na(frequency) && 12 %% frequency == 0)) {
     # When read from an xlsx file the tbl may contain  POSIXt values.
@@ -55,7 +60,9 @@ get_periods_tbl <- function(tbl, frequency, xlsx, period_fun) {
   } else {
     # return a character vector
     ret <- tibble_2_char(tbl, FALSE)
-    if (!missing(period_fun)) ret <- period_fun(ret)
+    if (!missing(period_fun)) {
+      ret <- sapply(ret, FUN = period_fun, USE.NAMES = FALSE)
+    }
     return(ret)
   }
 }
