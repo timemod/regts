@@ -15,9 +15,12 @@ regts1 <- regts(data, start = "2010Q2")
 ts1 <- as.regts(regts1)
 zoo1 <- as.zooreg(ts1)
 
-commands <- c("ts1[ , \"ts_3400\"]",
-              "regts1[ , \"ts_3400\"]",
-              "zoo1[ , \"ts_3400\"]"
+cols <- paste0("ts_", seq(1, 3400, by = 10))
+print(cols)
+
+commands <- c("ts1[ , cols]",
+              "regts1[ , cols]",
+              "zoo1[ , cols]"
 )
 
 print(time_commands(commands))
