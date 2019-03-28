@@ -139,16 +139,20 @@
 #' @seealso \code{\link{write_ts_xlsx}} and \code{\link{read_ts_csv}}
 #' @export
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
-                         skiprow = NA, skipcol = NA, rowwise, frequency = NA,
+                         skiprow = 0, skipcol = 0, rowwise, frequency = NA,
                          labels = c("after", "before", "no"),
                          na_string = "", name_fun, period_fun, strict = TRUE) {
 
+  # NOTE: read excel skips leading empty rows if the the first row in range
+  # has not been specified (if the first row is NA). We do not want that,
+  # therefore always start from the first row
   if (missing(range)) {
     range <- cell_limits()
     range$ul[1] <- skiprow + 1
     range$ul[2] <- skipcol + 1
   } else {
     range <- as.cell_limits(range)
+    if (is.na(range$ul[1])) range$ul[1] <- 1
   }
 
   na_string <- union(na_string, "")
@@ -163,33 +167,42 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   }
 
 
-  tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
+  N <- 25
+
+  range_1 <- range
+  range_1$lr[1] <- range_1$ul[1] + N - 1
+
+  cat("range_1\n")
+  print(range_1)
+
+
+  tbl_1 <- read_excel(filename, sheet, range = range_1, col_names = FALSE,
                     col_types = "list", na = na_string,
                     .name_repair = "minimal")
 
+  View(tbl_1)
+
+  # TODO: sheetname is not correct if the sheetname is specified in
+  # argument sheet.
   sheetname <- if (is.null(sheet)) "1" else as.character(sheet)
 
-  if (nrow(tbl) == 0 && ncol(tbl) == 0) {
-    stop(sprintf("Sheet %s of file %s is empty\n", sheetname, filename))
-  }
-
-  # remove all columns with only NAs
-  not_all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
-  tbl <- tbl[ , not_all_na]
-
-  period_info <- find_periods(tbl, frequency, rowwise, xlsx = TRUE,
+  period_info <- find_periods(tbl_1, frequency, rowwise, xlsx = TRUE,
                               period_fun = period_fun)
 
   if (is.null(period_info)) {
     stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
                  filename))
   }
+  print(period_info)
 
   if (period_info$rowwise) {
-    ret <- read_ts_rowwise_xlsx(tbl, frequency = frequency, labels = labels,
-                                name_fun = name_fun, period_fun = period_fun,
+    periods <- get_periods_tbl(tbl_1[period_info$row_nr, period_info$is_period],
+                               frequency, xlsx = TRUE, period_fun)
+    ret <- read_ts_rowwise_xlsx(filename, sheet, range, na_string, periods,
+                                frequency, labels, name_fun, period_fun,
                                 period_info = period_info, strict = strict)
   } else {
+    stop("columnwise not yet supported")
     ret <- read_ts_columnwise_xlsx(tbl, frequency = frequency, labels = labels,
                                   name_fun = name_fun, period_fun = period_fun,
                                   period_info = period_info, strict = strict)
@@ -200,13 +213,10 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 
 # Internal function to read timeseries rowwise from a tibble, used by
 # read_ts_xlsx
-read_ts_rowwise_xlsx <- function(tbl, frequency, labels, name_fun, period_fun,
+read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string, periods,
+                                 frequency, labels, name_fun, period_fun,
                                  period_info, strict) {
 
-  # remove all rows before the period row
-  if (period_info$row_nr > 1) {
-    tbl <- tbl[-(1:(period_info$row_nr - 1)), ]
-  }
 
   is_period <- period_info$is_period
   first_prd_col <- period_info$col_nr
@@ -231,15 +241,29 @@ read_ts_rowwise_xlsx <- function(tbl, frequency, labels, name_fun, period_fun,
     label_cols <- numeric(0)
   }
 
+  #
+  # read data
+  #
+  range_2 <- range
+  range_2$ul[1] <- range_2$ul[2] + period_info$row_nr
+  ncol <- length(period_info$is_period)
+  col_types <- rep("skip", ncol)
+  col_types[period_info$is_period] <- "numeric"
+  col_types[name_col] <- "text"
+  if (labels != 0) col_types[label_cols] <- "text"
+  tbl_2 <- read_excel(filename, sheet, range = range_2, col_names = FALSE,
+                      col_types = col_types, na = na_string,
+                      .name_repair = "minimal")
+
+  View(tbl_2)
+  return(NULL)
+
   # keep only period columns, the name column and the label columns
   col_sel <- is_period
   col_sel[c(name_col, label_cols)] <- TRUE
   tbl <- tbl[ , col_sel]
 
   data_cols <- (max(name_col, label_cols) + 1) : ncol(tbl)
-
-  periods <- get_periods_tbl(tbl[1, data_cols], frequency, xlsx = TRUE,
-                             period_fun)
 
   names <- tibble_2_char(tbl[-1, name_col], replace_na = FALSE)
   if (!missing(name_fun)) names <- name_fun(names)

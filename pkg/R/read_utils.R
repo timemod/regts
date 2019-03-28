@@ -104,7 +104,7 @@ find_periods <- function(tbl, frequency, rowwise, xlsx, period_fun) {
           } else {
             is_period_col <- is_period_tbl(tbl[[col_nr]], frequency, xlsx,
                                            period_fun)
-            rowwise <- col_nr != 1  && sum(is_period_row) > sum(is_period_col)
+            rowwise <- col_nr != 1  && sum(is_period_row) >= sum(is_period_col)
           }
         }
         if (rowwise) {
