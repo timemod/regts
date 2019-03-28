@@ -641,11 +641,11 @@ add_columns <- function(x, new_colnames) {
   }, error = function(err) {
     if (!j_missing && is.character(j) && err$message == "subscript out of bounds") {
       missing_cols <- setdiff(j, colnames(x))
-      col_text <- paste(missing_cols, collapse = ", ")
-      col_text <- strwrap(col_text, width = 80)
-      col_text <- paste(col_text, collapse = "\n")
-      stop(simpleError(paste0("Undefined columns:\n", col_text, "."),
-                         call = func_call))
+      message <- paste0("Undefined columns: ",
+                       paste(missing_cols, collapse = ", "), ".")
+      message_lines <- strwrap(message, width = 80)
+      message <- paste(message_lines, collapse = "\n")
+      stop(simpleError(message, call = func_call))
     } else {
       stop(err)
     }
