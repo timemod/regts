@@ -599,6 +599,9 @@ add_columns <- function(x, new_colnames) {
 
   j_missing <- missing(j)
 
+  # save function call for error handling
+  func_call <- sys.call()
+
   tryCatch({
     if (missing(i)) {
       lbls <- ts_labels(x)
@@ -641,8 +644,8 @@ add_columns <- function(x, new_colnames) {
       col_text <- paste(missing_cols, collapse = ", ")
       col_text <- strwrap(col_text, width = 80)
       col_text <- paste(col_text, collapse = "\n")
-      msg <- paste0("Undefined columns:\n", col_text, ".")
-      stop(msg)
+      stop(simpleError(paste0("Undefined columns:\n", col_text, "."),
+                         call = func_call))
     } else {
       stop(err)
     }

@@ -405,20 +405,41 @@ test_that("row selection with NA", {
 test_that("column selection with NA", {
   regts1 <- regts(matrix(1:10, ncol = 1), start = "2010Q4", names = "a")
   ts1 <- as.ts(regts1)
-  expect_identical(regts1[, NA], as.regts(ts1[, NA]))
-  expect_error(regts1[, NA_character_], "Undefined columns:\nNA.")
-  expect_error(regts1[, c("a", "z", "p", "g")], "Undefined columns:\nz, p, g.")
-  expect_error(regts1[, paste0("x",  1:10)])
+  expect_identical(regts1[, NA], as.regts(ts1[ , NA]))
 
+  expect_error(regts1[, NA_character_] <- 9, "subscript out of bounds")
 
   regts2 <- regts1
   regts2[, NA] <- 2L
   expect_identical(regts1, regts2)
-  expect_error(regts1[, NA_character_] <- 9, "subscript out of bounds")
 
   regts3 <- regts1
   regts3[, c(NA, 1)] <- 3
   expected_result <- regts1
   expected_result[] <- 3
   expect_identical(regts3, expected_result)
+})
+
+test_that("undefined columns selected", {
+
+  regts1 <- regts(matrix(1:10, ncol = 1), start = "2010Q4", names = "a")
+
+  expect_error(regts1[, NA_character_], "Undefined columns:\nNA.")
+  expect_error(regts1[, c("a", "z", "p", "g")], "Undefined columns:\nz, p, g.")
+
+  tryCatch({
+    regts1[, "xxx"]
+  }, error = function(err) {
+    err1 <<- err
+  })
+  expect_identical(err1$message, "Undefined columns:\nxxx.")
+  expect_identical(as.character(err1$call), c("[.regts", "regts1", "", "xxx"))
+
+  tryCatch({
+    regts1[, 50]
+  }, error = function(err) {
+    err2 <<- err
+  })
+  expect_identical(err2$message, "subscript out of bounds")
+  expect_identical(as.character(err2$call), c("[.default", "regts1", "", "50"))
 })
