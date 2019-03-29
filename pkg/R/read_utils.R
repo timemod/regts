@@ -93,18 +93,25 @@ find_periods <- function(tbl, frequency, rowwise, xlsx, period_fun) {
   }  else {
     # rowwise or columnwise
 
+    first_row_nr <- get_first_non_empty_row(tbl)
+    if (is.na(first_row_nr)) return(NULL)
+
     # first search for a period rowwise
-    for (row_nr in 1:nrow(tbl)) {
+    for (row_nr in first_row_nr:nrow(tbl)) {
       is_period_row <- is_period_tbl(tbl[row_nr, ], frequency, xlsx, period_fun)
       if (any(is_period_row)) {
         col_nr <- Position(function(x) {x}, is_period_row)
         if (missing(rowwise)) {
-          if (row_nr == 1) {
+          if (row_nr == first_row_nr) {
             rowwise <- TRUE
           } else {
             is_period_col <- is_period_tbl(tbl[[col_nr]], frequency, xlsx,
                                            period_fun)
-            rowwise <- col_nr != 1  && sum(is_period_row) >= sum(is_period_col)
+            # TODO: integers are also considered as periods. To determine
+            # rowwise, we should take this into account. For example, if
+            # is_period_row contains character periods and is_period_col
+            # integers, then the timeseries is probably rowwise.
+            rowwise <- col_nr != 1  && sum(is_period_row) > sum(is_period_col)
           }
         }
         if (rowwise) {
@@ -129,9 +136,27 @@ find_periods <- function(tbl, frequency, rowwise, xlsx, period_fun) {
   }
 
   if (found) {
+    if (rowwise) {
+      periods <- get_periods_tbl(tbl[row_nr, is_period], frequency, xlsx,
+                                 period_fun)
+    } else {
+      periods <- get_periods_tbl(tbl[is_period, col_nr], frequency, xlsx,
+                                 period_fun)
+    }
     return(list(rowwise = rowwise, row_nr = row_nr, col_nr = col_nr,
-                is_period = is_period))
+                is_period = is_period, periods = periods))
   } else {
     return(NULL)
   }
+}
+
+
+get_first_non_empty_row <- function(tbl) {
+  ttt <<- tbl
+  for (row_nr in 1:nrow(tbl)) {
+    if (any(!is.na(unlist(tbl[row_nr, ])))) {
+      return(row_nr)
+    }
+  }
+  return(NA)
 }

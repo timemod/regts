@@ -166,21 +166,20 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     stop("argument period_fun is not a function")
   }
 
-
+  # the number of lines used to inspect the file
   N <- 25
-
   range_1 <- range
   range_1$lr[1] <- range_1$ul[1] + N - 1
 
-  cat("range_1\n")
-  print(range_1)
+  #cat("range_1\n")
+  #print(range_1)
 
 
   tbl_1 <- read_excel(filename, sheet, range = range_1, col_names = FALSE,
                     col_types = "list", na = na_string,
                     .name_repair = "minimal")
 
-  View(tbl_1)
+  #View(tbl_1)
 
   # TODO: sheetname is not correct if the sheetname is specified in
   # argument sheet.
@@ -193,14 +192,14 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
                  filename))
   }
-  print(period_info)
+
+  #cat("period_info\n")
+  #print(period_info)
 
   if (period_info$rowwise) {
-    periods <- get_periods_tbl(tbl_1[period_info$row_nr, period_info$is_period],
-                               frequency, xlsx = TRUE, period_fun)
-    ret <- read_ts_rowwise_xlsx(filename, sheet, range, na_string, periods,
-                                frequency, labels, name_fun, period_fun,
-                                period_info = period_info, strict = strict)
+    ret <- read_ts_rowwise_xlsx(filename, sheet, range, na_string, frequency,
+                                labels, name_fun, period_fun, period_info,
+                                strict)
   } else {
     stop("columnwise not yet supported")
     ret <- read_ts_columnwise_xlsx(tbl, frequency = frequency, labels = labels,
@@ -213,7 +212,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 
 # Internal function to read timeseries rowwise from a tibble, used by
 # read_ts_xlsx
-read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string, periods,
+read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
                                  frequency, labels, name_fun, period_fun,
                                  period_info, strict) {
 
@@ -251,49 +250,43 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string, periods,
   col_types[period_info$is_period] <- "numeric"
   col_types[name_col] <- "text"
   if (labels != 0) col_types[label_cols] <- "text"
-  tbl_2 <- read_excel(filename, sheet, range = range_2, col_names = FALSE,
+  data_tbl <- read_excel(filename, sheet, range = range_2, col_names = FALSE,
                       col_types = col_types, na = na_string,
                       .name_repair = "minimal")
 
-  View(tbl_2)
-  return(NULL)
+  # remove rows with empty names
+  data_tbl <- data_tbl[!is.na(data_tbl[[name_col]]), ]
 
-  # keep only period columns, the name column and the label columns
-  col_sel <- is_period
-  col_sel[c(name_col, label_cols)] <- TRUE
-  tbl <- tbl[ , col_sel]
-
-  data_cols <- (max(name_col, label_cols) + 1) : ncol(tbl)
-
-  names <- tibble_2_char(tbl[-1, name_col], replace_na = FALSE)
+  # extra names
+  names <- data_tbl[[name_col]]
   if (!missing(name_fun)) names <- name_fun(names)
-  name_sel <- !is.na(names)
-  names <- names[name_sel]
 
-  # remove rows without names, including the row with the period
-  tbl <- tbl[c(FALSE, name_sel), ]
+  # extract labels
+  if (labels != "no" && length(label_cols) > 0) {
+    label_tbl <- data_tbl[ , label_cols]
+    label_tbl[] <- lapply(label_tbl, FUN = function(x)
+                {ifelse(is.na(x),  "", as.character(x))})
+    if (length(label_cols) == 1) {
+      lbls <- unlist(label_tbl, use.names = FALSE)
+    } else {
+      lbls <- do.call(paste, label_tbl)
+      lbls <- trimws(lbls, which = "right")
+    }
+  }
+
+  label_tbl <- data_tbl[ , label_cols]
 
   # convert data columns to a numeric matrix
-  mat <- convert_data_tbl(tbl[ , data_cols], transpose = TRUE, colnames = names)
+  mat <- t(as.matrix(data_tbl[ , -c(name_col, label_cols)]))
+  colnames(mat) <- names
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
-  ret <- matrix2regts_(mat, periods, fun = period, numeric = FALSE,
+  ret <- matrix2regts_(mat, period_info$periods, fun = period, numeric = FALSE,
                        frequency = frequency, strict = strict)
 
-  if (labels != "no" && length(label_cols) > 0) {
-    lbl_data <- tbl[, label_cols]
-    lbl_data[] <- lapply(lbl_data, FUN = function(x)
-                          {ifelse(is.na(x),  "", as.character(x))})
-    if (length(label_cols) == 1) {
-      lbls <- unlist(lbl_data, use.names = FALSE)
-    } else {
-      lbls <- do.call(paste, lbl_data)
-      lbls <- trimws(lbls, which = "right")
-    }
-    if (any(lbls != "")) {
-      ts_labels(ret) <- lbls
-    }
+  if (labels != "no" && any(nzchar(lbls))) {
+    ts_labels(ret) <- lbls
   }
 
   return(ret)
