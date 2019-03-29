@@ -70,7 +70,9 @@ get_periods_tbl <- function(tbl, frequency, xlsx, period_fun) {
 
 # internal function: find the first row or column containing a period in the
 # tibble read by read_excel of fread. Returns NULL if no period has been found
-find_periods <- function(tbl, frequency, rowwise, xlsx, period_fun) {
+get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun) {
+
+  first_row_nr <- get_first_non_empty_row(tbl)
 
   found <- FALSE
 
@@ -136,15 +138,68 @@ find_periods <- function(tbl, frequency, rowwise, xlsx, period_fun) {
   }
 
   if (found) {
+
     if (rowwise) {
+
       periods <- get_periods_tbl(tbl[row_nr, is_period], frequency, xlsx,
                                  period_fun)
+      names <- NULL
+      lbls <- NULL
+      is_data_col <- is_period
+
+      # TODO: in weird situations there may be a period indicator above the
+      # columns with variables, etc. Handle this situation.
+
     } else {
-      periods <- get_periods_tbl(tbl[is_period, col_nr], frequency, xlsx,
-                                 period_fun)
+
+      is_period_row <- NULL
+      periods <- NULL
+
+      # ignore possible period in the first row
+      first_data_row <- max(row_nr, 2)
+
+      if (first_data_row == first_row_nr + 1) labels <- "no"
+
+      # compute the row with variable names. 0 means: column names
+      # and the label rows
+      if (labels == "before") {
+        name_row <- first_data_row - 1
+        label_rows <- first_row_nr:(first_data_row - 2)
+      } else {
+        name_row <- first_row_nr
+        if (first_data_row > first_row_nr + 1) {
+          label_rows <- (first_row_nr + 1):(first_data_row -1)
+        } else {
+          label_rows <- integer(0)
+        }
+      }
+
+      name_row_data <- tibble_2_char(tbl[name_row, ])
+      is_data_col <- nzchar(name_row_data)
+      is_data_col[1 : col_nr] <- FALSE
+
+      names <- name_row_data[is_data_col]
+
+      # labels
+      if (labels != "no" && length(label_rows)) {
+        label_tbl <- tbl[label_rows, is_data_col]
+        label_tbl[] <- lapply(label_tbl, FUN = function(x)
+                          {ifelse(is.na(x),  "", as.character(x))})
+        if (length(label_rows) == 1) {
+          lbls <- unlist(label_tbl, use.names = FALSE)
+        } else {
+          label_mat <- as.matrix(label_tbl)
+          lbls <- apply(label_mat, MARGIN = 2, FUN = paste, collapse = " ")
+          lbls <- trimws(lbls, which = "right")
+        }
+        if (!any(nzchar(lbls))) lbls <- NULL
+      } else {
+        lbls <- NULL
+      }
     }
-    return(list(rowwise = rowwise, row_nr = row_nr, col_nr = col_nr,
-                is_period = is_period, periods = periods))
+    return(list(rowwise = rowwise, period_row = row_nr, period_col = col_nr,
+                is_data_col = is_data_col, periods = periods, names = names,
+                lbls = lbls))
   } else {
     return(NULL)
   }
@@ -152,7 +207,6 @@ find_periods <- function(tbl, frequency, rowwise, xlsx, period_fun) {
 
 
 get_first_non_empty_row <- function(tbl) {
-  ttt <<- tbl
   for (row_nr in 1:nrow(tbl)) {
     if (any(!is.na(unlist(tbl[row_nr, ])))) {
       return(row_nr)

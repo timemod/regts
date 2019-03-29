@@ -153,6 +153,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   } else {
     range <- as.cell_limits(range)
     if (is.na(range$ul[1])) range$ul[1] <- 1
+    if (is.na(range$ul[2])) range$ul[2] <- 1
   }
 
   na_string <- union(na_string, "")
@@ -178,33 +179,28 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   tbl_1 <- read_excel(filename, sheet, range = range_1, col_names = FALSE,
                     col_types = "list", na = na_string,
                     .name_repair = "minimal")
-
   #View(tbl_1)
 
   # TODO: sheetname is not correct if the sheetname is specified in
   # argument sheet.
   sheetname <- if (is.null(sheet)) "1" else as.character(sheet)
 
-  period_info <- find_periods(tbl_1, frequency, rowwise, xlsx = TRUE,
-                              period_fun = period_fun)
+  tbl_layout <- get_tbl_layout(tbl_1, frequency, rowwise, labels,
+                               xlsx = TRUE, period_fun = period_fun)
 
-  if (is.null(period_info)) {
+  if (is.null(tbl_layout)) {
     stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
                  filename))
   }
 
-  #cat("period_info\n")
-  #print(period_info)
-
-  if (period_info$rowwise) {
-    ret <- read_ts_rowwise_xlsx(filename, sheet, range, na_string, frequency,
-                                labels, name_fun, period_fun, period_info,
-                                strict)
+  if (tbl_layout$rowwise) {
+    return(read_ts_rowwise_xlsx(filename, sheet, range, na_string, frequency,
+                                labels, name_fun, period_fun, tbl_layout,
+                                strict))
   } else {
-    stop("columnwise not yet supported")
-    ret <- read_ts_columnwise_xlsx(tbl, frequency = frequency, labels = labels,
-                                  name_fun = name_fun, period_fun = period_fun,
-                                  period_info = period_info, strict = strict)
+    return(read_ts_columnwise_xlsx(filename, sheet, range, na_string,
+                                   frequency, name_fun, period_fun,
+                                   tbl_layout, strict))
   }
 
   return(ret)
@@ -214,45 +210,48 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 # read_ts_xlsx
 read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
                                  frequency, labels, name_fun, period_fun,
-                                 period_info, strict) {
+                                 tbl_layout, strict) {
 
+  if (!any(tbl_layout$is_data_col)) return(NULL) # TODO: error message?
 
-  is_period <- period_info$is_period
-  first_prd_col <- period_info$col_nr
-
-  # ignore possible period in the first colum
-  first_prd_col <- max(first_prd_col, 2)
-
-  # no labels found, ignore labels
-  if (first_prd_col == 2) labels = "no"
-
-  name_col <- if (labels == "before") first_prd_col - 1 else 1
-
-  if (labels == "before") {
-    label_cols <- seq_len(name_col - 1)
-  } else if (labels == "after") {
-    if (first_prd_col >= 3) {
-      label_cols <- 2 : (first_prd_col - 1)
-    } else {
-      label_cols <- numeric(0)
-    }
-  } else {
-    label_cols <- numeric(0)
-  }
+  #printobj(tbl_layout)
 
   #
   # read data
   #
-  range_2 <- range
-  range_2$ul[1] <- range_2$ul[2] + period_info$row_nr
-  ncol <- length(period_info$is_period)
-  col_types <- rep("skip", ncol)
-  col_types[period_info$is_period] <- "numeric"
-  col_types[name_col] <- "text"
-  if (labels != 0) col_types[label_cols] <- "text"
-  data_tbl <- read_excel(filename, sheet, range = range_2, col_names = FALSE,
-                      col_types = col_types, na = na_string,
-                      .name_repair = "minimal")
+  last_data_col <- Position(identity, tbl_layout$is_data_col, right = TRUE)
+  range$ul[1] <- range$ul[1] + tbl_layout$period_row
+  range$lr[2] <- range$ul[2] + last_data_col - 1
+
+  col_types <- rep("skip", last_data_col)
+  col_types[tbl_layout$is_data_col[1:last_data_col]] <- "numeric"
+  col_types[1:(tbl_layout$period_col - 1)] <- "text"
+
+  # read data
+  data_tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
+                         col_types = col_types, na = na_string,
+                         .name_repair = "minimal")
+
+  # find first  non-empty column
+  not_all_na <- sapply(data_tbl, FUN = function(x) {!all(is.na(x))})
+  first_col_nr <- Position(identity, not_all_na)
+
+  # no labels found, ignore labels
+  if (tbl_layout$period_col == first_col_nr + 1) labels = "no"
+
+  name_col <- if (labels == "before") {
+                tbl_layout$period_col - 1
+              } else {
+                first_col_nr
+              }
+
+  if (labels == "before") {
+    label_cols <- seq_len(name_col - 1)
+  } else if (labels == "after") {
+      label_cols <- 2 : (tbl_layout$period_col - 1)
+  } else {
+    label_cols <- numeric(0)
+  }
 
   # remove rows with empty names
   data_tbl <- data_tbl[!is.na(data_tbl[[name_col]]), ]
@@ -282,7 +281,7 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
-  ret <- matrix2regts_(mat, period_info$periods, fun = period, numeric = FALSE,
+  ret <- matrix2regts_(mat, tbl_layout$periods, fun = period, numeric = FALSE,
                        frequency = frequency, strict = strict)
 
   if (labels != "no" && any(nzchar(lbls))) {
@@ -294,88 +293,55 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
 
 # Internal function to read timeseries columnwise from a tibble, used in
 # read_ts_xlsx.
-read_ts_columnwise_xlsx <- function(tbl, frequency, labels, name_fun,
-                                    period_fun, period_info, strict) {
+read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
+                                    frequency, name_fun, period_fun,
+                                    tbl_layout, strict) {
 
-  time_column <- period_info$col_nr
-  is_period <- period_info$is_period
-  first_data_row <- period_info$row_nr
+  if (!any(tbl_layout$is_data_col)) return(NULL) # TODO: error message?
 
-  # ignore possible period in the first row
-  first_data_row <- max(first_data_row, 2)
+  #
+  # read data
+  #
 
-  # no labels found, ignore labels
-  if (first_data_row == 2) labels <- "no"
+  # determine range of data to read
+  last_data_col <- Position(identity, tbl_layout$is_data_col, right = TRUE)
+  range$ul[1] <- range$ul[1] + tbl_layout$period_row - 1
+  range$ul[2] <- range$ul[2] + tbl_layout$period_col - 1
+  range$lr[2] <- range$ul[2] + last_data_col - tbl_layout$period_col
 
-  # compute the row with variable names. 0 means: column names
-  # and the label rows
-  if (labels != "before") {
-    name_row <- 1
-    if (first_data_row > 2) {
-      label_rows <- 2:(first_data_row -1)
-    } else {
-      label_rows <- integer(0)
-    }
-  } else {  # labels == before
-    name_row <- first_data_row - 1
-    if (first_data_row > 2) {
-      label_rows <- 1:(first_data_row - 2)
-    } else {
-      label_rows <- integer(0)
-    }
-  }
+  # prepare column types
+  ncol_to_read <- last_data_col - tbl_layout$period_col + 1
+  col_types <- rep("skip", ncol_to_read)
+  col_types[1] <- "list"
+  col_types[tbl_layout$is_data_col[tbl_layout$period_col:last_data_col]] <- "numeric"
+  #printobj(col_types)
+  #printobj(range)
 
-  if (length(label_rows) == 0) {
-    labels <- "no"
-  }
+  # read data
+  data_tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
+                         col_types = col_types, na = na_string,
+                         .name_repair = "minimal")
 
-  # drop all columns to the left of time_column
-  if (time_column > 1) {
-    tbl <- tbl[, -(1:(time_column - 1))]
-  }
+  # select rows with valid periods
+  row_sel <- is_period_tbl(data_tbl[[1]], frequency, TRUE, period_fun)
+  data_tbl <- data_tbl[row_sel, ]
 
-  # get variable names
-  ts_names <- unlist(tbl[name_row, -1], use.names = FALSE)
-  if (!missing(name_fun)) ts_names <- name_fun(ts_names)
-  name_sel <- which(!is.na(ts_names))
-  ts_names <- ts_names[name_sel]
+  # TODO: this code is not efficient:
+  # 1) The period has been parsed before in is_period_tbl.
+  # 2) If period_fun has been specified, then it it called twice,
+  periods <- get_periods_tbl(data_tbl[[1]], frequency, TRUE, period_fun)
 
-  # keep the period column and the columnws with names
-  keep_cols <- c(1, name_sel + 1)
-  tbl <- tbl[, keep_cols]
 
-  # labels
-  if (labels != "no" && length(label_rows) > 0) {
-    lbl_data <- tbl[label_rows, -1]
-    lbl_data[] <- lapply(lbl_data, FUN = function(x)
-                              {ifelse(is.na(x),  "", as.character(x))})
-    if (length(label_rows) == 1) {
-      lbls <- unlist(lbl_data, use.names = FALSE)
-    } else {
-      lbl_mat <- as.matrix(lbl_data)
-      lbls <- apply(lbl_mat, MARGIN = 2, FUN = paste, collapse = " ")
-      lbls <- trimws(lbls, which = "right")
-    }
-  }
-
-  # remove all rows without period (the names and labels have already been
-  # stored in variables ts_names and lbls)
-  tbl <- tbl[is_period, ]
-
-  periods <- get_periods_tbl(tbl[[1]], frequency, xlsx = TRUE,
-                             period_fun = period_fun)
-
-  # convert data columns to a numeric matrix
-  mat <- convert_data_tbl(tbl[-1], transpose = FALSE, colnames = ts_names)
+  mat <- as.matrix(data_tbl[-1])
+  colnames(mat) <- tbl_layout$names
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
-
   ret <- matrix2regts_(mat, periods, fun = period, numeric = FALSE,
                        frequency = frequency, strict = strict)
 
-  if (labels != "no" && length(label_rows) > 0 && any(lbls != "")) {
-      ts_labels(ret) <- lbls
+  if (!is.null(tbl_layout$lbls)) {
+    ts_labels(ret) <- tbl_layout$lbls
   }
 
   return(ret)
