@@ -172,21 +172,22 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   range_1 <- range
   range_1$lr[1] <- range_1$ul[1] + N - 1
 
-  #cat("range_1\n")
-  #print(range_1)
-
-
   tbl_1 <- read_excel(filename, sheet, range = range_1, col_names = FALSE,
                     col_types = "list", na = na_string,
                     .name_repair = "minimal")
-  #View(tbl_1)
 
   # TODO: sheetname is not correct if the sheetname is specified in
-  # argument sheet.
+  # argument range.
   sheetname <- if (is.null(sheet)) "1" else as.character(sheet)
+
+  if (nrow(tbl_1) == 0 || ncol(tbl_1) == 0) {
+    stop(sprintf("Sheet %s of file %s is empty\n", sheetname, filename))
+  }
 
   tbl_layout <- get_tbl_layout(tbl_1, frequency, rowwise, labels,
                                xlsx = TRUE, period_fun = period_fun)
+
+  #printobj(tbl_layout)
 
   if (is.null(tbl_layout)) {
     stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
@@ -223,32 +224,39 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
   range$ul[1] <- range$ul[1] + tbl_layout$period_row
   range$lr[2] <- range$ul[2] + last_data_col - 1
 
+  #printobj(range)
+
   col_types <- rep("skip", last_data_col)
   col_types[tbl_layout$is_data_col[1:last_data_col]] <- "numeric"
   col_types[1:(tbl_layout$period_col - 1)] <- "text"
+  #printobj(col_types)
 
   # read data
   data_tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
                          col_types = col_types, na = na_string,
                          .name_repair = "minimal")
 
+  # View(data_tbl)
+
   # find first  non-empty column
   not_all_na <- sapply(data_tbl, FUN = function(x) {!all(is.na(x))})
   first_col_nr <- Position(identity, not_all_na)
 
+  first_data_col <- tbl_layout$period_col
+
   # no labels found, ignore labels
-  if (tbl_layout$period_col == first_col_nr + 1) labels = "no"
+  if (first_data_col == first_col_nr + 1) labels = "no"
 
   name_col <- if (labels == "before") {
-                tbl_layout$period_col - 1
+                first_data_col - 1
               } else {
                 first_col_nr
               }
 
   if (labels == "before") {
-    label_cols <- seq_len(name_col - 1)
+    label_cols <- first_col_nr : (name_col - 1)
   } else if (labels == "after") {
-      label_cols <- 2 : (tbl_layout$period_col - 1)
+      label_cols <- (first_col_nr + 1): (first_data_col - 1)
   } else {
     label_cols <- numeric(0)
   }
@@ -264,7 +272,7 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
   if (labels != "no" && length(label_cols) > 0) {
     label_tbl <- data_tbl[ , label_cols]
     label_tbl[] <- lapply(label_tbl, FUN = function(x)
-                {ifelse(is.na(x),  "", as.character(x))})
+                               {ifelse(is.na(x),  "", as.character(x))})
     if (length(label_cols) == 1) {
       lbls <- unlist(label_tbl, use.names = FALSE)
     } else {
@@ -276,7 +284,7 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
   label_tbl <- data_tbl[ , label_cols]
 
   # convert data columns to a numeric matrix
-  mat <- t(as.matrix(data_tbl[ , -c(name_col, label_cols)]))
+  mat <- t(as.matrix(data_tbl[ , -(1:(first_data_col - 1))]))
   colnames(mat) <- names
 
   # convert the matrix to a regts, using numeric = FALSE because we already

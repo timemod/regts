@@ -47,7 +47,8 @@ test_that("example2.xlsx is read correctly",  {
 
   xlsx_file <- "xlsx/example2.xlsx"
 
-  result <- read_ts_xlsx(xlsx_file, skipcol = 1, sheet = 2, labels = "no", strict = FALSE)
+  result <- read_ts_xlsx(xlsx_file, skipcol = 1, sheet = 2, labels = "no",
+                         strict = FALSE)
   expect_identical(result, correct_result)
 
   result2 <- read_ts_xlsx(xlsx_file, sheet = "example2", skipcol = 1,

@@ -73,6 +73,7 @@ get_periods_tbl <- function(tbl, frequency, xlsx, period_fun) {
 get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun) {
 
   first_row_nr <- get_first_non_empty_row(tbl)
+  first_col_nr <- 1  # TODO: find position of first non-empty column
 
   found <- FALSE
 
@@ -139,7 +140,18 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun) {
 
   if (found) {
 
+    period_col <- col_nr
+    period_row <- row_nr
+
     if (rowwise) {
+
+      if (is_period[first_col_nr]) {
+        # if the first period column is at the first non-empty column, then
+        # ignore that period.
+        is_period[first_col_nr] <- FALSE
+        period_col <- Position(identity, is_period)
+        if (is.na(period_col)) return(NULL)
+      }
 
       periods <- get_periods_tbl(tbl[row_nr, is_period], frequency, xlsx,
                                  period_fun)
@@ -197,9 +209,9 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun) {
         lbls <- NULL
       }
     }
-    return(list(rowwise = rowwise, period_row = row_nr, period_col = col_nr,
-                is_data_col = is_data_col, periods = periods, names = names,
-                lbls = lbls))
+    return(list(rowwise = rowwise, period_row = period_row,
+                period_col = period_col, is_data_col = is_data_col,
+                periods = periods, names = names, lbls = lbls))
   } else {
     return(NULL)
   }
