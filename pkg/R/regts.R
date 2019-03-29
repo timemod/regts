@@ -478,7 +478,7 @@ matrix2regts_ <- function(x, periods, numeric, fun, strict, ...) {
         dif_periods <- create_periods(dif, freq)
         missing_periods <- sapply(dif_periods, FUN = as.character)
         mp <- paste(missing_periods, collapse = ", ")
-        stop(paste0("Missing periods found (", mp, "). Use parameter strict!"))
+        stop(paste0("Missing periods found (", mp, "). Set parameter strict to FALSE!"))
       }
     }
 
