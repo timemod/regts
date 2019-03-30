@@ -288,10 +288,13 @@ get_labels_from_tbl <- function(label_tbl, rowwise) {
     label_tbl <- as.tibble(t(label_tbl))
   }
   if (ncol(label_tbl) == 1) {
-    lbls <- unlist(label_tbl, use.names = FALSE)
+    #lbls <- unlist(label_tbl, use.names = FALSE)
+    lbls <- label_tbl[[1]]
   } else {
     lbls <- do.call(paste, label_tbl)
+    # remove spurious spaces that are created when a label is "".
     lbls <- trimws(lbls, which = "right")
+    lbls <- gsub(" {2,}", "", lbls)
   }
   if (!any(nzchar(lbls))) lbls <- NULL
   return(lbls)
