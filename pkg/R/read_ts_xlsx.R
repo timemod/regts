@@ -212,23 +212,18 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
                                  frequency, labels, name_fun, period_fun,
                                  tbl_layout, strict) {
-
-  if (!any(tbl_layout$is_data_col)) return(NULL) # TODO: error message?
-
-  #printobj(tbl_layout)
-
   #
   # read data
   #
-  last_data_col <- Position(identity, tbl_layout$is_data_col, right = TRUE)
+
   range$ul[1] <- range$ul[1] + tbl_layout$period_row
-  range$lr[2] <- range$ul[2] + last_data_col - 1
+  range$lr[2] <- range$ul[2] + tbl_layout$last_data_col - 1
 
   #printobj(range)
 
-  col_types <- rep("skip", last_data_col)
-  col_types[tbl_layout$is_data_col[1:last_data_col]] <- "numeric"
-  col_types[1:(tbl_layout$period_col - 1)] <- "text"
+  col_types <- rep("skip", tbl_layout$last_data_col)
+  col_types[tbl_layout$is_data_col[1:tbl_layout$last_data_col]] <- "numeric"
+  col_types[1:(tbl_layout$first_data_col - 1)] <- "text"
   #printobj(col_types)
 
   # read data
@@ -238,62 +233,28 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
 
   # View(data_tbl)
 
-  # find first  non-empty column
+  # find first  non-empty column. NOTE: do not use tbl_layout$first_col_nr,
+  # because that colum number if only based on the first 25 rows.
+  # TODO: make a function get_first_non_empty_col in read_utils.
   not_all_na <- sapply(data_tbl, FUN = function(x) {!all(is.na(x))})
   first_col_nr <- Position(identity, not_all_na)
 
-  first_data_col <- tbl_layout$period_col
-
-  # no labels found, ignore labels
-  if (first_data_col == first_col_nr + 1) labels = "no"
-
-  name_col <- if (labels == "before") {
-                first_data_col - 1
-              } else {
-                first_col_nr
-              }
-
-  if (labels == "before") {
-    label_cols <- first_col_nr : (name_col - 1)
-  } else if (labels == "after") {
-      label_cols <- (first_col_nr + 1): (first_data_col - 1)
-  } else {
-    label_cols <- numeric(0)
-  }
-
-  # remove rows with empty names
-  data_tbl <- data_tbl[!is.na(data_tbl[[name_col]]), ]
-
-  # extra names
-  names <- data_tbl[[name_col]]
-  if (!missing(name_fun)) names <- name_fun(names)
-
-  # extract labels
-  if (labels != "no" && length(label_cols) > 0) {
-    label_tbl <- data_tbl[ , label_cols]
-    label_tbl[] <- lapply(label_tbl, FUN = function(x)
-                               {ifelse(is.na(x),  "", as.character(x))})
-    if (length(label_cols) == 1) {
-      lbls <- unlist(label_tbl, use.names = FALSE)
-    } else {
-      lbls <- do.call(paste, label_tbl)
-      lbls <- trimws(lbls, which = "right")
-    }
-  }
-
-  label_tbl <- data_tbl[ , label_cols]
+  name_info <- get_name_info_rowwise(tbl_layout, first_col_nr, data_tbl,
+                                      labels, name_fun)
 
   # convert data columns to a numeric matrix
-  mat <- t(as.matrix(data_tbl[ , -(1:(first_data_col - 1))]))
-  colnames(mat) <- names
+  rowsel <- name_info$row_has_name
+  colsel <- tbl_layout$first_data_col : ncol(data_tbl)
+  mat <- t(as.matrix(data_tbl[rowsel , colsel]))
+  colnames(mat) <- name_info$names
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
-  ret <- matrix2regts_(mat, tbl_layout$periods, fun = period, numeric = FALSE,
-                       frequency = frequency, strict = strict)
+  ret <- matrix2regts_(mat, periods = tbl_layout$periods, fun = period,
+                       numeric = FALSE, frequency = frequency, strict = strict)
 
-  if (labels != "no" && any(nzchar(lbls))) {
-    ts_labels(ret) <- lbls
+  if (!is.null(name_info$lbls)) {
+    ts_labels(ret) <- name_info$lbls
   }
 
   return(ret)
