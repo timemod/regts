@@ -178,53 +178,17 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun) {
       if (is.na(first_data_row)) return(NULL)
     }
 
+    period_col <- col_nr
+    name_info <- get_name_info_colwise(first_data_row, first_row_nr,
+                                       period_col, tbl, labels, name_fun)
 
-    # no labels if there is only one non-empty row before the first data row
-    if (first_data_row == first_row_nr + 1) labels <- "no"
-
-    # compute the row with variable names. 0 means: column names
-    # and the label rows
-    if (labels == "before") {
-      name_row <- first_data_row - 1
-      label_rows <- first_row_nr:(first_data_row - 2)
-    } else {
-      name_row <- first_row_nr
-      if (first_data_row > first_row_nr + 1) {
-        label_rows <- (first_row_nr + 1):(first_data_row -1)
-      } else {
-        label_rows <- integer(0)
-      }
-    }
-
-    name_row_data <- tibble_2_char(tbl[name_row, ])
-    is_data_col <- nzchar(name_row_data)
-    is_data_col[1 : col_nr] <- FALSE
-    last_data_col <- Position(identity, is_data_col, right = TRUE)
-
-    names <- name_row_data[is_data_col]
-
-    # labels
-    if (labels != "no" && length(label_rows)) {
-      label_tbl <- tbl[label_rows, is_data_col]
-      label_tbl[] <- lapply(label_tbl, FUN = function(x)
-      {ifelse(is.na(x),  "", as.character(x))})
-      if (length(label_rows) == 1) {
-        lbls <- unlist(label_tbl, use.names = FALSE)
-      } else {
-        label_mat <- as.matrix(label_tbl)
-        lbls <- apply(label_mat, MARGIN = 2, FUN = paste, collapse = " ")
-        lbls <- trimws(lbls, which = "right")
-      }
-      if (!any(nzchar(lbls))) lbls <- NULL
-    } else {
-      lbls <- NULL
-    }
+    last_data_col <- Position(identity, name_info$col_has_name, right = TRUE)
 
     return(list(rowwise = FALSE, first_row_nr = first_row_nr,
-                period_col = col_nr, first_data_row = first_data_row,
+                period_col = period_col, first_data_row = first_data_row,
                 last_data_col = last_data_col,
-                is_data_col = is_data_col, is_data_row = is_period,
-                names = names, lbls = lbls))
+                is_data_col = name_info$col_has_name, is_data_row = is_period,
+                names = name_info$names, lbls = name_info$lbls))
   }
 }
 
@@ -248,10 +212,10 @@ get_name_info_rowwise <- function(tbl_layout, first_col_nr, data_tbl,
   if (tbl_layout$first_data_col == first_col_nr + 1) labels = "no"
 
   name_col <- if (labels == "before") {
-                  tbl_layout$first_data_col - 1
-              } else {
-                  first_col_nr
-              }
+    tbl_layout$first_data_col - 1
+  } else {
+    first_col_nr
+  }
 
   if (labels == "before") {
     label_cols <- first_col_nr : (name_col - 1)
@@ -271,7 +235,7 @@ get_name_info_rowwise <- function(tbl_layout, first_col_nr, data_tbl,
   if (labels != "no") {
     label_tbl <- data_tbl[row_has_name , label_cols]
     label_tbl[] <- lapply(label_tbl, FUN = function(x)
-            {ifelse(is.na(x),  "", as.character(x))})
+    {ifelse(is.na(x),  "", as.character(x))})
     if (length(label_cols) == 1) {
       lbls <- unlist(label_tbl, use.names = FALSE)
     } else {
@@ -284,4 +248,52 @@ get_name_info_rowwise <- function(tbl_layout, first_col_nr, data_tbl,
   }
 
   return(list(row_has_name = row_has_name, names = names, lbls = lbls))
+}
+
+
+get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
+                                  labels, name_fun) {
+
+  # no labels if there is only one non-empty row before the first data row
+  if (first_data_row == first_row_nr + 1) labels <- "no"
+
+  # compute the row with variable names. 0 means: column names
+  # and the label rows
+  if (labels == "before") {
+    name_row <- first_data_row - 1
+    label_rows <- first_row_nr:(first_data_row - 2)
+  } else {
+    name_row <- first_row_nr
+    if (first_data_row > first_row_nr + 1) {
+      label_rows <- (first_row_nr + 1):(first_data_row -1)
+    } else {
+      label_rows <- integer(0)
+    }
+  }
+
+  name_row_data <- tibble_2_char(tbl[name_row, ])
+
+  col_has_name <- nzchar(name_row_data)
+  col_has_name[1 : period_col] <- FALSE
+
+  names <- name_row_data[col_has_name]
+
+  # labels
+  if (labels != "no" && length(label_rows)) {
+    label_tbl <- tbl[label_rows, col_has_name]
+    label_tbl[] <- lapply(label_tbl, FUN = function(x)
+    {ifelse(is.na(x),  "", as.character(x))})
+    if (length(label_rows) == 1) {
+      lbls <- unlist(label_tbl, use.names = FALSE)
+    } else {
+      label_mat <- as.matrix(label_tbl)
+      lbls <- apply(label_mat, MARGIN = 2, FUN = paste, collapse = " ")
+      lbls <- trimws(lbls, which = "right")
+    }
+    if (!any(nzchar(lbls))) lbls <- NULL
+  } else {
+    lbls <- NULL
+  }
+
+  return(list(col_has_name = col_has_name, names = names, lbls = lbls))
 }
