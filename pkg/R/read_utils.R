@@ -168,14 +168,18 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun) {
 
   } else {
 
-    period_row <- row_nr
-    period_col <- col_nr
-    is_period_row <- NULL
-    periods <- NULL
+    first_data_row <- row_nr
 
-    # ignore possible period in the first row
-    first_data_row <- max(row_nr, 2)
+    if (is_period[first_row_nr]) {
+      # if the first period row is the first non-empty row, then
+      # ignore that period, since the row should contain variable names
+      is_period[first_row_nr] <- FALSE
+      first_data_row <- Position(identity, is_period)
+      if (is.na(first_data_row)) return(NULL)
+    }
 
+
+    # no labels if there is only one non-empty row before the first data row
     if (first_data_row == first_row_nr + 1) labels <- "no"
 
     # compute the row with variable names. 0 means: column names
@@ -195,6 +199,7 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun) {
     name_row_data <- tibble_2_char(tbl[name_row, ])
     is_data_col <- nzchar(name_row_data)
     is_data_col[1 : col_nr] <- FALSE
+    last_data_col <- Position(identity, is_data_col, right = TRUE)
 
     names <- name_row_data[is_data_col]
 
@@ -214,10 +219,13 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun) {
     } else {
       lbls <- NULL
     }
+
+    return(list(rowwise = FALSE, first_row_nr = first_row_nr,
+                period_col = col_nr, first_data_row = first_data_row,
+                last_data_col = last_data_col,
+                is_data_col = is_data_col, is_data_row = is_period,
+                names = names, lbls = lbls))
   }
-  return(list(rowwise = rowwise, period_row = period_row,
-              period_col = period_col, is_data_col = is_data_col,
-              periods = periods, names = names, lbls = lbls))
 }
 
 

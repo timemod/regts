@@ -273,16 +273,17 @@ read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
   #
 
   # determine range of data to read
-  last_data_col <- Position(identity, tbl_layout$is_data_col, right = TRUE)
-  range$ul[1] <- range$ul[1] + tbl_layout$period_row - 1
+
+  range$ul[1] <- range$ul[1] + tbl_layout$first_data_row - 1
   range$ul[2] <- range$ul[2] + tbl_layout$period_col - 1
-  range$lr[2] <- range$ul[2] + last_data_col - tbl_layout$period_col
+  range$lr[2] <- range$ul[2] + tbl_layout$last_data_col - tbl_layout$period_col
 
   # prepare column types
-  ncol_to_read <- last_data_col - tbl_layout$period_col + 1
+  ncol_to_read <- tbl_layout$last_data_col - tbl_layout$period_col + 1
   col_types <- rep("skip", ncol_to_read)
   col_types[1] <- "list"
-  col_types[tbl_layout$is_data_col[tbl_layout$period_col:last_data_col]] <- "numeric"
+  colsel <- tbl_layout$period_col:tbl_layout$last_data_col
+  col_types[tbl_layout$is_data_col[colsel]] <- "numeric"
   #printobj(col_types)
   #printobj(range)
 
