@@ -234,15 +234,7 @@ get_name_info_rowwise <- function(tbl_layout, first_col_nr, data_tbl,
   # extract labels
   if (labels != "no") {
     label_tbl <- data_tbl[row_has_name , label_cols]
-    label_tbl[] <- lapply(label_tbl, FUN = function(x)
-    {ifelse(is.na(x),  "", as.character(x))})
-    if (length(label_cols) == 1) {
-      lbls <- unlist(label_tbl, use.names = FALSE)
-    } else {
-      lbls <- do.call(paste, label_tbl)
-      lbls <- trimws(lbls, which = "right")
-    }
-    if (!any(nzchar(lbls))) lbls <- NULL
+    lbls <- get_labels_from_tbl(label_tbl, TRUE)
   } else {
     lbls <- NULL
   }
@@ -279,21 +271,28 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
   names <- name_row_data[col_has_name]
 
   # labels
-  if (labels != "no" && length(label_rows)) {
+  if (labels != "no") {
     label_tbl <- tbl[label_rows, col_has_name]
-    label_tbl[] <- lapply(label_tbl, FUN = function(x)
-    {ifelse(is.na(x),  "", as.character(x))})
-    if (length(label_rows) == 1) {
-      lbls <- unlist(label_tbl, use.names = FALSE)
-    } else {
-      label_mat <- as.matrix(label_tbl)
-      lbls <- apply(label_mat, MARGIN = 2, FUN = paste, collapse = " ")
-      lbls <- trimws(lbls, which = "right")
-    }
-    if (!any(nzchar(lbls))) lbls <- NULL
+    lbls <- get_labels_from_tbl(label_tbl, FALSE)
   } else {
     lbls <- NULL
   }
 
   return(list(col_has_name = col_has_name, names = names, lbls = lbls))
+}
+
+get_labels_from_tbl <- function(label_tbl, rowwise) {
+  label_tbl[] <- lapply(label_tbl, FUN = function(x)
+                        {ifelse(is.na(x),  "", as.character(x))})
+  if (!rowwise) {
+    label_tbl <- as.tibble(t(label_tbl))
+  }
+  if (ncol(label_tbl) == 1) {
+    lbls <- unlist(label_tbl, use.names = FALSE)
+  } else {
+    lbls <- do.call(paste, label_tbl)
+    lbls <- trimws(lbls, which = "right")
+  }
+  if (!any(nzchar(lbls))) lbls <- NULL
+  return(lbls)
 }
