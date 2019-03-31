@@ -268,16 +268,21 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
   col_has_name <- nzchar(name_row_data)
   col_has_name[1 : period_col] <- FALSE
 
-  names <- name_row_data[col_has_name]
-
-  # labels
-  if (labels != "no") {
-    label_tbl <- tbl[label_rows, col_has_name]
-    lbls <- get_labels_from_tbl(label_tbl, FALSE)
+  if (!any(col_has_name)) {
+    names <- character(0)
+    lbls <- character(0)
   } else {
-    lbls <- NULL
-  }
 
+    names <- name_row_data[col_has_name]
+
+    # labels
+    if (labels != "no") {
+      label_tbl <- tbl[label_rows, col_has_name]
+      lbls <- get_labels_from_tbl(label_tbl, FALSE)
+    } else {
+      lbls <- NULL
+    }
+  }
   return(list(col_has_name = col_has_name, names = names, lbls = lbls))
 }
 

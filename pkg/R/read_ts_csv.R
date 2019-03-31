@@ -176,8 +176,16 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
 
   tbl <- as.tibble(df)
 
+  # remove all empty columns.
   not_all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
   tbl <- tbl[ , not_all_na, drop = FALSE]
+
+  tbl_layout <- get_tbl_layout(tbl, frequency, rowwise, labels,
+                               xlsx = FALSE, period_fun = period_fun)
+
+  if (is.null(tbl_layout)) {
+    stop(sprintf("No periods found in file %s\n", filename))
+  }
 
   period_info <- find_periods(tbl, frequency, rowwise, period_fun = period_fun)
 
@@ -193,7 +201,7 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
   } else {
     ret <- read_ts_columnwise(tbl, frequency = frequency, labels = labels,
                               dec = dec, name_fun = name_fun,
-                              period_fun = period_fun, period_info = period_info,
+                              period_fun = period_fun, tbl_layout = tbl_layout,
                               strict = strict)
   }
 
@@ -284,86 +292,29 @@ read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
 # Internal function to read timeseries columnwise from a tibble, used
 # by function read_ts_csv.
 read_ts_columnwise <- function(tbl, frequency, labels, dec, name_fun,
-                               period_fun, period_info, strict) {
+                               period_fun, tbl_layout, strict) {
 
-  time_column <- period_info$col_nr
-  is_period <- period_info$is_period
-  first_data_row <- period_info$row_nr
+  #printobj(tbl)
+  #printobj(tbl_layout)
 
-  # ignore possible period in the first row
-  first_data_row <- max(first_data_row, 2)
+  # remove all rows without period (the names and labels are already in
+  # tbl_layout)
+  tbl <- tbl[tbl_layout$is_data_row, ]
 
-  # no labels found, ignore labels
-  if (first_data_row == 2) labels <- "no"
-
-  # compute the row with variable names. 0 means: column names
-  # and the label rows
-  if (labels != "before") {
-    name_row <- 1
-    if (first_data_row > 2) {
-      label_rows <- 2:(first_data_row -1)
-    } else {
-      label_rows <- integer(0)
-    }
-  } else {  # labels == before
-    name_row <- first_data_row - 1
-    if (first_data_row > 2) {
-      label_rows <- 1:(first_data_row - 2)
-    } else {
-      label_rows <- integer(0)
-    }
-  }
-
-  if (length(label_rows) == 0) {
-    labels <- "no"
-  }
-
-  # drop all columns to the left of time_column
-  if (time_column > 1) {
-    tbl <- tbl[, -(1:(time_column - 1))]
-  }
-
-  # get variable names
-  ts_names <- unlist(tbl[name_row, -1], use.names = FALSE)
-  if (!missing(name_fun)) ts_names <- name_fun(ts_names)
-  name_sel <- which(!is.na(ts_names))
-  ts_names <- ts_names[name_sel]
-
-  # remove columns without names
-  keep_cols <- c(1, name_sel + 1)
-  tbl <- tbl[, keep_cols]
-
-  # labels
-  if (labels != "no" && length(label_rows) > 0) {
-    lbl_data <- tbl[label_rows, -1]
-    lbl_data[] <- lapply(lbl_data, FUN = function(x)
-    {ifelse(is.na(x),  "", as.character(x))})
-    if (length(label_rows) == 1) {
-      lbls <- unlist(lbl_data, use.names = FALSE)
-    } else {
-      lbl_mat <- as.matrix(lbl_data)
-      lbls <- apply(lbl_mat, MARGIN = 2, FUN = paste, collapse = " ")
-      lbls <- trimws(lbls, which = "right")
-    }
-  }
-
-  # remove all rows without period (the names and labels have already been
-  # stored in variables ts_names and lbls)
-  tbl <- tbl[is_period, ]
-
-  periods <- get_periods_tbl(tbl[[1]], frequency, xlsx = FALSE,
+  periods <- get_periods_tbl(tbl[[tbl_layout$period_col]], frequency, xlsx = FALSE,
                              period_fun = period_fun)
 
+  #printobj(periods)
   # convert data columns to a numeric matrix, employing function df_to_numeric_matrix
-  mat <- df_to_numeric_matrix(tbl[-1], dec = dec)
-  colnames(mat) <- ts_names
+  mat <- df_to_numeric_matrix(tbl[tbl_layout$is_data_col], dec = dec)
+  colnames(mat) <- tbl_layout$names
 
   # set numeric = FALSE, because we already know that df is numeric
   ret <- matrix2regts_(mat, periods, fun = period, numeric = FALSE,
                        frequency = frequency, strict = strict)
 
-  if (labels != "no" && any(lbls != "")) {
-    ts_labels(ret) <- lbls
+  if (!is.null(tbl_layout$lbls)) {
+    ts_labels(ret) <- tbl_layout$lbls
   }
 
   return(ret)
