@@ -316,29 +316,3 @@ read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
 
   return(ret)
 }
-
-convert_data_tbl <- function(tbl, transpose, colnames) {
-  # This function converts the part of the tibble that should contain data
-  # values to a numerical matrix.
-
-  # First check if the tbl contains POSIXt or Date objects.
-  # These cannot be handled correctly, so we should give an error.
-  check_col <- function(x) {
-    x <- sapply(x, FUN = function(x) {inherits(x, "POSIXt") |
-                                      inherits(x, "Date")})
-    return(any(x))
-  }
-
-  problem_cols <- sapply(tbl, FUN = check_col)
-  if (any(problem_cols)) {
-    stop(paste("Found Date values in cells were numerical values are expected"))
-  }
-
-  # convert the tbl to a numeric matrix, employing C++ function list_tbl_2_mat
-  mat <- list_tbl_2_mat(tbl)
-
-  if (transpose) mat <- t(mat)
-
-  colnames(mat) <- colnames
-  return(mat)
-}

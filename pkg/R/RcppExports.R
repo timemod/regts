@@ -9,10 +9,6 @@ disagg_spline <- function(ts_old, freq_new, constraint, method) {
     .Call(`_regts_disagg_spline`, ts_old, freq_new, constraint, method)
 }
 
-list_tbl_2_mat <- function(tbl) {
-    .Call(`_regts_list_tbl_2_mat`, tbl)
-}
-
 moving_average <- function(x, w, from, to, keep_range) {
     .Call(`_regts_moving_average`, x, w, from, to, keep_range)
 }

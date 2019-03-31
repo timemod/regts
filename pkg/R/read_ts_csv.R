@@ -176,7 +176,7 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
 
   tbl <- as.tibble(df)
 
-  # remove all empty columns.
+  # remove all empty columns. TODO: this code is probably not necessary,
   not_all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
   tbl <- tbl[ , not_all_na, drop = FALSE]
 
@@ -187,16 +187,10 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
     stop(sprintf("No periods found in file %s\n", filename))
   }
 
-  period_info <- find_periods(tbl, frequency, rowwise, period_fun = period_fun)
-
-  if (is.null(period_info)) {
-    stop(sprintf("No periods found in file %s\n", filename))
-  }
-
-  if (period_info$rowwise) {
+  if (tbl_layout$rowwise) {
     ret <- read_ts_rowwise(tbl, frequency = frequency, labels = labels,
                            dec = dec, name_fun = name_fun,
-                           period_fun = period_fun, period_info = period_info,
+                           period_fun = period_fun, tbl_layout = tbl_layout,
                            strict = strict)
   } else {
     ret <- read_ts_columnwise(tbl, frequency = frequency, labels = labels,
@@ -211,79 +205,34 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
 # Internal function to read timeseries rowwise from a tibble, used by
 # read_ts_csv.
 read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
-                            period_info, strict) {
+                            tbl_layout, strict) {
 
-  # remove all rows before the period row
-  if (period_info$row_nr > 1) {
-    tbl <- tbl[-(1:(period_info$row_nr - 1)), ]
-  }
+  #printobj(tbl_layout)
 
-  is_period <- period_info$is_period
-  first_prd_col <- period_info$col_nr
+  # obtain the data part of the tibble: the data below the period row.
+  data_tbl <- tbl[-(1:tbl_layout$period_row), ]
 
-  # ignore possible period in the first colum
-  first_prd_col <- max(first_prd_col, 2)
+  # find first non-empty column. TODO: use function for this.
+  not_all_na <- sapply(data_tbl, FUN = function(x) {!all(is.na(x))})
+  first_col_nr <- Position(identity, not_all_na)
 
-  # no labels found, ignore labels
-  if (first_prd_col == 2) labels = "no"
+  name_info <- get_name_info_rowwise(tbl_layout, first_col_nr, data_tbl, labels,
+                                     name_fun)
+  #printobj(name_info)
 
-  name_col <- if (labels == "before") first_prd_col - 1 else 1
-
-  if (labels == "before") {
-    name_col <- first_prd_col - 1
-    label_cols <- seq_len(name_col - 1)
-  } else {
-    name_col <- 1
-    if (first_prd_col >= 3) {
-      label_cols <- 2 : (first_prd_col - 1)
-    } else {
-      label_cols <- numeric(0)
-    }
-  }
-
-  # keep only period columns, the name column and the label columns
-  col_sel <- is_period
-  col_sel[c(name_col, label_cols)] <- TRUE
-  tbl <- tbl[ , col_sel]
-
-  data_cols <- (max(c(name_col, label_cols)) + 1) : ncol(tbl)
-
-  periods <- get_periods_tbl(tbl[1, data_cols], frequency, xlsx = FALSE,
-                             period_fun = period_fun)
-
-  names <- tibble_2_char(tbl[-1, name_col], replace_na = FALSE)
-  if (!missing(name_fun)) names <- name_fun(names)
-  name_sel <- !is.na(names)
-  names <- names[name_sel]
-
-  # remove rows without names, including the row with the period
-  tbl <- tbl[c(FALSE, name_sel), ]
-
-  # convert all data columns to numerical columns, taking the decimal separator
-  # into account
-  mat <- df_to_numeric_matrix(tbl[, data_cols], dec = dec)
+  rowsel <- name_info$row_has_name
+  colsel <- tbl_layout$is_data_col
+  mat <- df_to_numeric_matrix(data_tbl[rowsel, colsel], dec = dec)
   mat <- t(mat)
-  colnames(mat) <- names
+  colnames(mat) <- name_info$names
 
   # convert the matrix to a regts, using numeric = FALSE because we already
-  # know that df is numeric
-  ret <- matrix2regts_(mat, periods, fun = period, numeric = FALSE,
-                       frequency = frequency, strict = strict)
+  # know that mat is numeric
+  ret <- matrix2regts_(mat, periods = tbl_layout$periods, fun = period,
+                       numeric = FALSE, frequency = frequency, strict = strict)
 
-
-  if (labels != "no" && length(label_cols) > 0) {
-    lbl_data <- tbl[, label_cols]
-    lbl_data[] <- lapply(lbl_data, FUN = function(x)
-    {ifelse(is.na(x),  "", as.character(x))})
-    if (length(label_cols) == 1) {
-      lbls <- unlist(lbl_data, use.names = FALSE)
-    } else {
-      lbls <- do.call(paste, lbl_data)
-      lbls <- trimws(lbls, which = "right")
-    }
-    if (any(lbls != "")) {
-      ts_labels(ret) <- lbls
-    }
+  if (!is.null(name_info$lbls)) {
+    ts_labels(ret) <- name_info$lbls
   }
 
   return(ret)
@@ -368,72 +317,4 @@ df_to_numeric_matrix <- function(x, dec) {
   }
 
   return(num_mat)
-}
-
-# internal function: find the first row or column containing a period in the
-# tibble read by read_excel of fread. Returns NULL if no period has been found
-find_periods <- function(tbl, frequency, rowwise, period_fun) {
-
-  found <- FALSE
-
-  if (!missing(rowwise) && !rowwise) {
-    # columnwise
-
-    for (col_nr in 1:ncol(tbl)) {
-      is_period <- is_period_tbl(tbl[[col_nr]], frequency, FALSE, period_fun)
-      if (any(is_period)) {
-        last_col <- Position(function(x) {x}, is_period, right = TRUE)
-        if (last_col > 1) {
-          found <- TRUE
-          break
-        }
-      }
-    }
-
-    if (found) row_nr <- Position(function(x) {x}, is_period)
-
-  }  else {
-    # rowwise or columnwise
-
-    # first search for a period rowwise
-    for (row_nr in 1:nrow(tbl)) {
-      is_period_row <- is_period_tbl(tbl[row_nr, ], frequency, FALSE, period_fun)
-      if (any(is_period_row)) {
-        col_nr <- Position(function(x) {x}, is_period_row)
-        if (missing(rowwise)) {
-          if (row_nr == 1) {
-            rowwise <- TRUE
-          } else {
-            is_period_col <- is_period_tbl(tbl[[col_nr]], frequency, FALSE,
-                                           period_fun)
-            rowwise <- col_nr != 1  && sum(is_period_row) > sum(is_period_col)
-          }
-        }
-        if (rowwise) {
-          last_col <- Position(function(x) {x}, is_period_row, right = TRUE)
-          if (last_col > 1) {
-            found <- TRUE
-            break
-          }
-        } else {
-          last_row <- Position(function(x) {x}, is_period_col, right = TRUE)
-          if (last_row > 1) {
-            found <- TRUE
-            break
-          }
-        }
-      }
-    }
-
-    if (found) {
-      is_period <- if(rowwise) is_period_row else is_period_col
-    }
-  }
-
-  if (found) {
-    return(list(rowwise = rowwise, row_nr = row_nr, col_nr = col_nr,
-                is_period = is_period))
-  } else {
-    return(NULL)
-  }
 }
