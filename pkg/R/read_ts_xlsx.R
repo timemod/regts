@@ -219,28 +219,16 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
   range$ul[1] <- range$ul[1] + tbl_layout$period_row
   range$lr[2] <- range$ul[2] + tbl_layout$last_data_col - 1
 
-  #printobj(range)
-
   col_types <- rep("skip", tbl_layout$last_data_col)
   col_types[tbl_layout$is_data_col[1:tbl_layout$last_data_col]] <- "numeric"
   col_types[1:(tbl_layout$first_data_col - 1)] <- "text"
-  #printobj(col_types)
 
   # read data
   data_tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
                          col_types = col_types, na = na_string,
                          .name_repair = "minimal")
 
-  # View(data_tbl)
-
-  # find first  non-empty column. NOTE: do not use tbl_layout$first_col_nr,
-  # because that colum number if only based on the first 25 rows.
-  # TODO: make a function get_first_non_empty_col in read_utils.
-  not_all_na <- sapply(data_tbl, FUN = function(x) {!all(is.na(x))})
-  first_col_nr <- Position(identity, not_all_na)
-
-  name_info <- get_name_info_rowwise(tbl_layout, first_col_nr, data_tbl,
-                                      labels, name_fun)
+  name_info <- get_name_info_rowwise(tbl_layout, data_tbl, labels, name_fun)
 
   # convert data columns to a numeric matrix
   rowsel <- name_info$row_has_name
@@ -279,13 +267,12 @@ read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
   range$lr[2] <- range$ul[2] + tbl_layout$last_data_col - tbl_layout$period_col
 
   # prepare column types
+
   ncol_to_read <- tbl_layout$last_data_col - tbl_layout$period_col + 1
   col_types <- rep("skip", ncol_to_read)
   col_types[1] <- "list"
   colsel <- tbl_layout$period_col:tbl_layout$last_data_col
   col_types[tbl_layout$is_data_col[colsel]] <- "numeric"
-  #printobj(col_types)
-  #printobj(range)
 
   # read data
   data_tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,

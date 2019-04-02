@@ -212,13 +212,7 @@ read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
   # obtain the data part of the tibble: the data below the period row.
   data_tbl <- tbl[-(1:tbl_layout$period_row), ]
 
-  # find first non-empty column. TODO: use function for this.
-  not_all_na <- sapply(data_tbl, FUN = function(x) {!all(is.na(x))})
-  first_col_nr <- Position(identity, not_all_na)
-
-  name_info <- get_name_info_rowwise(tbl_layout, first_col_nr, data_tbl, labels,
-                                     name_fun)
-  #printobj(name_info)
+  name_info <- get_name_info_rowwise(tbl_layout, data_tbl, labels, name_fun)
 
   rowsel <- name_info$row_has_name
   colsel <- tbl_layout$is_data_col

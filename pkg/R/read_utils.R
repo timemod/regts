@@ -68,12 +68,25 @@ get_periods_tbl <- function(tbl, frequency, xlsx, period_fun) {
 }
 
 
-# internal function: find the first row or column containing a period in the
-# tibble read by read_excel of fread. Returns NULL if no period has been found
+# Internal function: finds the first row or column of the period data in a
+# tibble read by read_ts_xlsx or read_ts_csv. The function also determines
+# which column of the tibble contains timeseries data. Returns NULL if no
+# period has been found.
+#
+# The function does not assume that all rows of the csv file or Excel sheet
+# have been read. read_ts_xlsx first reads the first 25 rows,
+# then calls get_tbl_layout to determine the position of the period data and
+# the numerical data columns. The data are actually read in a second stage
+# using this information.
+#
+# For rowwise timeseries, the function returns the periods and for columnwise
+# timeseries the names and labels.  The function does not return names and labels
+# for rowwise timeseries, because the input tibble may not contain all rows
+# (we the discussion above). For the same reason, the function does not return
+# the periods for columnwise timeseries.
 get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun) {
 
   first_row_nr <- get_first_non_empty_row(tbl)
-  first_col_nr <- 1  # TODO: find position of first non-empty column
 
   found <- FALSE
 
@@ -144,10 +157,11 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun) {
 
     first_data_col <- col_nr
 
-    if (is_period[first_col_nr]) {
-      # if the first period column is the first non-empty column, then
-      # ignore that period, since the column should contain variable names
-      is_period[first_col_nr] <- FALSE
+    if (first_data_col == 1) {
+      # a period on the first column for a rowwise timeseries should be ignored,
+      # because the column to the left of the first data column should contain
+      # variable names
+      is_period[1] <- FALSE
       first_data_col <- Position(identity, is_period)
       if (is.na(first_data_col)) return(NULL)
     }
@@ -157,16 +171,12 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun) {
     periods <- get_periods_tbl(tbl[row_nr, is_period], frequency, xlsx,
                                period_fun)
 
-    return(list(rowwise = TRUE, first_col_nr = first_col_nr,
-                period_row = row_nr,
-                first_data_col = first_data_col,
-                last_data_col = last_data_col, is_data_col = is_period,
-                periods = periods))
-
-    # TODO: in weird situations there may be a period indicator above the
-    # columns with variables, etc. Handle this situation.
+    return(list(rowwise = TRUE, period_row = row_nr,
+                first_data_col = first_data_col, last_data_col = last_data_col,
+                is_data_col = is_period, periods = periods))
 
   } else {
+    # columnwise timeseries
 
     first_data_row <- row_nr
 
@@ -184,9 +194,8 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun) {
 
     last_data_col <- Position(identity, name_info$col_has_name, right = TRUE)
 
-    return(list(rowwise = FALSE, first_row_nr = first_row_nr,
-                period_col = period_col, first_data_row = first_data_row,
-                last_data_col = last_data_col,
+    return(list(rowwise = FALSE, period_col = period_col,
+                first_data_row = first_data_row, last_data_col = last_data_col,
                 is_data_col = name_info$col_has_name, is_data_row = is_period,
                 names = name_info$names, lbls = name_info$lbls))
   }
@@ -202,11 +211,25 @@ get_first_non_empty_row <- function(tbl) {
   return(NA)
 }
 
+get_first_non_empty_column <- function(tbl) {
+  for (col_nr in 1:ncol(tbl)) {
+    if (any(!is.na(tbl[[col_nr]]))) {
+      return(col_nr)
+    }
+  }
+  return(NA)
+}
 
-get_name_info_rowwise <- function(tbl_layout, first_col_nr, data_tbl,
-                                  labels, name_fun) {
+get_name_info_rowwise <- function(tbl_layout, data_tbl, labels, name_fun) {
   # get the names and labels for a rowwise tibble containing timeseries data.
-  # first_col_nr is the number of the first non-empty column.
+
+  # find the first non-empty column
+  first_col_nr <- get_first_non_empty_column(data_tbl)
+
+  if (tbl_layout$first_data_col <= first_col_nr) {
+    return(list(row_has_name = rep(FALSE, nrow(data_tbl)), names = character(0),
+                lbls = character(0)))
+  }
 
   # no labels if there is only one non-empty column before the first data column
   if (tbl_layout$first_data_col == first_col_nr + 1) labels = "no"
