@@ -16,6 +16,13 @@
 #' Use argument \code{period_fun} if the period cells contain a text with a
 #' format not recognized by function \code{period}.
 #'
+#' \code{read_ts_xlsx} reads the data in two steps. In the first step,
+#' the first \code{n_inspect} are read to inspect the structure of the
+#' data on the sheet: is the timeseries rowwise or columnwise,
+#' which row or column contain the period and which columns contain the
+#' timeseries data. If this information has been found, the file is
+#' read a second time.
+#'
 #' In many cases, this function will read timeseries correctly.
 #' However, \emph{you should always carefully check the results of this
 #' function}. If the function fails or if the result is not
@@ -24,6 +31,11 @@
 #' then convert the data frame to a standard columnwise data frame
 #' and finally convert it to a \code{\link{regts}} by using function
 #' \code{\link{as.regts}}.
+#'
+#' \code{read_ts_xlsx} skips all empty rows and columns. Use arguments
+#' \code{skipcol} and \code{skiprow} to skip additional leading rows
+#' and columns. Argument \code{range} can  be used to read only a part
+#' of the sheet.
 #'
 #' If argument \code{rowwise} has not been specified, then
 #' function \code{read_ts_xlsx} tries to guess if the timeseries are stored
@@ -73,10 +85,7 @@
 #' also contains variable names but the other rows before the first data
 #' row are ignored. If argument \code{labels = "before"}, then the variable
 #' names should be in the last row before the first data row.
-#'
-#' By default, the function skips all leading empty rows and columns,
-#' just as \code{read_excel}. This behaviour can be overruled by specifying
-#' arguments \code{range}, \code{skiprow} or \code{skipcol}.
+
 #'
 #' Sometimes it helps to supply information about the structure of
 #' the data on the sheet. Specify option  \code{rowwise} if you know
@@ -122,7 +131,8 @@
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
 #' start and the end period must be present.
 #' Otherwise the timeseries are filled with \code{NA} for the missing periods.
-#'
+#' @param n_inspect the number of rows to read when inspecting the layout of
+#' the sheet (incuding leading empty rows). The default is 25.
 
 #' @return a \code{regts} object
 #'
@@ -141,7 +151,8 @@
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          skiprow = 0, skipcol = 0, rowwise, frequency = NA,
                          labels = c("after", "before", "no"),
-                         na_string = "", name_fun, period_fun, strict = TRUE) {
+                         na_string = "", name_fun, period_fun, strict = TRUE,
+                         n_inspect = 25) {
 
   # NOTE: read excel skips leading empty rows if the the first row in range
   # has not been specified (if the first row is NA). We do not want that,
@@ -168,24 +179,24 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   }
 
   # the number of lines used to inspect the file
-  N <- 25
   range_1 <- range
-  range_1$lr[1] <- range_1$ul[1] + N - 1
+  range_1$lr[1] <- range_1$ul[1] + n_inspect - 1
 
-  tbl_1 <- read_excel(filename, sheet, range = range_1, col_names = FALSE,
-                    col_types = "list", na = na_string,
-                    .name_repair = "minimal")
+  tbl_inspect <- read_excel(filename, sheet, range = range_1, col_names = FALSE,
+                            col_types = "list", na = na_string,
+                            .name_repair = "minimal")
 
   # TODO: sheetname is not correct if the sheetname is specified in
   # argument range.
   sheetname <- if (is.null(sheet)) "1" else as.character(sheet)
 
-  if (nrow(tbl_1) == 0 || ncol(tbl_1) == 0) {
+  if (nrow(tbl_inspect) == 0 || ncol(tbl_inspect) == 0) {
     stop(sprintf("Sheet %s of file %s is empty\n", sheetname, filename))
   }
 
-  tbl_layout <- get_tbl_layout(tbl_1, frequency, rowwise, labels,
-                               xlsx = TRUE, period_fun = period_fun)
+  tbl_layout <- get_tbl_layout(tbl_inspect, frequency, rowwise, labels,
+                               xlsx = TRUE, period_fun = period_fun,
+                               name_fun = name_fun)
 
   #printobj(tbl_layout)
 
@@ -195,13 +206,13 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   }
 
   if (tbl_layout$rowwise) {
-    return(read_ts_rowwise_xlsx(filename, sheet, range, na_string, frequency,
+    ret <- read_ts_rowwise_xlsx(filename, sheet, range, na_string, frequency,
                                 labels, name_fun, period_fun, tbl_layout,
-                                strict))
+                                strict)
   } else {
-    return(read_ts_columnwise_xlsx(filename, sheet, range, na_string,
+    ret <- read_ts_columnwise_xlsx(filename, sheet, range, na_string,
                                    frequency, name_fun, period_fun,
-                                   tbl_layout, strict))
+                                   tbl_layout, strict)
   }
 
   return(ret)

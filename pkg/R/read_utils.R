@@ -49,7 +49,7 @@ get_periods_tbl <- function(tbl, frequency, xlsx, period_fun) {
       if (inherits(x, "POSIXt")) {
         return(as.Date(x))
       } else {
-        # convert string to period object and then to POSIXct
+        # apply period_fun and convert to Date
         if (period_fun_given) x <- period_fun(x)
         return(as.Date(period(x, frequency)))
       }
@@ -84,7 +84,8 @@ get_periods_tbl <- function(tbl, frequency, xlsx, period_fun) {
 # for rowwise timeseries, because the input tibble may not contain all rows
 # (we the discussion above). For the same reason, the function does not return
 # the periods for columnwise timeseries.
-get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun) {
+get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
+                           name_fun) {
 
   first_row_nr <- get_first_non_empty_row(tbl)
 
@@ -248,15 +249,16 @@ get_name_info_rowwise <- function(tbl_layout, data_tbl, labels, name_fun) {
     label_cols <- numeric(0)
   }
 
-  row_has_name <- !is.na(data_tbl[[name_col]])
+  name_col_data <- data_tbl[[name_col]]
+  row_has_name <- !is.na(name_col_data)
 
   # extract names
-  names <- data_tbl[[name_col]][row_has_name]
+  names <- name_col_data[row_has_name]
   if (!missing(name_fun)) names <- name_fun(names)
 
   # extract labels
   if (labels != "no") {
-    label_tbl <- data_tbl[row_has_name , label_cols]
+    label_tbl <- data_tbl[row_has_name, label_cols]
     lbls <- get_labels_from_tbl(label_tbl, TRUE)
   } else {
     lbls <- NULL

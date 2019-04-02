@@ -4,9 +4,10 @@
 \alias{read_ts_xlsx}
 \title{Read timeseries from a sheet of an  xls(x) file}
 \usage{
-read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = NA,
-  skipcol = NA, rowwise, frequency = NA, labels = c("after",
-  "before", "no"), na_string = "", name_fun, period_fun, strict = TRUE)
+read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = 0,
+  skipcol = 0, rowwise, frequency = NA, labels = c("after", "before",
+  "no"), na_string = "", name_fun, period_fun, strict = TRUE,
+  n_inspect = 25)
 }
 \arguments{
 \item{filename}{a string with the filename.}
@@ -54,6 +55,9 @@ Use this argument if the period texts do not have a standard format (see Descrip
 \item{strict}{A logical. If \code{TRUE} (the default) all periods between the
 start and the end period must be present.
 Otherwise the timeseries are filled with \code{NA} for the missing periods.}
+
+\item{n_inspect}{the number of rows to read when inspecting the layout of
+the sheet (incuding leading empty rows). The default is 25.}
 }
 \value{
 a \code{regts} object
@@ -76,6 +80,13 @@ Use argument \code{period_fun} if the period cells contain a text with a
 format not recognized by function \code{period}.
 }
 \details{
+\code{read_ts_xlsx} reads the data in two steps. In the first step,
+the first \code{n_inspect} are read to inspect the structure of the
+data on the sheet: is the timeseries rowwise or columnwise,
+which row or column contain the period and which columns contain the
+timeseries data. If this information has been found, the file is
+read a second time.
+
 In many cases, this function will read timeseries correctly.
 However, \emph{you should always carefully check the results of this
 function}. If the function fails or if the result is not
@@ -84,6 +95,11 @@ what you want, then you have to read the data into a data frame
 then convert the data frame to a standard columnwise data frame
 and finally convert it to a \code{\link{regts}} by using function
 \code{\link{as.regts}}.
+
+\code{read_ts_xlsx} skips all empty rows and columns. Use arguments
+\code{skipcol} and \code{skiprow} to skip additional leading rows
+and columns. Argument \code{range} can  be used to read only a part
+of the sheet.
 
 If argument \code{rowwise} has not been specified, then
 function \code{read_ts_xlsx} tries to guess if the timeseries are stored
@@ -133,10 +149,6 @@ row contains the variable names. If \code{labels = "no"} the first row
 also contains variable names but the other rows before the first data
 row are ignored. If argument \code{labels = "before"}, then the variable
 names should be in the last row before the first data row.
-
-By default, the function skips all leading empty rows and columns,
-just as \code{read_excel}. This behaviour can be overruled by specifying
-arguments \code{range}, \code{skiprow} or \code{skipcol}.
 
 Sometimes it helps to supply information about the structure of
 the data on the sheet. Specify option  \code{rowwise} if you know

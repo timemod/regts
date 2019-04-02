@@ -181,7 +181,8 @@ read_ts_csv <- function(filename, rowwise, frequency = NA,
   tbl <- tbl[ , not_all_na, drop = FALSE]
 
   tbl_layout <- get_tbl_layout(tbl, frequency, rowwise, labels,
-                               xlsx = FALSE, period_fun = period_fun)
+                               xlsx = FALSE, period_fun = period_fun,
+                               name_fun = name_fun)
 
   if (is.null(tbl_layout)) {
     stop(sprintf("No periods found in file %s\n", filename))
