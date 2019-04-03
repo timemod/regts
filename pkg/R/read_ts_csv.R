@@ -1,27 +1,34 @@
 #' Read timeseries from a csv file
 #'
-#' This function attempts to read timeseries from a csv file.
-#' The csv file is actually read by function \code{\link[data.table]{fread}}
-#' of package \code{data.table}.
-#' The timeseries can be stored both rowwise or columnwise.
-#' The function tries to find fields with valid period texts.
+#' This function reads timeseries from a csv file,
+#' employing function \code{\link[data.table]{fread}} of package
+#' \code{data.table}.
+#' The functions searches for period texts and automatically
+#' determines how the timeseries are stored (rowwise or columnwise)
+#' and which columns contain the numerical values of the timeseries.
 #' Period texts should have the format recognized by function
 #' \code{\link{period}}, for example \code{"2010Q2"}, \code{"2010.2Q"},
 #' \code{"2010m2"}, \code{"2011"} or \code{"2011-1"}. Use argument
 #' \code{period_fun} if the period texts have a different format.
 #'
 #' In many cases, this function will read timeseries correctly.
-#' However, \emph{you should always carefully check the results of this
-#' function}. If the function fails or if the result is not
-#' what you want, then you have to read the data into a data frame
-#' (for example by using function \code{read.csv} or the function
-#' \code{fread} of package \code{data.table}),
+#' If the function fails or if the result is not what you want,
+#' it might help to specify arguments \code{rowwise}, \code{frequency},
+#' \code{period_fun}, \code{skipcol} or \code{skiprow}.
+#' Specify option  \code{rowwise} if you know
+#' that the timeseries are stored rowwise or columnwise. Specify
+#' argument \code{frequency} if you already know the frequency of the timeseries.
+#' Arguments \code{skipcol} and \code{skiprow} can be used to read only a
+#' part of the file.
+#' If that does not help, then you can read the data into a data frame
+#' (for example by using function \code{\link{read.csv}} or function
+#' \code{\link[data.table]{fread}} of package \code{data.table}),
 #' then convert the data frame to a standard columnwise data frame
 #' and finally convert it to a \code{\link{regts}} by using function
 #' \code{\link{as.regts}}.
 #'
 #' If argument \code{rowwise} has not been specified, then
-#' function \code{read_ts_xlsx} tries to guess if the timeseries are stored
+#' function \code{read_ts_csv} tries to guess if the timeseries are stored
 #' rowwise or columnwise based on the positions of the fields with period texts.
 #'
 #' \strong{rowwise timeseries}
@@ -47,6 +54,9 @@
 #' column are ignored. If argument \code{labels = "before"}, then the variable
 #' names should be in the last column before the first data column.
 #'
+#' With argumennt \code{name_fun} a function can be applied to names of the
+#' timeseries, e.g. \code{\link{tolower}}.
+#'
 #'\strong{columnwise timeseries}
 #'
 #' For columnwise timeseries, the first non-empty row that is not skipped (see
@@ -69,16 +79,6 @@
 #' row are ignored. If argument \code{labels = "before"}, then the variable
 #' names should be in the last row before the first data row.
 #'
-#' Sometimes it helps to supply information about the structure of
-#' the data on the csv file. Specify argument \code{rowwise} if you know
-#' that the timeseries are stored rowwise or columnwise. Specify
-#' argument \code{frequency} if you already know the frequency of the timeseries.
-#' Argument \code{frequency} is mandatory if a general period format
-#' such as  \code{"2011-1"} has been used.
-#'
-#' With \code{name_fun} a function can be applied to names of the timeseries,
-#' e.g. \code{\link{tolower}}.
-#'
 #' \strong{automatic row skip}
 #'
 #' If \code{skiprow = 0}, then the first rows with less columns than
@@ -95,17 +95,18 @@
 #' disabled.
 #'
 #' @param filename  a string with the filename.
+#' @param skiprow the number of rows to skip.
+#' If 0 (default) and if argument \code{fill} is \code{FALSE},
+#' then comment rows are automatically skipped.
+#' See Details.
+#' @param skipcol the number of columns to skip.
 #' @param rowwise a logical value: are the timeseries stored rowwise?
 #' If not specified, then \code{read_ts_csv} tries to figure out itself if
 #' the timeseries are stored rowwise or columnwise.
 #' @param frequency the frequency of the timeseries.
 #' This argument is mandatory if the file contains a period texts without
 #' frequency indicator (for example "2011-1").
-#' @param skiprow the number of rows to skip.
-#' If 0 (default) and if argument \code{fill} is \code{FALSE},
-#' then comment rows are automatically skipped.
-#' See Details.
-#' @param skipcol the number of columns to skip.
+
 #' @param labels label option. See Details.
 #' @param sep the separator between columns. If not specified, then
 #' the separator is determined automatically by inspecting the
@@ -138,8 +139,8 @@
 #' @importFrom tibble as.tibble
 #' @seealso \code{\link{write_ts_csv}} and \code{\link{read_ts_xlsx}}
 #' @export
-read_ts_csv <- function(filename, rowwise, frequency = NA,
-                        skiprow = 0, skipcol = 0,
+read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
+                        rowwise, frequency = NA,
                         labels = c("after", "before", "no"),
                         sep = "auto", fill = FALSE,
                         dec = if (sep != ".") "." else ",",

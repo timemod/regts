@@ -1,11 +1,11 @@
 #' Read timeseries from a sheet of an  xls(x) file
 #'
-#' This function attempts to read timeseries from an xls(x) file.
-#' The xls(x) file is actually read by function \code{\link[readxl]{read_excel}}
-#' of package \code{readxl}.
-#' The timeseries can be stored both rowwise or columnwise on the sheet.
-#' The function tries to find period cells on the sheet. Period cells are
-#' cells containing
+#' This function reads timeseries from a sheet of an xls(x) file,
+#' employing function \code{\link[readxl]{read_excel}} of
+#' package \code{readxl}. \code{read_ts_xlsx} searches for period cells and
+#' automatically determines how the timeseries are stored (rowwise or columnwise)
+#' and which columns contain the numerical values of the timeseries.
+#' Period cells are cells containing
 #' \itemize{
 #' \item a text with the format recognized by function \code{\link{period}},
 #' for example \code{"2010Q2"}, \code{"2010.2Q"},
@@ -16,17 +16,25 @@
 #' Use argument \code{period_fun} if the period cells contain a text with a
 #' format not recognized by function \code{period}.
 #'
-#' \code{read_ts_xlsx} reads the data in two steps. In the first step,
-#' the first \code{n_inspect} are read to inspect the structure of the
-#' data on the sheet: is the timeseries rowwise or columnwise,
-#' which row or column contain the period and which columns contain the
-#' timeseries data. If this information has been found, the file is
-#' read a second time.
+#' \code{read_ts_xlsx} reads the timeseries data in two steps. In the first step,
+#' the first 25 rows are read to inspect the
+#' structure of the data on the sheet: are the timeseries stored rowwise or
+#' columnwise, which row or column contains the period cells and which columns
+#' contain the numerical data of the timeseries.
+#' Using this information, the
+#' complete sheet is read and the timeseries are constructed.
 #'
 #' In many cases, this function will read timeseries correctly.
-#' However, \emph{you should always carefully check the results of this
-#' function}. If the function fails or if the result is not
-#' what you want, then you have to read the data into a data frame
+#' If the function fails or if the result is not what you want,
+#' it might help to specify arguments \code{rowwise}, \code{frequency},
+#' \code{period_fun}, \code{range}, \code{skipcol} or \code{skiprow}.
+#' Specify option  \code{rowwise} if you know
+#' that the timeseries are stored rowwise or columnwise. Specify
+#' argument \code{frequency} if you already know the frequency of the timeseries.
+#' Arguments \code{range}, \code{skipcol} and \code{skiprow} can be used to read
+#' only a part of the file.
+#'
+#' If that does not help, then you can read the data into a data frame
 #' (for example by using function \code{read_excel} of package \code{readxl}),
 #' then convert the data frame to a standard columnwise data frame
 #' and finally convert it to a \code{\link{regts}} by using function
@@ -64,7 +72,10 @@
 #' column are ignored. If argument \code{labels = "before"}, then the variable
 #' names should be in the last column before the first data column.
 #'
-#'\strong{columnwise timeseries}
+#' With argument \code{name_fun} a function can be applied to names of the
+#' timeseries, e.g. \code{\link{tolower}}.
+#'
+#' \strong{columnwise timeseries}
 #'
 #' For columnwise timeseries, the first non-empty row that has been read (see
 #' argument \code{range} or \code{skiprow}) should contain the variable names
@@ -85,17 +96,6 @@
 #' also contains variable names but the other rows before the first data
 #' row are ignored. If argument \code{labels = "before"}, then the variable
 #' names should be in the last row before the first data row.
-
-#'
-#' Sometimes it helps to supply information about the structure of
-#' the data on the sheet. Specify option  \code{rowwise} if you know
-#' that the timeseries are stored rowwise or columnwise. Specify
-#' argument \code{frequency} if you already know the frequency of the timeseries.
-#' Argument \code{frequency} is mandatory if a general period format
-#' such as  \code{"2011-1"} has been used.
-#'
-#' With \code{name_fun} a function can be applied to names of the timeseries,
-#' e.g. \code{\link{tolower}}.
 #'
 #' @param filename  a string with the filename.
 #' @param sheet Sheet to read. Either a string (the name of a sheet),
@@ -106,8 +106,6 @@
 #' \code{\link[readxl]{cell-specification}}. Includes typical Excel ranges
 #' like \code{"B3:D87"}, possibly including the
 #' sheet name like \code{"Budget!B2:G14"}, and more.
-#' Strictly, even if the range forces the inclusion of leading or trailing
-#' empty rows or columns.
 #' Takes precedence over \code{skiprow}, \code{skipcol} and \code{sheet}.
 #' @param skiprow the number of rows to skip, including leading empty rows.
 #' Ignored if \code{range} is given. By default, all leading empty rows are
@@ -131,8 +129,6 @@
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
 #' start and the end period must be present.
 #' Otherwise the timeseries are filled with \code{NA} for the missing periods.
-#' @param n_inspect the number of rows to read when inspecting the layout of
-#' the sheet (incuding leading empty rows). The default is 25.
 
 #' @return a \code{regts} object
 #'
@@ -151,8 +147,12 @@
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          skiprow = 0, skipcol = 0, rowwise, frequency = NA,
                          labels = c("after", "before", "no"),
-                         na_string = "", name_fun, period_fun, strict = TRUE,
-                         n_inspect = 25) {
+                         na_string = "", name_fun, period_fun, strict = TRUE) {
+
+  #
+  # internal parameters
+  #
+  n_inspect <- 25
 
   # NOTE: read excel skips leading empty rows if the the first row in range
   # has not been specified (if the first row is NA). We do not want that,

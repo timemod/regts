@@ -75,15 +75,16 @@ get_periods_tbl <- function(tbl, frequency, xlsx, period_fun) {
 # period has been found.
 #
 # The function does not assume that all rows of the csv file or Excel sheet
-# have been read. read_ts_xlsx first reads the first 25 rows,
-# then calls get_tbl_layout to determine the position of the period data and
+# have been read. read_ts_xlsx first reads the first 25 rows, then calls
+# get_tbl_layout to determine the position of the period data and
 # the numerical data columns. The data are actually read in a second stage
-# using this information.
+# using this information. Currently, read_ts_csv reads all rows in one go,
+# but get_tbl_layout does not use that information.
 #
 # For rowwise timeseries, the function returns the periods and for columnwise
 # timeseries the names and labels.  The function does not return names and labels
 # for rowwise timeseries, because the input tibble may not contain all rows
-# (we the discussion above). For the same reason, the function does not return
+# (see the discussion above). For the same reason, the function does not return
 # the periods for columnwise timeseries.
 get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
                            name_fun) {
