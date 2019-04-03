@@ -23,8 +23,9 @@ is_period_tbl <- function(tbl, frequency, xlsx, period_fun) {
   if (xlsx && (!is.na(frequency) && 12 %% frequency == 0)) {
     # When read from an xlsx file the tbl may contain  POSIXt values.
     # POSIXt values are possible periods if the frequency is a divisor of 12.
-    is_posixt <- sapply(tbl, FUN = function(x) {inherits(x[[1]], "POSIXt")})
-    return(is_per_text | is_posixt)
+    is_posixt <- sapply(tbl, FUN = function(x) {inherits(x[[1]], "POSIXt")},
+                        USE.NAMES = FALSE)
+    return(is_per_text | unname(is_posixt))
   } else {
     # csv
     return(is_per_text)

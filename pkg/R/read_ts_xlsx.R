@@ -282,8 +282,10 @@ read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
   ncol_to_read <- tbl_layout$last_data_col - tbl_layout$period_col + 1
   col_types <- rep("skip", ncol_to_read)
   col_types[1] <- "list"
-  colsel <- tbl_layout$period_col:tbl_layout$last_data_col
-  col_types[tbl_layout$is_data_col[colsel]] <- "numeric"
+  if (!is.na(tbl_layout$last_data_col)) {
+    colsel <- tbl_layout$period_col:tbl_layout$last_data_col
+    col_types[tbl_layout$is_data_col[colsel]] <- "numeric"
+  }
 
   # read data
   data_tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
