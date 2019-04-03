@@ -204,6 +204,11 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
 is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
                        tbl, frequency, xlsx) {
 
+  #
+  # This function tries to determine if the timeseries are stored rowwise
+  # or columnwise.
+  #
+
   if (col_nr == 1) {
     return(FALSE)
   }
@@ -213,77 +218,86 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
 
   if (is_period_sum_row == 1 && is_period_sum_col == 1) {
     # There is a single period. Count the number of non-NA numerical
-    # values in row.
+    # values in the row to the right of the period, and in the cells below this
+    # period.
+
+    # create a list (xlsx) or character vector (csv) for the data next to /
+    # below the period
+    row_data <- lapply(tbl[row_nr, (col_nr + 1):ncol(tbl)],
+                       FUN = function(x) x[[1]])
+    if (!xlsx) row <- unlist(period_data, use.names = FALSE)
+    col_data <- tbl[(row_nr + 1) : nrow(tbl), col_nr][[1]]
+
     if (xlsx) {
-      # for xlsx, a NA value will have type logical.
-      num_period_row <- sapply(tbl[row_nr, ],
-                             FUN = function(x) is.numeric(x[[1]]))
-      num_period_col <- sapply(tbl[[col_nr]], FUN = is.numeric)
-      return(sum(num_period_row) > sum(num_period_col))
+      f <- function(x) {is.numeric(x) && !is.na(x)}
+      row_data_is_num <- sapply(row_data, FUN = f)
+      col_data_is_num <- sapply(col_data, FUN = f)
     } else {
-      period_row <- unlist(tbl[row_nr, is_period_row])
-      num_period_row <- grepl(year_pattern, period_row)
-      period_col <- unlist(tbl[is_period_col, col_nr])
-      num_period_col <- grepl(year_pattern, period_col)
-      return(sum(num_period_row) > sum(num_period_col))
+      suppressWarnings({
+        row_data_is_num <- !is.na(as.numeric(row_data))
+        col_data_is_num <- !is.na(as.numeric(col_data))
+      })
     }
+    return(sum(num_period_row) > sum(num_period_col))
+
   } else if (is_period_sum_row == 1) {
     return(FALSE)
   } else if (is_period_sum_col == 1) {
     return(TRUE)
   }
 
-  if (xlsx && (is.na(frequency) || frequency == 1)) {
+  # create a list (xlsx) or character vector (csv) for the data on the period
+  # row
+  row_periods <- lapply(tbl[row_nr, is_period_row], FUN = function(x) x[[1]])
+  if (!xlsx) row_periods <- unlist(row_periods, use.names = FALSE)
+  col_periods <- tbl[is_period_col, col_nr][[1]]
 
-    # For frequency 1, an integer numeric value is also considered as a
-    # period. If the periods on the period row only
-    # contain non-numeric period objects, then this suggest that we have a
-    # rowwise timeseries.
+  #printobj(period_row)
+  #printobj(period_col)
 
-    num_period_row <- sapply(tbl[row_nr, is_period_row],
-                             FUN = function(x) is.numeric(x[[1]]))
-    if (!any(num_period_row)) {
-      # all periods on row row_nr are non-numerical:
-      # assume rowwise timeseries
-      return(TRUE)
+  is_num_period <- function(period_data) {
+    if (xlsx) {
+      return(sapply(period_data, FUN = is.numeric))
+    } else {
+      return(grepl("^-?\\d+$", period_data))
     }
+  }
 
-    num_period_col <- sapply(tbl[is_period_col, col_nr][[1]],
-                             FUN = is.numeric)
-    if (!any(num_period_col)) {
-      # all periods on column col_nr are non-numerical:
-      # assume columnwise timeseries
+  if (is.na(frequency) || (xlsx && frequency == 1)) {
+
+    # Integer numerical values could be periods with frequency 1, but also
+    # just a numerical value of a timeseries. On the other hand,
+    # a string value such as "2019q1" unambigously specifies a period.
+    # Therefore, if the frequency is unknown w.....
+    #
+    # If the frequency has not been specified, the we can check wether
+    # the period_col or period_row contains any non-numeric values.
+    # For example, if the periods on the period row only
+    # contain non-numeric period texts (e.g. "2018q1"),
+    # then we probably have a rowwise timeseries.
+    #
+    # If the frequency has been specified as 1, then for xlsx we can still
+    # distinguish between real numerical cells and text cells containing
+    # a numerical value as text ("2011"). Here we assume that such texts do
+    # specify a period range.
+
+    is_num_period_row <- is_num_period(row_periods)
+    is_num_period_col <- is_num_period(col_periods)
+
+    if (!any(is_num_period_row) && all(is_num_period_col)) {
+      return(TRUE)
+    } else if (!any(is_num_period_col) && all(is_num_period_col)) {
       return(FALSE)
     }
 
     # TODO: if all periods are numeric, then check the min and max value.
-    # If on the first row the maximum is larger than 1900 and smaller than 3000,
-    # then the timeseries is probably rowwise.
+    # If on the first row the number are between 1800 and 2300, then that
+    # is probably a normal series.
 
-  } else if (!xlsx && is.na(frequency)) {
-
-    # For csv files we cannot distinguish character values and numerical
-    # values. However, if the frequency has not been specified and the
-    # period row contains a period simple integer value, we use the same
-    # approach.
-    year_pattern <- "^-?\\d+$"
-    period_row <- unlist(tbl[row_nr, is_period_row])
-    num_period_row <- grepl(year_pattern, period_row)
-    if (!any(num_period_row)) {
-      # all periods on row row_nr are not simple integer numbers:
-      # assume rowwise timeseries
-      return(TRUE)
-    }
-
-    period_col <- unlist(tbl[is_period_col, col_nr])
-    num_period_col <- grepl(year_pattern, period_col)
-    if (!any(num_period_col)) {
-      # all periods on column col_nr are non-numerical:
-      # assume columnwise timeseries
-      return(FALSE)
-    }
+    # If previous tests failed, then use the largest number of non-numerical
+    # periods as criterium.
+    return(sum(!is_num_period_row) >= sum(!is_num_period_col))
   }
-
 
   # if there is no information available, then simply use the maximum
   # number of periods objects in the row or column.
