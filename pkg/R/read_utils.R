@@ -126,11 +126,8 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
           } else {
             is_period_col <- is_period_tbl(tbl[[col_nr]], frequency, xlsx,
                                            period_fun)
-            # TODO: integers are also considered as periods. To determine
-            # rowwise, we should take this into account. For example, if
-            # is_period_row contains character periods and is_period_col
-            # integers, then the timeseries is probably rowwise.
-            rowwise <- col_nr != 1  && sum(is_period_row) > sum(is_period_col)
+            rowwise <- is_rowwise(row_nr, col_nr, is_period_row, is_period_col,
+                                  tbl, frequency, xlsx)
           }
         }
         if (rowwise) {
@@ -204,6 +201,97 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
   }
 }
 
+is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
+                       tbl, frequency, xlsx) {
+
+  if (col_nr == 1) {
+    return(FALSE)
+  }
+
+  is_period_sum_row <- sum(is_period_row)
+  is_period_sum_col <- sum(is_period_col)
+
+  if (is_period_sum_row == 1 && is_period_sum_col == 1) {
+    # There is a single period. Count the number of non-NA numerical
+    # values in row.
+    if (xlsx) {
+      # for xlsx, a NA value will have type logical.
+      num_period_row <- sapply(tbl[row_nr, ],
+                             FUN = function(x) is.numeric(x[[1]]))
+      num_period_col <- sapply(tbl[[col_nr]], FUN = is.numeric)
+      return(sum(num_period_row) > sum(num_period_col))
+    } else {
+      period_row <- unlist(tbl[row_nr, is_period_row])
+      num_period_row <- grepl(year_pattern, period_row)
+      period_col <- unlist(tbl[is_period_col, col_nr])
+      num_period_col <- grepl(year_pattern, period_col)
+      return(sum(num_period_row) > sum(num_period_col))
+    }
+  } else if (is_period_sum_row == 1) {
+    return(FALSE)
+  } else if (is_period_sum_col == 1) {
+    return(TRUE)
+  }
+
+  if (xlsx && (is.na(frequency) || frequency == 1)) {
+
+    # For frequency 1, an integer numeric value is also considered as a
+    # period. If the periods on the period row only
+    # contain non-numeric period objects, then this suggest that we have a
+    # rowwise timeseries.
+
+    num_period_row <- sapply(tbl[row_nr, is_period_row],
+                             FUN = function(x) is.numeric(x[[1]]))
+    if (!any(num_period_row)) {
+      # all periods on row row_nr are non-numerical:
+      # assume rowwise timeseries
+      return(TRUE)
+    }
+
+    num_period_col <- sapply(tbl[is_period_col, col_nr][[1]],
+                             FUN = is.numeric)
+    if (!any(num_period_col)) {
+      # all periods on column col_nr are non-numerical:
+      # assume columnwise timeseries
+      return(FALSE)
+    }
+
+    # TODO: if all periods are numeric, then check the min and max value.
+    # If on the first row the maximum is larger than 1900 and smaller than 3000,
+    # then the timeseries is probably rowwise.
+
+  } else if (!xlsx && is.na(frequency)) {
+
+    # For csv files we cannot distinguish character values and numerical
+    # values. However, if the frequency has not been specified and the
+    # period row contains a period simple integer value, we use the same
+    # approach.
+    year_pattern <- "^-?\\d+$"
+    period_row <- unlist(tbl[row_nr, is_period_row])
+    num_period_row <- grepl(year_pattern, period_row)
+    if (!any(num_period_row)) {
+      # all periods on row row_nr are not simple integer numbers:
+      # assume rowwise timeseries
+      return(TRUE)
+    }
+
+    period_col <- unlist(tbl[is_period_col, col_nr])
+    num_period_col <- grepl(year_pattern, period_col)
+    if (!any(num_period_col)) {
+      # all periods on column col_nr are non-numerical:
+      # assume columnwise timeseries
+      return(FALSE)
+    }
+  }
+
+
+  # if there is no information available, then simply use the maximum
+  # number of periods objects in the row or column.
+  return(is_period_sum_row >= is_period_sum_col)
+}
+
+
+
 
 get_first_non_empty_row <- function(tbl) {
   for (row_nr in 1:nrow(tbl)) {
@@ -213,6 +301,7 @@ get_first_non_empty_row <- function(tbl) {
   }
   return(NA)
 }
+
 
 get_first_non_empty_column <- function(tbl) {
   for (col_nr in 1:ncol(tbl)) {

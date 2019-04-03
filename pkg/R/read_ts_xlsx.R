@@ -198,8 +198,6 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                                xlsx = TRUE, period_fun = period_fun,
                                name_fun = name_fun)
 
-  #printobj(tbl_layout)
-
   if (is.null(tbl_layout)) {
     stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
                  filename))

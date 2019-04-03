@@ -2,7 +2,7 @@ library(regts)
 
 csv_file <- "csv/example1.csv"
 
-ret <- read_ts_csv(csv_file, skiprow = 1, skipcol = 1, strict = FALSE)
+ret <- read_ts_csv(csv_file, skiprow = 1, strict = FALSE)
 print(ret)
 
 ts2 <- read_ts_csv(csv_file, skiprow = 1, skipcol =1 , labels = "after",
