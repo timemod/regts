@@ -1,14 +1,3 @@
-# converts a tibble to a character vector.
-tibble_2_char <- function(tbl, replace_na = TRUE) {
-  ret <- unlist(tbl, use.names = FALSE)
-  ret <- as.character(ret)
-  if (replace_na) {
-    ret[is.na(ret)] <- ""
-  }
-  return(ret)
-}
-
-
 # Return a logical vector, where each element indicates whether the
 # corresponding element in tbl is a period.
 # INPUT:
@@ -254,7 +243,7 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
 
     period_col <- col_nr
     name_info <- get_name_info_colwise(first_data_row, first_row_nr,
-                                       period_col, tbl, labels, name_fun)
+                                       period_col, tbl, labels, name_fun, xlsx)
 
     last_data_col <- Position(identity, name_info$col_has_name, right = TRUE)
 
@@ -445,7 +434,7 @@ get_name_info_rowwise <- function(tbl_layout, data_tbl, labels, name_fun) {
   }
 
   name_col_data <- data_tbl[[name_col]]
-  row_has_name <- !is.na(name_col_data)
+  row_has_name <- !is.na(name_col_data) & nzchar(name_col_data)
 
   # extract names
   names <- name_col_data[row_has_name]
@@ -464,7 +453,7 @@ get_name_info_rowwise <- function(tbl_layout, data_tbl, labels, name_fun) {
 
 
 get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
-                                  labels, name_fun) {
+                                  labels, name_fun, xlsx) {
 
   # no labels if there is only one non-empty row before the first data row
   if (first_data_row == first_row_nr + 1) labels <- "no"
@@ -483,7 +472,9 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
     }
   }
 
-  name_row_data <- tibble_2_char(tbl[name_row, ])
+  name_row_data <- get_row_tbl(tbl, name_row, xlsx)
+  name_row_data[is.na(name_row_data)] <- ""
+  if (xlsx) name_row_data <- as.character(name_row_data)
 
   col_has_name <- nzchar(name_row_data)
   col_has_name[1 : period_col] <- FALSE
