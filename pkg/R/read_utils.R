@@ -278,7 +278,7 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     # below the period
     row_data <- lapply(tbl[row_nr, (col_nr + 1):ncol(tbl)],
                        FUN = function(x) x[[1]])
-    if (!xlsx) row <- unlist(period_data, use.names = FALSE)
+    if (!xlsx) row <- unlist(row_data, use.names = FALSE)
     col_data <- tbl[(row_nr + 1) : nrow(tbl), col_nr][[1]]
 
     if (xlsx) {
