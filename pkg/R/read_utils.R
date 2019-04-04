@@ -105,10 +105,15 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
         # first convert all texts to Date objects
         is_text <- is_text | is_num # all numerical values have already been
                                     # converted
-        result[is_text] <- sapply(result[is_text], FUN = function(x) {
+        result_date <- rep(as.Date(NA), length(result))
+        result_date[is_text] <- sapply(result[is_text], FUN = function(x) {
                                   as.Date(as.period(x, frequency))})
 
-        result[is_posixt] <- as.Date(data[is_posixt])
+        # create a vector of POSIXT objects (unlist(data[is_posixt] does not
+        # give correct results):
+        posixt_vector <- do.call(c, data[is_posixt])
+        result_date[is_posixt] <- as.Date(posixt_vector)
+        return(result_date)
       }
     }
 
