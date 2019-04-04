@@ -209,8 +209,6 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
 read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
                             tbl_layout, strict) {
 
-  #printobj(tbl_layout)
-
   # obtain the data part of the tibble: the data below the period row.
   data_tbl <- tbl[-(1:tbl_layout$period_row), ]
 
@@ -238,9 +236,6 @@ read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
 # by function read_ts_csv.
 read_ts_columnwise <- function(tbl, frequency, labels, dec, name_fun,
                                period_fun, tbl_layout, strict) {
-
-  #printobj(tbl)
-  #printobj(tbl_layout)
 
   # remove all rows without period (the names and labels are already in
   # tbl_layout)

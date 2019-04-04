@@ -198,7 +198,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                                xlsx = TRUE, period_fun = period_fun,
                                name_fun = name_fun)
 
-  #printobj(tbl_layout)
+  # printobj(tbl_layout)
 
   if (is.null(tbl_layout)) {
     stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
@@ -264,22 +264,25 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
 read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
                                     frequency, name_fun, period_fun,
                                     tbl_layout, strict) {
-
-  if (!any(tbl_layout$is_data_col)) return(NULL) # TODO: error message?
-
   #
   # read data
   #
 
   # determine range of data to read
 
+  last_col_to_read <- if (is.na(tbl_layout$last_data_col)) {
+                        tbl_layout$period_col
+                      } else {
+                        tbl_layout$last_data_col
+                      }
+
   range$ul[1] <- range$ul[1] + tbl_layout$first_data_row - 1
   range$ul[2] <- range$ul[2] + tbl_layout$period_col - 1
-  range$lr[2] <- range$ul[2] + tbl_layout$last_data_col - tbl_layout$period_col
+  range$lr[2] <- range$ul[2] + last_col_to_read - tbl_layout$period_col
 
   # prepare column types
 
-  ncol_to_read <- tbl_layout$last_data_col - tbl_layout$period_col + 1
+  ncol_to_read <- last_col_to_read - tbl_layout$period_col + 1
   col_types <- rep("skip", ncol_to_read)
   col_types[1] <- "list"
   if (!is.na(tbl_layout$last_data_col)) {

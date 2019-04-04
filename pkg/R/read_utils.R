@@ -294,8 +294,6 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
       #  col_data_is_num <- !is.na(as.numeric(col_data))
       # })
     }
-
-
   } else if (is_period_sum_row == 1 &&
              col_nr == get_last_non_empty_column(tbl)) {
     return(TRUE)
