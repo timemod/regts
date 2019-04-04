@@ -232,78 +232,79 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
       f <- function(x) {is.numeric(x) && !is.na(x)}
       row_data_is_num <- sapply(row_data, FUN = f)
       col_data_is_num <- sapply(col_data, FUN = f)
+      return(sum(row_data_is_num) <= sum(col_data_is_num))
     } else {
-      suppressWarnings({
-        row_data_is_num <- !is.na(as.numeric(row_data))
-        col_data_is_num <- !is.na(as.numeric(col_data))
-      })
+      # TODO: For csv files, we should take the decimal separator into account,
+      # so the code is slightly more complicated than the code below
+      # suppressWarnings({
+      #  row_data_is_num <- !is.na(as.numeric(row_data))
+      #  col_data_is_num <- !is.na(as.numeric(col_data))
+      # })
     }
-    return(sum(num_period_row) > sum(num_period_col))
 
-  } else if (is_period_sum_row == 1) {
-    return(FALSE)
-  } else if (is_period_sum_col == 1) {
+
+  } else if (is_period_sum_row == 1 &&
+             col_nr == get_last_non_empty_column(tbl)) {
     return(TRUE)
+  } else if (is_period_sum_col == 1 &&
+             row_nr == get_last_non_empty_row(tbl)) {
+    return(FALSE)
   }
+
+
+  # An integer or fractional number (e.g. 2017 or 2017.25) can be either a
+  # period or just the numerical data of a timeseries. On the other hand, a
+  # text such as "2018q1" is unambigiously a period. We can use this
+  # to determine if the timeseries are stored rowwise or columnwise.
+
+  # For xlsx, we can also distinguish if a cell value is stored as
+  # numerical or text value. For example, 2017 could be specified as a
+  # numerical value 2017 or a string "2017". Here, we assume that all
+  # text cells contain a period, while numerical cells may or may not
+  # contain data.
+
+  # For csv  files there is no distinction between numerical cells and text
+  # cells: are cells contain a character. Therefore, it does not make sense
+  # to use the information if the specified frequency is 1. If the specified
+  # frequency == 1has been specified for csv files.
 
   # create a list (xlsx) or character vector (csv) for the data on the period
   # row
+
   row_periods <- lapply(tbl[row_nr, is_period_row], FUN = function(x) x[[1]])
   if (!xlsx) row_periods <- unlist(row_periods, use.names = FALSE)
   col_periods <- tbl[is_period_col, col_nr][[1]]
-
-  #printobj(period_row)
-  #printobj(period_col)
 
   is_num_period <- function(period_data) {
     if (xlsx) {
       return(sapply(period_data, FUN = is.numeric))
     } else {
+      # TODO: what to do with fractionals (e.g. 2017.25)?
+      # this approach is not yet correct.
       return(grepl("^-?\\d+$", period_data))
     }
   }
 
-  if (is.na(frequency) || (xlsx && frequency == 1)) {
+  is_num_period_row <- is_num_period(row_periods)
+  is_num_period_col <- is_num_period(col_periods)
 
-    # Integer numerical values could be periods with frequency 1, but also
-    # just a numerical value of a timeseries. On the other hand,
-    # a string value such as "2019q1" unambigously specifies a period.
-    # Therefore, if the frequency is unknown w.....
-    #
-    # If the frequency has not been specified, the we can check wether
-    # the period_col or period_row contains any non-numeric values.
-    # For example, if the periods on the period row only
-    # contain non-numeric period texts (e.g. "2018q1"),
-    # then we probably have a rowwise timeseries.
-    #
-    # If the frequency has been specified as 1, then for xlsx we can still
-    # distinguish between real numerical cells and text cells containing
-    # a numerical value as text ("2011"). Here we assume that such texts do
-    # specify a period range.
-
-    is_num_period_row <- is_num_period(row_periods)
-    is_num_period_col <- is_num_period(col_periods)
-
-    if (!any(is_num_period_row) && all(is_num_period_col)) {
-      return(TRUE)
-    } else if (!any(is_num_period_col) && all(is_num_period_col)) {
-      return(FALSE)
-    }
-
-    # TODO: if all periods are numeric, then check the min and max value.
-    # If on the first row the number are between 1800 and 2300, then that
-    # is probably a normal series.
-
-    # If previous tests failed, then use the largest number of non-numerical
-    # periods as criterium.
-    return(sum(!is_num_period_row) >= sum(!is_num_period_col))
+  if (is_period_sum_col > 1 && all(is_num_period_col[-1] &&
+                                   any(!is_num_period_row))) {
+    return(TRUE)
+  } else if (is_period_sum_row > 1 && all(is_num_period_row[-1] &&
+                                          any(!is_num_period_col))) {
+    return(FALSE)
   }
 
-  # if there is no information available, then simply use the maximum
-  # number of periods objects in the row or column.
+  # TODO: if all periods are numeric, then check the min and max value.
+  # If on the first row the number are between 1800 and 2300, then that
+  # is probably a normal series. If that test fails we could check for periods
+  # before 2023.
+
+  # Fall back option: if every other test failed, use the total number of
+  # rowwise/colwise periods.
   return(is_period_sum_row >= is_period_sum_col)
 }
-
 
 
 
@@ -316,10 +317,27 @@ get_first_non_empty_row <- function(tbl) {
   return(NA)
 }
 
+get_last_non_empty_row <- function(tbl) {
+  for (row_nr in nrow(tbl):1) {
+    if (any(!is.na(unlist(tbl[row_nr, ])))) {
+      return(row_nr)
+    }
+  }
+  return(NA)
+}
 
 get_first_non_empty_column <- function(tbl) {
   for (col_nr in 1:ncol(tbl)) {
     if (any(!is.na(tbl[[col_nr]]))) {
+      return(col_nr)
+    }
+  }
+  return(NA)
+}
+
+get_last_non_empty_column <- function(tbl) {
+  for (col_nr in ncol(tbl):1) {
+    if (any(!is.na(unlist(tbl[[col_nr]])))) {
       return(col_nr)
     }
   }
