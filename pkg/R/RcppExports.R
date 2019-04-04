@@ -21,8 +21,8 @@ parse_period_range <- function(period_text, frequency) {
     .Call(`_regts_parse_period_range`, period_text, frequency)
 }
 
-is_period_text_ <- function(strings, given_freq) {
-    .Call(`_regts_is_period_text_`, strings, given_freq)
+is_period_text <- function(strings, frequency) {
+    .Call(`_regts_is_period_text`, strings, frequency)
 }
 
 #' Returns the \link{period_range} of a timeseries.

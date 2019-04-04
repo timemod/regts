@@ -191,22 +191,26 @@ test_that("as.period.numeric", {
 
 test_that("regts:::is_period_text", {
   expect_identical(regts:::is_period_text(c("2060", "noot", "2012M2",
-                                            "2010-2", "2010Q3QA")),
+                                            "2010-2", "2010Q3QA"),
+                                          frequency = NA),
                    c(TRUE, FALSE, TRUE, TRUE, FALSE))
   expect_identical(regts:::is_period_text(c("2060", "noot", "2012M2",
-                                            "2010-2", "2010Q3QA")),
+                                            "2010-2", "2010Q3QA"),
+                                          frequency = NA),
                    c(TRUE, FALSE, TRUE, TRUE, FALSE))
   expect_true(regts:::is_period_text("2010-2", frequency = 4))
   expect_false(regts:::is_period_text("2010-8", frequency = 4))
   expect_false(regts:::is_period_text("2010Q2", frequency = 1))
   expect_false(regts:::is_period_text("2010Q2", frequency = 12))
   expect_true(regts:::is_period_text("2010Q2", frequency = 4))
-  expect_true(regts:::is_period_text("2010-8"))
-  expect_false(regts:::is_period_text("2010Q8"))
-  expect_false(regts:::is_period_text("2010Q0"))
-  expect_true(regts:::is_period_text("2010.0"))
+  expect_true(regts:::is_period_text("2010-8", frequency = NA))
+  expect_false(regts:::is_period_text("2010Q8", frequency = NA))
+  expect_false(regts:::is_period_text("2010Q0", frequency = NA))
+  expect_true(regts:::is_period_text("2010.0", frequency = NA))
   expect_true(regts:::is_period_text("2010.0", frequency = 1))
   expect_false(regts:::is_period_text("2010.0", frequency = 4))
+  expect_true(regts:::is_period_text("2010.25", frequency = NA))
+  expect_false(regts:::is_period_text("2010.25", frequency = 1))
 })
 
 

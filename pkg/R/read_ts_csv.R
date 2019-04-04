@@ -246,8 +246,8 @@ read_ts_columnwise <- function(tbl, frequency, labels, dec, name_fun,
   # tbl_layout)
   tbl <- tbl[tbl_layout$is_data_row, ]
 
-  periods <- get_periods_tbl(tbl[[tbl_layout$period_col]], frequency, xlsx = FALSE,
-                             period_fun = period_fun)
+  periods <- get_periods_data(tbl[[tbl_layout$period_col]], frequency,
+                              xlsx = FALSE, period_fun = period_fun)
 
   #printobj(periods)
   # convert data columns to a numeric matrix, employing function df_to_numeric_matrix

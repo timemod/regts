@@ -198,6 +198,8 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                                xlsx = TRUE, period_fun = period_fun,
                                name_fun = name_fun)
 
+  #printobj(tbl_layout)
+
   if (is.null(tbl_layout)) {
     stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
                  filename))
@@ -291,13 +293,13 @@ read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
                          .name_repair = "minimal")
 
   # select rows with valid periods
-  row_sel <- is_period_tbl(data_tbl[[1]], frequency, TRUE, period_fun)
+  row_sel <- is_period_data(data_tbl[[1]], frequency, TRUE, period_fun)
   data_tbl <- data_tbl[row_sel, ]
 
   # TODO: this code is not efficient:
   # 1) The period has been parsed before in is_period_tbl.
   # 2) If period_fun has been specified, then it it called twice,
-  periods <- get_periods_tbl(data_tbl[[1]], frequency, TRUE, period_fun)
+  periods <- get_periods_data(data_tbl[[1]], frequency, TRUE, period_fun)
 
 
   mat <- as.matrix(data_tbl[-1])

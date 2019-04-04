@@ -112,20 +112,20 @@ static void parse_single_period(const std::string &period_text,
 }
 
 // [[Rcpp::export]]
-LogicalVector is_period_text_(std::vector<std::string> strings,
-                              const double given_freq) {
+LogicalVector is_period_text(std::vector<std::string> strings,
+                             const double frequency) {
      int n = strings.size();
      LogicalVector out(n);
      for (int i = 0; i < n; i++) {
-          ParsedPeriod per = parse_period_text(strings[i], given_freq);
+          ParsedPeriod per = parse_period_text(strings[i], frequency);
           out[i] = !per.error;
           if (per.error) {
               continue;
           }
-          if (!ISNA(given_freq)) {
+          if (!ISNA(frequency)) {
               if (ISNA(per.freq)) {
-                  per.freq = given_freq;
-              } else if (per.freq != given_freq) {
+                  per.freq = frequency;
+              } else if (per.freq != frequency) {
                   /* the given frequency does not agree with the actual
                    * frequency */
                   out[i] = false;

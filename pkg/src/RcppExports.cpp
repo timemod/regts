@@ -71,15 +71,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// is_period_text_
-LogicalVector is_period_text_(std::vector<std::string> strings, const double given_freq);
-RcppExport SEXP _regts_is_period_text_(SEXP stringsSEXP, SEXP given_freqSEXP) {
+// is_period_text
+LogicalVector is_period_text(std::vector<std::string> strings, const double frequency);
+RcppExport SEXP _regts_is_period_text(SEXP stringsSEXP, SEXP frequencySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::vector<std::string> >::type strings(stringsSEXP);
-    Rcpp::traits::input_parameter< const double >::type given_freq(given_freqSEXP);
-    rcpp_result_gen = Rcpp::wrap(is_period_text_(strings, given_freq));
+    Rcpp::traits::input_parameter< const double >::type frequency(frequencySEXP);
+    rcpp_result_gen = Rcpp::wrap(is_period_text(strings, frequency));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -112,7 +112,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_regts_moving_average", (DL_FUNC) &_regts_moving_average, 5},
     {"_regts_parse_period", (DL_FUNC) &_regts_parse_period, 2},
     {"_regts_parse_period_range", (DL_FUNC) &_regts_parse_period_range, 2},
-    {"_regts_is_period_text_", (DL_FUNC) &_regts_is_period_text_, 2},
+    {"_regts_is_period_text", (DL_FUNC) &_regts_is_period_text, 2},
     {"_regts_get_period_range", (DL_FUNC) &_regts_get_period_range, 1},
     {"_regts_rel2index_cpp", (DL_FUNC) &_regts_rel2index_cpp, 1},
     {NULL, NULL, 0}

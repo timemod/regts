@@ -369,27 +369,6 @@ create_periods <- function(subperiod_count, frequency) {
   return(lapply(subperiod_count, FUN = create_period, frequency = frequency))
 }
 
-# PRIVATE METHODS THAT COULD BE USEFULL FOR AUTOMATIC CONVERSIONS
-# OF DATA FRAMES to TS
-
-# Checks if character or numerical values can be converted to a
-# period_range with a specific frequency
-# INPUT
-# x a character or numeric vector
-# freq frequency (or NA: the period text should have either the
-# specific frequency or an unknown frequyency.
-#
-# RETURN
-# a logical vector with element equal to \code{TRUE} is the
-# corresponding element in \code{x} can be converted to a
-# period_range
-is_period_text <- function(x, frequency = NA) {
-  if (is.numeric(x)) {
-    x <- as.character(x)
-  }
-  return(is_period_text_(x, frequency))
-}
-
 # minimum or maximum of 2 or more periods
 #' @export
 Summary.period <- function(..., na.rm = FALSE){

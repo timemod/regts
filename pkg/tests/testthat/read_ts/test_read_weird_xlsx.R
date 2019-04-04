@@ -20,11 +20,12 @@ test_that("weird_isis.xlsx is read correctly",  {
   result2 <- read_ts_xlsx(xlsx_file, rowwise = TRUE)
   expect_equal(result2, expected_result)
 
-  expect_error(read_ts_xlsx(xlsx_file, frequency = 4),
-               "No periods found")
+  expected_result3 <- regts(matrix(NA, ncol = 2), period = "2000q1/2003q1",
+                           names = c("a", "b"))
+  expected_result3[c(1, 5, 9, 13), ] <- as.numeric(result1)
 
-  expect_error(read_ts_xlsx(xlsx_file, rowwise = TRUE, frequency = 4),
-               "No periods found on Sheet 1 of file xlsx/weird_isis.xlsx\n")
+  result3 <- read_ts_xlsx(xlsx_file, frequency = 4, strict = FALSE)
+  expect_equal(result3, expected_result3)
 })
 
 test_that("weird_1.xlsx is read correctly",  {
@@ -43,11 +44,14 @@ test_that("weird_2.xlsx is read correctly",  {
 
   xlsx_file <- "xlsx/weird_2.xlsx"
 
-  a <- regts(2, start = "2002Q2")
-  b <- 2 * a
-  expected_result1 <- cbind(a, b)
+  result1 <- read_ts_xlsx(xlsx_file, frequency = 4, labels = "no",
+                          strict = FALSE)
 
-  result1 <- read_ts_xlsx(xlsx_file, frequency = 4, labels = "no")
+  expected_result1 <- regts(matrix(NA, ncol = 2), period = "2001q1/2002q2",
+                            names = c("a", "b"))
+  expected_result1[c(1, 6), ] <- c(sqrt(2), 2, sqrt(8), 4)
+
+
   expect_equal(result1, expected_result1)
 
   a <- regts(sqrt(1:3), start = "2000")

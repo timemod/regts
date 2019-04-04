@@ -9,62 +9,120 @@ tibble_2_char <- function(tbl, replace_na = TRUE) {
 }
 
 
-# return a logical vector, where each element indicates whether the
-# corresponding element in tbl is a period
-is_period_tbl <- function(tbl, frequency, xlsx, period_fun) {
+# Return a logical vector, where each element indicates whether the
+# corresponding element in tbl is a period.
+# INPUT:
+#    data a list (xlsx) or character vector (csv) whose elements should be
+#     checked
+is_period_data <- function(data, frequency, xlsx, period_fun) {
 
-  period_texts <- tibble_2_char(tbl)
+   is_period_fun <- function(period_texts, frequency, period_fun) {
+    # give a character vector with texts, this function returns a logical
+    # vectors with TRUE and FALSE depending on the period
+    if (!missing(period_fun)) {
+      period_texts <- sapply(period_texts, FUN = period_fun, USE.NAMES = FALSE)
+    }
 
-  if (!missing(period_fun)) {
-    period_texts <- sapply(period_texts, FUN = period_fun, USE.NAMES = FALSE)
+    # call C++ function is_period_text
+    return(is_period_text(period_texts, frequency))
   }
 
-  is_per_text <- is_period_text(period_texts, frequency)
-  if (xlsx && (!is.na(frequency) && 12 %% frequency == 0)) {
-    # When read from an xlsx file the tbl may contain  POSIXt values.
-    # POSIXt values are possible periods if the frequency is a divisor of 12.
-    is_posixt <- sapply(tbl, FUN = function(x) {inherits(x[[1]], "POSIXt")},
-                        USE.NAMES = FALSE)
-    return(is_per_text | unname(is_posixt))
+  if (xlsx) {
+
+    is_text   <- sapply(data, FUN = is.character)
+    is_num    <- sapply(data, FUN = is.numeric)
+
+    is_period <- rep(FALSE, length(data))
+
+    if (any(is_text)) {
+      period_texts <- unlist(data[is_text], use.names = FALSE)
+      #printobj(period_texts)
+      is_period[is_text] <- is_period_fun(period_texts, frequency, period_fun)
+    }
+
+    if (any(is_num)) {
+      num_values <- unlist(data[is_num], use.names = FALSE)
+      is_period[is_num] <-  num_values %%  1 == 0
+    }
+
+    if (is.na(frequency) || 12 %% frequency == 0) {
+      # When read from an xlsx file the tbl may contain  POSIXt values.
+      # POSIXt values are possible periods if the frequency is a divisor of 12.
+      is_posixt <- sapply(data, FUN =  function(x) {inherits(x[[1]], "POSIXt")})
+      if (any(is_posixt)) {
+        is_period[is_posixt] <- TRUE
+      }
+    }
+    return(is_period)
+
   } else {
-    # csv
-    return(is_per_text)
+
+    # csv file
+   return(is_period_fun(data, frequency, period_fun))
   }
 }
 
-# Returns the periods as either a character or Date vector
-get_periods_tbl <- function(tbl, frequency, xlsx, period_fun) {
-  if (xlsx &&  (!is.na(frequency) && 12 %% frequency == 0)) {
-    # when read from xlsx the tbl may contain POSIXt data
-    is_posixt <- sapply(tbl, FUN = function(x) {inherits(x[[1]], "POSIXt")})
-    has_posixt <- any(is_posixt)
-  } else {
-    # csv file, no posixt values possible
-    has_posixt <- FALSE
-  }
-  if (has_posixt) {
-    # convert all periods to Dates, and return a Date vector
-    period_fun_given <- !missing(period_fun)
-    conv_date <- function(x) {
-      x <- x[[1]]
-      if (inherits(x, "POSIXt")) {
-        return(as.Date(x))
-      } else {
-        # apply period_fun and convert to Date
-        if (period_fun_given) x <- period_fun(x)
-        return(as.Date(period(x, frequency)))
+# Returns the periods as either a character or Date vector from data
+# read by read_ts_xlsx or read_ts_csv.
+get_periods_data <- function(data, frequency, xlsx, period_fun) {
+
+  if (xlsx) {
+
+    #printobj(data)
+
+    is_text   <- sapply(data, FUN = is.character)
+    is_num    <- sapply(data, FUN = is.numeric)
+
+    # first handle numerical and character data
+    result <- rep(NA, length(data))
+
+    if (any(is_text)) {
+      period_texts <- unlist(data[is_text], use.names = FALSE)
+      if (!missing(period_fun)) {
+        period_texts <- sapply(period_texts, FUN = period_fun,
+                               USE.NAMES = FALSE)
+      }
+      #printobj(period_texts)
+      result[is_text] <- period_texts
+    }
+
+    if (any(is_num)) {
+        num_values <- unlist(data[is_num], use.names = FALSE)
+        if (!is.na(frequency)) {
+          period_texts <- paste0(num_values, "/1")
+        } else {
+          period_texts <- as.character(num_values)
+        }
+        result[is_num] <- period_texts
+    }
+
+    if (is.na(frequency) || 12 %% frequency == 0) {
+
+      # when read from xlsx the tbl may contain POSIXt data
+      is_posixt <- sapply(data, FUN = function(x) {inherits(x[[1]], "POSIXt")})
+      if (any(is_posixt)) {
+
+        # first convert all texts to Date objects
+        is_text <- is_text | is_num # all numerical values have already been
+                                    # converted
+        result[is_text] <- sapply(result[is_text], FUN = function(x) {
+                                  as.Date(as.period(x, frequency))})
+
+        result[is_posixt] <- as.Date(data[is_posixt])
       }
     }
-    date_list <- lapply(tbl, FUN = conv_date)
-    # convert to vector of Dates (sapply does not work)
-    return(do.call(c, date_list))
+
+    return(result)
+
   } else {
-    # return a character vector
-    ret <- tibble_2_char(tbl, FALSE)
+
+    # csv file, all data are already character vectors
+    periods <- data
     if (!missing(period_fun)) {
-      ret <- sapply(ret, FUN = period_fun, USE.NAMES = FALSE)
+      periods <- sapply(periods, FUN = period_fun, USE.NAMES = FALSE)
     }
-    return(ret)
+    return(periods)
+
   }
 }
 
@@ -97,7 +155,7 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
     # columnwise
 
     for (col_nr in 1:ncol(tbl)) {
-      is_period <- is_period_tbl(tbl[[col_nr]], frequency, xlsx, period_fun)
+      is_period <- is_period_data(tbl[[col_nr]], frequency, xlsx, period_fun)
       if (any(is_period)) {
         last_col <- Position(function(x) {x}, is_period, right = TRUE)
         if (last_col > 1) {
@@ -117,14 +175,15 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
 
     # first search for a period rowwise
     for (row_nr in first_row_nr:nrow(tbl)) {
-      is_period_row <- is_period_tbl(tbl[row_nr, ], frequency, xlsx, period_fun)
+      is_period_row <- is_period_data(get_row_tbl(tbl, row_nr, xlsx), frequency,
+                                      xlsx, period_fun)
       if (any(is_period_row)) {
         col_nr <- Position(function(x) {x}, is_period_row)
         if (missing(rowwise)) {
           if (row_nr == first_row_nr) {
             rowwise <- TRUE
           } else {
-            is_period_col <- is_period_tbl(tbl[[col_nr]], frequency, xlsx,
+            is_period_col <- is_period_data(tbl[[col_nr]], frequency, xlsx,
                                            period_fun)
             rowwise <- is_rowwise(row_nr, col_nr, is_period_row, is_period_col,
                                   tbl, frequency, xlsx)
@@ -168,8 +227,8 @@ get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
 
     last_data_col <- Position(identity, is_period, right = TRUE)
 
-    periods <- get_periods_tbl(tbl[row_nr, is_period], frequency, xlsx,
-                               period_fun)
+    periods <- get_periods_data(get_row_tbl(tbl, row_nr, xlsx)[is_period],
+                                frequency, xlsx, period_fun)
 
     return(list(rowwise = TRUE, period_row = row_nr,
                 first_data_col = first_data_col, last_data_col = last_data_col,
@@ -324,6 +383,14 @@ get_last_non_empty_row <- function(tbl) {
     }
   }
   return(NA)
+}
+
+get_row_tbl <- function(tbl, row_nr, xlsx) {
+  # returns a specific row of a tibble, as a list for xlsx and as a
+  # character vector for csv.
+  data <- lapply(tbl[row_nr, ], FUN = function(x) x[[1]])
+  if (!xlsx) data <- unlist(data, use.names = FALSE)
+  return(data)
 }
 
 get_first_non_empty_column <- function(tbl) {

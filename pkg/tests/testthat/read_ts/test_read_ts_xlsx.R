@@ -83,12 +83,14 @@ test_that("example3.xlsx is read correctly (leading empty rows and columns are s
   xlsx_file <- "xlsx/example3.xlsx"
 
 
-  result <- read_ts_xlsx(xlsx_file, period_fun = period_fun, frequency = 4, strict = FALSE)
+  result <- read_ts_xlsx(xlsx_file, period_fun = period_fun, frequency = 4,
+                         strict = FALSE)
   expect_identical(result, correct_result)
 
   # argument labels should have no effect if there are no labels
   result2 <- read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", NA)),
-                          labels = "after", period_fun = period_fun, strict = FALSE)
+                          labels = "after", period_fun = period_fun,
+                          strict = FALSE)
   expect_identical(result2, correct_result)
 
   result3 <- read_ts_xlsx(xlsx_file, range = cellranger::cell_rows(c(2, NA)),
