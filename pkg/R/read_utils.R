@@ -304,11 +304,10 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     return(FALSE)
   }
 
-
-  # An integer or fractional number (e.g. 2017 or 2017.25) can be either a
-  # period or just the numerical data of a timeseries. On the other hand, a
-  # text such as "2018q1" is unambigiously a period. We can use this
-  # to determine if the timeseries are stored rowwise or columnwise.
+  # An integer number (e.g. 2017) can be either a period or just the numerical
+  # data of a timeseries. On the other hand, a text such as "2018q1" is
+  # unambigiously a period. We can use this to determine if the timeseries are
+  # stored rowwise or columnwise.
 
   # For xlsx, we can also distinguish if a cell value is stored as
   # numerical or text value. For example, 2017 could be specified as a
@@ -316,12 +315,11 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
   # text cells contain a period, while numerical cells may or may not
   # contain data.
 
-  # For csv  files there is no distinction between numerical cells and text
-  # cells: are cells contain a character. Therefore, it does not make sense
-  # to use the information if the specified frequency is 1. If the specified
-  # frequency == 1has been specified for csv files.
+  # For csv files there is no distinction between numerical cells and text
+  # cells: are cells contain a character.
 
-  # create a list (xlsx) or character vector (csv) for the data on the period
+
+  # First step: create a list (xlsx) or character vector (csv) for the data on the period
   # row
 
   row_periods <- lapply(tbl[row_nr, is_period_row], FUN = function(x) x[[1]])
@@ -332,8 +330,6 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     if (xlsx) {
       return(sapply(period_data, FUN = is.numeric))
     } else {
-      # TODO: what to do with fractionals (e.g. 2017.25)?
-      # this approach is not yet correct.
       return(grepl("^-?\\d+$", period_data))
     }
   }
