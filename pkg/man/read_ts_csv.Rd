@@ -93,7 +93,7 @@ rowwise or columnwise based on the positions of the fields with period texts.
 \strong{rowwise timeseries}
 
 For rowwise timeseries, the function searches for the first
-row with periods.  All rows before the period row are ignored.
+row with periods. All rows before the period row are ignored.
 Columns without a valid period in the period row are also ignored.
 The first non-empty column should contain the timeseries names
 (or labels if argument \code{labels = "before"}, see the discussion below).
@@ -107,13 +107,13 @@ There may be more than one column before the columns with timeseries values
 (data columns). In that case one column should contain the variable names.
 The other columns before the first data column are used to create
 timeseries labels (see \code{\link{ts_labels}}). If argument
-\code{labels = "after"} (default), then the first
-column contains the variable names. If \code{labels = "no"} the first column
+\code{labels = "after"} (default), then the first column contains the
+variable names. If \code{labels = "no"} the first column
 also contains variable names but the other columns before the first data
 column are ignored. If argument \code{labels = "before"}, then the variable
 names should be in the last column before the first data column.
 
-With argumennt \code{name_fun} a function can be applied to names of the
+With argument \code{name_fun} a function can be applied to names of the
 timeseries, e.g. \code{\link{tolower}}.
 
 \strong{columnwise timeseries}

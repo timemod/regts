@@ -30,8 +30,13 @@ is_period_data <- function(data, frequency, xlsx, period_fun) {
     }
 
     if (any(is_num)) {
-      num_values <- unlist(data[is_num], use.names = FALSE)
-      is_period[is_num] <-  num_values %%  1 == 0
+      if (is.na(frequency) || frequency == 1) {
+        # integer numerical values only possible for frequency 1
+        num_values <- unlist(data[is_num], use.names = FALSE)
+        is_period[is_num] <-  num_values %% 1 == 0
+      } else {
+        is_period[is_num] <- FALSE
+      }
     }
 
     if (is.na(frequency) || 12 %% frequency == 0) {
