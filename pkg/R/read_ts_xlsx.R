@@ -142,6 +142,8 @@
 #' @importFrom readxl read_excel
 #' @importFrom cellranger cell_limits
 #' @importFrom cellranger as.cell_limits
+#' @importFrom testthat capture_warnings
+#' @importFrom stringr str_match
 #' @seealso \code{\link{write_ts_xlsx}} and \code{\link{read_ts_csv}}
 #' @export
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
@@ -243,9 +245,11 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
   col_types[1:(tbl_layout$first_data_col - 1)] <- "text"
 
   # read data
-  data_tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
-                         col_types = col_types, na = na_string,
-                         .name_repair = "minimal")
+  warnings <- capture_warnings({
+    data_tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
+                           col_types = col_types, na = na_string,
+                           .name_repair = "minimal")
+  })
 
   name_info <- get_name_info_rowwise(tbl_layout, data_tbl, labels, name_fun)
 
@@ -254,6 +258,11 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
   colsel <- tbl_layout$first_data_col : ncol(data_tbl)
   mat <- t(as.matrix(data_tbl[rowsel , colsel]))
   colnames(mat) <- name_info$names
+
+  # print warnings
+  for (warning in select_read_excel_warnings(warnings, rowsel, range$ul[1])) {
+    warning(warning)
+  }
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
@@ -298,14 +307,20 @@ read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
     col_types[tbl_layout$is_data_col[colsel]] <- "numeric"
   }
 
-  # read data
-  data_tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
-                         col_types = col_types, na = na_string,
-                         .name_repair = "minimal")
+  warnings <- capture_warnings({
+    data_tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
+                           col_types = col_types, na = na_string,
+                          .name_repair = "minimal")
+  })
 
   # select rows with valid periods
   row_sel <- is_period_data(data_tbl[[1]], frequency, TRUE, period_fun)
   data_tbl <- data_tbl[row_sel, ]
+
+  for (warning in select_read_excel_warnings(warnings, row_sel, range$ul[1])) {
+    warning(warning)
+  }
+
 
   # TODO: this code is not efficient:
   # 1) The period has been parsed before in is_period_tbl.
@@ -315,6 +330,7 @@ read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
 
   mat <- as.matrix(data_tbl[-1])
   colnames(mat) <- tbl_layout$names
+
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
@@ -326,4 +342,15 @@ read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
   }
 
   return(ret)
+}
+
+select_read_excel_warnings <- function(warnings, row_sel, first_row_nr)  {
+  # select warnings issued by read_excel.  Warning about expecting a numerical
+  # value in a cell should only be given for rows that are actually read.
+  row_nrs <- which(row_sel) + first_row_nr - 1
+
+  pattern <- "((Expecting numeric)|(Coercing text to numeric)) in [A-Z]+(\\d+)"
+  warning_row_nrs <- as.numeric(str_match(warnings, pattern)[ , 5])
+  sel <- is.na(warning_row_nrs) | warning_row_nrs %in% row_nrs
+  return(warnings[sel])
 }
