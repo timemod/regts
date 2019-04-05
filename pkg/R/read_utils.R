@@ -419,6 +419,9 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     }
   }
 
+  # TODO: check frequencies: are the multiple frequencies for rowwise v.s.
+  # non-rowwise timeseries?
+
   #cat("fallback option\n")
   #print(is_period_sum_row)
   #print(is_period_sum_col)
