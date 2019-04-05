@@ -78,13 +78,23 @@ test_that("missing data columns / rows ", {
 
   tbl2 <- tibble(a = c(NA, NA, "a", NA), b = c("xxx", "2010", "2011", "2012"),
                  c = c("y", NA, 3, NA))
-  layout <- regts:::get_tbl_layout(tbl2, frequency = NA, xlsx = FALSE,
-                                   labels =  "after")
+  wmsg <- paste("Could not determine if timeseries are stored rowwise or",
+                "columnwise.\nAssuming columnwise based on the number of",
+                "periods found.\nUse argument rowwise if necessary.")
+  expect_warning(layout <- regts:::get_tbl_layout(tbl2, frequency = NA, xlsx = FALSE,
+                                   labels =  "after"), wmsg)
   expect_identical(layout, list(rowwise = FALSE, period_col = 2L,
                                 first_data_row = 2L, last_data_col = 3L,
                                 is_data_col = c(FALSE, FALSE, TRUE),
                                 is_data_row = c(FALSE, rep(TRUE, 3)),
                                 names = "y", lbls = NULL))
+
+  layout_roww <- regts:::get_tbl_layout(tbl2, frequency = NA, xlsx = FALSE,
+                                   rowwise = TRUE)
+  expect_identical(layout_roww, list(rowwise = TRUE, period_row = 2L,
+                                first_data_col = 2L, last_data_col = 2L,
+                                is_data_col = c(FALSE, TRUE, FALSE),
+                                periods = "2010"))
 
 
   tbl3 <- tibble(z = list("emu", NA, NA, NA), a = list(NA, NA, 2010, NA),

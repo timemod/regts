@@ -82,7 +82,6 @@ test_that("example3.xlsx is read correctly (leading empty rows and columns are s
 
   xlsx_file <- "xlsx/example3.xlsx"
 
-
   result <- read_ts_xlsx(xlsx_file, period_fun = period_fun, frequency = 4,
                          strict = FALSE)
   expect_identical(result, correct_result)
@@ -197,5 +196,18 @@ test_that("example11.xlsx, missing periods",  {
   xlsx_file <- "xlsx/example11.xlsx"
   expect_error(read_ts_xlsx(xlsx_file, skiprow = 1, labels = "no"), msg)
 })
+
+test_that("example15.xlsx, multiple year frequencies",  {
+
+  xlsx_file <- "xlsx/example15.xlsx"
+
+  result1 <- read_ts_xlsx(xlsx_file)
+
+  expected_result <- regts(matrix(c(1:4, sqrt(1:4)), nrow = 2, byrow = TRUE),
+                           start = 2010, names = c("a", "b", "c", "d"))
+  expect_equal(result1, expected_result)
+})
+
+
 
 
