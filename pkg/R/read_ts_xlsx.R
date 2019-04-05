@@ -179,16 +179,24 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   }
 
   # the number of lines used to inspect the file
-  range_1 <- range
-  range_1$lr[1] <- range_1$ul[1] + n_inspect - 1
+  range_inspect <- range
+  range_inspect$lr[1] <- min(range_inspect$ul[1] + n_inspect - 1,
+                             range_inspect$lr[1], na.rm = TRUE)
 
-  tbl_inspect <- read_excel(filename, sheet, range = range_1, col_names = FALSE,
-                            col_types = "list", na = na_string,
+  tbl_inspect <- read_excel(filename, sheet, range = range_inspect,
+                            col_names = FALSE, col_types = "list",
+                            na = na_string,
                             .name_repair = "minimal")
 
-  # TODO: sheetname is not correct if the sheetname is specified in
-  # argument range.
-  sheetname <- if (is.null(sheet)) "1" else as.character(sheet)
+
+  # create sheetname for error messages
+  sheetname <- if (!is.na(range$sheet))  {
+                range$sheet
+               } else if (!is.null(sheet)) {
+                 as.character(sheet)
+               } else {
+                 "1"
+               }
 
   if (nrow(tbl_inspect) == 0 || ncol(tbl_inspect) == 0) {
     stop(sprintf("Sheet %s of file %s is empty\n", sheetname, filename))

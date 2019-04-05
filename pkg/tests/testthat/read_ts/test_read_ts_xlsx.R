@@ -130,11 +130,12 @@ test_that("example5.xlsx is read correctly (leading empty are skipped)",  {
 test_that("example8.xlsx is read correctly (names to lowercase)",  {
 
   xlsx_file <- "xlsx/example8.xlsx"
-  result <- read_ts_xlsx(xlsx_file, name_fun = tolower, strict = FALSE)
-  expect_identical(result, correct_result)
+  result1 <- read_ts_xlsx(xlsx_file, name_fun = tolower, strict = FALSE)
+  expect_identical(result1, correct_result)
 
   # argument labels should have no effect if there are no labels
-  result2 <- read_ts_xlsx(xlsx_file, name_fun = tolower, labels = "before", strict = FALSE)
+  result2 <- read_ts_xlsx(xlsx_file, name_fun = tolower, labels = "before",
+                          strict = FALSE)
   expect_identical(result2, correct_result)
 })
 
@@ -157,8 +158,19 @@ test_that("example12.xlsx is read correctly",  {
 test_that("example13.xlsx (reversed period) is read correctly",  {
 
   xlsx_file <- "xlsx/example13.xlsx"
-  result <- read_ts_xlsx(xlsx_file, skiprow = 1)
-  expect_identical(result, correct_result_labels)
+  result1 <- read_ts_xlsx(xlsx_file, skiprow = 1)
+  expect_identical(result1, correct_result_labels)
+
+  expect_message(
+    # read_excel prints a message about different sheet specified in range
+    # and sheet
+    result2 <- read_ts_xlsx(xlsx_file, range = "example1!a2:e6", sheet= "xxx")
+  )
+  expect_identical(result2, correct_result_labels["2011q1/2011q2"])
+
+  expect_error(
+    read_ts_xlsx(xlsx_file, range = "example1!c5:e6", frequency = 4),
+    "No periods found on Sheet example1 of file xlsx/example13.xlsx")
 })
 
 test_that("example14.xlsx is read correctly",  {

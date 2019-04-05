@@ -319,42 +319,50 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
   # contain data.
 
   # For csv files there is no distinction between numerical cells and text
-  # cells: are cells contain a character.
+  # cells: are cells contain a character. However, even voor frequency 1 we
+  # a text as "2010y" is definitively a text string.
 
+  if (is.na(frequency) || frequency == 1) {
 
-  # First step: create a list (xlsx) or character vector (csv) for the data on the period
-  # row
+    # First step: create a list (xlsx) or character vector (csv) for the data
+    # on the period row
 
-  row_periods <- lapply(tbl[row_nr, is_period_row], FUN = function(x) x[[1]])
-  if (!xlsx) row_periods <- unlist(row_periods, use.names = FALSE)
-  col_periods <- tbl[is_period_col, col_nr][[1]]
+    row_periods <- lapply(tbl[row_nr, is_period_row], FUN = function(x) x[[1]])
+    if (!xlsx) row_periods <- unlist(row_periods, use.names = FALSE)
+    col_periods <- tbl[is_period_col, col_nr][[1]]
 
-  is_num_period <- function(period_data) {
-    if (xlsx) {
-      return(sapply(period_data, FUN = is.numeric))
-    } else {
-      return(grepl("^-?\\d+$", period_data))
+    is_num_period <- function(period_data) {
+      if (xlsx) {
+        return(sapply(period_data, FUN = is.numeric))
+      } else {
+        return(grepl("^-?\\d+$", period_data))
+      }
     }
+
+    is_num_period_row <- is_num_period(row_periods)
+    is_num_period_col <- is_num_period(col_periods)
+
+    if (is_period_sum_col > 1 && all(is_num_period_col[-1] &&
+                                     any(!is_num_period_row))) {
+      return(TRUE)
+    } else if (is_period_sum_row > 1 && all(is_num_period_row[-1] &&
+                                            any(!is_num_period_col))) {
+      return(FALSE)
+    }
+
+
+    # TODO: if all periods are numeric, then check the min and max value.
+    # If on the first row the numbers are between 1800 and 2300, then these
+    # numbers are probably years. If that test fails we could check for periods
+    # between 1 and 2300.
   }
 
-  is_num_period_row <- is_num_period(row_periods)
-  is_num_period_col <- is_num_period(col_periods)
-
-  if (is_period_sum_col > 1 && all(is_num_period_col[-1] &&
-                                   any(!is_num_period_row))) {
-    return(TRUE)
-  } else if (is_period_sum_row > 1 && all(is_num_period_row[-1] &&
-                                          any(!is_num_period_col))) {
-    return(FALSE)
-  }
-
-  # TODO: if all periods are numeric, then check the min and max value.
-  # If on the first row the number are between 1800 and 2300, then that
-  # is probably a normal series. If that test fails we could check for periods
-  # before 2023.
+  #cat("fallback option\n")
+  #print(is_period_sum_row)
+  #print(is_period_sum_col)
 
   # Fall back option: if every other test failed, use the total number of
-  # rowwise/colwise periods.
+  # rowwise / colwise periods.
   return(is_period_sum_row >= is_period_sum_col)
 }
 
