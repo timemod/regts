@@ -271,54 +271,68 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     return(FALSE)
   }
 
-  is_period_sum_row <- sum(is_period_row)
-  is_period_sum_col <- sum(is_period_col)
+  is_period_row_sum <- sum(is_period_row)
+  is_period_col_sum <- sum(is_period_col)
 
-  if (is_period_sum_row == 1 && is_period_sum_col == 1) {
-    # There is a single period. Count the number of non-NA numerical
-    # values in the cells to the right of and below this period cell.
 
-    # create a list (xlsx) or character vector (csv) for the data next to /
-    # below the period
+  #
+  #  SINGLE PERIOD
+  #
+
+  if (is_period_row_sum == 1 && is_period_col_sum == 1) {
+    # Single period. Count the number of numerical values in the cells to the
+    # right of and below this period cell. In case of doubt assume rowwise.
+
     row_data <- lapply(tbl[row_nr, (col_nr + 1):ncol(tbl)],
                        FUN = function(x) x[[1]])
-    if (!xlsx) row <- unlist(row_data, use.names = FALSE)
     col_data <- tbl[(row_nr + 1) : nrow(tbl), col_nr][[1]]
 
     if (xlsx) {
-      f <- function(x) {is.numeric(x) && !is.na(x)}
-      row_data_is_num <- sapply(row_data, FUN = f)
-      col_data_is_num <- sapply(col_data, FUN = f)
-      return(sum(row_data_is_num) <= sum(col_data_is_num))
+      row_data_n_num <- sum(sapply(row_data, FUN = is.numeric))
+      col_data_n_num <- sum(sapply(col_data, FUN = is.numeric))
     } else {
-      # TODO: For csv files, we should take the decimal separator into account,
-      # so the code is slightly more complicated than the code below
-      # suppressWarnings({
-      #  row_data_is_num <- !is.na(as.numeric(row_data))
-      #  col_data_is_num <- !is.na(as.numeric(col_data))
-      # })
+      # For csv files, we should take the decimal separator into account
+      # to check if the data are numerical.
+      # For the time being, just compare the number of any non-NA values.
+      row_data_n_num <- sum(!is.na(row_data))
+      col_data_n_num <- sum(!is.na(col_data))
     }
+    if (row_data_n_num != col_data_n_num) {
+      return(row_data_n_num < col_data_n_num)
+    } else {
+      p_txt <- as.character(tbl[row_nr, col_nr])
+      warning(sprintf(paste0("Could not determine if timeseries are stored",
+                            " rowwise or columnwise.\nFound a single period",
+                            "%s\nAssuming rowwise."), p_txt))
+      return(TRUE)
+    }
+
+    return(sum(row_data_is_num) <= sum(col_data_is_num))
   }
 
+  #
+  # FREQUENCY > 1
+  #
+
   if (!is.na(frequency) && frequency > 1 &&
-      (is_period_sum_row == 1 || is_period_sum_col == 1)) {
+      (is_period_row_sum == 1 || is_period_col_sum == 1)) {
     # If the frequency is larger than 1, there is no confusion between periods
-    # and integer numerical data values. Therefore, if all periods occur in a
+    # and integer numerical data values. Therefore, if all periods are in a
     # single row then the timeseries are probably stored rowwise.
     # Something similar holds when all periods are in a single column.
     #
     # This is not the case if the frequency is 1. For example, for the row
     #      1   2   3
     # it is possible that all values in the row a periods. However, it could
-    # be possible that the data are stored columnwise, with one period (1).
-    # 2 and 3 are then just data values.
+    # be possible that the data are stored columnwise, with one period (1) and
+    # two numerical values: 2 and 3 are then just data values.
 
-    return(is_period_sum_col == 1)
+    return(is_period_col_sum == 1)
   }
 
 
   #
-  # HANDLE PERIODS WITH FREQUENCY 1
+  # FREQUENCY UNKNOWN or 1
   #
 
   # An integer number (e.g. 2017) can be either a period or just the numerical
@@ -330,10 +344,10 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
   # numerical or text value. For example, 2017 could be specified as a
   # numerical value 2017 or a string "2017". Here, we assume that all
   # text cells contain a period, while numerical cells may or may not
-  # contain data.
+  # be a period.
 
   # For csv files there is no distinction between numerical cells and text
-  # cells: are cells contain a character. However, even voor frequency 1 we
+  # cells: are cells contain a text. However, even forfrequency 1 we
   # a text as "2010y" is definitively a text string.
 
   if (is.na(frequency) || frequency == 1) {
@@ -342,7 +356,6 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     # on the period row
 
     row_periods <- lapply(tbl[row_nr, is_period_row], FUN = function(x) x[[1]])
-    if (!xlsx) row_periods <- unlist(row_periods, use.names = FALSE)
     col_periods <- tbl[is_period_col, col_nr][[1]]
 
     is_num_period <- function(period_data) {
@@ -356,41 +369,65 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     is_num_period_row <- is_num_period(row_periods)
     is_num_period_col <- is_num_period(col_periods)
 
-    if (is_period_sum_col > 1 && all(is_num_period_col[-1] &&
-                                     any(!is_num_period_row))) {
+    if (is_period_row_sum > 1) {
+        if (!any(is_num_period_row)) {
+          return(TRUE)
+        } else if (!is_num_period_row[1] && all(is_num_period_row[-1])) {
+          return(FALSE)
+        } else if (is_period_col_sum == 1 && all(is_num_period_row)) {
+          # we have a row of integers, e.g. 2011 2012 2013 2015
+          if (row_nr == get_last_non_empty_row(tbl)) {
+            # If all periods are in a single row and if there are only empty
+            # rows below that row, then the timeseries are probably stored
+            # columnwise (where only the first period in the row is actually
+            # a period, while the other "periods" are numerical data).
+            return(FALSE)
+          } else {
+            return(TRUE)
+          }
+        }
+    }
+    if (is_period_col_sum > 1) {
+      if (!any(is_num_period_col)) {
+        return(FALSE)
+      } else if (!is_num_period_col[1] && all(is_num_period_col[-1])) {
+        return(TRUE)
+      } else if (is_period_row_sum == 1 && all(is_num_period_col)) {
+        if (col_nr == get_last_non_empty_column(tbl)) {
+          # see the comment above in the code block for is_period_row_sum > 1
+          return(TRUE)
+        } else {
+          return(FALSE)
+        }
+      }
+    }
 
-      return(TRUE)
-
-    } else if (is_period_sum_row > 1 && all(is_num_period_row[-1] &&
-                                            any(!is_num_period_col))) {
-      return(FALSE)
-
-    } else if (all(is_num_period_row) && all(is_num_period_col)) {
-
-      # now check if numerical values are likely years. An integer value
-      # 13424566 or -1345 is probably not a year
+    if (all(is_num_period_row) && all(is_num_period_col)) {
+       # All periods are numeric.
+      # Check if numerical values are likely years. An integer value
+      # 13424566 or -1345 is probably not a year.
 
       num_per_row <- as.numeric(row_periods)
       num_per_col <- as.numeric(col_periods)
 
-      num_is_year <- function(x, format = "YYYY") {
+      num_is_year <- function(x, format) {
         # this function returns true if a numerical value is likely a year.
         # for format = "YYYY" we assume for digits, otherwise two digits
         if (format == "YYYY") {
-          return(x >= 1000 & x <= 9999)
+          return(x >= 1800 & x <= 3000)
         } else {
           return(x >= 0 & x < 99)
         }
       }
 
       is_rowwise_year <- function(format = "YYYY") {
-        num_is_year_row <- num_is_year(num_per_row)
-        num_is_year_col <- num_is_year(num_per_col)
-        if (is_period_sum_col > 1 && all(num_is_year_row) &&
-                                  !all(num_is_year_col)) {
+        num_is_year_row <- num_is_year(num_per_row, format)
+        num_is_year_col <- num_is_year(num_per_col, format)
+        if (all(num_is_year_row) &&
+              (is_period_col_sum == 1 || !all(num_is_year_col[-1]))) {
           return(TRUE)
-        } else if (is_period_sum_row > 1 && all(num_is_year_col) &&
-                  !all(num_is_year_row)) {
+        } else if (all(num_is_year_col) &&
+                   (is_period_row_sum == 1 || !all(num_is_year_row[-1]))) {
           return(FALSE)
         } else {
           return(NA)
@@ -403,32 +440,18 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
       if (!is.na(is_rowwise)) return(is_rowwise)
 
 
-      # If all periods are in a single column and if there are only empty columns
-      # to the right of that column, then the timeseries are probably stored
-      # rowwise (where only the first period in the column is a real period, and
-      # the second and next cells in that column are numerical cells.
-      # Something similar holds if there are only empty rows below the row with
-      # periods.
-      if (is_period_sum_row == 1 && all(is_num_period_col) &&
-                 col_nr == get_last_non_empty_column(tbl)) {
-        return(TRUE)
-      } else if (is_period_sum_col == 1 && all(is_num_period_row) &&
-                  row_nr == get_last_non_empty_row(tbl)) {
-        return(FALSE)
-      }
+
     }
   }
 
-  # TODO: check frequencies: are the multiple frequencies for rowwise v.s.
-  # non-rowwise timeseries?
 
-  #cat("fallback option\n")
-  #print(is_period_sum_row)
-  #print(is_period_sum_col)
+  #
+  # FALL BACK CASE
+  #
 
-  # Fall back option: if every other test failed, use the total number of
-  # rowwise / colwise periods.\
-  is_rowwise <- is_period_sum_row >= is_period_sum_col
+  # Fall back case" if every other test failed, use the total number of
+  # rowwise / colwise periods.
+  is_rowwise <- is_period_row_sum >= is_period_col_sum
 
   text <- if (is_rowwise) "rowwise" else  "columnwise"
   warning(paste("Could not determine if timeseries are stored rowwise or",
