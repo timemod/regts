@@ -133,17 +133,17 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
 #
 # The function does not assume that all rows of the csv file or Excel sheet
 # have been read. read_ts_xlsx first reads the first 25 rows, then calls
-# get_tbl_layout to determine the position of the period data and
+# inspect_tibble to determine the position of the period data and
 # the numerical data columns. The data are actually read in a second stage
 # using this information. Currently, read_ts_csv reads all rows in one go,
-# but get_tbl_layout does not use that information.
+# but inspect_tibble does not use that information.
 #
 # For rowwise timeseries, the function returns the periods and for columnwise
 # timeseries the names and labels.  The function does not return names and labels
 # for rowwise timeseries, because the input tibble may not contain all rows
 # (see the discussion above). For the same reason, the function does not return
 # the periods for columnwise timeseries.
-get_tbl_layout <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
+inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
                            name_fun) {
 
   first_row_nr <- get_first_non_empty_row(tbl)
@@ -484,22 +484,22 @@ get_last_non_empty_column <- function(tbl) {
   return(NA)
 }
 
-get_name_info_rowwise <- function(tbl_layout, data_tbl, labels, name_fun) {
+get_name_info_rowwise <- function(layout, data_tbl, labels, name_fun) {
   # get the names and labels for a rowwise tibble containing timeseries data.
 
   # find the first non-empty column
   first_col_nr <- get_first_non_empty_column(data_tbl)
 
-  if (tbl_layout$first_data_col <= first_col_nr) {
+  if (layout$first_data_col <= first_col_nr) {
     return(list(row_has_name = rep(FALSE, nrow(data_tbl)), names = character(0),
                 lbls = character(0)))
   }
 
   # no labels if there is only one non-empty column before the first data column
-  if (tbl_layout$first_data_col == first_col_nr + 1) labels = "no"
+  if (layout$first_data_col == first_col_nr + 1) labels = "no"
 
   name_col <- if (labels == "before") {
-    tbl_layout$first_data_col - 1
+    layout$first_data_col - 1
   } else {
     first_col_nr
   }
@@ -507,7 +507,7 @@ get_name_info_rowwise <- function(tbl_layout, data_tbl, labels, name_fun) {
   if (labels == "before") {
     label_cols <- first_col_nr : (name_col - 1)
   } else if (labels == "after") {
-    label_cols <- (name_col + 1): (tbl_layout$first_data_col - 1)
+    label_cols <- (name_col + 1): (layout$first_data_col - 1)
   } else {
     label_cols <- numeric(0)
   }

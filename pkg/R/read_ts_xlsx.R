@@ -204,25 +204,25 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     stop(sprintf("Sheet %s of file %s is empty\n", sheetname, filename))
   }
 
-  tbl_layout <- get_tbl_layout(tbl_inspect, frequency, rowwise, labels,
+  layout <- inspect_tibble(tbl_inspect, frequency, rowwise, labels,
                                xlsx = TRUE, period_fun = period_fun,
                                name_fun = name_fun)
 
-  # printobj(tbl_layout)
+  # printobj(layout)
 
-  if (is.null(tbl_layout)) {
+  if (is.null(layout)) {
     stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
                  filename))
   }
 
-  if (tbl_layout$rowwise) {
+  if (layout$rowwise) {
     ret <- read_ts_rowwise_xlsx(filename, sheet, range, na_string, frequency,
-                                labels, name_fun, period_fun, tbl_layout,
+                                labels, name_fun, period_fun, layout,
                                 strict)
   } else {
     ret <- read_ts_columnwise_xlsx(filename, sheet, range, na_string,
                                    frequency, name_fun, period_fun,
-                                   tbl_layout, strict)
+                                   layout, strict)
   }
 
   return(ret)
@@ -232,21 +232,21 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 # read_ts_xlsx
 read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
                                  frequency, labels, name_fun, period_fun,
-                                 tbl_layout, strict) {
+                                 layout, strict) {
   #
   # read data
   #
 
-  # TODO: check periods for multiple freqiencies in tbl_layout.
+  # TODO: check periods for multiple freqiencies in layout.
   # This check should not be done in matrix2regts. Generate a nice error
   # message with the cell coordinates of the period axis.
 
-  range$ul[1] <- range$ul[1] + tbl_layout$period_row
-  range$lr[2] <- range$ul[2] + tbl_layout$last_data_col - 1
+  range$ul[1] <- range$ul[1] + layout$period_row
+  range$lr[2] <- range$ul[2] + layout$last_data_col - 1
 
-  col_types <- rep("skip", tbl_layout$last_data_col)
-  col_types[tbl_layout$is_data_col[1:tbl_layout$last_data_col]] <- "numeric"
-  col_types[1:(tbl_layout$first_data_col - 1)] <- "text"
+  col_types <- rep("skip", layout$last_data_col)
+  col_types[layout$is_data_col[1:layout$last_data_col]] <- "numeric"
+  col_types[1:(layout$first_data_col - 1)] <- "text"
 
   # read data
   warnings <- capture_warnings({
@@ -255,11 +255,11 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
                            .name_repair = "minimal")
   })
 
-  name_info <- get_name_info_rowwise(tbl_layout, data_tbl, labels, name_fun)
+  name_info <- get_name_info_rowwise(layout, data_tbl, labels, name_fun)
 
   # convert data columns to a numeric matrix
   rowsel <- name_info$row_has_name
-  colsel <- tbl_layout$first_data_col : ncol(data_tbl)
+  colsel <- layout$first_data_col : ncol(data_tbl)
   mat <- t(as.matrix(data_tbl[rowsel , colsel]))
   colnames(mat) <- name_info$names
 
@@ -270,7 +270,7 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
-  ret <- matrix2regts_(mat, periods = tbl_layout$periods, fun = period,
+  ret <- matrix2regts_(mat, periods = layout$periods, fun = period,
                        numeric = FALSE, frequency = frequency, strict = strict)
 
   if (!is.null(name_info$lbls)) {
@@ -284,31 +284,31 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
 # read_ts_xlsx.
 read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
                                     frequency, name_fun, period_fun,
-                                    tbl_layout, strict) {
+                                    layout, strict) {
   #
   # read data
   #
 
   # determine range of data to read
 
-  last_col_to_read <- if (is.na(tbl_layout$last_data_col)) {
-                        tbl_layout$period_col
+  last_col_to_read <- if (is.na(layout$last_data_col)) {
+                        layout$period_col
                       } else {
-                        tbl_layout$last_data_col
+                        layout$last_data_col
                       }
 
-  range$ul[1] <- range$ul[1] + tbl_layout$first_data_row - 1
-  range$ul[2] <- range$ul[2] + tbl_layout$period_col - 1
-  range$lr[2] <- range$ul[2] + last_col_to_read - tbl_layout$period_col
+  range$ul[1] <- range$ul[1] + layout$first_data_row - 1
+  range$ul[2] <- range$ul[2] + layout$period_col - 1
+  range$lr[2] <- range$ul[2] + last_col_to_read - layout$period_col
 
   # prepare column types
 
-  ncol_to_read <- last_col_to_read - tbl_layout$period_col + 1
+  ncol_to_read <- last_col_to_read - layout$period_col + 1
   col_types <- rep("skip", ncol_to_read)
   col_types[1] <- "list"
-  if (!is.na(tbl_layout$last_data_col)) {
-    colsel <- tbl_layout$period_col:tbl_layout$last_data_col
-    col_types[tbl_layout$is_data_col[colsel]] <- "numeric"
+  if (!is.na(layout$last_data_col)) {
+    colsel <- layout$period_col:layout$last_data_col
+    col_types[layout$is_data_col[colsel]] <- "numeric"
   }
 
   warnings <- capture_warnings({
@@ -335,7 +335,7 @@ read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
   # done in matrix2regts. Generate a nice error message with the cell coordinates
   # of the period axis.
   mat <- as.matrix(data_tbl[-1])
-  colnames(mat) <- tbl_layout$names
+  colnames(mat) <- layout$names
 
 
   # convert the matrix to a regts, using numeric = FALSE because we already
@@ -343,8 +343,8 @@ read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
   ret <- matrix2regts_(mat, periods, fun = period, numeric = FALSE,
                        frequency = frequency, strict = strict)
 
-  if (!is.null(tbl_layout$lbls)) {
-    ts_labels(ret) <- tbl_layout$lbls
+  if (!is.null(layout$lbls)) {
+    ts_labels(ret) <- layout$lbls
   }
 
   return(ret)
