@@ -143,6 +143,7 @@
 #' @importFrom cellranger cell_limits
 #' @importFrom cellranger as.cell_limits
 #' @importFrom testthat capture_warnings
+#' @importFrom cellranger num_to_letter
 #' @importFrom stringr str_match
 #' @seealso \code{\link{write_ts_xlsx}} and \code{\link{read_ts_csv}}
 #' @export
@@ -237,11 +238,19 @@ read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
   # read data
   #
 
-  periods_and_freq <- get_periods(layout$periods, layout, filename,
-                                  frequency = frequency, xlsx = TRUE,
-                                  sheetname = sheetname, range = range)
+  periods_and_freq <- convert_periods(layout$periods,frequency = frequency)
   periods <- periods_and_freq$periods
   freq <- periods_and_freq$freq
+  if (is.na(freq)) {
+    row_nr <- range$ul[1] + layout$period_row - 1
+    col1 <- num_to_letter(range$ul[2] + layout$first_data_col - 1)
+    col2 <- num_to_letter(range$ul[2] + layout$last_data_col - 1)
+    cells <- paste0(c(col1, col2), row_nr)
+    stop(sprintf(paste0("The row %s:%s of sheet %s of file %s contains\n",
+                        "periods with different frequencies."),
+                 cells[1], cells[2], sheetname, filename))
+  }
+
 
   range$ul[1] <- range$ul[1] + layout$period_row
   range$lr[2] <- range$ul[2] + layout$last_data_col - 1
@@ -326,17 +335,18 @@ read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
     warning(warning)
   }
 
-
-  # TODO: this code is not efficient:
-  # 1) The period has been parsed before in is_period_tbl.
-  # 2) If period_fun has been specified, then it it called twice,
   periods <- get_periods_data(data_tbl[[1]], frequency, TRUE, period_fun)
 
-  periods_and_freq <- get_periods(periods, layout, filename,
-                                  frequency = frequency, xlsx =TRUE,
-                                  range = range, sheetname = sheetname)
+  periods_and_freq <- convert_periods(periods, frequency = frequency)
   periods <- periods_and_freq$periods
   freq <- periods_and_freq$freq
+  if (is.na(freq)) {
+    col <- num_to_letter(range$ul[2])
+    cells <- paste0(col, c(range$ul[1], range$ul[1] + length(row_sel) - 1))
+    stop(sprintf(paste0("The column %s:%s of sheet %s of file %s contains\n",
+                       "periods with different frequencies."),
+                 cells[1], cells[2], sheetname, filename))
+  }
 
   mat <- as.matrix(data_tbl[-1])
   colnames(mat) <- layout$names

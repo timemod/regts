@@ -210,10 +210,13 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
 read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
                             layout, strict, filename, skiprow) {
 
-  periods_and_freq <- get_periods(layout$periods, layout, filename,
-                                  frequency = frequency, skiprow = skiprow)
+  periods_and_freq <- convert_periods(layout$periods,frequency = frequency)
   periods <- periods_and_freq$periods
   freq <- periods_and_freq$freq
+  if (is.na(freq)) {
+    stop(sprintf("Different periods found in the %dth row of file %s",
+         layout$period_row, filename))
+  }
 
   # obtain the data part of the tibble: the data below the period row.
   data_tbl <- tbl[-(1:layout$period_row), ]
@@ -249,10 +252,13 @@ read_ts_columnwise <- function(tbl, frequency, labels, dec, name_fun,
   periods <- get_periods_data(tbl[[layout$period_col]], frequency,
                               xlsx = FALSE, period_fun = period_fun)
 
-  periods_and_freq <- get_periods(periods, layout, filename,
-                                  frequency = frequency, skiprow = skiprow)
+  periods_and_freq <- convert_periods(periods,frequency = frequency)
   periods <- periods_and_freq$periods
   freq <- periods_and_freq$freq
+  if (is.na(freq)) {
+    stop(sprintf("Different periods found in the %dth column of file %s",
+                 layout$period_col, filename))
+  }
 
   #printobj(periods)
   # convert data columns to a numeric matrix, employing function df_to_numeric_matrix

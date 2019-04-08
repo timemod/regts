@@ -296,7 +296,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   # extract time column(s) and data from the input data frame,
   # and convert to a matrix. data are converted to numeric if necessary
 
-  # x could be a subclass of a data frame, for example a data.table.
+  # x could be a subclass of a data frame, for example a data.table or tibble.
   # Therefore use function as.data.frame to make sure that x is a normal
   # data frame.
 
@@ -313,7 +313,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     if (is.character(time_column)) {
       time_column <- which(colnames(x) %in% time_column)
     }
-    periods <- x[[time_column]]
+    periods <- x[ , time_column]
     data <- x[-time_column]
   }
 
@@ -349,15 +349,24 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
 #' @describeIn as.regts Convert a \code{\link{matrix}} to a
 #' \code{regts}
 #' @export
-as.regts.matrix <- function(x, numeric = TRUE, fun = period, strict = TRUE, ...) {
-
+as.regts.matrix <- function(x, numeric = TRUE, fun = period, strict = TRUE,
+                            ...) {
   if (nrow(x) == 0) {
     stop("'regts' object must have one or more observations")
   }
 
-  periods_and_freq <- convert_periods(rownames(x), fun = fun, ...)
-  periods <- periods_and_freq$periods
-  freq <- periods_and_freq$freq
+  periods <- rownames(x)
+  if (is.null(periods)) {
+    periods <- seq_len(nrow(x))
+    freq <- 1
+  } else {
+    periods_and_freq <- convert_periods(periods, fun = fun, ...)
+    periods <- periods_and_freq$periods
+    freq <- periods_and_freq$freq
+    if (is.na(freq)) {
+      stop("The row names contain periods with different frquencies")
+    }
+  }
 
   # we assume that the periods are in the rownames of the matrix
   return(matrix2regts_(x, periods, freq, numeric = numeric, strict = strict))
@@ -437,18 +446,29 @@ numeric_matrix <- function(x, dec = ".") {
   return(num_mat)
 }
 
-convert_periods <- function(periods, fun, ...) {
-  # internal function that converts a vector to a list of period objects.
-  # the function returns a list with element "periods" and "freq". freq is
-  # NA if the periods have different frequencies.
+convert_periods <- function(periods, fun = period, ...) {
+  # Internal function that converts a vector or data frame that can be coerced
+  # to period objects to a list of period objects. Optionally, a coercion
+  # function fun can be specified.
+  # The function returns a list with elements "periods" and "freq". freq is
+  # NA if the periods have different frequencies, and otherwise the freuqency
+  # of the periods.
 
-  if (is.null(periods)) {
-    periods <- seq_len(nrow(x))
-  } else if (is.factor(periods)) {
-    periods <- as.character(periods)
+  if (is.data.frame(period)) {
+    stop("Cannot handle multiple time columns yet.")
   }
 
-  # create a list of regperiod objects
+  # remove factors
+  if (is.factor(periods)) {
+    periods <- as.character(periods)
+  } else if (is.data.frame(periods)) {
+    periods[] <- lapply(periods, FUN = function(x) {
+       if (is.factor(x)) as.character(x) else x
+         })
+  }
+
+  # finally convert to a list of period objects
+  # create a list of regpriod objects
   periods <- lapply(periods, FUN = fun, ...)
 
   # if freq has been specified, then the frequency of the periods has

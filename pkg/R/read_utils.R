@@ -617,21 +617,3 @@ get_labels_from_tbl <- function(label_tbl, rowwise) {
   if (!any(nzchar(lbls))) lbls <- NULL
   return(lbls)
 }
-
-get_periods <- function(period_texts, layout, filename, frequency, xlsx = FALSE,
-                        sheetname = NULL, range = NULL, skiprow = NULL) {
-  # Returns the frequency of a list of period objects. The function gives an
-  # error if the periods have multiple frequencies.
-
-  periods_and_freq <- convert_periods(period_texts, fun = period,
-                                      frequency = frequency)
-
-  if (is.na(periods_and_freq$freq)) {
-    stop("The time column(s) contain different frequencies")
-  }
-
-  return(periods_and_freq)
-}
-
-
-

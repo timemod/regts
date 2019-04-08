@@ -57,8 +57,9 @@ test_that("weird_2.xlsx is read correctly",  {
   result2 <- read_ts_xlsx(xlsx_file, frequency = 1)
   expect_equal(result2, expected_result2)
 
-  expect_error(read_ts_xlsx(xlsx_file),
-               "The time column\\(s\\) contain different frequencies")
+  msg <- paste0("The row B1:E1 of sheet 1 of file xlsx/weird_2.xlsx contains\n",
+                "periods with different frequencies.")
+  expect_error(read_ts_xlsx(xlsx_file), msg)
 })
 
 
@@ -75,9 +76,14 @@ test_that("weird_3.xlsx is read correctly",  {
 test_that("weird_4.xlsx",  {
 
   xlsx_file <- "xlsx/weird_4.xlsx"
-  expect_identical(1, 1)
-  #result1 <- read_ts_xlsx(xlsx_file)
 
+  wmsg <- "Assuming columnwise based on the number of periods found."
+  emsg <- paste("The column B2:B4 of sheet 1 of file xlsx/weird_4.xlsx",
+                "contains\nperiods with different frequencies.")
 
+  expect_warning(
+    expect_error(
+      read_ts_xlsx(xlsx_file), emsg
+    ), wmsg)
 })
 
