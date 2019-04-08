@@ -262,3 +262,17 @@ test_that("as.character and print", {
   expect_output(print(py), "\\[1\\] 12")
   expect_output(print(pm), "\\[1\\] \"12M01\"")
 })
+
+test_that("multiple periods", {
+  expect_identical(period(c("2010q2", "2018m3")),
+              list(period("2010q2"), period("2018m3")))
+  expect_identical(period(c("2010Q2", "2018m3")),
+                   list(period("2010q2"), period("2018m3")))
+
+  expect_identical(period(2010:2011),
+                   list(period(2010), period(2011)))
+
+  expect_identical(
+    period(c(as.Date("2010-04-01"), as.Date("2010-07-01")), frequency = 4),
+    list(period("2010q2"), period("2010q3")))
+})

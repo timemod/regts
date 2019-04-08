@@ -210,7 +210,7 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
 read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
                             layout, strict, filename, skiprow) {
 
-  periods_and_freq <- convert_periods(layout$periods,frequency = frequency)
+  periods_and_freq <- convert_periods(layout$periods, frequency = frequency)
   periods <- periods_and_freq$periods
   freq <- periods_and_freq$freq
   if (is.na(freq)) {

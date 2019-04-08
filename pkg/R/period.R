@@ -63,15 +63,17 @@
 #' frequency month. It is possible to specify another output frequency,
 #' provided that this frequency is a divisor of 12.
 #'
-#' @param x a character string, numeric scalar,
+#' @param x a character, numeric scalar,
 #' \code{\link[base]{Date}}, \code{\link[base:DateTimeClasses]{POSIXct}}
-#' or  \code{\link[base:Dates]{POSIXlt}}
+#' or \code{\link[base:Dates]{POSIXlt}}. If \code{x} has length > 1, then the
+#' function returns of list of \code{period} objects.
 #' @param frequency frequency of the period. Argument \code{frequency} is
 #' mandatory if the frequency cannot be inferred from \code{x} (for example
 #' \code{"2017-2"} could be a quarter, month, etc.)
 #' @param ... additional arguments to be passed to or from methods (currently
 #' not used in package \code{regts})
-#' @return a \code{period} object
+#' @return a \code{period} object if \code{length(x) == 1}, or a
+#' list of \code{period} objects if  \code{length(x) > 1}
 #'
 #' @examples
 #' period("2010Q3")
@@ -109,7 +111,7 @@ as.period.period <- function(x, ...) {
 #' @export
 as.period.character <- function(x, frequency = NA, ...) {
   if (length(x) != 1) {
-    stop("x should be a single character string")
+    return(lapply(x, FUN = as.period.character, frequency = frequency, ...))
   }
 
   if (is.na(x)) {
@@ -120,10 +122,17 @@ as.period.character <- function(x, frequency = NA, ...) {
 }
 
 #' @export
+as.period.factor <- function(x, frequency = NA, ...) {
+  return(as.period.character(as.character(x), frequency = frequency, ...))
+}
+
+#' @export
 as.period.numeric <- function(x, frequency = NA, ...) {
+
   if (length(x) != 1) {
-    stop("x should be a numeric scalar")
+    return(lapply(x, FUN = as.period.numeric, frequency = frequency, ...))
   }
+
   x <- as.numeric(x)
 
   x_is_int <- x %% 1 == 0
@@ -167,7 +176,7 @@ as.period.POSIXct <- function(x, frequency = NA, ...) {
 as.period.POSIXlt <- function(x, frequency = NA, ...) {
 
   if (length(x) != 1) {
-    stop("x should be a vector with length 1")
+    return(lapply(x, FUN = as.period.POSIXlt, frequency = frequency, ...))
   }
 
   if (is.na(frequency)) {

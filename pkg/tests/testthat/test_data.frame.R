@@ -189,11 +189,11 @@ test_that("as.regts.data.frame with argument fun", {
   expect_identical(ts1, ts2)
 })
 
-# test_that("as.regts.data.frame with multiple time columns", {
-#   df <- data.frame(years = c(2018, 2018), quarters = c(1, 2),
-#                    a = 1:2)
-#   fun <- function(x) {printobj(x); period(paste(x[[1]], x[[2]]), frequency = 4)}
-#   ts1 <- as.regts(df, fun = fun, time_column = c("years", "quarters"))
-#   ts2 <- regts(matrix(1:4, ncol =  2), start = "2018Q3", names = c("a", "b"))
-#   expect_identical(ts1, ts2)
-# })
+test_that("as.regts.data.frame with multiple time columns", {
+  df <- data.frame(years = c(2018, 2018), quarters = c(1, 2),
+                   a = 1:2, stringsAsFactors = TRUE)
+  fun <- function(x) {period(paste(x[[1]], x[[2]]), frequency = 4)}
+  ts1 <- as.regts(df, fun = fun, time_column = c("years", "quarters"))
+  ts2 <- regts(matrix(1:2, ncol =  1), start = "2018Q1", names = "a")
+  expect_identical(ts1, ts2)
+})
