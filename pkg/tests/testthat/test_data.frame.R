@@ -168,7 +168,7 @@ test_that("as.regts.data.frame for irregular timeseries with strict", {
   df <- data.frame(a = 1:3, b = 4:6)
   rownames(df) <- c("2016Q2", "2015Q3", "2015Q4")
 
-  msg <- "Missing periods found \\(2016Q1\\). Use parameter strict!"
+  msg <- "Missing periods found \\(2016Q1\\). Set parameter strict to FALSE!"
   expect_error(as.regts(df), msg)
 })
 
