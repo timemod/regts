@@ -467,14 +467,6 @@ numeric_matrix <- function(x, dec = ".") {
 # of the periods.
 convert_periods <- function(periods, fun = period, ...) {
 
-  # convert factors to character
-  #if (is.factor(periods)) {
-  #  periods <- as.character(periods)
-  #} else if (is.data.frame(periods) && FALSE) {
-  #  f <- function(x) {if (is.factor(x)) as.character(x) else x}
-  #  periods[] <- lapply(periods, FUN = f)
-  #}
-
   # finally convert to a list of period objects
   # create a list of regpriod objects
   periods <- fun(periods, ...)

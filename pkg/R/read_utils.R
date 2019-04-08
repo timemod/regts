@@ -9,7 +9,7 @@ is_period_data <- function(data, frequency, xlsx, period_fun) {
     # give a character vector with texts, this function returns a logical
     # vectors with TRUE and FALSE depending on the period
     if (!missing(period_fun)) {
-      period_texts <- sapply(period_texts, FUN = period_fun, USE.NAMES = FALSE)
+      period_texts <- apply_period_fun(period_texts, period_fun)
     }
 
     # call C++ function is_period_text
@@ -25,7 +25,6 @@ is_period_data <- function(data, frequency, xlsx, period_fun) {
 
     if (any(is_text)) {
       period_texts <- unlist(data[is_text], use.names = FALSE)
-      #printobj(period_texts)
       is_period[is_text] <- is_period_fun(period_texts, frequency, period_fun)
     }
 
@@ -73,10 +72,8 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
     if (any(is_text)) {
       period_texts <- unlist(data[is_text], use.names = FALSE)
       if (!missing(period_fun)) {
-        period_texts <- sapply(period_texts, FUN = period_fun,
-                               USE.NAMES = FALSE)
+        period_texts <- apply_period_fun(period_texts, period_fun)
       }
-      #printobj(period_texts)
       result[is_text] <- period_texts
     }
 
@@ -118,13 +115,36 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
     # csv file, all data are already character vectors
     periods <- data
     if (!missing(period_fun)) {
-      periods <- sapply(periods, FUN = period_fun, USE.NAMES = FALSE)
+      periods <- apply_period_fun(periods, period_fun)
     }
     return(periods)
 
   }
 }
 
+apply_period_fun <- function(texts, period_fun) {
+
+  if (length(texts) == 0) return(character(0))
+
+  period_texts <- period_fun(texts)
+
+  if (length(period_texts) != length(texts)) {
+    stop(paste0("Function period_fun should return an object with the same",
+                "length as its input value"))
+  }
+
+  if (is.character(period_texts)) {
+    return(period_texts)
+  } else if (is.list(period_texts) && is.period(period_texts[[1]])) {
+    return(sapply(period_texts, FUN = as.character, USE.NAMES = FALSE))
+  } else if (length(period_texts) == 1 && is.period(period_texts)) {
+    return(as.character(period_texts))
+  }
+
+  stop(paste0("Illegal return value of period_fun. Period_fun should return:\n",
+              "  * a character vector\n",
+              "  * a single period object or a list of period objects."))
+}
 
 # Internal function: finds the first row or column of the period data in a
 # tibble read by read_ts_xlsx or read_ts_csv. The function also determines
