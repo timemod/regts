@@ -216,11 +216,11 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   }
 
   if (layout$rowwise) {
-    ret <- read_ts_rowwise_xlsx(filename, sheet, range, na_string, frequency,
-                                labels, name_fun, period_fun, layout,
+    ret <- read_ts_rowwise_xlsx(filename, sheet, sheetname, range, na_string,
+                                frequency, labels, name_fun, period_fun, layout,
                                 strict)
   } else {
-    ret <- read_ts_columnwise_xlsx(filename, sheet, range, na_string,
+    ret <- read_ts_columnwise_xlsx(filename, sheet, sheetname, range, na_string,
                                    frequency, name_fun, period_fun,
                                    layout, strict)
   }
@@ -230,16 +230,18 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 
 # Internal function to read timeseries rowwise from a tibble, used by
 # read_ts_xlsx
-read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
+read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
                                  frequency, labels, name_fun, period_fun,
                                  layout, strict) {
   #
   # read data
   #
 
-  # TODO: check periods for multiple freqiencies in layout.
-  # This check should not be done in matrix2regts. Generate a nice error
-  # message with the cell coordinates of the period axis.
+  periods_and_freq <- get_periods(layout$periods, layout, filename,
+                                  frequency = frequency, xlsx = TRUE,
+                                  sheetname = sheetname, range = range)
+  periods <- periods_and_freq$periods
+  freq <- periods_and_freq$freq
 
   range$ul[1] <- range$ul[1] + layout$period_row
   range$lr[2] <- range$ul[2] + layout$last_data_col - 1
@@ -270,8 +272,7 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
-  ret <- matrix2regts_(mat, periods = layout$periods, fun = period,
-                       numeric = FALSE, frequency = frequency, strict = strict)
+  ret <- matrix2regts_(mat, periods, freq, numeric = FALSE, strict = strict)
 
   if (!is.null(name_info$lbls)) {
     ts_labels(ret) <- name_info$lbls
@@ -282,8 +283,8 @@ read_ts_rowwise_xlsx <- function(filename, sheet, range, na_string,
 
 # Internal function to read timeseries columnwise from a tibble, used in
 # read_ts_xlsx.
-read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
-                                    frequency, name_fun, period_fun,
+read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
+                                    na_string, frequency, name_fun, period_fun,
                                     layout, strict) {
   #
   # read data
@@ -331,17 +332,18 @@ read_ts_columnwise_xlsx <- function(filename, sheet, range, na_string,
   # 2) If period_fun has been specified, then it it called twice,
   periods <- get_periods_data(data_tbl[[1]], frequency, TRUE, period_fun)
 
-  # TODO: check periods for multiple freqiencies. This check should not be
-  # done in matrix2regts. Generate a nice error message with the cell coordinates
-  # of the period axis.
+  periods_and_freq <- get_periods(periods, layout, filename,
+                                  frequency = frequency, xlsx =TRUE,
+                                  range = range, sheetname = sheetname)
+  periods <- periods_and_freq$periods
+  freq <- periods_and_freq$freq
+
   mat <- as.matrix(data_tbl[-1])
   colnames(mat) <- layout$names
 
-
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
-  ret <- matrix2regts_(mat, periods, fun = period, numeric = FALSE,
-                       frequency = frequency, strict = strict)
+  ret <- matrix2regts_(mat, periods, freq, numeric = FALSE, strict = strict)
 
   if (!is.null(layout$lbls)) {
     ts_labels(ret) <- layout$lbls

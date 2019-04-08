@@ -330,7 +330,6 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     return(is_period_col_sum == 1)
   }
 
-
   #
   # FREQUENCY UNKNOWN or 1
   #
@@ -370,25 +369,26 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     is_num_period_col <- is_num_period(col_periods)
 
     if (is_period_row_sum > 1) {
-        if (!any(is_num_period_row)) {
-          return(TRUE)
-        } else if (!is_num_period_row[1] && all(is_num_period_row[-1])) {
+      if (!any(is_num_period_row) && all(is_num_period_col[-1])) {
+        return(TRUE)
+      } else if (!is_num_period_row[1] && all(is_num_period_row[-1])) {
+        return(FALSE)
+      } else if (is_period_col_sum == 1 && all(is_num_period_row)) {
+        # we have a row of integers, e.g. 2011 2012 2013 2015
+        if (row_nr == get_last_non_empty_row(tbl)) {
+          # If all periods are in a single row and if there are only empty
+          # rows below that row, then the timeseries are probably stored
+          # columnwise (where only the first period in the row is actually
+          # a period, while the other "periods" are numerical data).
           return(FALSE)
-        } else if (is_period_col_sum == 1 && all(is_num_period_row)) {
-          # we have a row of integers, e.g. 2011 2012 2013 2015
-          if (row_nr == get_last_non_empty_row(tbl)) {
-            # If all periods are in a single row and if there are only empty
-            # rows below that row, then the timeseries are probably stored
-            # columnwise (where only the first period in the row is actually
-            # a period, while the other "periods" are numerical data).
-            return(FALSE)
-          } else {
-            return(TRUE)
-          }
+        } else {
+          return(TRUE)
         }
+      }
     }
+
     if (is_period_col_sum > 1) {
-      if (!any(is_num_period_col)) {
+      if (!any(is_num_period_col) && all(is_num_period_row[-1])) {
         return(FALSE)
       } else if (!is_num_period_col[1] && all(is_num_period_col[-1])) {
         return(TRUE)
@@ -617,3 +617,21 @@ get_labels_from_tbl <- function(label_tbl, rowwise) {
   if (!any(nzchar(lbls))) lbls <- NULL
   return(lbls)
 }
+
+get_periods <- function(period_texts, layout, filename, frequency, xlsx = FALSE,
+                        sheetname = NULL, range = NULL, skiprow = NULL) {
+  # Returns the frequency of a list of period objects. The function gives an
+  # error if the periods have multiple frequencies.
+
+  periods_and_freq <- convert_periods(period_texts, fun = period,
+                                      frequency = frequency)
+
+  if (is.na(periods_and_freq$freq)) {
+    stop("The time column(s) contain different frequencies")
+  }
+
+  return(periods_and_freq)
+}
+
+
+

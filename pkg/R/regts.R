@@ -323,10 +323,17 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     datamat <- as.matrix(data)
   }
 
+  periods_and_freq <- convert_periods(periods, fun = fun, ...)
+  periods <- periods_and_freq$periods
+  freq <- periods_and_freq$freq
+
+  if (is.na(freq)) {
+    stop("The time column(s) contain different frequencies")
+  }
+
   # Use numeric == FALSE, because the data has already been converted
   # to numeric when needed
-  ret <- matrix2regts_(datamat, periods = periods, numeric = FALSE, fun = fun,
-                       strict = strict, ...)
+  ret <- matrix2regts_(datamat, periods, freq, numeric = FALSE, strict = strict)
 
   # handle labels
   if (ncol(data) > 0) {
@@ -348,9 +355,12 @@ as.regts.matrix <- function(x, numeric = TRUE, fun = period, strict = TRUE, ...)
     stop("'regts' object must have one or more observations")
   }
 
+  periods_and_freq <- convert_periods(rownames(x), fun = fun, ...)
+  periods <- periods_and_freq$periods
+  freq <- periods_and_freq$freq
+
   # we assume that the periods are in the rownames of the matrix
-  return(matrix2regts_(x, periods = rownames(x), numeric = numeric, fun = fun,
-                       strict = strict, ...))
+  return(matrix2regts_(x, periods, freq, numeric = numeric, strict = strict))
 }
 
 
@@ -427,15 +437,11 @@ numeric_matrix <- function(x, dec = ".") {
   return(num_mat)
 }
 
+convert_periods <- function(periods, fun, ...) {
+  # internal function that converts a vector to a list of period objects.
+  # the function returns a list with element "periods" and "freq". freq is
+  # NA if the periods have different frequencies.
 
-# internal function to convert a matrix to a regts.
-matrix2regts_ <- function(x, periods, numeric, fun, strict, ...) {
-
-  if (numeric && !is.numeric(x)) {
-    x <- as.numeric(x)
-  }
-
-  # convert the rownames to a list of periods
   if (is.null(periods)) {
     periods <- seq_len(nrow(x))
   } else if (is.factor(periods)) {
@@ -445,13 +451,25 @@ matrix2regts_ <- function(x, periods, numeric, fun, strict, ...) {
   # create a list of regperiod objects
   periods <- lapply(periods, FUN = fun, ...)
 
+  # if freq has been specified, then the frequency of the periods has
+  # already been checked.
   # check that all frequencies are equal
   frequencies <- sapply(periods, FUN = frequency)
   frequencies <- unique(frequencies)
   if (length(frequencies) > 1) {
-    stop("The time column(s) contain different frequencies")
+    freq <- NA
   } else {
-    freq <- frequencies[1]
+    freq <- frequencies
+  }
+  return(list(periods = periods, freq = freq))
+}
+
+# internal function to convert a matrix to a regts. If freq has been specified,
+# then we assume that
+matrix2regts_ <- function(x, periods, freq, numeric, strict) {
+
+  if (numeric && !is.numeric(x)) {
+    x <- as.numeric(x)
   }
 
   # compute times as the number of subperiods since AD 0.

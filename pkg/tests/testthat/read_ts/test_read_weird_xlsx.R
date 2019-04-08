@@ -72,4 +72,12 @@ test_that("weird_3.xlsx is read correctly",  {
   expect_identical(result1, expected_result)
 })
 
+test_that("weird_4.xlsx",  {
+
+  xlsx_file <- "xlsx/weird_4.xlsx"
+  expect_identical(1, 1)
+  #result1 <- read_ts_xlsx(xlsx_file)
+
+
+})
 

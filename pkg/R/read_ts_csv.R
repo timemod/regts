@@ -181,24 +181,25 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
   not_all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
   tbl <- tbl[ , not_all_na, drop = FALSE]
 
-  layouy <- inspect_tibble(tbl, frequency, rowwise, labels,
+  layout <- inspect_tibble(tbl, frequency, rowwise, labels,
                                xlsx = FALSE, period_fun = period_fun,
                                name_fun = name_fun)
 
-  if (is.null(layouy)) {
+  if (is.null(layout)) {
     stop(sprintf("No periods found in file %s\n", filename))
   }
 
-  if (layouy$rowwise) {
+  if (layout$rowwise) {
     ret <- read_ts_rowwise(tbl, frequency = frequency, labels = labels,
                            dec = dec, name_fun = name_fun,
-                           period_fun = period_fun, layouy = layouy,
-                           strict = strict)
+                           period_fun = period_fun, layout = layout,
+                           strict = strict, filename = filename, skiprow = skip)
   } else {
     ret <- read_ts_columnwise(tbl, frequency = frequency, labels = labels,
                               dec = dec, name_fun = name_fun,
-                              period_fun = period_fun, layouy = layouy,
-                              strict = strict)
+                              period_fun = period_fun, layout = layout,
+                              strict = strict, filename = filename,
+                              skiprow = skip)
   }
 
   return(ret)
@@ -207,23 +208,27 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
 # Internal function to read timeseries rowwise from a tibble, used by
 # read_ts_csv.
 read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
-                            layouy, strict) {
+                            layout, strict, filename, skiprow) {
+
+  periods_and_freq <- get_periods(layout$periods, layout, filename,
+                                  frequency = frequency, skiprow = skiprow)
+  periods <- periods_and_freq$periods
+  freq <- periods_and_freq$freq
 
   # obtain the data part of the tibble: the data below the period row.
-  data_tbl <- tbl[-(1:layouy$period_row), ]
+  data_tbl <- tbl[-(1:layout$period_row), ]
 
-  name_info <- get_name_info_rowwise(layouy, data_tbl, labels, name_fun)
+  name_info <- get_name_info_rowwise(layout, data_tbl, labels, name_fun)
 
   rowsel <- name_info$row_has_name
-  colsel <- layouy$is_data_col
+  colsel <- layout$is_data_col
   mat <- df_to_numeric_matrix(data_tbl[rowsel, colsel], dec = dec)
   mat <- t(mat)
   colnames(mat) <- name_info$names
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
-  ret <- matrix2regts_(mat, periods = layouy$periods, fun = period,
-                       numeric = FALSE, frequency = frequency, strict = strict)
+  ret <- matrix2regts_(mat, periods, freq,  numeric = FALSE, strict = strict)
 
   if (!is.null(name_info$lbls)) {
     ts_labels(ret) <- name_info$lbls
@@ -235,26 +240,30 @@ read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
 # Internal function to read timeseries columnwise from a tibble, used
 # by function read_ts_csv.
 read_ts_columnwise <- function(tbl, frequency, labels, dec, name_fun,
-                               period_fun, layouy, strict) {
+                               period_fun, layout, strict, filename, skiprow) {
 
   # remove all rows without period (the names and labels are already in
-  # layouy)
-  tbl <- tbl[layouy$is_data_row, ]
+  # layout)
+  tbl <- tbl[layout$is_data_row, ]
 
-  periods <- get_periods_data(tbl[[layouy$period_col]], frequency,
+  periods <- get_periods_data(tbl[[layout$period_col]], frequency,
                               xlsx = FALSE, period_fun = period_fun)
+
+  periods_and_freq <- get_periods(periods, layout, filename,
+                                  frequency = frequency, skiprow = skiprow)
+  periods <- periods_and_freq$periods
+  freq <- periods_and_freq$freq
 
   #printobj(periods)
   # convert data columns to a numeric matrix, employing function df_to_numeric_matrix
-  mat <- df_to_numeric_matrix(tbl[layouy$is_data_col], dec = dec)
-  colnames(mat) <- layouy$names
+  mat <- df_to_numeric_matrix(tbl[layout$is_data_col], dec = dec)
+  colnames(mat) <- layout$names
 
   # set numeric = FALSE, because we already know that df is numeric
-  ret <- matrix2regts_(mat, periods, fun = period, numeric = FALSE,
-                       frequency = frequency, strict = strict)
+  ret <- matrix2regts_(mat, periods, freq,  numeric = FALSE, strict = strict)
 
-  if (!is.null(layouy$lbls)) {
-    ts_labels(ret) <- layouy$lbls
+  if (!is.null(layout$lbls)) {
+    ts_labels(ret) <- layout$lbls
   }
 
   return(ret)
