@@ -17,7 +17,7 @@ test_that("as.regts.matrix univariate", {
   expect_equal(regts1, ref_ts[ , "a", drop = FALSE])
 
   expect_error(as.regts(m[-2, , drop = FALSE]),
-               "Missing periods found \\(2018Q2\\). Use parameter strict!")
+               "Missing periods found \\(2018Q2\\). Set parameter strict to FALSE!")
 
   regts2 <- as.regts(m[-2, , drop = FALSE], strict = FALSE)
   expected_result <- ref_ts[ , "a", drop = FALSE]
