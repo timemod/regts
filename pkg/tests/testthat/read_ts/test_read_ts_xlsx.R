@@ -39,7 +39,7 @@ test_that("example1.xlsx is read correctly",  {
   colnames(correct_result_labels2) <- "(EUR)"
   ts_labels(correct_result_labels2) <- "b Timeseries b"
 
-  result3 <- read_ts_xlsx(xlsx_file, skiprow = 1, labels = "before", strict = FALSE)
+  result3 <- read_ts_xlsx(xlsx_file, labels = "before", strict = FALSE)
   expect_identical(result3, correct_result_labels2)
 })
 
@@ -142,7 +142,7 @@ test_that("example11.xlsx is read correctly",  {
 
   xlsx_file <- "xlsx/example11.xlsx"
 
-  result <- read_ts_xlsx(xlsx_file, skiprow = 1, labels = "no", strict = FALSE)
+  result <- read_ts_xlsx(xlsx_file, labels = "no", strict = FALSE)
   expect_identical(result, correct_result)
 })
 
@@ -157,7 +157,7 @@ test_that("example12.xlsx is read correctly",  {
 test_that("example13.xlsx (reversed period) is read correctly",  {
 
   xlsx_file <- "xlsx/example13.xlsx"
-  result1 <- read_ts_xlsx(xlsx_file, skiprow = 1)
+  result1 <- read_ts_xlsx(xlsx_file)
   expect_identical(result1, correct_result_labels)
 
   expect_message(
@@ -187,14 +187,14 @@ msg <- "Missing periods found \\(2010Q3, 2010Q4\\). Set parameter strict to FALS
 test_that("example5.xlsx, missing periods",  {
 
   xlsx_file <- "xlsx/example5.xlsx"
-  expect_error(read_ts_xlsx(xlsx_file, skiprow = 2, sheet = "example2",
+  expect_error(read_ts_xlsx(xlsx_file, sheet = "example2",
                             labels = "no"), msg)
 })
 
 test_that("example11.xlsx, missing periods",  {
 
   xlsx_file <- "xlsx/example11.xlsx"
-  expect_error(read_ts_xlsx(xlsx_file, skiprow = 1, labels = "no"), msg)
+  expect_error(read_ts_xlsx(xlsx_file, labels = "no"), msg)
 })
 
 test_that("example15.xlsx, multiple year frequencies",  {

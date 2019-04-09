@@ -119,7 +119,7 @@ test_that("example1.csv is read correctly",  {
 
   csv_file <- "csv/example1.csv"
 
-  result <- read_ts_csv(csv_file, skiprow = 1, labels = "no", strict = FALSE)
+  result <- read_ts_csv(csv_file, labels = "no", strict = FALSE)
   expect_identical(result, correct_result * 1)
 
   result2 <- read_ts_csv(csv_file, skiprow = 1, strict = FALSE)
@@ -129,7 +129,7 @@ test_that("example1.csv is read correctly",  {
   colnames(correct_result_labels2) <- "(EUR)"
   ts_labels(correct_result_labels2) <- "b Timeseries b"
 
-  result3 <- read_ts_csv(csv_file, skiprow = 1, labels = "before", strict = FALSE)
+  result3 <- read_ts_csv(csv_file, labels = "before", strict = FALSE)
   expect_identical(result3, correct_result_labels2 * 1)
 })
 
@@ -183,8 +183,8 @@ test_that("example4.csv is read correctly",  {
                "The following texts could not be converted to numeric:\n",
                "\"aap,x\"")
   expect_warning({
-    result <- read_ts_csv(csv_file, skiprow = 1, dec = ",",
-                          period_fun = period_fun, strict = FALSE)
+    result <- read_ts_csv(csv_file, dec = ",", period_fun = period_fun,
+                          strict = FALSE)
   }, msg = msg)
   expect_identical(result, correct_result_tmp)
 })
