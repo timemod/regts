@@ -6,6 +6,13 @@ rm(list = ls())
 
 context("test internal function inspect_tibble")
 
+list_2_char_tbl <- function(tbl) {
+  # convert 2 list tbl to a char tbl
+  tbl[] <- lapply(tbl, FUN = as.character)
+  return(tbl)
+}
+
+
 test_that("test1", {
 
   tbl <- tibble(a = c("2010", "", "a"), b = c("", "2014", "3"))
@@ -52,19 +59,51 @@ test_that("test2", {
 
 test_that("single period", {
 
-  tbl1 <- tibble(a = list(NA, NA, "olie"), b = list(NA, 2010, NA),
+  tbl1 <- tibble(a = list(NA, NA, "oil"), b = list(NA, 2010, NA),
                  c = list("a", sqrt(2), 2 * sqrt(2)), d =list("b", sqrt(3), NA))
-  layout <- regts:::inspect_tibble(tbl1, frequency = NA, xlsx = TRUE)
+  layout1 <- regts:::inspect_tibble(tbl1, frequency = NA, xlsx = TRUE)
 
-  expected_result <- list(rowwise = FALSE, period_col = 2L,
+  expected_result1 <- list(rowwise = FALSE, period_col = 2L,
                           first_data_row = 2L, last_data_col = 4L,
                           is_data_col = c(FALSE, FALSE, TRUE, TRUE),
                           is_data_row = c(FALSE, TRUE, FALSE),
                           names = c("a", "b"), lbls = NULL)
-  expect_identical(layout, expected_result)
+  expect_identical(layout1, expected_result1)
+
+  tbl1_csv <- list_2_char_tbl(tbl1)
+  layout1_csv <- regts:::inspect_tibble(tbl1_csv, frequency = NA, xlsx = FALSE)
+
+  expect_identical(layout1_csv, expected_result1)
 
 
+  tbl2 <- tibble(a = list(NA, NA, "a", "b"), b = list(NA, "2010m2", sqrt(2),
+                                                      sqrt(3)),
+                 c = list("oil", sqrt(5), sqrt(6), sqrt(7)))
 
+  layout2 <- regts:::inspect_tibble(tbl2, frequency = NA, xlsx = TRUE)
+
+  expected_result2 <- list(rowwise = TRUE, period_row = 2L,
+                          first_data_col = 2L, last_data_col = 2L,
+                          is_data_col = c(FALSE, TRUE, FALSE),
+                          periods = "2010m2")
+
+  expect_identical(layout2, expected_result2)
+
+  tbl3 <- tbl2[-4, ]
+
+  wmsg <- paste("Could not determine if timeseries are stored rowwise or",
+                "columnwise.\nFound a single period 2010m2. Assuming rowwise.")
+  expect_warning(layout3 <- regts:::inspect_tibble(tbl3, frequency = NA,
+                                                   xlsx = TRUE), wmsg)
+
+  expected_result3 <- expected_result2
+  expect_identical(layout3, expected_result3)
+
+  tbl3_csv <- list_2_char_tbl(tbl3)
+  expect_warning(
+    layout3_csv <- regts:::inspect_tibble(tbl3_csv, frequency = NA,
+                                          xlsx = FALSE), wmsg)
+  expect_identical(layout3, expected_result3)
 })
 
 test_that("missing data columns / rows ", {

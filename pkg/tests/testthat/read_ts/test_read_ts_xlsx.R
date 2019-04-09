@@ -23,7 +23,7 @@ ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b (EUR)")
 
 
 test_that("example1.xlsx is read correctly",  {
- xlsx_file <- "xlsx/example1.xlsx"
+  xlsx_file <- "xlsx/example1.xlsx"
 
   result <- read_ts_xlsx(xlsx_file, skiprow = 1, labels = "no", strict = FALSE)
 
@@ -106,7 +106,7 @@ test_that("example4.xlsx is read correctly (leading empty columns are skipped)",
   expect_identical(result, correct_result)
 
   result2 <- read_ts_xlsx(xlsx_file, range = cellranger::cell_limits(c(NA, 2),
-                                                          sheet = "example2"),
+                                                                     sheet = "example2"),
                           period_fun = period_fun, strict = FALSE)
   expect_identical(result2, correct_result_labels)
 })
@@ -119,7 +119,7 @@ test_that("example5.xlsx is read correctly (leading empty are skipped)",  {
 
   msg <- "Sheet Sheet3 of file xlsx/example5.xlsx is empty\n"
   expect_error(read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", NA)),
-                         sheet = "Sheet3"), msg)
+                            sheet = "Sheet3"), msg)
 
   msg <- "No periods found on Sheet example2 of file xlsx/example5.xlsx\n"
   expect_error(read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", "D")),

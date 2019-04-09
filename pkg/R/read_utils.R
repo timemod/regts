@@ -322,15 +322,16 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     if (row_data_n_num != col_data_n_num) {
       return(row_data_n_num < col_data_n_num)
     } else {
-      p_txt <- as.character(tbl[row_nr, col_nr])
+      p_txt <- as.character(tbl[row_nr, col_nr][[1]])
       warning(sprintf(paste0("Could not determine if timeseries are stored",
-                            " rowwise or columnwise.\nFound a single period",
-                            "%s\nAssuming rowwise."), p_txt))
+                            " rowwise or columnwise.\nFound a single period ",
+                            "%s. Assuming rowwise."), p_txt))
       return(TRUE)
     }
 
-    return(sum(row_data_is_num) <= sum(col_data_is_num))
+    return(sum(row_data_n_num) <= sum(col_data_n_num))
   }
+
 
   #
   # FREQUENCY > 1
