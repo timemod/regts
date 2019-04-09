@@ -6,8 +6,8 @@ rm(list = ls())
 
 context("test internal function inspect_tibble")
 
-list_2_char_tbl <- function(tbl) {
-  # convert 2 list tbl to a char tbl
+get_csv_tbl <- function(tbl) {
+  # convert a tbl for xlsx to a tibble for csv
   tbl[] <- lapply(tbl, FUN = as.character)
   return(tbl)
 }
@@ -70,7 +70,7 @@ test_that("single period", {
                           names = c("a", "b"), lbls = NULL)
   expect_identical(layout1, expected_result1)
 
-  tbl1_csv <- list_2_char_tbl(tbl1)
+  tbl1_csv <- get_csv_tbl(tbl1)
   layout1_csv <- regts:::inspect_tibble(tbl1_csv, frequency = NA, xlsx = FALSE)
 
   expect_identical(layout1_csv, expected_result1)
@@ -99,7 +99,7 @@ test_that("single period", {
   expected_result3 <- expected_result2
   expect_identical(layout3, expected_result3)
 
-  tbl3_csv <- list_2_char_tbl(tbl3)
+  tbl3_csv <- get_csv_tbl(tbl3)
   expect_warning(
     layout3_csv <- regts:::inspect_tibble(tbl3_csv, frequency = NA,
                                           xlsx = FALSE), wmsg)
@@ -142,4 +142,142 @@ test_that("missing data columns / rows ", {
                                 is_data_col = c(FALSE, FALSE, TRUE, FALSE),
                                 is_data_row = c(FALSE, FALSE, TRUE, FALSE),
                                 names = "a", lbls = "var a"))
+})
+
+test_that("combination of numeric and text periods", {
+
+  tbl1 <- tibble(a = list(NA, NA, "a", "b"),
+                 b = list("x", "2010q1", 1, 2),
+                 c = list("y", "2010q2", sqrt(2), sqrt(3)))
+  expect_warning(layout1 <- regts:::inspect_tibble(tbl1, frequency = NA,
+                                                   xlsx = TRUE), NA)
+
+  expected_result1 <- list(rowwise = TRUE, period_row = 2L,
+                           first_data_col = 2L, last_data_col = 3L,
+                           is_data_col = c(FALSE, TRUE, TRUE),
+                           periods = c("2010q1", "2010q2"))
+  expect_identical(layout1, expected_result1)
+
+  layout1_csv <-  regts:::inspect_tibble(get_csv_tbl(tbl1), frequency = NA,
+                                         xlsx = FALSE)
+  expect_identical(layout1_csv, expected_result1)
+
+
+  tbl2 <- tibble(a = list(NA, "x", "y"), b = list(NA, "2010q1", "2010q2"),
+                 c = list("a", 1, sqrt(2)), d = list("b", 2, sqrt(3)))
+
+  expect_warning(layout2 <- regts:::inspect_tibble(tbl2, frequency = NA,
+                                                   xlsx = TRUE), NA)
+
+  expected_result2 <- list(rowwise = FALSE, period_col = 2L,
+                           first_data_row = 2L, last_data_col = 4L,
+                           is_data_col = c(FALSE, FALSE, TRUE, TRUE),
+                           is_data_row = c(FALSE, TRUE, TRUE),
+                           names = c("a", "b"), lbls = NULL)
+
+  expect_identical(layout2, expected_result2)
+
+  layout2_csv <-  regts:::inspect_tibble(get_csv_tbl(tbl2), frequency = NA,
+                                         xlsx = FALSE)
+  expect_identical(layout2_csv, expected_result2)
+
+
+  tbl3 <- tibble(a = list(NA, "a", "b"), b = list("x", "2010q1", 12346),
+                  c = list("y", 12345, sqrt(3)))
+
+  wmsg <- paste("Could not determine if timeseries are stored rowwise or",
+                "columnwise.\nAssuming rowwise based on the number of periods",
+                "found.\nUse argument rowwise if necessary.")
+  expect_warning(
+    layout3 <- regts:::inspect_tibble(tbl3, frequency = NA, xlsx = TRUE),
+    wmsg)
+
+  expected_result3 <- expected_result1
+  expected_result3$periods <- c("2010q1", "12345")
+  expect_identical(layout3, expected_result3)
+
+  expect_warning(
+    layout3_csv <-  regts:::inspect_tibble(get_csv_tbl(tbl3), frequency = NA,
+                                         xlsx = FALSE), wmsg)
+  expect_identical(layout3_csv, expected_result3)
+})
+
+test_that("all periods are numeric, check YYYY", {
+
+  tbl1 <- tibble(a = list(NA, NA, "a", "b"),
+                 b = list(NA, 2010, 1, 2),
+                 c = list("x", 2011, 3, 4))
+
+  expect_warning({
+    layout1 <-  regts:::inspect_tibble(tbl1, frequency = NA, xlsx = TRUE)
+    layout1_csv<-  regts:::inspect_tibble(get_csv_tbl(tbl1), frequency = NA,
+                                          xlsx = FALSE)
+  }, NA)
+
+  expected_result1 <- list(rowwise = TRUE, period_row = 2L,
+                           first_data_col = 2L, last_data_col = 3L,
+                           is_data_col = c(FALSE, TRUE, TRUE),
+                           periods = c("2010", "2011"))
+  expect_identical(layout1, expected_result1)
+  expect_identical(layout1_csv, expected_result1)
+
+
+  tbl2 <- tibble(a = list(NA, NA, "a", "b"),
+                 b = list(NA, 2010, sqrt(2), sqrt(3)),
+                 c = list("x", 2011, sqrt(5), sqrt(7)))
+  expect_warning({
+    layout2 <-  regts:::inspect_tibble(tbl2, frequency = NA, xlsx = TRUE)
+    layout2_csv <-  regts:::inspect_tibble(get_csv_tbl(tbl2), frequency = NA,
+                                       xlsx = FALSE)
+  }, NA)
+
+  expected_result2 <- expected_result1
+  expect_identical(layout2, expected_result2)
+  expect_identical(layout2_csv, expected_result2)
+
+  tbl3 <- tibble(a = list(NA, NA, "x"), b = list(NA, 2010, 2011),
+                 c = list("a", 1, 2), d = list("b", 2, 4))
+  expect_warning(
+    layout3 <-  regts:::inspect_tibble(tbl3, frequency = NA, xlsx = TRUE), NA)
+
+  expected_result3 <- list(rowwise = FALSE, period_col = 2L,
+                           first_data_row = 2L, last_data_col = 4L,
+                           is_data_col = c(FALSE, FALSE, TRUE, TRUE),
+                           is_data_row = c(FALSE, TRUE, TRUE),
+                           names = c("a", "b"), lbls = NULL)
+
+  expect_identical(layout3, expected_result3)
+
+  tbl4 <- tibble(a = list(NA, NA, "a", "b"),
+                 b = list(NA, 22354, 11223, 2334),
+                 c = list("x", 3223, 11131, -411))
+
+  wmsg <- paste("Could not determine if timeseries are stored rowwise or",
+                "columnwise.\nAssuming columnwise based on the number of periods",
+                "found.\nUse argument rowwise if necessary.")
+  expect_warning(
+    layout4 <- regts:::inspect_tibble(tbl4, frequency = NA, xlsx = TRUE),
+    wmsg)
+
+  expected_result4 <- list(rowwise = FALSE, period_col = 2L,
+                           first_data_row = 2L, last_data_col = 3L,
+                           is_data_col = c(FALSE, FALSE, TRUE),
+                           is_data_row = c(FALSE, TRUE, TRUE, TRUE),
+                           names = "x", lbls = NULL)
+})
+
+test_that("all periods are numeric, check YY periods", {
+
+  tbl1 <- tibble(a = list(NA, NA, "a", "b"),
+                 b = list(NA, 18, 112445, -22),
+                 c = list("x", 19, -33, 42134))
+
+  expect_warning(
+    layout1 <-  regts:::inspect_tibble(tbl1, frequency = NA, xlsx = TRUE), NA)
+
+  expected_result1 <- list(rowwise = TRUE, period_row = 2L,
+                           first_data_col = 2L, last_data_col = 3L,
+                           is_data_col = c(FALSE, TRUE, TRUE),
+                           periods = c("18", "19"))
+  expect_identical(layout1, expected_result1)
 })

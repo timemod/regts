@@ -391,42 +391,30 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     is_num_period_row <- is_num_period(row_periods)
     is_num_period_col <- is_num_period(col_periods)
 
-    if (is_period_row_sum > 1) {
-      if (!any(is_num_period_row) && all(is_num_period_col[-1])) {
-        return(TRUE)
-      } else if (!is_num_period_row[1] && all(is_num_period_row[-1])) {
-        return(FALSE)
-      } else if (is_period_col_sum == 1 && all(is_num_period_row)) {
-        # we have a row of integers, e.g. 2011 2012 2013 2015
-        if (row_nr == get_last_non_empty_row(tbl)) {
-          # If all periods are in a single row and if there are only empty
-          # rows below that row, then the timeseries are probably stored
-          # columnwise (where only the first period in the row is actually
-          # a period, while the other "periods" are numerical data).
-          return(FALSE)
-        } else {
-          return(TRUE)
-        }
-      }
-    }
+    if (!any(is_num_period_row) && all(is_num_period_col[-1])) {
 
-    if (is_period_col_sum > 1) {
-      if (!any(is_num_period_col) && all(is_num_period_row[-1])) {
-        return(FALSE)
-      } else if (!is_num_period_col[1] && all(is_num_period_col[-1])) {
-        return(TRUE)
-      } else if (is_period_row_sum == 1 && all(is_num_period_col)) {
-        if (col_nr == get_last_non_empty_column(tbl)) {
-          # see the comment above in the code block for is_period_row_sum > 1
-          return(TRUE)
-        } else {
-          return(FALSE)
-        }
-      }
-    }
+      return(TRUE)
 
-    if (all(is_num_period_row) && all(is_num_period_col)) {
-       # All periods are numeric.
+    } else if (!any(is_num_period_col) && all(is_num_period_row[-1])) {
+
+      return(FALSE)
+
+    } else if (all(is_num_period_row) && all(is_num_period_col)) {
+      # All periods are numeric.
+
+      if (is_period_col_sum == 1 && row_nr == get_last_non_empty_row(tbl)) {
+        # we have a row of integers, e.g. 2011 2012 2013 2015) {
+        # If all periods are in a single row and if there are only empty
+        # rows below that row, then the timeseries are probably stored
+        # columnwise (where only the first period in the row is actually
+        # a period, while the other "periods" are numerical data).
+        return(FALSE)
+      } else if (is_period_row_sum == 1 &&
+                 col_nr == get_last_non_empty_column(tbl)) {
+        # see the comment above in the code block for is_period_row_sum > 1
+        return(TRUE)
+      }
+
       # Check if numerical values are likely years. An integer value
       # 13424566 or -1345 is probably not a year.
 
@@ -461,9 +449,6 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
       is_rowwise <- is_rowwise_year()
       if (is.na(is_rowwise)) is_rowwise <- is_rowwise_year(format = "YY")
       if (!is.na(is_rowwise)) return(is_rowwise)
-
-
-
     }
   }
 
