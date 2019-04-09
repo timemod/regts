@@ -5,7 +5,7 @@
 #     checked
 is_period_data <- function(data, frequency, xlsx, period_fun) {
 
-   is_period_fun <- function(period_texts, frequency, period_fun) {
+  is_period_fun <- function(period_texts, frequency, period_fun) {
     # give a character vector with texts, this function returns a logical
     # vectors with TRUE and FALSE depending on the period
     if (!missing(period_fun)) {
@@ -51,7 +51,7 @@ is_period_data <- function(data, frequency, xlsx, period_fun) {
   } else {
 
     # csv file
-   return(is_period_fun(data, frequency, period_fun))
+    return(is_period_fun(data, frequency, period_fun))
   }
 }
 
@@ -78,13 +78,13 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
     }
 
     if (any(is_num)) {
-        num_values <- unlist(data[is_num], use.names = FALSE)
-        if (!is.na(frequency)) {
-          period_texts <- paste0(num_values, "/1")
-        } else {
-          period_texts <- as.character(num_values)
-        }
-        result[is_num] <- period_texts
+      num_values <- unlist(data[is_num], use.names = FALSE)
+      if (!is.na(frequency)) {
+        period_texts <- paste0(num_values, "/1")
+      } else {
+        period_texts <- as.character(num_values)
+      }
+      result[is_num] <- period_texts
     }
 
     if (is.na(frequency) || 12 %% frequency == 0) {
@@ -95,10 +95,10 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
 
         # first convert all texts to Date objects
         is_text <- is_text | is_num # all numerical values have already been
-                                    # converted
+        # converted
         result_date <- rep(as.Date(NA), length(result))
         result_date[is_text] <- sapply(result[is_text], FUN = function(x) {
-                                  as.Date(as.period(x, frequency))})
+          as.Date(as.period(x, frequency))})
 
         # create a vector of POSIXT objects (unlist(data[is_posixt] does not
         # give correct results):
@@ -205,7 +205,7 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
             rowwise <- TRUE
           } else {
             is_period_col <- is_period_data(tbl[[col_nr]], frequency, xlsx,
-                                           period_fun)
+                                            period_fun)
             rowwise <- is_rowwise(row_nr, col_nr, is_period_row, is_period_col,
                                   tbl, frequency, xlsx)
           }
@@ -324,8 +324,8 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     } else {
       p_txt <- as.character(tbl[row_nr, col_nr][[1]])
       warning(sprintf(paste0("Could not determine if timeseries are stored",
-                            " rowwise or columnwise.\nFound a single period ",
-                            "%s. Assuming rowwise."), p_txt))
+                             " rowwise or columnwise.\nFound a single period ",
+                             "%s. Assuming rowwise."), p_txt))
       return(TRUE)
     }
 
@@ -435,7 +435,7 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
         num_is_year_row <- num_is_year(num_per_row, format)
         num_is_year_col <- num_is_year(num_per_col, format)
         if (all(num_is_year_row) &&
-              (is_period_col_sum == 1 || !all(num_is_year_col[-1]))) {
+            (is_period_col_sum == 1 || !all(num_is_year_col[-1]))) {
           return(TRUE)
         } else if (all(num_is_year_col) &&
                    (is_period_row_sum == 1 || !all(num_is_year_row[-1]))) {
@@ -497,15 +497,6 @@ get_row_tbl <- function(tbl, row_nr, xlsx) {
   return(data)
 }
 
-get_first_non_empty_column <- function(tbl) {
-  for (col_nr in 1:ncol(tbl)) {
-    if (any(!is.na(tbl[[col_nr]]))) {
-      return(col_nr)
-    }
-  }
-  return(NA)
-}
-
 get_last_non_empty_column <- function(tbl) {
   for (col_nr in ncol(tbl):1) {
     if (any(!is.na(unlist(tbl[[col_nr]])))) {
@@ -515,30 +506,49 @@ get_last_non_empty_column <- function(tbl) {
   return(NA)
 }
 
+
+# get_name_info_rowwise: internal function to get names and labels from
+# rowwise timeseries.
+# INPUT:
+# layout           : the result of function inspect_tibble
+# data_tbl         : the tibble containing all rows below the period row
+# labels           : label option ("before", "after" or "no")
+# name_fun         : function applied to the names
+# RETURN: a list with names, labels, and  a logical vector which indicates
+#         which rows in data_tbl contain a name.
+
 get_name_info_rowwise <- function(layout, data_tbl, labels, name_fun) {
   # get the names and labels for a rowwise tibble containing timeseries data.
 
-  # find the first non-empty column
-  first_col_nr <- get_first_non_empty_column(data_tbl)
+  if (layout$first_data_col > 1) {
+    pre_data_cols <- 1 : (layout$first_data_col - 1)
+    pre_data_tbl <- data_tbl[ , pre_data_cols]
+    empty_cols <- apply(is.na(pre_data_tbl), MARGIN = 2, FUN = all)
+    name_label_cols <- which(!empty_cols)
+  } else {
+    name_label_cols <- numeric(0)
+  }
 
-  if (layout$first_data_col <= first_col_nr) {
+  if (length(name_label_cols) == 0) {
     return(list(row_has_name = rep(FALSE, nrow(data_tbl)), names = character(0),
                 lbls = character(0)))
   }
 
-  # no labels if there is only one non-empty column before the first data column
-  if (layout$first_data_col == first_col_nr + 1) labels = "no"
+  n_label_cols <- length(name_label_cols) - 1
+
+  # no labels if there is only one non-empty column
+  if (n_label_cols == 0) labels = "no"
 
   name_col <- if (labels == "before") {
-    layout$first_data_col - 1
+    name_label_cols[n_label_cols + 1]
   } else {
-    first_col_nr
+    name_label_cols[1]
   }
 
   if (labels == "before") {
-    label_cols <- first_col_nr : (name_col - 1)
+    label_cols <- name_label_cols[1 : n_label_cols]
   } else if (labels == "after") {
-    label_cols <- (name_col + 1): (layout$first_data_col - 1)
+    label_cols <- name_label_cols[2 : (n_label_cols + 1)]
   } else {
     label_cols <- numeric(0)
   }
@@ -562,24 +572,52 @@ get_name_info_rowwise <- function(layout, data_tbl, labels, name_fun) {
 }
 
 
+# get_name_info_colwise: internal function to get names and labels from
+# columnwise timeseries.
+# INPUT:
+# first_data_row   : first row in tbl with a period and data
+# first_row_nr     : first non-empty row
+# period_col       : column number of the periods
+# tbl              : tibble with data of the sheet
+# labels           : label option ("before", "after" or "no")
+# name_fun         : function applied to the names
+# xlsx             : TRUE if these function is used by read_ts_xlsx.
+# RETURN: a list with names, labels, and  a logical vector which indicates
+#         which columns in tbl contain a name.
 get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
                                   labels, name_fun, xlsx) {
 
-  # no labels if there is only one non-empty row before the first data row
-  if (first_data_row == first_row_nr + 1) labels <- "no"
-
-  # compute the row with variable names. 0 means: column names
-  # and the label rows
-  if (labels == "before") {
-    name_row <- first_data_row - 1
-    label_rows <- first_row_nr:(first_data_row - 2)
+  if (first_row_nr < first_data_row && period_col < ncol(tbl)) {
+    pre_data_rows <- first_row_nr : (first_data_row - first_row_nr)
+    pre_data_tbl <- tbl[pre_data_rows, (period_col + 1) : ncol(tbl)]
+    empty_rows <- apply(is.na(pre_data_tbl), MARGIN = 1, FUN = all)
+    name_label_rows <- which(!empty_rows) + (first_row_nr - 1)
   } else {
-    name_row <- first_row_nr
-    if (first_data_row > first_row_nr + 1) {
-      label_rows <- (first_row_nr + 1):(first_data_row -1)
-    } else {
-      label_rows <- integer(0)
-    }
+    name_label_rows <- numeric(0)
+  }
+
+  if (length(name_label_rows) == 0) {
+    return(list(col_has_name = rep(FALSE, ncol(tbl)), names = character(0),
+                lbls = character(0)))
+  }
+
+  n_label_rows <- length(name_label_rows) - 1
+
+  # no labels if there is only one non-empty column
+  if (n_label_rows == 0) labels = "no"
+
+  name_row <- if (labels == "before") {
+                name_label_rows[n_label_rows + 1]
+              } else {
+                name_label_rows[1]
+              }
+
+  if (labels == "before") {
+    label_rows <- name_label_rows[1 : n_label_rows]
+  } else if (labels == "after") {
+    label_rows <- name_label_rows[2 : (n_label_rows + 1)]
+  } else {
+    label_rows <- numeric(0)
   }
 
   name_row_data <- get_row_tbl(tbl, name_row, xlsx)
@@ -609,7 +647,7 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
 
 get_labels_from_tbl <- function(label_tbl, rowwise) {
   label_tbl[] <- lapply(label_tbl, FUN = function(x)
-                        {ifelse(is.na(x),  "", as.character(x))})
+  {ifelse(is.na(x),  "", as.character(x))})
   if (!rowwise) {
     label_tbl <- as.tibble(t(label_tbl))
   }

@@ -25,7 +25,7 @@ ts_labels(correct_result_labels) <- c("Timeseries a", "Timeseries b (EUR)")
 test_that("example1.xlsx is read correctly",  {
   xlsx_file <- "xlsx/example1.xlsx"
 
-  result <- read_ts_xlsx(xlsx_file, skiprow = 1, labels = "no", strict = FALSE)
+  result <- read_ts_xlsx(xlsx_file, labels = "no", strict = FALSE)
 
   expect_identical(result, correct_result)
 

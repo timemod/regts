@@ -38,7 +38,7 @@ test_that("rowwise1.csv is read correctly",  {
 
   # argument labels should have no effect if there are no labels
   result3 <- read_ts_csv(csv_file, labels = "before", strict = FALSE)
-  expect_identical(result3, correct_result[, character(0)])
+  expect_identical(result3, correct_result)
 })
 
 test_that("rowwise2.csv is read correctly",  {
@@ -191,7 +191,7 @@ test_that("example4.csv is read correctly",  {
 
 test_that("rowwise5.csv is read correctly",  {
   csv_file <- "csv/rowwise5.csv"
-  result <- read_ts_csv(csv_file, strict = FALSE)
+  result <- read_ts_csv(csv_file)
   expect_identical(result, correct_result["2010Q2", ])
 })
 
@@ -232,9 +232,9 @@ test_that("columnwise8.csv is read correctly",  {
   result <- read_ts_csv(csv_file, strict = FALSE)
   expect_identical(result, correct_result * 1)
 
+  # if there are no labels, then the labels option should have no effect
   result2 <- read_ts_csv(csv_file, labels = "before", strict = FALSE)
-  expect_identical(ncol(result2), 0L)
-  expect_identical(get_period_range(result2), get_period_range(correct_result))
+  expect_identical(result, correct_result * 1)
 })
 
 
