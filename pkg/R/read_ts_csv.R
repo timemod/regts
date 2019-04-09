@@ -180,14 +180,9 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
 
   tbl <- as.tibble(df)
 
-  # remove all empty columns. TODO: this code is probably not necessary,
-  not_all_na <- sapply(tbl, FUN = function(x) {!all(is.na(x))})
-  tbl <- tbl[ , not_all_na, drop = FALSE]
-
   layout <- inspect_tibble(tbl, frequency, rowwise, labels,
                                xlsx = FALSE, period_fun = period_fun,
                                name_fun = name_fun)
-
   if (is.null(layout)) {
     stop(sprintf("No periods found in file %s\n", filename))
   }
@@ -196,13 +191,13 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
     ret <- read_ts_rowwise(tbl, frequency = frequency, labels = labels,
                            dec = dec, name_fun = name_fun,
                            period_fun = period_fun, layout = layout,
-                           strict = strict, filename = filename, skiprow = skip)
+                           strict = strict, filename = filename)
   } else {
     ret <- read_ts_columnwise(tbl, frequency = frequency, labels = labels,
                               dec = dec, name_fun = name_fun,
                               period_fun = period_fun, layout = layout,
                               strict = strict, filename = filename,
-                              skiprow = skip)
+                              skipcol = skipcol)
   }
 
   return(ret)
@@ -211,13 +206,16 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
 # Internal function to read timeseries rowwise from a tibble, used by
 # read_ts_csv.
 read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
-                            layout, strict, filename, skiprow) {
+                            layout, strict, filename) {
 
   periods_and_freq <- convert_periods(layout$periods, frequency = frequency)
   periods <- periods_and_freq$periods
   freq <- periods_and_freq$freq
   if (is.na(freq)) {
-    stop(sprintf("Different periods found in the %dth row of file %s",
+    # The exact row number is unknown, because of the automatic row skipping.
+    # Therefore the error message cannot be as specific as for read_ts_xlsx.
+    stop(sprintf(paste0("Periods with different frequencies found in the ",
+                        "%d'th non-skipped row in file file %s."),
          layout$period_row, filename))
   }
 
@@ -246,7 +244,7 @@ read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
 # Internal function to read timeseries columnwise from a tibble, used
 # by function read_ts_csv.
 read_ts_columnwise <- function(tbl, frequency, labels, dec, name_fun,
-                               period_fun, layout, strict, filename, skiprow) {
+                               period_fun, layout, strict, filename, skipcol) {
 
   # remove all rows without period (the names and labels are already in
   # layout)
@@ -259,8 +257,11 @@ read_ts_columnwise <- function(tbl, frequency, labels, dec, name_fun,
   periods <- periods_and_freq$periods
   freq <- periods_and_freq$freq
   if (is.na(freq)) {
-    stop(sprintf("Different periods found in the %dth column of file %s",
-                 layout$period_col, filename))
+    # The exact row number is unknown, because of the automatic row skipping.
+    # Therefore the error message cannot be as specific as for read_ts_xlsx.
+    col <- num_to_letter(layout$period_col + skipcol)
+    stop(sprintf(paste("Periods with different frequencies found in column %s",
+                       "of file %s."), col, filename))
   }
 
   #printobj(periods)
