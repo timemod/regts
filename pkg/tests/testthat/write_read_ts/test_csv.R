@@ -124,6 +124,27 @@ test_that("period_format", {
   ts_read <- read_ts_csv(file, period_fun = period_fun, labels = "before")
 
   expect_identical(ts1_lbls, ts_read)
+
+  # incorrect period_fun
+
+  period_fun_err1 <- function(x) {
+    return("xxx")
+  }
+
+  expect_error(read_ts_csv(file, period_fun = period_fun_err1),
+               paste("Function period_fun should return an object with the",
+                     "same length as its input value."))
+
+  period_fun_err2 <- function(x) {
+    return(rep(2, length(x)))
+  }
+
+  emsg <- paste0("Illegal return value of period_fun. Period_fun should",
+                 " return:\n  \\* a character vector\n",
+                 "  \\* a single period object\n  \\* a list of period objects.")
+  expect_error(read_ts_csv(file, period_fun = period_fun_err2),
+               emsg)
+
 })
 
 

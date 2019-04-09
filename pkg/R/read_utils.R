@@ -130,12 +130,13 @@ apply_period_fun <- function(texts, period_fun) {
 
   if (length(period_texts) != length(texts)) {
     stop(paste0("Function period_fun should return an object with the same",
-                "length as its input value"))
+                " length as its input value."))
   }
 
   if (is.character(period_texts)) {
     return(period_texts)
-  } else if (is.list(period_texts) && is.period(period_texts[[1]])) {
+  } else if (is.list(period_texts) &&
+             all(sapply(period_texts, FUN = is.period))) {
     return(sapply(period_texts, FUN = as.character, USE.NAMES = FALSE))
   } else if (length(period_texts) == 1 && is.period(period_texts)) {
     return(as.character(period_texts))
@@ -143,7 +144,8 @@ apply_period_fun <- function(texts, period_fun) {
 
   stop(paste0("Illegal return value of period_fun. Period_fun should return:\n",
               "  * a character vector\n",
-              "  * a single period object or a list of period objects."))
+              "  * a single period object\n",
+              "  * a list of period objects."))
 }
 
 # Internal function: finds the first row or column of the period data in a

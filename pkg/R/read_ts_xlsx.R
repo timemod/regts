@@ -124,11 +124,11 @@
 #' By default, \code{read_ts_xlsx} treats blank cells as missing data.
 #' @param name_fun function to apply to the names of the timeseries.
 #' @param period_fun function applied to period texts. This should be a function
-#' that converts a character vector to another character vector, or
-#' a single character to a single \code{period} object, or a character vector
-#' with length > 1 to a list of \code{period} objects.
-#' Use this argument if the period texts do not have a standard format
-#' (see Description).
+#' that converts a character vector to another character vector with the same
+#' length, or a single character to a single \code{period} object, or a
+#' character vector with length > 1 to a list of \code{period} objects with
+#' the same length. Use this argument if the period texts do not have a
+#' standard format (see Description).
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
 #' start and the end period must be present.
 #' Otherwise the timeseries are filled with \code{NA} for the missing periods.
@@ -211,8 +211,6 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   layout <- inspect_tibble(tbl_inspect, frequency, rowwise, labels,
                                xlsx = TRUE, period_fun = period_fun,
                                name_fun = name_fun)
-
-  # printobj(layout)
 
   if (is.null(layout)) {
     stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
