@@ -139,7 +139,7 @@
 #' }
 #'
 #' @importFrom data.table fread
-#' @importFrom tibble as.tibble
+#' @importFrom tibble as_tibble
 #' @seealso \code{\link{write_ts_csv}} and \code{\link{read_ts_xlsx}}
 #' @export
 read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
@@ -172,7 +172,7 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
     stop(sprintf("File %s is empty\n", filename))
   }
 
-  tbl <- as.tibble(df)
+  tbl <- as_tibble(df)
 
   layout <- inspect_tibble(tbl, frequency, rowwise, labels, xlsx = FALSE,
                            period_fun = period_fun, name_fun = name_fun)

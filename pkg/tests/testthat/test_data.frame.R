@@ -131,7 +131,7 @@ test_that("as.regts.data.frame with invalid period texts and with factors", {
 test_that("as.regts.data.frame for a tibble", {
   df <- data.frame(period =  c("2015q3", "2015q4", "2016q1"), a = 1:3,
                    b = 4:6)
-  df <- tibble::as.tibble(df)
+  df <- tibble::as_tibble(df)
   # we don't want error messages about "Setting row names on a tibble is deprecated"
   expect_silent(ts1 <- as.regts(df, frequency = 4, time_column = 1))
   ts2 <- regts(matrix(1:6, ncol =  2), start = "2015Q3", names = c("a", "b"))

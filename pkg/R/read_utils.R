@@ -644,9 +644,9 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
 
 get_labels_from_tbl <- function(label_tbl, rowwise) {
   label_tbl[] <- lapply(label_tbl, FUN = function(x)
-  {ifelse(is.na(x),  "", as.character(x))})
+              {ifelse(is.na(x),  "", as.character(x))})
   if (!rowwise) {
-    label_tbl <- as.tibble(t(label_tbl))
+    label_tbl <- as_tibble(t(label_tbl), .name_repair = "minimal")
   }
   if (ncol(label_tbl) == 1) {
     #lbls <- unlist(label_tbl, use.names = FALSE)
