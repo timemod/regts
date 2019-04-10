@@ -142,8 +142,29 @@ test_that("example11.xlsx is read correctly",  {
 
   xlsx_file <- "xlsx/example11.xlsx"
 
-  result <- read_ts_xlsx(xlsx_file, labels = "no", strict = FALSE)
-  expect_identical(result, correct_result)
+  result1 <- read_ts_xlsx(xlsx_file, labels = "no", strict = FALSE)
+  expect_identical(result1, correct_result)
+
+  # extra tests for argument skiprow and range
+  result2 <- read_ts_xlsx(xlsx_file, labels = "after", skiprow = 2,
+                         strict = FALSE)
+  expected_result2 <- correct_result
+  colnames(expected_result2) <- paste("Timeseries", c("a", "b"))
+  ts_labels(expected_result2) <- c("", "(EUR)")
+  expect_identical(result2, expected_result2)
+
+  result3 <- read_ts_xlsx(xlsx_file, labels = "after",
+                          range = "B3:E8", strict = FALSE)
+  expect_identical(result2, result3)
+
+  emsg <- paste("The row B5:E5 of sheet 1 of file xlsx/example11.xlsx",
+                "contains\nperiods with different frequencies.")
+  expect_error(read_ts_xlsx(xlsx_file, labels = "after", skiprow = 2,
+                            rowwise = TRUE,
+               strict = FALSE), emsg)
+  expect_error(read_ts_xlsx(xlsx_file, labels = "after",
+                            range = "A3:E8", rowwise = TRUE,
+                            strict = FALSE), emsg)
 })
 
 test_that("example12.xlsx is read correctly",  {
