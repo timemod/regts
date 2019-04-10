@@ -11,7 +11,7 @@ test_that("constructor period", {
   expect_identical(as.character(period("1m2")), "1M02")
   expect_identical(as.character(period("2012")), "2012")
   expect_identical(as.character(period(2012)), "2012")
-  expect_identical(as.character(period("2012M3")), "2012M03")
+  expect_identical(as.character(period(as.factor("2012M3"))), "2012M03")
   expect_identical(as.character(period("2001-4", frequency = 4)), "2001Q4")
   expect_identical(as.character(period("2001 4", frequency = 12)), "2001M04")
   expect_identical(as.character(period("4 2001", frequency = 12)), "2001M04")
@@ -35,16 +35,7 @@ test_that("constructor period", {
   expect_identical(p, period(NA_character_, frequency = 12))
   expect_identical(p, period(NA_real_, frequency = 12))
 
-  # multiple texts
-  expect_identical(period(c("2018q1", "2011", "2012m2")),
-                          list(period("2018q1"), period("2011"), period("2012m2")))
 
-  expect_error(period(c("2018q1", "2011", "2012m2"), frequency = 4),
-               paste("Specified frequency 4 does not agree with actual",
-                     "frequency in period 2011."))
-
-  expect_error(period(c("2018q1", NA_character_, "2012m2")),
-               "Frequency of NA period unknown. Specify argument frequency.")
 })
 
 
@@ -277,15 +268,44 @@ test_that("as.character and print", {
 })
 
 test_that("multiple periods", {
-  expect_identical(period(c("2010q2", "2018m3")),
-              list(period("2010q2"), period("2018m3")))
-  expect_identical(period(c("2010Q2", "2018m3")),
-                   list(period("2010q2"), period("2018m3")))
 
-  expect_identical(period(2010:2011),
-                   list(period(2010), period(2011)))
+  # create some reference periods
+  pq1 <- period("2010q2")
+  pq2 <- period("2010q3")
+  pq3 <- period(NA, frequency = 4)
+  pm1 <- period("2018m3")
+  py1 <- period(2010)
+  py2 <- period(2011)
+  py3 <- period(NA, frequency = 1)
+
+  expect_identical(period(c("2010q2", "2018m3")), list(pq1, pm1))
+  expect_identical(period(2010:2011), list(py1, py2))
+
+  expect_identical(period(c(2010, NA, 2011), frequency = 1),
+                   list(py1, py3, py2))
+
+  expect_identical(period(c(2010.25, 2010.5, NA), frequency = 4),
+                   list(pq1, pq2, pq3))
+
+  expect_error(period(c(2010, 2010.5), frequency = 1),
+              "If frequency == 1, then x should be an integer.")
+
+  expect_error(period(c(2010, NA, 2011)),
+                      "Argument frequency should be specified.")
 
   expect_identical(
     period(c(as.Date("2010-04-01"), as.Date("2010-07-01")), frequency = 4),
-    list(period("2010q2"), period("2010q3")))
+          list(pq1, pq2))
+
+  # multiple texts
+  expect_identical(period(c("2010q2", "2011", "2018m3")), list(pq1, py2, pm1))
+
+  expect_error(period(as.factor(c("2018q1", "2011", "2012m2")), frequency = 4),
+               paste("Specified frequency 4 does not agree with actual",
+                     "frequency in period 2011."))
+
+  expect_error(period(c("2018q1", NA_character_, "2012m2")),
+               "Frequency of NA period unknown. Specify argument frequency.")
+
+
 })

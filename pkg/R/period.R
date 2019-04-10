@@ -122,32 +122,32 @@ as.period.factor <- function(x, frequency = NA, ...) {
 #' @export
 as.period.numeric <- function(x, frequency = NA, ...) {
 
-  if (length(x) != 1) {
-    return(lapply(x, FUN = as.period.numeric, frequency = frequency, ...))
-  }
-
+  # convert possible integer vector to numeric vector
   x <- as.numeric(x)
 
-  x_is_int <- x %% 1 == 0
-
   if (is.na(frequency)) {
-    if (is.na(x) || !x_is_int) {
-      stop("Argument frequency should be specified")
+    if (any(is.na(x) | x %%1 != 0)) {
+      stop("Argument frequency should be specified.")
     } else {
       frequency <- 1
     }
-  } else if (frequency == 1 && !(is.na(x) || x %%1 == 0)) {
+  } else if (frequency == 1 && !all(is.na(x) | x %% 1 == 0)) {
     stop("If frequency == 1, then x should be an integer.")
   }
 
-  if (frequency == 1 || is.na(x)) {
+  if (frequency == 1) {
     subp_count <- x
   } else {
     year <- floor(x)
     subp <- floor(frequency * (x %% 1))
     subp_count <- year * frequency + subp
   }
-  return(create_period(subp_count, frequency))
+
+  if (length(subp_count) == 1) {
+    return(create_period(subp_count, frequency))
+  } else {
+    return(create_periods(subp_count, frequency))
+  }
 }
 
 #' @export
@@ -168,9 +168,9 @@ as.period.POSIXct <- function(x, frequency = NA, ...) {
 #' @export
 as.period.POSIXlt <- function(x, frequency = NA, ...) {
 
-  if (length(x) != 1) {
-    return(lapply(x, FUN = as.period.POSIXlt, frequency = frequency, ...))
-  }
+  #if (length(x) != 1) {
+  #  return(lapply(x, FUN = as.period.POSIXlt, frequency = frequency, ...))
+  #}
 
   if (is.na(frequency)) {
     frequency <- 12
@@ -189,7 +189,11 @@ as.period.POSIXlt <- function(x, frequency = NA, ...) {
     subperiod <- month
   }
   subp_since_christ <- year * frequency + subperiod - 1
-  return(create_period(subp_since_christ, frequency))
+  if (length(subp_since_christ) == 1) {
+    return(create_period(subp_since_christ, frequency))
+  } else {
+    return(create_periods(subp_since_christ, frequency))
+  }
 }
 
 
