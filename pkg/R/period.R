@@ -110,15 +110,8 @@ as.period.period <- function(x, ...) {
 
 #' @export
 as.period.character <- function(x, frequency = NA, ...) {
-  if (length(x) != 1) {
-    return(lapply(x, FUN = as.period.character, frequency = frequency, ...))
-  }
-
-  if (is.na(x)) {
-    return(as.period.logical(NA, frequency = frequency))
-  }
-
-  return(parse_period(x, frequency = frequency))
+  # Call C++ function parse_period
+  return(parse_period(x, frequency))
 }
 
 #' @export

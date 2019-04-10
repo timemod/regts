@@ -4,6 +4,7 @@
 using Rcpp::NumericVector;
 using Rcpp::CharacterVector;
 using Rcpp::LogicalVector;
+using Rcpp::List;
 using std::string;
 
 static string trim(const string& str);
@@ -11,18 +12,44 @@ static void parse_single_period(const std::string &period_text,
                                 const double given_freq,
                                 double &subperiods, double &freq);
 
+
 // [[Rcpp::export]]
-NumericVector parse_period(const std::string &period_text, double frequency) {
+/* This function converts a character vector to a period object or to
+ * a list of periods objects if the length of the vector > 1 */
+SEXP parse_period(const CharacterVector period_text, double frequency) {
+    
+    int n = period_text.size();
 
-    double per, f;
-    parse_single_period(period_text, frequency, per, f);
+    List list_result(n);
 
-    NumericVector result(1);
-    result[0] = per;
-    result.attr("class") = "period";
-    result.attr("frequency") = f;
-	return result;
+    for (int i = 0; i < n; i++) {
+        double per, f;
+        NumericVector period(1);
+        period.attr("class") = "period";
+        if (CharacterVector::is_na(period_text(i))) {
+            per = NA_REAL;
+            if (ISNA(frequency)) {
+                Rf_error("Frequency of NA period unknown."
+                        " Specify argument frequency.");
+            }
+            f = frequency;
+        } else {
+            std::string per_text = Rcpp::as<std::string>(period_text(i));
+            parse_single_period(per_text, frequency, per, f);
+        }
+        period[0] = per;
+        period.attr("frequency") = f;
+    
+        if (n == 1) {
+            return period;
+        } else {
+            list_result[i] = period;
+        }
+    }
+
+    return list_result;
 }
+
 
 
 // [[Rcpp::export]]

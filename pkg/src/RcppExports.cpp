@@ -48,12 +48,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // parse_period
-NumericVector parse_period(const std::string& period_text, double frequency);
+/* This function converts a character vector to a period object or to  * a list of periods objects if the length of the vector > 1 */ SEXP parse_period(const CharacterVector period_text, double frequency);
 RcppExport SEXP _regts_parse_period(SEXP period_textSEXP, SEXP frequencySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type period_text(period_textSEXP);
+    Rcpp::traits::input_parameter< const CharacterVector >::type period_text(period_textSEXP);
     Rcpp::traits::input_parameter< double >::type frequency(frequencySEXP);
     rcpp_result_gen = Rcpp::wrap(parse_period(period_text, frequency));
     return rcpp_result_gen;

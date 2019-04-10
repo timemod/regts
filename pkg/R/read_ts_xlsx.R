@@ -240,7 +240,9 @@ read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
   # read data
   #
 
-  periods_and_freq <- convert_periods(layout$periods, frequency = frequency)
+  # Convert periods with C++ function parse_period
+  periods_and_freq <- convert_periods(layout$periods, fun = parse_period,
+                                      frequency = frequency)
   periods <- periods_and_freq$periods
   freq <- periods_and_freq$freq
   if (is.na(freq)) {
@@ -339,7 +341,9 @@ read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
 
   periods <- get_periods_data(data_tbl[[1]], frequency, TRUE, period_fun)
 
-  periods_and_freq <- convert_periods(periods, frequency = frequency)
+  # Convert periods with C++ function parse_period
+  periods_and_freq <- convert_periods(periods, fun = parse_period,
+                                      frequency = frequency)
   periods <- periods_and_freq$periods
   freq <- periods_and_freq$freq
   if (is.na(freq)) {

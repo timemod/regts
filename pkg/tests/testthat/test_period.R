@@ -34,6 +34,17 @@ test_that("constructor period", {
   expect_identical(p, period(NA, frequency = 12))
   expect_identical(p, period(NA_character_, frequency = 12))
   expect_identical(p, period(NA_real_, frequency = 12))
+
+  # multiple texts
+  expect_identical(period(c("2018q1", "2011", "2012m2")),
+                          list(period("2018q1"), period("2011"), period("2012m2")))
+
+  expect_error(period(c("2018q1", "2011", "2012m2"), frequency = 4),
+               paste("Specified frequency 4 does not agree with actual",
+                     "frequency in period 2011."))
+
+  expect_error(period(c("2018q1", NA_character_, "2012m2")),
+               "Frequency of NA period unknown. Specify argument frequency.")
 })
 
 
@@ -211,6 +222,8 @@ test_that("regts:::is_period_text", {
   expect_false(regts:::is_period_text("2010.0", frequency = 4))
   expect_true(regts:::is_period_text("2010.25", frequency = NA))
   expect_false(regts:::is_period_text("2010.25", frequency = 1))
+  expect_false(regts:::is_period_text(as.character(period(NA_character_, 4)),
+                                                   frequency = 1))
 })
 
 
