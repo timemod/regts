@@ -91,8 +91,10 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
       # POSIXt values are possible periods if the frequency is a divisor of 12.
       is_posixt <- sapply(data, FUN = function(x) {inherits(x[[1]], "POSIXt")})
       if (any(is_posixt)) {
-        fun <- function(x) {as.character(as.period(x, frequency))}
-        result[is_posixt] <- sapply(data[is_posixt], FUN = fun)
+        # unlist does not work here. Therefore use function c (concatenation):
+        date_vector <- do.call(c, data[is_posixt])
+        result[is_posixt] <- sapply(as.period(date_vector, frequency),
+                                    FUN = as.character)
       }
     }
 
