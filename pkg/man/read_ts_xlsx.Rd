@@ -71,7 +71,8 @@ Period cells are cells containing
 for example \code{"2010Q2"}, \code{"2010.2Q"},
 \code{"2010m2"}, \code{"2011"} or \code{"2011-1"},
 \item an integer value (e.g. \code{2018}), which is considered as a year,
-\item a date
+\item a date, which  is assumed to specify a month unless argument
+\code{frequency} has been specified.
 }
 Use argument \code{period_fun} if the period cells contain a text with a
 format not recognized by function \code{period}.

@@ -1,13 +1,13 @@
-# Return a logical vector, where each element indicates whether the
-# corresponding element in tbl is a period.
+# is_period_data: do elements in data contain a period?
 # INPUT:
-#    data a list (xlsx) or character vector (csv) whose elements should be
-#     checked
+#   data  a list (xlsx) or character vector (csv)
+# RETURN: a logical vector
 is_period_data <- function(data, frequency, xlsx, period_fun) {
 
   is_period_fun <- function(period_texts, frequency, period_fun) {
-    # give a character vector with texts, this function returns a logical
-    # vectors with TRUE and FALSE depending on the period
+    # Returns a logical vector with elements TRUE or FALSE if the corresponding
+    # element in character vector period_texts is a valid period (for the
+    # specified frequency).
     if (!missing(period_fun)) {
       period_texts <- apply_period_fun(period_texts, period_fun)
     }
@@ -18,23 +18,20 @@ is_period_data <- function(data, frequency, xlsx, period_fun) {
 
   if (xlsx) {
 
-    is_text   <- sapply(data, FUN = is.character)
-    is_num    <- sapply(data, FUN = is.numeric)
-
     is_period <- rep(FALSE, length(data))
 
+    is_text <- sapply(data, FUN = is.character)
     if (any(is_text)) {
       period_texts <- unlist(data[is_text], use.names = FALSE)
       is_period[is_text] <- is_period_fun(period_texts, frequency, period_fun)
     }
 
-    if (any(is_num)) {
-      if (is.na(frequency) || frequency == 1) {
-        # integer numerical values only possible for frequency 1
+    if ((is.na(frequency) || frequency == 1)) {
+      # integer numerical values are possible periods for frequency 1
+      is_num  <- sapply(data, FUN = is.numeric)
+      if (any(is_num)) {
         num_values <- unlist(data[is_num], use.names = FALSE)
-        is_period[is_num] <-  num_values %% 1 == 0
-      } else {
-        is_period[is_num] <- FALSE
+        is_period[is_num] <- num_values %% 1 == 0
       }
     }
 
@@ -50,21 +47,23 @@ is_period_data <- function(data, frequency, xlsx, period_fun) {
 
   } else {
 
-    # csv file
+    # csv file, data is a character vector
     return(is_period_fun(data, frequency, period_fun))
   }
 }
 
-# Returns the periods as either a character or Date vector from data
-# read by read_ts_xlsx or read_ts_csv.
+# get_periods_data: converts a list (xlsx) or character vector (csv) to
+# a character vector with the corresponding periods as texts.
+# INPUT:
+#   data:  a list (xlsx) or character vector (csv). Each element should
+#          be an object which can be converted to a period.
+# RETURN: a character vector
 get_periods_data <- function(data, frequency, xlsx, period_fun) {
 
   if (xlsx) {
 
-    #printobj(data)
-
-    is_text   <- sapply(data, FUN = is.character)
-    is_num    <- sapply(data, FUN = is.numeric)
+    is_text <- sapply(data, FUN = is.character)
+    is_num  <- sapply(data, FUN = is.numeric)
 
     # first handle numerical and character data
     result <- rep(NA, length(data))
@@ -88,23 +87,12 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
     }
 
     if (is.na(frequency) || 12 %% frequency == 0) {
-
-      # when read from xlsx the tbl may contain POSIXt data
+      # When read from xlsx data may contain POSIXt values
+      # POSIXt values are possible periods if the frequency is a divisor of 12.
       is_posixt <- sapply(data, FUN = function(x) {inherits(x[[1]], "POSIXt")})
       if (any(is_posixt)) {
-
-        # first convert all texts to Date objects
-        is_text <- is_text | is_num # all numerical values have already been
-        # converted
-        result_date <- rep(as.Date(NA), length(result))
-        result_date[is_text] <- sapply(result[is_text], FUN = function(x) {
-          as.Date(as.period(x, frequency))})
-
-        # create a vector of POSIXT objects (unlist(data[is_posixt] does not
-        # give correct results):
-        posixt_vector <- do.call(c, data[is_posixt])
-        result_date[is_posixt] <- as.Date(posixt_vector)
-        return(result_date)
+        fun <- function(x) {as.character(as.period(x, frequency))}
+        result[is_posixt] <- sapply(data[is_posixt], FUN = fun)
       }
     }
 
@@ -607,10 +595,10 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
   if (n_label_rows == 0) labels = "no"
 
   name_row <- if (labels == "before") {
-                name_label_rows[n_label_rows + 1]
-              } else {
-                name_label_rows[1]
-              }
+    name_label_rows[n_label_rows + 1]
+  } else {
+    name_label_rows[1]
+  }
 
   if (labels == "before") {
     label_rows <- name_label_rows[1 : n_label_rows]
