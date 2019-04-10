@@ -372,7 +372,13 @@ create_period <- function(subperiod_count, frequency) {
 # Internal function that creates a list of period objects based
 # on a vector with the number of subperiods after Christ.
 create_periods <- function(subperiod_count, frequency) {
-  return(lapply(subperiod_count, FUN = create_period, frequency = frequency))
+
+  fun <- function(x) {
+    attr(x, "class") <- "period"
+    attr(x, "frequency") <- frequency
+    return(x)
+  }
+  return(lapply(subperiod_count, FUN = fun))
 }
 
 # minimum or maximum of 2 or more periods
