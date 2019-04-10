@@ -136,8 +136,8 @@ apply_period_fun <- function(texts, period_fun) {
               "  * a list of period objects."))
 }
 
-# Internal function: finds the first row or column of the period data in a
-# tibble read by read_ts_xlsx or read_ts_csv. The function also determines
+# Internal function inspect_tibble: finds the first row or column of the periods
+# of the tibble read by read_ts_xlsx or read_ts_csv. The function also determines
 # which column of the tibble contains timeseries data. Returns NULL if no
 # period has been found.
 #
@@ -157,6 +157,7 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
                            name_fun) {
 
   first_row_nr <- get_first_non_empty_row(tbl)
+  if (is.na(first_row_nr)) return(NULL)
 
   found <- FALSE
 
@@ -166,8 +167,11 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
     for (col_nr in 1:ncol(tbl)) {
       is_period <- is_period_data(tbl[[col_nr]], frequency, xlsx, period_fun)
       if (any(is_period)) {
-        last_col <- Position(function(x) {x}, is_period, right = TRUE)
-        if (last_col > 1) {
+        last_row <- Position(function(x) {x}, is_period, right = TRUE)
+        if (last_row > first_row_nr) {
+          # If last_row == first_row_nr, there is a single period in the first
+          # non-empty row. Since there is no room for possible variable names,
+          # we have probably not found the real period column yet.
           found <- TRUE
           break
         }
@@ -177,15 +181,13 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
     if (found) row_nr <- Position(function(x) {x}, is_period)
 
   }  else {
-    # rowwise or columnwise
 
-    first_row_nr <- get_first_non_empty_row(tbl)
-    if (is.na(first_row_nr)) return(NULL)
+    # rowwise or columnwise
 
     # first search for a period rowwise
     for (row_nr in first_row_nr:nrow(tbl)) {
-      is_period_row <- is_period_data(get_row_tbl(tbl, row_nr, xlsx), frequency,
-                                      xlsx, period_fun)
+      row_data <- get_row_tbl(tbl, row_nr, xlsx)
+      is_period_row <- is_period_data(row_data, frequency, xlsx, period_fun)
       if (any(is_period_row)) {
         col_nr <- Position(function(x) {x}, is_period_row)
         if (missing(rowwise)) {
@@ -236,8 +238,8 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
 
     last_data_col <- Position(identity, is_period, right = TRUE)
 
-    periods <- get_periods_data(get_row_tbl(tbl, row_nr, xlsx)[is_period],
-                                frequency, xlsx, period_fun)
+    period_data <- get_row_tbl(tbl[row_nr, is_period], 1, xlsx = xlsx)
+    periods <- get_periods_data(period_data, frequency, xlsx, period_fun)
 
     return(list(rowwise = TRUE, period_row = row_nr,
                 first_data_col = first_data_col, last_data_col = last_data_col,
