@@ -156,20 +156,20 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          labels = c("after", "before", "no"),
                          na_string = "", name_fun, period_fun, strict = TRUE) {
 
-  #
-  # internal parameters
-  #
+  # n_inspect if the number of rows to read to determine the layout of the
+  # sheet.
   n_inspect <- 25
 
-  # NOTE: read excel skips leading empty rows if the the first row in range
-  # has not been specified (if the first row is NA). We do not want that,
-  # therefore always start from the first row
   if (missing(range)) {
     range <- cell_limits()
     range$ul[1] <- skiprow + 1
     range$ul[2] <- skipcol + 1
   } else {
     range <- as.cell_limits(range)
+    # Function read_excel skips leading empty rows and columns if the the first
+    # row or column in range is NA (i.e. not-specified). This is not desired
+    # here, because otherwise we do no longer know to which part of the sheet
+    # the readed data corresponds.
     if (is.na(range$ul[1])) range$ul[1] <- 1
     if (is.na(range$ul[2])) range$ul[2] <- 1
   }
@@ -179,7 +179,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   labels <- match.arg(labels)
 
   if (!missing(name_fun) && !is.function(name_fun)) {
-      stop("argument name_fun is not a function")
+    stop("argument name_fun is not a function")
   }
   if (!missing(period_fun) && !is.function(period_fun)) {
     stop("argument period_fun is not a function")
@@ -192,40 +192,37 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 
   tbl_inspect <- read_excel(filename, sheet, range = range_inspect,
                             col_names = FALSE, col_types = "list",
-                            na = na_string,
-                            .name_repair = "minimal")
+                            na = na_string, .name_repair = "minimal")
 
 
   # create sheetname for error messages
   sheetname <- if (!is.na(range$sheet))  {
-                range$sheet
-               } else if (!is.null(sheet)) {
-                 as.character(sheet)
-               } else {
-                 "1"
-               }
+    range$sheet
+  } else if (!is.null(sheet)) {
+    as.character(sheet)
+  } else {
+    "1"
+  }
 
   if (nrow(tbl_inspect) == 0 || ncol(tbl_inspect) == 0) {
     stop(sprintf("Sheet %s of file %s is empty\n", sheetname, filename))
   }
 
   layout <- inspect_tibble(tbl_inspect, frequency, rowwise, labels,
-                               xlsx = TRUE, period_fun = period_fun,
-                               name_fun = name_fun)
+                           xlsx = TRUE, period_fun = period_fun,
+                           name_fun = name_fun)
 
   if (is.null(layout)) {
-    stop(sprintf("No periods found on Sheet %s of file %s\n", sheetname,
+    stop(sprintf("No periods found on sheet %s of file %s\n", sheetname,
                  filename))
   }
 
   if (layout$rowwise) {
     ret <- read_ts_rowwise_xlsx(filename, sheet, sheetname, range, na_string,
-                                frequency, labels, name_fun, period_fun, layout,
-                                strict)
+                                frequency, labels, name_fun, layout, strict)
   } else {
     ret <- read_ts_columnwise_xlsx(filename, sheet, sheetname, range, na_string,
-                                   frequency, name_fun, period_fun,
-                                   layout, strict)
+                                   frequency, period_fun, layout, strict)
   }
 
   return(ret)
@@ -234,11 +231,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 # Internal function to read timeseries rowwise from a tibble, used by
 # read_ts_xlsx
 read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
-                                 frequency, labels, name_fun, period_fun,
-                                 layout, strict) {
-  #
-  # read data
-  #
+                                 frequency, labels, name_fun, layout, strict) {
 
   # Convert periods with C++ function parse_period
   periods_and_freq <- convert_periods(layout$periods, fun = parse_period,
@@ -255,6 +248,9 @@ read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
                  cells[1], cells[2], sheetname, filename))
   }
 
+  #
+  # read data
+  #
 
   range$ul[1] <- range$ul[1] + layout$period_row
   range$lr[2] <- range$ul[2] + layout$last_data_col - 1
@@ -275,7 +271,7 @@ read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
   # convert data columns to a numeric matrix
   rowsel <- name_info$row_has_name
   colsel <- layout$first_data_col : ncol(data_tbl)
-  mat <- t(as.matrix(data_tbl[rowsel , colsel]))
+  mat <- t(data_tbl[rowsel, colsel])
   colnames(mat) <- name_info$names
 
   # print warnings
@@ -297,8 +293,8 @@ read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
 # Internal function to read timeseries columnwise from a tibble, used in
 # read_ts_xlsx.
 read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
-                                    na_string, frequency, name_fun, period_fun,
-                                    layout, strict) {
+                                    na_string, frequency, period_fun, layout,
+                                    strict) {
   #
   # read data
   #
@@ -306,10 +302,10 @@ read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
   # determine range of data to read
 
   last_col_to_read <- if (is.na(layout$last_data_col)) {
-                        layout$period_col
-                      } else {
-                        layout$last_data_col
-                      }
+    layout$period_col
+  } else {
+    layout$last_data_col
+  }
 
   range$ul[1] <- range$ul[1] + layout$first_data_row - 1
   range$ul[2] <- range$ul[2] + layout$period_col - 1
@@ -328,7 +324,7 @@ read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
   warnings <- capture_warnings({
     data_tbl <- read_excel(filename, sheet, range = range, col_names = FALSE,
                            col_types = col_types, na = na_string,
-                          .name_repair = "minimal")
+                           .name_repair = "minimal")
   })
 
   # select rows with valid periods
@@ -350,7 +346,7 @@ read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
     col <- num_to_letter(range$ul[2])
     cells <- paste0(col, c(range$ul[1], range$ul[1] + length(row_sel) - 1))
     stop(sprintf(paste0("The column %s:%s of sheet %s of file %s contains\n",
-                       "periods with different frequencies."),
+                        "periods with different frequencies."),
                  cells[1], cells[2], sheetname, filename))
   }
 

@@ -149,12 +149,6 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
                         dec = if (sep != ".") "." else ",",
                         na_string = "", name_fun, period_fun, strict = TRUE) {
 
-  if (!missing(skiprow)) {
-    skip <- skiprow
-  } else {
-    skip <- 0
-  }
-
   na_string <- union(na_string, "")
 
   labels <- match.arg(labels)
@@ -166,7 +160,7 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
     stop("argument period_fun is not a function")
   }
 
-  df <- fread(filename, skip = skip, header = FALSE, data.table = FALSE,
+  df <- fread(filename, skip = skiprow, header = FALSE, data.table = FALSE,
               sep = sep, dec = dec, fill = fill, colClasses = "character",
               na.strings = na_string)
 
@@ -180,21 +174,18 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
 
   tbl <- as.tibble(df)
 
-  layout <- inspect_tibble(tbl, frequency, rowwise, labels,
-                               xlsx = FALSE, period_fun = period_fun,
-                               name_fun = name_fun)
+  layout <- inspect_tibble(tbl, frequency, rowwise, labels, xlsx = FALSE,
+                           period_fun = period_fun, name_fun = name_fun)
   if (is.null(layout)) {
     stop(sprintf("No periods found in file %s\n", filename))
   }
 
   if (layout$rowwise) {
     ret <- read_ts_rowwise(tbl, frequency = frequency, labels = labels,
-                           dec = dec, name_fun = name_fun,
-                           period_fun = period_fun, layout = layout,
+                           dec = dec, name_fun = name_fun, layout = layout,
                            strict = strict, filename = filename)
   } else {
-    ret <- read_ts_columnwise(tbl, frequency = frequency, labels = labels,
-                              dec = dec, name_fun = name_fun,
+    ret <- read_ts_columnwise(tbl, frequency = frequency, dec = dec,
                               period_fun = period_fun, layout = layout,
                               strict = strict, filename = filename,
                               skipcol = skipcol)
@@ -205,8 +196,8 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
 
 # Internal function to read timeseries rowwise from a tibble, used by
 # read_ts_csv.
-read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
-                            layout, strict, filename) {
+read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, layout,
+                            strict, filename) {
 
   # Convert periods with C++ function parse_period
   periods_and_freq <- convert_periods(layout$periods, fun = parse_period,
@@ -245,8 +236,8 @@ read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, period_fun,
 
 # Internal function to read timeseries columnwise from a tibble, used
 # by function read_ts_csv.
-read_ts_columnwise <- function(tbl, frequency, labels, dec, name_fun,
-                               period_fun, layout, strict, filename, skipcol) {
+read_ts_columnwise <- function(tbl, frequency, dec, period_fun, layout, strict,
+                               filename, skipcol) {
 
   # remove all rows without period (the names and labels are already in
   # layout)
@@ -268,13 +259,12 @@ read_ts_columnwise <- function(tbl, frequency, labels, dec, name_fun,
                        "of file %s."), col, filename))
   }
 
-  #printobj(periods)
   # convert data columns to a numeric matrix, employing function df_to_numeric_matrix
   mat <- df_to_numeric_matrix(tbl[layout$is_data_col], dec = dec)
   colnames(mat) <- layout$names
 
   # set numeric = FALSE, because we already know that df is numeric
-  ret <- matrix2regts_(mat, periods, freq,  numeric = FALSE, strict = strict)
+  ret <- matrix2regts_(mat, periods, freq, numeric = FALSE, strict = strict)
 
   if (!is.null(layout$lbls)) {
     ts_labels(ret) <- layout$lbls

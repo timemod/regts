@@ -121,7 +121,7 @@ test_that("example5.xlsx is read correctly (leading empty are skipped)",  {
   expect_error(read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", NA)),
                             sheet = "Sheet3"), msg)
 
-  msg <- "No periods found on Sheet example2 of file xlsx/example5.xlsx\n"
+  msg <- "No periods found on sheet example2 of file xlsx/example5.xlsx\n"
   expect_error(read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", "D")),
                             sheet = "example2"), msg)
 })
@@ -169,7 +169,7 @@ test_that("example13.xlsx (reversed period) is read correctly",  {
 
   expect_error(
     read_ts_xlsx(xlsx_file, range = "example1!c5:e6", frequency = 4),
-    "No periods found on Sheet example1 of file xlsx/example13.xlsx")
+    "No periods found on sheet example1 of file xlsx/example13.xlsx")
 })
 
 test_that("example14.xlsx is read correctly",  {

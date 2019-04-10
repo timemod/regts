@@ -205,6 +205,9 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
         if (rowwise) {
           last_col <- Position(function(x) {x}, is_period_row, right = TRUE)
           if (last_col > 1) {
+            # If last_col == 1, there is a single period in the first column.
+            # Since there is no room for possible variable names,
+            # we have probably not found the real period row yet.
             found <- TRUE
             break
           }
@@ -465,7 +468,7 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
 
 get_first_non_empty_row <- function(tbl) {
   for (row_nr in 1:nrow(tbl)) {
-    if (any(!is.na(unlist(tbl[row_nr, ])))) {
+    if (any(!is.na(tbl[row_nr, ]))) {
       return(row_nr)
     }
   }
@@ -474,8 +477,17 @@ get_first_non_empty_row <- function(tbl) {
 
 get_last_non_empty_row <- function(tbl) {
   for (row_nr in nrow(tbl):1) {
-    if (any(!is.na(unlist(tbl[row_nr, ])))) {
+    if (any(!is.na(tbl[row_nr, ]))) {
       return(row_nr)
+    }
+  }
+  return(NA)
+}
+
+get_last_non_empty_column <- function(tbl) {
+  for (col_nr in ncol(tbl):1) {
+    if (any(!is.na(tbl[[col_nr]]))) {
+      return(col_nr)
     }
   }
   return(NA)
@@ -489,14 +501,7 @@ get_row_tbl <- function(tbl, row_nr, xlsx) {
   return(data)
 }
 
-get_last_non_empty_column <- function(tbl) {
-  for (col_nr in ncol(tbl):1) {
-    if (any(!is.na(unlist(tbl[[col_nr]])))) {
-      return(col_nr)
-    }
-  }
-  return(NA)
-}
+
 
 
 # get_name_info_rowwise: internal function to get names and labels from
