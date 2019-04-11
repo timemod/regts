@@ -34,11 +34,33 @@ test_that("no row names", {
   expect_equal(regts1, regts(m, period = "1/3"))
 })
 
-test_that("different frequencies and fun", {
+test_that("fun", {
 
-  fun <- function(x) {period(paste0(2018, x))}
-  m <- matrix(1:2, ncol = 1, dimnames = list(c("q1", "m2"), c("a")))
-  expect_error(as.regts(m, fun = fun),
-               "The row names contain periods with different frquencies")
+  fun_a <- function(x) {period(paste0(2018, x))}
+  fun_b <- function(x) {as.list(period(paste0(2018, x)))}
+  fun_c <- function(x) {period("2018q1")}
+  fun_d <- function(x) {c(TRUE, FALSE)}
+
+  m1 <- matrix(1:2, ncol = 1, dimnames = list(c("q1", "q2"), c("a")))
+  regts1 <- as.regts(m1, fun = fun_a)
+  expect_identical(regts1, regts(matrix(1:2, ncol = 1), names = "a",
+                                 start = "2018q1"))
+
+  expect_warning(regts2 <- as.regts(m1, fun = fun_b),
+                 paste("Function 'fun' returns a list of period objects",
+                       "instead of a period vector.\nThe list is converted",
+                       "to a vector."))
+
+  expect_error(as.regts(m1, fun = fun_c),
+               paste("Function 'fun' should return an object with the same",
+                     "length as\nthe number of rows in the data.frame or matrix."))
+
+  expect_error(as.regts(m1, fun = fun_d),
+               "Function 'fun' should return a period vector.")
+
+
+  m2 <- matrix(1:2, ncol = 1, dimnames = list(c("q1", "m2"), c("a")))
+  expect_error(as.regts(m2, fun = fun_a),
+               "The row names contain periods with different frequencies.")
 })
 

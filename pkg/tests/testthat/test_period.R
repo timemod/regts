@@ -272,13 +272,19 @@ test_that("multiple periods", {
   pq1 <- period("2010q2")
   pq2 <- period("2010q3")
   pq3 <- period(NA, frequency = 4)
+  pq4 <- period("2018q3")
   pm1 <- period("2018m3")
   py1 <- period(2010)
   py2 <- period(2011)
   py3 <- period(NA, frequency = 1)
 
-  expect_identical(period(c("2010q2", "2010q3")), c(pq1, pq2))
-
+  periods <- period(c("2010q2", "2010q3"))
+  expect_identical(periods, c(pq1, pq2))
+  expect_identical(as.list(periods), list(pq1, pq2))
+  periods[2] <- pq4
+  expect_identical(periods, c(pq1, pq4))
+  periods[1:2] <- pq4
+  expect_identical(periods, rep(pq4, 2))
   expect_identical(period(c("2010q2", "2018m3")), list(pq1, pm1))
   expect_identical(period(c("2010q2", "2010q3", "2018m3")), list(pq1, pq2, pm1))
   expect_identical(period(2010:2011), c(py1, py2))

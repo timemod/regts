@@ -339,7 +339,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
 
   periods <- convert_periods(periods, fun = fun, ...)
   if (is.list(periods)) {
-    stop("The time column(s) contain different frequencies")
+    stop("The time column(s) contain different frequencies.")
   }
 
   # Use numeric == FALSE, because the data has already been converted
@@ -372,7 +372,7 @@ as.regts.matrix <- function(x, numeric = TRUE, fun = period, strict = TRUE,
   } else {
     periods <- convert_periods(periods, fun = fun, ...)
     if (is.list(periods)) {
-      stop("The row names contain periods with different frquencies")
+      stop("The row names contain periods with different frequencies.")
     }
   }
 
@@ -460,9 +460,16 @@ numeric_matrix <- function(x, dec = ".") {
 # periods.
 convert_periods <- function(periods, fun = period, ...) {
 
+  n <- NROW(periods)
+
   # finally convert to a list of period objects
   # create a list of regpriod objects
   periods <- fun(periods, ...)
+
+  if (length(periods) != n) {
+    stop(paste0("Function 'fun' should return an object with the same",
+                " length as\nthe number of rows in the data.frame or matrix."))
+  }
 
   if (is.period(periods)) {
     return(periods)
@@ -471,7 +478,7 @@ convert_periods <- function(periods, fun = period, ...) {
     if (length(freqs) == 1) {
       # all periods have the same frequency -> convert to vector
       warning(paste("Function 'fun' returns a list of period objects instead",
-                    "of a period vector.\nThe list is converted to a vector"))
+                    "of a period vector.\nThe list is converted to a vector."))
       return(create_period(unlist(periods), frequency = freqs))
     } else {
       # different frequencies -> give error message in calling function.
@@ -479,7 +486,7 @@ convert_periods <- function(periods, fun = period, ...) {
     }
   }
 
-  stop("Function 'fun' should return a period vector")
+  stop("Function 'fun' should return a period vector.")
 }
 
 # matrix2regts_ : internal function to convert a matrix to a regts.

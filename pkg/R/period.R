@@ -406,7 +406,7 @@ Summary.period <- function(..., na.rm = FALSE){
 #'   \code{length.out} > 1, then the number of periods between \code{from} and
 #'   \code{to} should be divisible by \code{length.out - 1}.
 #' @param ... arguments passed to or from methods (not used)
-#' @return a \code{\link{list}} with period objects
+#' @return a \code{period} vector
 #' @name seq
 #' @examples
 #' p1 <- period("2018q2")
@@ -499,4 +499,10 @@ as.list.period <- function(x, ...) {
     return(p)
   }
   return(lapply(retval, FUN = fun))
+}
+
+#' @export
+rep.period <- function(x, times, ...) {
+  retval <- NextMethod(.Generic)
+  return(create_period(retval, frequency = frequency(x)))
 }
