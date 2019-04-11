@@ -96,9 +96,13 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
       period_texts <- unlist(data[is_text], use.names = FALSE)
       if (!missing(period_fun)) {
         period_texts <- apply_period_fun(period_texts, period_fun)
+        if (is.character(period_texts)) {
+          # Convert texts to periods with C++ function parse_period:
+          text_periods <- parse_period(period_texts, frequency = frequency)
+        }
+      } else {
+        text_periods <- parse_period(period_texts, frequency = frequency)
       }
-      # Convert texts to periods with C++ function parse_period:
-      text_periods <- parse_period(period_texts, frequency = frequency)
       if (all(is_text)) return(text_periods)
       multi_freq_text <- is.list(text_periods)
       if (!multi_freq_text) freq_text <- frequency(text_periods)
@@ -159,9 +163,13 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
     periods <- data
     if (!missing(period_fun)) {
       periods <- apply_period_fun(periods, period_fun)
+      if (is.character(periods)) {
+        periods <- parse_period(periods, frequency = frequency)
+      }
+    } else {
+      periods <- parse_period(periods, frequency = frequency)
     }
-    return(parse_period(periods, frequency = frequency))
-
+    return(periods)
   }
 }
 
@@ -181,18 +189,10 @@ apply_period_fun <- function(texts, period_fun) {
   } else if (is_period_list(periods)) {
     # the return value if a list of period objects. If they have the same
     # frequency, then convert to vector, otherwise return as list.
-    periods <- simplify_plist(periods)
-    if (is.list(periods)) {
-      warning(paste("Function period_fun returns a list of period objects with",
-                    "different frequencies."))
-    }
-    return(periods)
+    return(simplify_plist(periods))
   }
 
-  stop(paste0("Illegal return value of period_fun. Period_fun should return:\n",
-              "  * a character vector\n",
-              "  * a period vector\n",
-              "  * a list of period objects."))
+  stop("Period_fun should return a character or period vector.")
 }
 
 # Internal function inspect_tibble: finds the first row or column of the periods

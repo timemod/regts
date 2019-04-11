@@ -14,8 +14,12 @@ correct_result <- cbind(a, b)
 period_fun <- function(x) {
   x <- paste("1", x)
   x <- lubridate::dmy(x, quiet = TRUE)
-  ret <- paste(lubridate::year(x), "Q", (lubridate::month(x) %/% 3 + 1))
-  return(ret)
+  return(ifelse(is.na(x), NA_character_,
+                paste(lubridate::year(x), "Q", (lubridate::month(x) %/% 3 + 1))))
+}
+
+period_fun2 <- function(x) {
+  return(period(period_fun(x), 4))
 }
 
 correct_result_labels <- correct_result
@@ -93,8 +97,14 @@ test_that("example3.xlsx is read correctly (leading empty rows and columns are s
   expect_identical(result2, correct_result)
 
   result3 <- read_ts_xlsx(xlsx_file, range = cellranger::cell_rows(c(2, NA)),
-                          labels = "before", period_fun = period_fun, strict = FALSE)
+                          labels = "before", period_fun = period_fun,
+                          strict = FALSE)
   expect_identical(result2, correct_result)
+
+  result4 <- read_ts_xlsx(xlsx_file, range = cellranger::cell_rows(c(2, NA)),
+                          labels = "before", period_fun = period_fun2,
+                          strict = FALSE)
+  expect_identical(result4, correct_result)
 })
 
 test_that("example4.xlsx is read correctly (leading empty columns are skipped)",  {
