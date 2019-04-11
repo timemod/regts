@@ -467,16 +467,19 @@ convert_periods <- function(periods, fun = period, ...) {
   if (is.period(periods)) {
     return(periods)
   } else if (is.list(periods) && all(sapply(periods, FUN = is.period))) {
-    freqs <- sapply(periods, FUN = frequency)
-    freqs <- unique(freqs)
-    if (length(freqs) > 1) {
-      return(periods)
-    } else {
+    freqs <- unique(sapply(periods, FUN = frequency))
+    if (length(freqs) == 1) {
+      # all periods have the same frequency -> convert to vector
+      warning(paste("Function 'fun' returns a list of period objects instead",
+                    "of a period vector.\nThe list is converted to a vector"))
       return(create_period(unlist(periods), frequency = freqs))
+    } else {
+      # different frequencies -> give error message in calling function.
+      return(periods)
     }
   }
 
-  stop("convert_periods returns an illegal return value")
+  stop("Function 'fun' should return a period vector")
 }
 
 # matrix2regts_ : internal function to convert a matrix to a regts.
