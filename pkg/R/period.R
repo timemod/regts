@@ -163,10 +163,6 @@ as.period.POSIXct <- function(x, frequency = NA, ...) {
 #' @export
 as.period.POSIXlt <- function(x, frequency = NA, ...) {
 
-  #if (length(x) != 1) {
-  #  return(lapply(x, FUN = as.period.POSIXlt, frequency = frequency, ...))
-  #}
-
   if (is.na(frequency)) {
     frequency <- 12
   }
@@ -309,15 +305,13 @@ get_year <- function(x) {
 #' @export
 as.Date.period <- function(x, ...) {
 
-  # first change frequency to month
   freq_x  <- frequency(x)
 
-
+  # first change frequency to month
   if (12 %% freq_x != 0) {
     stop(sprintf(paste("12 is not divisible by frequency timeseries",
                        "(%d)."), freq_x))
   }
-
   if (freq_x != 12) {
     per_m <- create_period(floor(12 * as.numeric(x) / freq_x), 12)
   } else {
@@ -363,6 +357,26 @@ create_period <- function(subperiod_count, frequency) {
                     frequency = frequency))
 }
 
+# returns true if x is a list of period objects
+is_period_list <- function(x) {
+  return(is.list(x) && all(sapply(x, FUN = is.period)))
+}
+
+# returns all frequencies in period list x
+get_freqs_plist <- function(x) {
+  return(unique(sapply(x, FUN = frequency)))
+}
+
+# simplifies a period list to a period vector if all periods have the
+# same frequency. x should be a list with only period objects.
+simplify_plist <- function(x) {
+  freqs <- get_freqs_plist(x)
+  if (length(freqs) == 1) {
+    x <- create_period(unlist(x), freqs)
+  }
+  return(x)
+}
+
 # minimum or maximum of 2 or more periods
 #' @export
 Summary.period <- function(..., na.rm = FALSE){
@@ -372,19 +386,18 @@ Summary.period <- function(..., na.rm = FALSE){
     args <- list(...)
 
     # check if period
-    is_prd <- sapply(args, FUN = is.period)
-    if (!all(is_prd))  {
+    if (!is_period_list(args))  {
       stop("Inputs must all be periods")
     }
 
     # check frequencies
-    freq <- sapply(args, FUN = frequency)
-    if (length(unique(freq)) > 1){
+    freq <- get_freqs_plist(args)
+    if (length(freq) > 1) {
       stop("All periods must have the same frequency")
     }
 
     result <- NextMethod(.Generic)
-    return(create_period(result, freq[[1]]))
+    return(create_period(result, freq))
   }
   else {
     stop(paste(.Generic, "is not supported for period objects"))
@@ -467,11 +480,8 @@ seq.period <- function(from, to, by, length.out, ...) {
 #' @export
 c.period <- function(...) {
   retval <- list(...)
-  if (all(sapply(retval, FUN = is.period))) {
-    freqs <- unique(sapply(retval, FUN = frequency))
-    if (length(freqs) == 1) {
-      retval <- create_period(unlist(retval), freqs)
-    }
+  if (is_period_list(retval)) {
+    retval <- simplify_plist(retval)
   }
   return(retval)
 }
@@ -493,9 +503,10 @@ c.period <- function(...) {
 #' @export
 as.list.period <- function(x, ...) {
   retval <- NextMethod(.Generic)
+  freq <- frequency(x)
   fun <- function(p) {
     attr(p, "class") <- "period"
-    attr(p, "frequency") <- frequency(x)
+    attr(p, "frequency") <- freq
     return(p)
   }
   return(lapply(retval, FUN = fun))

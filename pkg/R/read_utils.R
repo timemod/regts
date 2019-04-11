@@ -172,23 +172,21 @@ apply_period_fun <- function(texts, period_fun) {
   periods <- period_fun(texts)
 
   if (length(periods) != length(texts)) {
-    stop(paste0("Function period_fun should return an object with the same",
-                " length as its input value."))
+    stop(paste("Function period_fun should return an object with the same",
+               "length as its input value."))
   }
 
   if (is.character(periods) || is.period(periods)) {
     return(periods)
-  } else if (is.list(periods) && all(sapply(periods, FUN = is.period))) {
+  } else if (is_period_list(periods)) {
     # the return value if a list of period objects. If they have the same
     # frequency, then convert to vector, otherwise return as list.
-    freqs <- unique(sapply(periods, FUN = frequency))
-    if (length(freqs) == 1) {
-      return(create_period(unlist(periods), frequency = freqs))
-    } else {
+    periods <- simplify_plist(periods)
+    if (is.list(periods)) {
       warning(paste("Function period_fun returns a list of period objects with",
                     "different frequencies."))
-      return(periods)
     }
+    return(periods)
   }
 
   stop(paste0("Illegal return value of period_fun. Period_fun should return:\n",

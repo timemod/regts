@@ -456,8 +456,8 @@ numeric_matrix <- function(x, dec = ".") {
 
 # Function convert_periods: Internal function that converts a vector or
 # data frame to a period vector. Optionally, a coercion function fun can be
-# specified. If the periods have different frequencies it returns a list with
-# periods.
+# specified. If the periods have different frequencies it period may return a
+# list with periods.
 convert_periods <- function(periods, fun = period, ...) {
 
   n <- NROW(periods)
@@ -473,20 +473,11 @@ convert_periods <- function(periods, fun = period, ...) {
 
   if (is.period(periods)) {
     return(periods)
-  } else if (is.list(periods) && all(sapply(periods, FUN = is.period))) {
-    freqs <- unique(sapply(periods, FUN = frequency))
-    if (length(freqs) == 1) {
-      # all periods have the same frequency -> convert to vector
-      warning(paste("Function 'fun' returns a list of period objects instead",
-                    "of a period vector.\nThe list is converted to a vector."))
-      return(create_period(unlist(periods), frequency = freqs))
-    } else {
-      # different frequencies -> give error message in calling function.
-      return(periods)
-    }
+  } else if (is_period_list(periods)) {
+    return(simplify_plist(periods))
+  } else {
+    stop("Function 'fun' should return a period vector.")
   }
-
-  stop("Function 'fun' should return a period vector.")
 }
 
 # matrix2regts_ : internal function to convert a matrix to a regts.

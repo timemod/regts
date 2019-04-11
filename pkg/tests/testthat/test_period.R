@@ -315,5 +315,11 @@ test_that("multiple periods", {
   expect_error(period(c("2018q1", NA_character_, "2012m2")),
                "Frequency of NA period unknown. Specify argument frequency.")
 
+  # min and max
+  expect_identical(min(pq2, pq1), pq1)
+  expect_identical(min(c(pq1, pq2), c(pq3, pq4)), pq3)
+  expect_identical(min(c(pq1, pq2), c(pq3, pq4), na.rm = TRUE), pq1)
 
+  expect_error(max(pq1, pq2, pm1), "All periods must have the same frequency")
+  expect_error(max(pq1, pq2, 3), "Inputs must all be periods")
 })

@@ -46,10 +46,8 @@ test_that("fun", {
   expect_identical(regts1, regts(matrix(1:2, ncol = 1), names = "a",
                                  start = "2018q1"))
 
-  expect_warning(regts2 <- as.regts(m1, fun = fun_b),
-                 paste("Function 'fun' returns a list of period objects",
-                       "instead of a period vector.\nThe list is converted",
-                       "to a vector."))
+  regts2 <- as.regts(m1, fun = fun_b)
+  expect_identical(regts1, regts2)
 
   expect_error(as.regts(m1, fun = fun_c),
                paste("Function 'fun' should return an object with the same",
