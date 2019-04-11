@@ -28,8 +28,7 @@ If both \code{from} and \code{to} have been specified, and if
 a \code{\link{list}} with period objects
 }
 \description{
-Generates a regular sequence of \code{\link[regts]{period}} objects. The
-function returns the sequence as a \code{\link{list}}.
+Generates a regular sequence of \code{\link[regts]{period}} objects.
 }
 \examples{
 p1 <- period("2018q2")

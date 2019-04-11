@@ -20,34 +20,52 @@ SEXP parse_period(const CharacterVector period_text, double frequency) {
     
     int n = period_text.size();
 
-    List list_result(n);
+    std::vector<double> subp(n), freqs(n);
+    double per, f, f0;
+    bool freq_given = !ISNA(frequency);
+    bool multi_freqs = false;
 
     for (int i = 0; i < n; i++) {
-        double per, f;
-        NumericVector period(1);
-        period.attr("class") = "period";
         if (CharacterVector::is_na(period_text(i))) {
-            per = NA_REAL;
             if (ISNA(frequency)) {
                 Rf_error("Frequency of NA period unknown."
                         " Specify argument frequency.");
+                return R_NilValue;
             }
+            per = NA_REAL;
             f = frequency;
         } else {
             std::string per_text = Rcpp::as<std::string>(period_text(i));
             parse_single_period(per_text, frequency, per, f);
         }
-        period[0] = per;
-        period.attr("frequency") = f;
-    
-        if (n == 1) {
-            return period;
-        } else {
-            list_result[i] = period;
+        subp[i] = per;
+        freqs[i] = f;
+        if (!freq_given) {
+           if (i == 0) {
+               f0 = f;
+           } else if (f != f0) {
+               multi_freqs = true;
+           }
         }
     }
 
-    return list_result;
+
+    if (!multi_freqs) {
+        double freq_result = freq_given ? frequency : f0;
+        NumericVector period(subp.begin(), subp.end());
+        period.attr("class") = "period";
+        period.attr("frequency") = freq_result;
+        return period;
+    } else {
+        List period_list(n);
+        for (int i  = 0; i < n; i++) {
+            NumericVector period = NumericVector::create(subp[i]);
+            period.attr("class") = "period";
+            period.attr("frequency") = freqs[i];
+            period_list[i] = period;
+        }
+        return period_list;
+    }
 }
 
 

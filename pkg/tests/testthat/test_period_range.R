@@ -43,6 +43,13 @@ test_that("constructor period_range", {
 
   expect_error(period_range(d2, d2, frequency = 4),
                "Both the start and end period of the period range are NA.")
+
+  expect_error(period_range(period(c("2018m1", "2018m2")), period("2019m2"),
+                            frequency = 4),
+               "Argument 'start' must be of length 1")
+  expect_error(period_range(period("2018m1"), period(c("2019m2", "2019m3")),
+                            frequency = 4),
+               "Argument 'end' must be of length 1")
 })
 
 test_that("as.period_range.character", {

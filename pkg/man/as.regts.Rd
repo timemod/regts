@@ -29,7 +29,7 @@ as.regts(x, ...)
 in which the time (periods) is stored. Specify \code{0} if the index is in
 the row names of the data frame.
 If \code{time_column} has length > 1, then argument \code{fun} should be
-a function which converts a data frame to a list of \code{period} objects.}
+a function which converts a data frame to \code{period} vector.}
 
 \item{numeric}{logical: should non numeric values be converted to numeric data.
 By default they are converted to numeric. This can be changed by setting
@@ -37,7 +37,7 @@ By default they are converted to numeric. This can be changed by setting
 
 \item{fun}{a function for converting values in the row names or
 time column(s) to \code{\link{period}} objects. Normally this is a function
-which converts a vector to a list of \code{period} objects (for example
+which converts a vector to a \code{period} vector (for example
 function \code{period}). See argument \code{time_column} for exceptions.}
 
 \item{strict}{A logical. If \code{TRUE} (the default) all periods between the

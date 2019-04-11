@@ -25,7 +25,7 @@ test_that("as.regts.matrix univariate", {
   expect_equal(regts2, expected_result)
 })
 
-test_that("no column names", {
+test_that("no row names", {
 
   m <- matrix(1:6, ncol = 2, dimnames = list(NULL,
                                              c("a", "b")))

@@ -4,16 +4,22 @@
 # RETURN: a logical vector
 is_period_data <- function(data, frequency, xlsx, period_fun) {
 
-  is_period_fun <- function(period_texts, frequency, period_fun) {
+  is_period_fun <- function(periods, frequency, period_fun) {
     # Returns a logical vector with elements TRUE or FALSE if the corresponding
     # element in character vector period_texts is a valid period (for the
     # specified frequency).
     if (!missing(period_fun)) {
-      period_texts <- apply_period_fun(period_texts, period_fun)
+      periods <- apply_period_fun(periods, period_fun)
+      if (!is.character(periods)) {
+        # period_texts is a period vector or a list of period objects
+        # with the different frequencies -> every element in data is a possible
+        # period if the period is not NA.
+        return(!is.na(periods))
+      }
     }
 
     # call C++ function is_period_text
-    return(is_period_text(period_texts, frequency))
+    return(is_period_text(periods, frequency))
   }
 
   if (xlsx) {
@@ -53,11 +59,12 @@ is_period_data <- function(data, frequency, xlsx, period_fun) {
 }
 
 # get_periods_data: converts a list (xlsx) or character vector (csv) to
-# a character vector with the corresponding periods as texts.
+# a period vector or a period list.
 # INPUT:
 #   data:  a list (xlsx) or character vector (csv). Each element should
 #          be an object which can be converted to a period.
-# RETURN: a character vector
+# RETURN: a period vector if all periods in data have the same frequency,
+#         otherwise a period list.
 get_periods_data <- function(data, frequency, xlsx, period_fun) {
 
   if (xlsx) {
@@ -65,37 +72,83 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
     is_text <- sapply(data, FUN = is.character)
     is_num  <- sapply(data, FUN = is.numeric)
 
-    # first handle numerical and character data
-    result <- rep(NA, length(data))
+    freq_text <- NA
+    freq_num <- NA
+    freq_posixt <- NA
+    multi_freq_text <- FALSE
 
-    if (any(is_text)) {
+    text_present <- any(is_text)
+    if (is.na(frequency) || frequency == 1) {
+      # integer numerical values are possible periods if the frequency 1
+      num_present <- any(is_num)
+    } else {
+      num_present <- FALSE
+    }
+    if (is.na(frequency) || 12 %% frequency == 0) {
+      # POSIXt values are possible periods if the frequency is a divisor of 12.
+      is_posixt <- sapply(data, FUN = function(x) {inherits(x[[1]], "POSIXt")})
+      posixt_present <- any(is_posixt)
+    } else {
+      posixt_present <- FALSE
+    }
+
+    if (text_present) {
       period_texts <- unlist(data[is_text], use.names = FALSE)
       if (!missing(period_fun)) {
         period_texts <- apply_period_fun(period_texts, period_fun)
       }
-      result[is_text] <- period_texts
+      # Convert texts to periods with C++ function parse_period:
+      text_periods <- parse_period(period_texts, frequency = frequency)
+      if (all(is_text)) return(text_periods)
+      multi_freq_text <- is.list(text_periods)
+      if (!multi_freq_text) freq_text <- frequency(text_periods)
     }
 
-    if (any(is_num)) {
+    if (num_present) {
       num_values <- unlist(data[is_num], use.names = FALSE)
-      if (!is.na(frequency)) {
-        period_texts <- paste0(num_values, "/1")
-      } else {
-        period_texts <- as.character(num_values)
-      }
-      result[is_num] <- period_texts
+      num_periods <- period(num_values, frequency = frequency)
+      if (all(is_num)) return(num_periods)
+      # numerical periods always have frequency 1
+      freq_num <- 1
     }
 
-    if (is.na(frequency) || 12 %% frequency == 0) {
+    if (posixt_present) {
       # When read from xlsx data may contain POSIXt values
-      # POSIXt values are possible periods if the frequency is a divisor of 12.
-      is_posixt <- sapply(data, FUN = function(x) {inherits(x[[1]], "POSIXt")})
-      if (any(is_posixt)) {
-        # unlist does not work here. Therefore use function c (concatenation):
-        date_vector <- do.call(c, data[is_posixt])
-        result[is_posixt] <- sapply(as.period(date_vector, frequency),
-                                    FUN = as.character)
+      # unlist does not work here. Therefore use function c (concatenation):
+      date_vector <- do.call(c, data[is_posixt])
+      posixt_periods <- period(date_vector, frequency = frequency)
+      if (all(is_posixt)) return(posixt_periods)
+      freq_posixt <- frequency(posixt_periods)
+    }
+
+    if (is.na(frequency)) {
+      # check if the frequencies are identical
+      if (multi_freq_text) {
+        all_freqs_equal <- FALSE
+      } else {
+        all_freqs <- c(freq_text, freq_num, freq_posixt)
+        all_freqs <- unique(all_freqs[!is.na(all_freqs)])
+        all_freqs_equal <- length(all_freqs) == 1
+        freq_result <- all_freqs
       }
+    } else {
+      all_freqs_equal <- TRUE
+      freq_result <- frequency
+    }
+
+
+    if (all_freqs_equal) {
+      # all frequencies are equal: return a period vector
+      result <- period(rep(NA, length(data)), frequency = freq_result)
+      if (text_present) result[is_text] <- text_periods
+      if (num_present) result[is_num] <- num_periods
+      if (posixt_present) result[is_posixt] <- posixt_periods
+    } else  {
+      # different frequencies: return a list of period objects
+      result <- list(rep(NULL, length(data)))
+      if (text_present) result[is_text] <- as.list(text_periods)
+      if (num_present) result[is_num] <- as.list(num_periods)
+      if (posixt_present) result[is_posixt] <- as.list(posixt_periods)
     }
 
     return(result)
@@ -107,7 +160,7 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
     if (!missing(period_fun)) {
       periods <- apply_period_fun(periods, period_fun)
     }
-    return(periods)
+    return(parse_period(periods, frequency = frequency))
 
   }
 }
@@ -116,25 +169,31 @@ apply_period_fun <- function(texts, period_fun) {
 
   if (length(texts) == 0) return(character(0))
 
-  period_texts <- period_fun(texts)
+  periods <- period_fun(texts)
 
-  if (length(period_texts) != length(texts)) {
+  if (length(periods) != length(texts)) {
     stop(paste0("Function period_fun should return an object with the same",
                 " length as its input value."))
   }
 
-  if (is.character(period_texts)) {
-    return(period_texts)
-  } else if (is.list(period_texts) &&
-             all(sapply(period_texts, FUN = is.period))) {
-    return(sapply(period_texts, FUN = as.character, USE.NAMES = FALSE))
-  } else if (length(period_texts) == 1 && is.period(period_texts)) {
-    return(as.character(period_texts))
+  if (is.character(periods) || is.period(periods)) {
+    return(periods)
+  } else if (is.list(periods) && all(sapply(periods, FUN = is.period))) {
+    # the return value if a list of period objects. If they have the same
+    # frequency, then convert to vector, otherwise return as list.
+    freqs <- unique(sapply(periods, FUN = frequency))
+    if (length(freqs) == 1) {
+      return(create_period(unlist(periods), frequency = freqs))
+    } else {
+      warning(paste("Function period_fun returns a list of period objects with",
+                    "different frequencies."))
+      return(periods)
+    }
   }
 
   stop(paste0("Illegal return value of period_fun. Period_fun should return:\n",
               "  * a character vector\n",
-              "  * a single period object\n",
+              "  * a period vector\n",
               "  * a list of period objects."))
 }
 

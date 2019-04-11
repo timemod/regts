@@ -63,17 +63,16 @@
 #' frequency month. It is possible to specify another output frequency,
 #' provided that this frequency is a divisor of 12.
 #'
-#' @param x a character, numeric scalar,
+#' @param x a character, numeric,
 #' \code{\link[base]{Date}}, \code{\link[base:DateTimeClasses]{POSIXct}}
-#' or \code{\link[base:Dates]{POSIXlt}}. If \code{x} has length > 1, then the
-#' function returns of list of \code{period} objects.
+#' or \code{\link[base:Dates]{POSIXlt}} vector.
 #' @param frequency frequency of the period. Argument \code{frequency} is
 #' mandatory if the frequency cannot be inferred from \code{x} (for example
 #' \code{"2017-2"} could be a quarter, month, etc.)
 #' @param ... additional arguments to be passed to or from methods (currently
 #' not used in package \code{regts})
-#' @return a \code{period} object if \code{length(x) == 1}, or a
-#' list of \code{period} objects if  \code{length(x) > 1}
+#' @return a \code{period} vector if all periods have the same frequency,
+#' otherwise a list of \code{period} objects.
 #'
 #' @examples
 #' period("2010Q3")
@@ -143,11 +142,7 @@ as.period.numeric <- function(x, frequency = NA, ...) {
     subp_count <- year * frequency + subp
   }
 
-  if (length(subp_count) == 1) {
-    return(create_period(subp_count, frequency))
-  } else {
-    return(create_periods(subp_count, frequency))
-  }
+  return(create_period(subp_count, frequency))
 }
 
 #' @export
@@ -189,11 +184,7 @@ as.period.POSIXlt <- function(x, frequency = NA, ...) {
     subperiod <- month
   }
   subp_since_christ <- year * frequency + subperiod - 1
-  if (length(subp_since_christ) == 1) {
-    return(create_period(subp_since_christ, frequency))
-  } else {
-    return(create_periods(subp_since_christ, frequency))
-  }
+  return(create_period(subp_since_christ, frequency))
 }
 
 
@@ -256,14 +247,13 @@ Ops.period <- function(e1, e2) {
 
     # perform the actual arithmetic operation
     retval <- NextMethod(.Generic)
-
     if (e1_is_per && e2_is_per && .Generic == "-") {
       # if both operands are periods, then the result is an ordinary numeric.
       retval <- as.numeric(retval)
     } else if (length(retval) > 1) {
       # the result is a list of periods
       frequency <- if (e1_is_per) frequency(e1) else frequency(e2)
-      retval <- create_periods(as.numeric(retval), frequency = frequency)
+      retval <- create_period(as.numeric(retval), frequency = frequency)
     }
     return(retval)
 
@@ -322,12 +312,17 @@ as.Date.period <- function(x, ...) {
   # first change frequency to month
   freq_x  <- frequency(x)
 
+
   if (12 %% freq_x != 0) {
     stop(sprintf(paste("12 is not divisible by frequency timeseries",
                        "(%d)."), freq_x))
   }
-  per_m <- create_period(floor(12 * x[1] / freq_x), 12)
 
+  if (freq_x != 12) {
+    per_m <- create_period(floor(12 * as.numeric(x) / freq_x), 12)
+  } else {
+    per_m <- x
+  }
   year <- get_year(per_m)
   month <- get_subperiod(per_m)
   date_text <- paste0(year, "-", month, "-01")
@@ -361,24 +356,11 @@ print.period <- function(x, ...) {
   }
 }
 
-
-# Create a period object based on the number of subperiods after Christ.
+# Create a period vector based on the number of subperiods after Christ.
 # Internal function.
 create_period <- function(subperiod_count, frequency) {
-  return(structure(subperiod_count[1], class = "period",
+  return(structure(subperiod_count, class = "period",
                     frequency = frequency))
-}
-
-# Internal function that creates a list of period objects based
-# on a vector with the number of subperiods after Christ.
-create_periods <- function(subperiod_count, frequency) {
-
-  fun <- function(x) {
-    attr(x, "class") <- "period"
-    attr(x, "frequency") <- frequency
-    return(x)
-  }
-  return(lapply(subperiod_count, FUN = fun))
 }
 
 # minimum or maximum of 2 or more periods
@@ -412,8 +394,7 @@ Summary.period <- function(..., na.rm = FALSE){
 
 #' Generates a sequence of periods
 #'
-#' Generates a regular sequence of \code{\link[regts]{period}} objects. The
-#' function returns the sequence as a \code{\link{list}}.
+#' Generates a regular sequence of \code{\link[regts]{period}} objects.
 #' @param from a \code{period} object specifying the first period of the
 #'   sequence.
 #' @param to a \code{period} object (or an object that can be coerced to a
@@ -480,12 +461,42 @@ seq.period <- function(from, to, by, length.out, ...) {
 
   # subperiod_count is the number of subperiods since Christ
   subperiod_count <- NextMethod(.Generic)
-
-  return(create_periods(as.numeric(subperiod_count), frequency = freq))
+  return(create_period(as.numeric(subperiod_count), frequency = freq))
 }
 
 #' @export
 c.period <- function(...) {
-  return(list(...))
+  retval <- list(...)
+  if (all(sapply(retval, FUN = is.period))) {
+    freqs <- unique(sapply(retval, FUN = frequency))
+    if (length(freqs) == 1) {
+      retval <- create_period(unlist(retval), freqs)
+    }
+  }
+  return(retval)
 }
 
+
+#' @export
+"[.period" <- function(x, i, j, drop) {
+  subperiod_count <- NextMethod(.Generic)
+  return(create_period(subperiod_count, frequency = frequency(x)))
+}
+
+#' @export
+"[<-.period" <- function(x, i, j, value) {
+  if (!is.period(value)) stop("value is not a period object")
+  if (frequency(value) != frequency(x)) stop("value has a different frequency")
+  return(NextMethod(.Generic))
+}
+
+#' @export
+as.list.period <- function(x, ...) {
+  retval <- NextMethod(.Generic)
+  fun <- function(p) {
+    attr(p, "class") <- "period"
+    attr(p, "frequency") <- frequency(x)
+    return(p)
+  }
+  return(lapply(retval, FUN = fun))
+}

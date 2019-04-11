@@ -19,7 +19,7 @@ test_that("test1", {
 
   expected_result <- list(rowwise = TRUE, period_row = 2L, first_data_col = 2L,
                           last_data_col = 2L, is_data_col = c(FALSE, TRUE),
-                          periods = "2014")
+                          periods = period(2014))
 
   info1 <- regts:::inspect_tibble(tbl, frequency = NA, xlsx = FALSE)
   expect_identical(info1, expected_result)
@@ -54,7 +54,7 @@ test_that("test2", {
   expect_identical(info2, list(rowwise = TRUE, period_row = 2L,
                                first_data_col = 2L, last_data_col = 2L,
                                is_data_col = c(FALSE, TRUE),
-                               periods = "3"))
+                               periods = period(3)))
 })
 
 test_that("single period", {
@@ -85,7 +85,7 @@ test_that("single period", {
   expected_result2 <- list(rowwise = TRUE, period_row = 2L,
                           first_data_col = 2L, last_data_col = 2L,
                           is_data_col = c(FALSE, TRUE, FALSE),
-                          periods = "2010m2")
+                          periods = period("2010m2"))
 
   expect_identical(layout2, expected_result2)
 
@@ -113,7 +113,7 @@ test_that("missing data columns / rows ", {
   expect_identical(layout, list(rowwise = TRUE, period_row = 2L,
                                first_data_col = 2L, last_data_col = 2L,
                                is_data_col = c(FALSE, TRUE, FALSE),
-                               periods = "2010"))
+                               periods = period(2010)))
 
   tbl2 <- tibble(a = c(NA, NA, "a", NA), b = c("xxx", "2010", "2011", "2012"),
                  c = c("y", NA, 3, NA))
@@ -130,7 +130,7 @@ test_that("missing data columns / rows ", {
   expect_identical(layout_roww, list(rowwise = TRUE, period_row = 2L,
                                 first_data_col = 2L, last_data_col = 2L,
                                 is_data_col = c(FALSE, TRUE, FALSE),
-                                periods = "2010"))
+                                periods = period(2010)))
 
 
   tbl3 <- tibble(z = list("emu", NA, NA, NA), a = list(NA, NA, 2010, NA),
@@ -155,7 +155,7 @@ test_that("combination of numeric and text periods", {
   expected_result1 <- list(rowwise = TRUE, period_row = 2L,
                            first_data_col = 2L, last_data_col = 3L,
                            is_data_col = c(FALSE, TRUE, TRUE),
-                           periods = c("2010q1", "2010q2"))
+                           periods = period(c("2010q1", "2010q2")))
   expect_identical(layout1, expected_result1)
 
   layout1_csv <-  regts:::inspect_tibble(get_csv_tbl(tbl1), frequency = NA,
@@ -193,13 +193,19 @@ test_that("combination of numeric and text periods", {
     wmsg)
 
   expected_result3 <- expected_result1
-  expected_result3$periods <- c("2010q1", "12345")
+  expected_result3$periods <- list(period("2010q1"), period(12345))
   expect_identical(layout3, expected_result3)
 
+  # csv file cannot parse "12345" ...the function requires that a period
+  # is present
+  tbl3_csv <- tibble(a = c(NA, "a", "b"), b = c("x", "2010q1", 1234),
+                 c = c("y", 1234, sqrt(3)))
   expect_warning(
-    layout3_csv <-  regts:::inspect_tibble(get_csv_tbl(tbl3), frequency = NA,
+    layout3_csv <-  regts:::inspect_tibble(tbl3_csv, frequency = NA,
                                          xlsx = FALSE), wmsg)
-  expect_identical(layout3_csv, expected_result3)
+  expected_result3_csv <- expected_result3
+  expected_result3_csv$periods[[2]] <- period(1234)
+  expect_identical(layout3_csv, expected_result3_csv)
 })
 
 test_that("all periods are numeric, check YYYY", {
@@ -217,7 +223,7 @@ test_that("all periods are numeric, check YYYY", {
   expected_result1 <- list(rowwise = TRUE, period_row = 2L,
                            first_data_col = 2L, last_data_col = 3L,
                            is_data_col = c(FALSE, TRUE, TRUE),
-                           periods = c("2010", "2011"))
+                           periods = period(c("2010", "2011")))
   expect_identical(layout1, expected_result1)
   expect_identical(layout1_csv, expected_result1)
 
@@ -278,6 +284,6 @@ test_that("all periods are numeric, check YY periods", {
   expected_result1 <- list(rowwise = TRUE, period_row = 2L,
                            first_data_col = 2L, last_data_col = 3L,
                            is_data_col = c(FALSE, TRUE, TRUE),
-                           periods = c("18", "19"))
+                           periods = period(18:19))
   expect_identical(layout1, expected_result1)
 })

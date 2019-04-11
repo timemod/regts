@@ -121,10 +121,9 @@
 #' By default, \code{read_ts_csv} treats blank cells as missing data.
 #' @param name_fun function to apply to the names of the timeseries.
 #' @param period_fun function applied to period texts. This should be a function
-#' that converts a character vector to another character vector with the same
-#' length, or a single character to a single \code{period} object, or a
-#' character vector with length > 1 to a list of \code{period} objects with
-#' the same length. Use this argument if the period texts do not have a
+#' that converts a character vector to another character vector or a
+#' \code{period} vector with the same length. Use this argument if the period
+#' texts do not have a
 #' standard format (see Description).
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
 #' start and the end period must be present.
@@ -199,12 +198,8 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
 read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, layout,
                             strict, filename) {
 
-  # Convert periods with C++ function parse_period
-  periods_and_freq <- convert_periods(layout$periods, fun = parse_period,
-                                      frequency = frequency)
-  periods <- periods_and_freq$periods
-  freq <- periods_and_freq$freq
-  if (is.na(freq)) {
+  if (is.list(layout$periods)) {
+    # There are periods with differnet frequencies.
     # The exact row number is unknown, because of the automatic row skipping.
     # Therefore the error message cannot be as specific as for read_ts_xlsx.
     stop(sprintf(paste0("Periods with different frequencies found in the ",
@@ -225,7 +220,7 @@ read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, layout,
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
-  ret <- matrix2regts_(mat, periods, freq,  numeric = FALSE, strict = strict)
+  ret <- matrix2regts_(mat, layout$periods, numeric = FALSE, strict = strict)
 
   if (!is.null(name_info$lbls)) {
     ts_labels(ret) <- name_info$lbls
@@ -245,13 +240,8 @@ read_ts_columnwise <- function(tbl, frequency, dec, period_fun, layout, strict,
 
   periods <- get_periods_data(tbl[[layout$period_col]], frequency,
                               xlsx = FALSE, period_fun = period_fun)
-
-  # Convert periods with C++ function parse_period
-  periods_and_freq <- convert_periods(periods, fun = parse_period,
-                                      frequency = frequency)
-  periods <- periods_and_freq$periods
-  freq <- periods_and_freq$freq
-  if (is.na(freq)) {
+  if (is.list(periods)) {
+    # There are periods with differnet frequencies.
     # The exact row number is unknown, because of the automatic row skipping.
     # Therefore the error message cannot be as specific as for read_ts_xlsx.
     col <- num_to_letter(layout$period_col + skipcol)
@@ -264,7 +254,7 @@ read_ts_columnwise <- function(tbl, frequency, dec, period_fun, layout, strict,
   colnames(mat) <- layout$names
 
   # set numeric = FALSE, because we already know that df is numeric
-  ret <- matrix2regts_(mat, periods, freq, numeric = FALSE, strict = strict)
+  ret <- matrix2regts_(mat, periods, numeric = FALSE, strict = strict)
 
   if (!is.null(layout$lbls)) {
     ts_labels(ret) <- layout$lbls

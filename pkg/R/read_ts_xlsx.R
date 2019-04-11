@@ -124,11 +124,10 @@
 #' @param na_string Character vector of strings to use for missing values.
 #' By default, \code{read_ts_xlsx} treats blank cells as missing data.
 #' @param name_fun function to apply to the names of the timeseries.
-#' @param period_fun function applied to period texts. This should be a function
-#' that converts a character vector to another character vector with the same
-#' length, or a single character to a single \code{period} object, or a
-#' character vector with length > 1 to a list of \code{period} objects with
-#' the same length. Use this argument if the period texts do not have a
+##' @param period_fun function applied to period texts. This should be a function
+#' that converts a character vector to another character vector or a
+#' \code{period} vector with the same length. Use this argument if the period
+#' texts do not have a
 #' standard format (see Description).
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
 #' start and the end period must be present.
@@ -233,12 +232,8 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
                                  frequency, labels, name_fun, layout, strict) {
 
-  # Convert periods with C++ function parse_period
-  periods_and_freq <- convert_periods(layout$periods, fun = parse_period,
-                                      frequency = frequency)
-  periods <- periods_and_freq$periods
-  freq <- periods_and_freq$freq
-  if (is.na(freq)) {
+  if (is.list(layout$periods)) {
+    # there are periods with different frequencies
     row_nr <- range$ul[1] + layout$period_row - 1
     col1 <- num_to_letter(range$ul[2] + layout$first_data_col - 1)
     col2 <- num_to_letter(range$ul[2] + layout$last_data_col - 1)
@@ -281,7 +276,7 @@ read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
-  ret <- matrix2regts_(mat, periods, freq, numeric = FALSE, strict = strict)
+  ret <- matrix2regts_(mat, layout$periods, numeric = FALSE, strict = strict)
 
   if (!is.null(name_info$lbls)) {
     ts_labels(ret) <- name_info$lbls
@@ -337,12 +332,8 @@ read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
 
   periods <- get_periods_data(data_tbl[[1]], frequency, TRUE, period_fun)
 
-  # Convert periods with C++ function parse_period
-  periods_and_freq <- convert_periods(periods, fun = parse_period,
-                                      frequency = frequency)
-  periods <- periods_and_freq$periods
-  freq <- periods_and_freq$freq
-  if (is.na(freq)) {
+  if (is.list(periods)) {
+    # periods with different frequencies
     col <- num_to_letter(range$ul[2])
     cells <- paste0(col, c(range$ul[1], range$ul[1] + length(row_sel) - 1))
     stop(sprintf(paste0("The column %s:%s of sheet %s of file %s contains\n",
@@ -355,7 +346,7 @@ read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
-  ret <- matrix2regts_(mat, periods, freq, numeric = FALSE, strict = strict)
+  ret <- matrix2regts_(mat, periods, numeric = FALSE, strict = strict)
 
   if (!is.null(layout$lbls)) {
     ts_labels(ret) <- layout$lbls

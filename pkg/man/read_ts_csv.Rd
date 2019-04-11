@@ -47,10 +47,9 @@ By default, \code{read_ts_csv} treats blank cells as missing data.}
 \item{name_fun}{function to apply to the names of the timeseries.}
 
 \item{period_fun}{function applied to period texts. This should be a function
-that converts a character vector to another character vector with the same
-length, or a single character to a single \code{period} object, or a
-character vector with length > 1 to a list of \code{period} objects with
-the same length. Use this argument if the period texts do not have a
+that converts a character vector to another character vector or a
+\code{period} vector with the same length. Use this argument if the period
+texts do not have a
 standard format (see Description).}
 
 \item{strict}{A logical. If \code{TRUE} (the default) all periods between the

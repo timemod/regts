@@ -141,7 +141,7 @@ test_that("period_format", {
 
   emsg <- paste0("Illegal return value of period_fun. Period_fun should",
                  " return:\n  \\* a character vector\n",
-                 "  \\* a single period object\n  \\* a list of period objects.")
+                 "  \\* a period vector\n  \\* a list of period objects.")
   expect_error(read_ts_csv(file, period_fun = period_fun_err2),
                emsg)
 

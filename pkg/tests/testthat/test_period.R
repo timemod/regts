@@ -133,9 +133,8 @@ test_that("arithmetic operators: only + and - allowed", {
   expect_identical(period("2010q2") + 4, 4 + period("2010q2"))
 
   expect_identical(period("2010m2") + c(1, 4),
-                   list(period("2010m3"), period("2010m6")))
-  expect_identical(period("2010") - 1:3,
-                   list(period("2009"), period("2008"), period("2007")))
+                   c(period("2010m3"), period("2010m6")))
+  expect_identical(period("2010") - 1:3, period(2009:2007))
 
   p <- period("2010q1")
   expect_identical(p + NA, period(NA, frequency = 4))
@@ -145,7 +144,7 @@ test_that("arithmetic operators: only + and - allowed", {
   expect_identical(period("2010Q1") - period(NA, frequency = 4), NA_real_)
 
   expect_identical(p + c(1, NA, 0),
-                   list(p + 1, period(NA, frequency = 4), p))
+                   c(p + 1, period(NA, frequency = 4), p))
 
   # errors
   expect_error(period("2010Q1") * 2,
@@ -278,14 +277,17 @@ test_that("multiple periods", {
   py2 <- period(2011)
   py3 <- period(NA, frequency = 1)
 
+  expect_identical(period(c("2010q2", "2010q3")), c(pq1, pq2))
+
   expect_identical(period(c("2010q2", "2018m3")), list(pq1, pm1))
-  expect_identical(period(2010:2011), list(py1, py2))
+  expect_identical(period(c("2010q2", "2010q3", "2018m3")), list(pq1, pq2, pm1))
+  expect_identical(period(2010:2011), c(py1, py2))
 
   expect_identical(period(c(2010, NA, 2011), frequency = 1),
-                   list(py1, py3, py2))
+                   c(py1, py3, py2))
 
   expect_identical(period(c(2010.25, 2010.5, NA), frequency = 4),
-                   list(pq1, pq2, pq3))
+                   c(pq1, pq2, pq3))
 
   expect_error(period(c(2010, 2010.5), frequency = 1),
               "If frequency == 1, then x should be an integer.")
@@ -295,7 +297,7 @@ test_that("multiple periods", {
 
   expect_identical(
     period(c(as.Date("2010-04-01"), as.Date("2010-07-01")), frequency = 4),
-          list(pq1, pq2))
+          c(pq1, pq2))
 
   # multiple texts
   expect_identical(period(c("2010q2", "2011", "2018m3")), list(pq1, py2, pm1))
