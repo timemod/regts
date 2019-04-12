@@ -30,6 +30,7 @@ is_period_text <- function(strings, frequency) {
 #' @param x a timeseries (\link{ts} or \link{regts})
 #' @return a \code{period_range}
 #' @export
+#' @seealso \code{\link{get_periods}}
 get_period_range <- function(x) {
     .Call(`_regts_get_period_range`, x)
 }

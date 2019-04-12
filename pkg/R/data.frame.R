@@ -38,13 +38,11 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
     x <- univec2unimat(x, name)
   }
 
-  # convert the time index to a character vector with period texts
-  periods <- seq(start_period.ts(x), length = NROW(x))
-
+  periods <- get_periods(x)
   if (period_as_date)  {
-    times <- as.Date(periods)
+    periods <- as.Date(periods)
   } else {
-    times <- as.character(periods)
+    periods <- as.character(periods)
   }
 
   lbls <- ts_labels(x)
@@ -52,7 +50,7 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
   if (rowwise) {
 
     ret <- as.data.frame(t(x), ...)
-    colnames(ret) <- times
+    colnames(ret) <- periods
 
     if (!is.null(lbls)) {
       ret <- cbind(label = lbls, ret, stringsAsFactors = FALSE)
@@ -75,9 +73,9 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
     }
 
     if (row_names) {
-      rownames(ret) <- times
+      rownames(ret) <- periods
     } else {
-      ret <- cbind(period = times, ret, stringsAsFactors = FALSE)
+      ret <- cbind(period = periods, ret, stringsAsFactors = FALSE)
     }
 
 
