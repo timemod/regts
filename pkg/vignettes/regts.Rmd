@@ -484,6 +484,34 @@ The function skips the first 2 lines, analyses where the period begins, converts
 the timeseries names to lowercase and recognises that empty cells and cells with
 text 'NA' are not available.
 
+When the file contains a deviant period, like this 
+
+```{r echo = FALSE, comment=""}
+cat(readLines("period.csv"), sep = "\n")
+```
+
+we use a period function when reading the file:
+
+```{r}
+period_fun <- function(per) {
+  # This function converts a period with format <month> <year> 
+  # to a format recognised by regts 
+  
+  # convert input to day-month-year (add day 1) so we can use function dmy
+  per <- paste("1", per)
+  
+  date <- lubridate::dmy(per, locale = "English_United States.1252", quiet = TRUE)
+  return(format(date, "%YM%m"))
+}
+period_fun("may2019")
+```
+
+Now we can read the file:
+```{r results = "hide"}
+read_ts_xlsx("period.xlsx", period_fun = period_fun)
+```
+
+
 Function `write_ts_xlsx` is used for writing a `regts` object to an xlsx file.
 It creates or opens an Excel workbook depending on argument `append`. Appending
 to a non existent file means creating the file. You can specify the sheetname 
