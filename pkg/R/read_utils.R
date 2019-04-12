@@ -93,15 +93,15 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
     }
 
     if (text_present) {
-      period_texts <- unlist(data[is_text], use.names = FALSE)
+      text_values <- unlist(data[is_text], use.names = FALSE)
       if (!missing(period_fun)) {
-        period_texts <- apply_period_fun(period_texts, period_fun)
-        if (is.character(period_texts)) {
+        text_periods <- apply_period_fun(text_values, period_fun)
+        if (is.character(text_periods)) {
           # Convert texts to periods with C++ function parse_period:
-          text_periods <- parse_period(period_texts, frequency = frequency)
+          text_periods <- parse_period(text_periods, frequency = frequency)
         }
       } else {
-        text_periods <- parse_period(period_texts, frequency = frequency)
+        text_periods <- parse_period(text_values, frequency = frequency)
       }
       if (all(is_text)) return(text_periods)
       multi_freq_text <- is.list(text_periods)
