@@ -25,11 +25,10 @@ If both \code{from} and \code{to} have been specified, and if
 \item{...}{arguments passed to or from methods (not used)}
 }
 \value{
-a \code{\link{list}} with period objects
+a \code{period} vector
 }
 \description{
-Generates a regular sequence of \code{\link[regts]{period}} objects. The
-function returns the sequence as a \code{\link{list}}.
+Generates a regular sequence of \code{\link[regts]{period}} objects.
 }
 \examples{
 p1 <- period("2018q2")

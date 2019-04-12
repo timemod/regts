@@ -312,12 +312,11 @@ print.tsdif <- function(x, ...) {
         per_index <- sapply(max_index, FUN = period_index_func)
 
         startp <- start_period(dif)
-        periods <- sapply(per_index, FUN = function(i) {as.character(startp + i - 1)})
-
+        period_texts <- as.character(startp + per_index - 1)
         max_values <- dif[cbind(per_index, max_index)]
 
         # periods and max_values are already in index order
-        df <- data.frame(period = periods, max_dif = max_values)
+        df <- data.frame(period = period_texts, max_dif = max_values)
         rownames(df) <- difnames[max_index]
 
         cat("\nMaximum differences timeseries in decreasing order\n\n")

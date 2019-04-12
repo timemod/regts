@@ -26,9 +26,10 @@ Imports:
     readxl (>= 1.2.0),
     cellranger,
     tibble,
-    openxlsx
+    openxlsx,
+    stringr,
+    testthat
 Suggests:
-    testthat,
     knitr,
     rmarkdown,
     zoo,

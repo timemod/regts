@@ -12,28 +12,30 @@ correct_result <- regts(matrix(c(num_dec, 1, NA, num_dec), ncol = 2),
                         labels = paste("Timeseries", c("a", "b")),
                         period =  prd)
 
-msg <- paste0("NAs introduced by coercion\n",
-              "The following texts could not be converted to numeric:\n",
-              "\"x\"")
-
 test_that("example6.xlsx is read correctly",  {
   xlsx_file <- "xlsx/example6.xlsx"
 
-  expect_warning(result <- read_ts_xlsx(xlsx_file, labels = "after"),  msg)
+  expect_warning(result <- read_ts_xlsx(xlsx_file, labels = "after"),
+                 "Expecting numeric in C4 / R4C3: got 'x'")
   expect_identical(result, correct_result)
 })
 
 test_that("example7.xlsx is read correctly",  {
   xlsx_file <- "xlsx/example7.xlsx"
-  expect_warning(result <- read_ts_xlsx(xlsx_file), msg)
+  expect_warning(result <- read_ts_xlsx(xlsx_file),
+                 "Expecting numeric in C3 / R3C3: got 'x'")
   expect_identical(result, correct_result)
 })
 
 test_that("example9.xlsx is read correctly",  {
   xlsx_file <- "xlsx/example9.xlsx"
-  expect_warning(result <- read_ts_xlsx(xlsx_file, labels = "after"), msg)
-  expected_result <- regts(matrix(c(rep(NA, 3), 5, 6, 10, NA, NA, 50, 60), ncol = 2),
-                          names = c("A", "B"),
+  warnings <- capture_warnings(result <- read_ts_xlsx(xlsx_file,
+                                                      labels = "after"))
+  expect_identical(warnings,
+                   c("Expecting numeric in D2 / R2C4: got 'x'",
+                     "Coercing text to numeric in D3 / R3C4: '10'"))
+  expected_result <- regts(matrix(c(rep(NA, 3), 5, 6, 10, NA, NA, 50, 60),
+                                  ncol = 2), names = c("A", "B"),
                           labels = paste("Timeseries", c("a", "b (EUR)")),
                           period =  "2010q2/2011q2")
   expect_identical(result, expected_result)
@@ -41,7 +43,9 @@ test_that("example9.xlsx is read correctly",  {
 
 test_that("example10.xlsx is read correctly",  {
   xlsx_file <- "xlsx/example10.xlsx"
-  result <- read_ts_xlsx(xlsx_file, labels = "after", skipcol = 1, strict = FALSE)
+  expect_warning(result <- read_ts_xlsx(xlsx_file, labels = "after",
+                                        skipcol = 1, strict = FALSE),
+                 "Coercing text to numeric in E8 / R8C5: '10.123'")
   expected_result <- regts(matrix(c(1.12345678901234, NA, NA, 5, 6,
                                     10.123, NA, NA, 50, 60), ncol = 2),
                            names = c("a", "b"),
@@ -49,6 +53,3 @@ test_that("example10.xlsx is read correctly",  {
                            period =  "2010q2/2011q2")
   expect_equal(result, expected_result)
 })
-
-
-

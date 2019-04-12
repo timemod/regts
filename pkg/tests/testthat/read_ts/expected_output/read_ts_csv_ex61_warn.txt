@@ -1,0 +1,2 @@
+[1] "Could not determine if timeseries are stored rowwise or columnwise.\nAssuming columnwise based on the number of periods found.\nUse argument rowwise if necessary."
+[2] "NAs introduced by coercion.\nThe following texts could not be converted to numeric:\n\"2018q1\""                                                                   

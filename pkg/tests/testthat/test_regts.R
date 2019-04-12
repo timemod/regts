@@ -85,6 +85,11 @@ test_that("arguments: start, end & period", {
   expect_identical(regts1, regts4)
   expect_identical(regts1, regts5)
   expect_identical(regts1, regts6)
+
+  expect_error(regts(1:5, start = period(c("2010Q1", "2010q2"))),
+               "Argument 'start' must be of length 1")
+  expect_error(regts(1:5, end = period(c("2010Q1", "2010q2"))),
+               "Argument 'end' must be of length 1")
 })
 
 test_that("period selection in univariate timeseries", {
@@ -124,6 +129,12 @@ test_that("period selection in univariate timeseries", {
 
   # period selection outside range
   expect_identical(regts1["2018Q1"], regts(NA_integer_, period = "2018q1"))
+
+  expect_error(regts1[period(c("2010q2", "2010q3"))],
+               "'x' must be a period of length 1")
+
+  expect_error(regts1[c("2010q2", "2010q3")],
+               "x should be a single character string")
 })
 
 test_that("period / column selection in multivariate timeseries", {

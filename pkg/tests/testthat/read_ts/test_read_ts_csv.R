@@ -53,6 +53,11 @@ test_that("rowwise2.csv is read correctly",  {
 
   result3 <- read_ts_csv(csv_file,  labels = "after", strict = FALSE)
   expect_identical(result3, correct_result_labels)
+
+  result4 <- read_ts_csv(csv_file, skipcol = 1, rowwise = FALSE, strict = FALSE)
+  expected_result <- regts(matrix(c(5, rep(NA, 8), 50, 6, rep(NA, 8), 60),
+                           ncol = 2), names = c("2011Q1", "2011Q2"))
+  expect_identical(result4, expected_result)
 })
 
 test_that("columnwise1.csv is read correctly",  {
@@ -114,7 +119,7 @@ test_that("example1.csv is read correctly",  {
 
   csv_file <- "csv/example1.csv"
 
-  result <- read_ts_csv(csv_file, skiprow = 1, labels = "no", strict = FALSE)
+  result <- read_ts_csv(csv_file, labels = "no", strict = FALSE)
   expect_identical(result, correct_result * 1)
 
   result2 <- read_ts_csv(csv_file, skiprow = 1, strict = FALSE)
@@ -124,7 +129,7 @@ test_that("example1.csv is read correctly",  {
   colnames(correct_result_labels2) <- "(EUR)"
   ts_labels(correct_result_labels2) <- "b Timeseries b"
 
-  result3 <- read_ts_csv(csv_file, skiprow = 1, labels = "before", strict = FALSE)
+  result3 <- read_ts_csv(csv_file, labels = "before", strict = FALSE)
   expect_identical(result3, correct_result_labels2 * 1)
 })
 
@@ -178,15 +183,15 @@ test_that("example4.csv is read correctly",  {
                "The following texts could not be converted to numeric:\n",
                "\"aap,x\"")
   expect_warning({
-    result <- read_ts_csv(csv_file, skiprow = 1, dec = ",",
-                          period_fun = period_fun, strict = FALSE)
+    result <- read_ts_csv(csv_file, dec = ",", period_fun = period_fun,
+                          strict = FALSE)
   }, msg = msg)
   expect_identical(result, correct_result_tmp)
 })
 
 test_that("rowwise5.csv is read correctly",  {
   csv_file <- "csv/rowwise5.csv"
-  result <- read_ts_csv(csv_file, strict = FALSE)
+  result <- read_ts_csv(csv_file)
   expect_identical(result, correct_result["2010Q2", ])
 })
 
@@ -227,8 +232,36 @@ test_that("columnwise8.csv is read correctly",  {
   result <- read_ts_csv(csv_file, strict = FALSE)
   expect_identical(result, correct_result * 1)
 
+  # if there are no labels, then the labels option should have no effect
   result2 <- read_ts_csv(csv_file, labels = "before", strict = FALSE)
-  expect_identical(ncol(result2), 0L)
-  expect_identical(get_period_range(result2), get_period_range(correct_result))
+  expect_identical(result, correct_result * 1)
+})
+
+
+test_that("example5.csv read correctly", {
+  csv_file <- "csv/example5.csv"
+  result1 <- read_ts_csv(csv_file, skipcol = 1)
+  expect_identical(result1, regts(matrix(seq(1, 2.5, by = 0.5), ncol = 2),
+                                  names = c("a", "b"), start = "2011q1"))
+
+  expect_error(read_ts_csv(csv_file, skipcol = 1, rowwise = FALSE),
+               paste("Periods with different frequencies found in column C of",
+                    "file csv/example5.csv."))
+})
+
+test_that("example6.csv read correctly", {
+  csv_file <- "csv/example6.csv"
+
+  warnings <- capture_warnings(result1 <- read_ts_csv(csv_file))
+
+  expect_known_output(warnings, "expected_output/read_ts_csv_ex61_warn.txt",
+                      print = TRUE)
+
+  expect_identical(result1, regts(matrix(c(NA, 1, 2), ncol = 1),
+                                  names = c("a"), start = "2011"))
+
+  expect_error(read_ts_csv(csv_file, rowwise = TRUE),
+               paste("Periods with different frequencies found in the 2'th",
+                     "non-skipped row in file file csv/example6.csv."))
 })
 

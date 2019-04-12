@@ -4,9 +4,9 @@
 \alias{read_ts_xlsx}
 \title{Read timeseries from a sheet of an  xls(x) file}
 \usage{
-read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = NA,
-  skipcol = NA, rowwise, frequency = NA, labels = c("after",
-  "before", "no"), na_string = "", name_fun, period_fun, strict = TRUE)
+read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = 0,
+  skipcol = 0, rowwise, frequency = NA, labels = c("after", "before",
+  "no"), na_string = "", name_fun, period_fun, strict = TRUE)
 }
 \arguments{
 \item{filename}{a string with the filename.}
@@ -20,8 +20,6 @@ defaults to the first sheet.}
 \code{\link[readxl]{cell-specification}}. Includes typical Excel ranges
 like \code{"B3:D87"}, possibly including the
 sheet name like \code{"Budget!B2:G14"}, and more.
-Strictly, even if the range forces the inclusion of leading or trailing
-empty rows or columns.
 Takes precedence over \code{skiprow}, \code{skipcol} and \code{sheet}.}
 
 \item{skiprow}{the number of rows to skip, including leading empty rows.
@@ -48,8 +46,10 @@ By default, \code{read_ts_xlsx} treats blank cells as missing data.}
 \item{name_fun}{function to apply to the names of the timeseries.}
 
 \item{period_fun}{function applied to period texts. This should be a function
-that converts a character vector of length 1 to a character vector of length 1.
-Use this argument if the period texts do not have a standard format (see Description).}
+that converts a character vector to another character vector or a
+\code{period} vector with the same length. Use this argument if the period
+texts do not have a
+standard format (see Description).}
 
 \item{strict}{A logical. If \code{TRUE} (the default) all periods between the
 start and the end period must be present.
@@ -59,31 +59,52 @@ Otherwise the timeseries are filled with \code{NA} for the missing periods.}
 a \code{regts} object
 }
 \description{
-This function attempts to read timeseries from an xls(x) file.
-The xls(x) file is actually read by function \code{\link[readxl]{read_excel}}
-of package \code{readxl}.
-The timeseries can be stored both rowwise or columnwise on the sheet.
-The function tries to find period cells on the sheet. Period cells are
-cells containing
+This function reads timeseries from a sheet of an xls(x) file,
+employing function \code{\link[readxl]{read_excel}} of
+package \code{readxl}. \code{read_ts_xlsx} searches for period cells and
+automatically determines how the timeseries are stored (rowwise or columnwise)
+and which columns contain the numerical values of the timeseries.
+Period cells are cells containing
 \itemize{
 \item a text with the format recognized by function \code{\link{period}},
 for example \code{"2010Q2"}, \code{"2010.2Q"},
 \code{"2010m2"}, \code{"2011"} or \code{"2011-1"},
 \item an integer value (e.g. \code{2018}), which is considered as a year,
-\item a date
+\item a date, which  is assumed to specify a month unless argument
+\code{frequency} has been specified.
 }
 Use argument \code{period_fun} if the period cells contain a text with a
 format not recognized by function \code{period}.
 }
 \details{
+\code{read_ts_xlsx} reads the timeseries data in two steps. In the first step,
+the first 25 rows are read to inspect the
+structure of the data on the sheet: are the timeseries stored rowwise or
+columnwise, which row or column contains the period cells and which columns
+contain the numerical data of the timeseries.
+Using this information, the
+complete sheet is read and the timeseries are constructed.
+
 In many cases, this function will read timeseries correctly.
-However, \emph{you should always carefully check the results of this
-function}. If the function fails or if the result is not
-what you want, then you have to read the data into a data frame
+If the function fails or if the result is not what you want,
+it might help to specify arguments \code{rowwise}, \code{frequency},
+\code{period_fun}, \code{range}, \code{skipcol} or \code{skiprow}.
+Specify option  \code{rowwise} if you know
+that the timeseries are stored rowwise or columnwise. Specify
+argument \code{frequency} if you already know the frequency of the timeseries.
+Arguments \code{range}, \code{skipcol} and \code{skiprow} can be used to read
+only a part of the file.
+
+If that does not help, then you can read the data into a data frame
 (for example by using function \code{read_excel} of package \code{readxl}),
 then convert the data frame to a standard columnwise data frame
 and finally convert it to a \code{\link{regts}} by using function
 \code{\link{as.regts}}.
+
+\code{read_ts_xlsx} skips all empty rows and columns. Use arguments
+\code{skipcol} and \code{skiprow} to skip additional leading rows
+and columns. Argument \code{range} can  be used to read only a part
+of the sheet.
 
 If argument \code{rowwise} has not been specified, then
 function \code{read_ts_xlsx} tries to guess if the timeseries are stored
@@ -112,6 +133,9 @@ also contains variable names but the other columns before the first data
 column are ignored. If argument \code{labels = "before"}, then the variable
 names should be in the last column before the first data column.
 
+With argument \code{name_fun} a function can be applied to names of the
+timeseries, e.g. \code{\link{tolower}}.
+
 \strong{columnwise timeseries}
 
 For columnwise timeseries, the first non-empty row that has been read (see
@@ -133,20 +157,6 @@ row contains the variable names. If \code{labels = "no"} the first row
 also contains variable names but the other rows before the first data
 row are ignored. If argument \code{labels = "before"}, then the variable
 names should be in the last row before the first data row.
-
-By default, the function skips all leading empty rows and columns,
-just as \code{read_excel}. This behaviour can be overruled by specifying
-arguments \code{range}, \code{skiprow} or \code{skipcol}.
-
-Sometimes it helps to supply information about the structure of
-the data on the sheet. Specify option  \code{rowwise} if you know
-that the timeseries are stored rowwise or columnwise. Specify
-argument \code{frequency} if you already know the frequency of the timeseries.
-Argument \code{frequency} is mandatory if a general period format
-such as  \code{"2011-1"} has been used.
-
-With \code{name_fun} a function can be applied to names of the timeseries,
-e.g. \code{\link{tolower}}.
 }
 \examples{
 \dontrun{

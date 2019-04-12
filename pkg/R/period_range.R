@@ -66,6 +66,7 @@ period_range <- function(start = NULL, end = NULL, frequency = NA) {
   }
 
   if (!is.null(start)) {
+    if (length(start) > 1) stop("Argument 'start' must be of length 1")
     if (is.character(start) && grepl("/", start[1])) {
       # direct conversion, inputs "2016q1" and "2016q1/2017q1" are possible
       if (is.null(end)){
@@ -79,6 +80,7 @@ period_range <- function(start = NULL, end = NULL, frequency = NA) {
     }
   }
   if (!is.null(end)) {
+    if (length(end) > 1) stop("Argument 'end' must be of length 1")
     end <- as.period(end, frequency)
     freq2 <- attr(end, 'frequency')
   }
@@ -137,6 +139,7 @@ as.period_range.period_range <- function(x, ...) {
 
 #' @export
 as.period_range.period <- function(x, ...) {
+  if (length(x) > 1) stop("'x' must be a period of length 1")
   return(create_period_range(as.numeric(x), as.numeric(x), frequency(x)))
 }
 

@@ -4,13 +4,20 @@
 \alias{read_ts_csv}
 \title{Read timeseries from a csv file}
 \usage{
-read_ts_csv(filename, rowwise, frequency = NA, skiprow = 0,
-  skipcol = 0, labels = c("after", "before", "no"), sep = "auto",
+read_ts_csv(filename, skiprow = 0, skipcol = 0, rowwise,
+  frequency = NA, labels = c("after", "before", "no"), sep = "auto",
   fill = FALSE, dec = if (sep != ".") "." else ",", na_string = "",
   name_fun, period_fun, strict = TRUE)
 }
 \arguments{
 \item{filename}{a string with the filename.}
+
+\item{skiprow}{the number of rows to skip.
+If 0 (default) and if argument \code{fill} is \code{FALSE},
+then comment rows are automatically skipped.
+See Details.}
+
+\item{skipcol}{the number of columns to skip.}
 
 \item{rowwise}{a logical value: are the timeseries stored rowwise?
 If not specified, then \code{read_ts_csv} tries to figure out itself if
@@ -19,13 +26,6 @@ the timeseries are stored rowwise or columnwise.}
 \item{frequency}{the frequency of the timeseries.
 This argument is mandatory if the file contains a period texts without
 frequency indicator (for example "2011-1").}
-
-\item{skiprow}{the number of rows to skip.
-If 0 (default) and if argument \code{fill} is \code{FALSE},
-then comment rows are automatically skipped.
-See Details.}
-
-\item{skipcol}{the number of columns to skip.}
 
 \item{labels}{label option. See Details.}
 
@@ -47,8 +47,10 @@ By default, \code{read_ts_csv} treats blank cells as missing data.}
 \item{name_fun}{function to apply to the names of the timeseries.}
 
 \item{period_fun}{function applied to period texts. This should be a function
-that converts a character vector of length 1 to a character vector of length 1.
-Use this argument if the period texts do not have a standard format (see Description).}
+that converts a character vector to another character vector or a
+\code{period} vector with the same length. Use this argument if the period
+texts do not have a
+standard format (see Description).}
 
 \item{strict}{A logical. If \code{TRUE} (the default) all periods between the
 start and the end period must be present.
@@ -58,11 +60,12 @@ Otherwise the timeseries are filled with \code{NA} for the missing periods.}
 a \code{regts} object
 }
 \description{
-This function attempts to read timeseries from a csv file.
-The csv file is actually read by function \code{\link[data.table]{fread}}
-of package \code{data.table}.
-The timeseries can be stored both rowwise or columnwise.
-The function tries to find fields with valid period texts.
+This function reads timeseries from a csv file,
+employing function \code{\link[data.table]{fread}} of package
+\code{data.table}.
+The functions searches for period texts and automatically
+determines how the timeseries are stored (rowwise or columnwise)
+and which columns contain the numerical values of the timeseries.
 Period texts should have the format recognized by function
 \code{\link{period}}, for example \code{"2010Q2"}, \code{"2010.2Q"},
 \code{"2010m2"}, \code{"2011"} or \code{"2011-1"}. Use argument
@@ -70,23 +73,29 @@ Period texts should have the format recognized by function
 }
 \details{
 In many cases, this function will read timeseries correctly.
-However, \emph{you should always carefully check the results of this
-function}. If the function fails or if the result is not
-what you want, then you have to read the data into a data frame
-(for example by using function \code{read.csv} or the function
-\code{fread} of package \code{data.table}),
+If the function fails or if the result is not what you want,
+it might help to specify arguments \code{rowwise}, \code{frequency},
+\code{period_fun}, \code{skipcol} or \code{skiprow}.
+Specify option  \code{rowwise} if you know
+that the timeseries are stored rowwise or columnwise. Specify
+argument \code{frequency} if you already know the frequency of the timeseries.
+Arguments \code{skipcol} and \code{skiprow} can be used to read only a
+part of the file.
+If that does not help, then you can read the data into a data frame
+(for example by using function \code{\link{read.csv}} or function
+\code{\link[data.table]{fread}} of package \code{data.table}),
 then convert the data frame to a standard columnwise data frame
 and finally convert it to a \code{\link{regts}} by using function
 \code{\link{as.regts}}.
 
 If argument \code{rowwise} has not been specified, then
-function \code{read_ts_xlsx} tries to guess if the timeseries are stored
+function \code{read_ts_csv} tries to guess if the timeseries are stored
 rowwise or columnwise based on the positions of the fields with period texts.
 
 \strong{rowwise timeseries}
 
 For rowwise timeseries, the function searches for the first
-row with periods.  All rows before the period row are ignored.
+row with periods. All rows before the period row are ignored.
 Columns without a valid period in the period row are also ignored.
 The first non-empty column should contain the timeseries names
 (or labels if argument \code{labels = "before"}, see the discussion below).
@@ -100,11 +109,14 @@ There may be more than one column before the columns with timeseries values
 (data columns). In that case one column should contain the variable names.
 The other columns before the first data column are used to create
 timeseries labels (see \code{\link{ts_labels}}). If argument
-\code{labels = "after"} (default), then the first
-column contains the variable names. If \code{labels = "no"} the first column
+\code{labels = "after"} (default), then the first column contains the
+variable names. If \code{labels = "no"} the first column
 also contains variable names but the other columns before the first data
 column are ignored. If argument \code{labels = "before"}, then the variable
 names should be in the last column before the first data column.
+
+With argument \code{name_fun} a function can be applied to names of the
+timeseries, e.g. \code{\link{tolower}}.
 
 \strong{columnwise timeseries}
 
@@ -127,16 +139,6 @@ row contains the variable names. If \code{labels = "no"} the first row
 also contains variable names but the other rows before the first data
 row are ignored. If argument \code{labels = "before"}, then the variable
 names should be in the last row before the first data row.
-
-Sometimes it helps to supply information about the structure of
-the data on the csv file. Specify argument \code{rowwise} if you know
-that the timeseries are stored rowwise or columnwise. Specify
-argument \code{frequency} if you already know the frequency of the timeseries.
-Argument \code{frequency} is mandatory if a general period format
-such as  \code{"2011-1"} has been used.
-
-With \code{name_fun} a function can be applied to names of the timeseries,
-e.g. \code{\link{tolower}}.
 
 \strong{automatic row skip}
 

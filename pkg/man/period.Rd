@@ -10,9 +10,9 @@ period(x, frequency = NA)
 as.period(x, ...)
 }
 \arguments{
-\item{x}{a character string, numeric scalar,
+\item{x}{a character, numeric,
 \code{\link[base]{Date}}, \code{\link[base:DateTimeClasses]{POSIXct}}
-or  \code{\link[base:Dates]{POSIXlt}}}
+or \code{\link[base:Dates]{POSIXlt}} vector.}
 
 \item{frequency}{frequency of the period. Argument \code{frequency} is
 mandatory if the frequency cannot be inferred from \code{x} (for example
@@ -22,7 +22,8 @@ mandatory if the frequency cannot be inferred from \code{x} (for example
 not used in package \code{regts})}
 }
 \value{
-a \code{period} object
+a \code{period} vector if all periods have the same frequency,
+otherwise a list of \code{period} objects.
 }
 \description{
 Function \code{period} creates a \code{period} object

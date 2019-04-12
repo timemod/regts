@@ -27,14 +27,18 @@ as.regts(x, ...)
 
 \item{time_column}{the column names or numbers of the data frame
 in which the time (periods) is stored. Specify \code{0} if the index is in
-the row names of the data frame.}
+the row names of the data frame.
+If \code{time_column} has length > 1, then argument \code{fun} should be
+a function which converts a data frame to \code{period} vector.}
 
 \item{numeric}{logical: should non numeric values be converted to numeric data.
 By default they are converted to numeric. This can be changed by setting
 \code{numeric = FALSE}.}
 
-\item{fun}{a function for converting values in the time column to
-\code{\link{period}} objects.}
+\item{fun}{a function for converting values in the row names or
+time column(s) to \code{\link{period}} objects. Normally this is a function
+which converts a vector to a \code{period} vector (for example
+function \code{period}). See argument \code{time_column} for exceptions.}
 
 \item{strict}{A logical. If \code{TRUE} (the default) all periods between the
 start and the end period must be present.
@@ -84,8 +88,16 @@ ts <- as.regts(df, time_column = 1, frequency = 4)
 # create a data frame with non numeric data and convert to regts
 # Strings containing non numeric values are converted to NA
 # Logical values TRUE/FALSE are converted to 1/0
-df <- data.frame(a = c("1", "2", "X"), b = c(TRUE, FALSE, TRUE), stringsAsFactors = FALSE)
+df <- data.frame(a = c("1", "2", "X"), b
+= c(TRUE, FALSE, TRUE), stringsAsFactors = FALSE)
 as.regts(df)
+
+# data frame with the years in the first column and quarters in the
+# second column
+df <- data.frame(years = c(2018, 2018), quarters = c(1, 2), a = 1:2)
+fun <- function(x) {period(paste(x[[1]], x[[2]]), frequency = 4)}
+as.regts(df, time_column = c("years", "quarters"), fun = fun)
+
 }
 \seealso{
 \code{\link{regts}}, \code{\link{is.regts}},

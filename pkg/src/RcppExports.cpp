@@ -32,17 +32,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// list_tbl_2_mat
-NumericMatrix list_tbl_2_mat(List tbl);
-RcppExport SEXP _regts_list_tbl_2_mat(SEXP tblSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type tbl(tblSEXP);
-    rcpp_result_gen = Rcpp::wrap(list_tbl_2_mat(tbl));
-    return rcpp_result_gen;
-END_RCPP
-}
 // moving_average
 NumericMatrix moving_average(NumericMatrix& x, NumericVector& w, const int from, const int to, const bool keep_range);
 RcppExport SEXP _regts_moving_average(SEXP xSEXP, SEXP wSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP keep_rangeSEXP) {
@@ -59,12 +48,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // parse_period
-NumericVector parse_period(const std::string& period_text, double frequency);
+/* This function converts a character vector to a period object or to  * a list of periods objects if the length of the vector > 1 */ SEXP parse_period(const CharacterVector period_text, double frequency);
 RcppExport SEXP _regts_parse_period(SEXP period_textSEXP, SEXP frequencySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type period_text(period_textSEXP);
+    Rcpp::traits::input_parameter< const CharacterVector >::type period_text(period_textSEXP);
     Rcpp::traits::input_parameter< double >::type frequency(frequencySEXP);
     rcpp_result_gen = Rcpp::wrap(parse_period(period_text, frequency));
     return rcpp_result_gen;
@@ -82,15 +71,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// is_period_text_
-LogicalVector is_period_text_(std::vector<std::string> strings, const double given_freq);
-RcppExport SEXP _regts_is_period_text_(SEXP stringsSEXP, SEXP given_freqSEXP) {
+// is_period_text
+LogicalVector is_period_text(std::vector<std::string> strings, const double frequency);
+RcppExport SEXP _regts_is_period_text(SEXP stringsSEXP, SEXP frequencySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::vector<std::string> >::type strings(stringsSEXP);
-    Rcpp::traits::input_parameter< const double >::type given_freq(given_freqSEXP);
-    rcpp_result_gen = Rcpp::wrap(is_period_text_(strings, given_freq));
+    Rcpp::traits::input_parameter< const double >::type frequency(frequencySEXP);
+    rcpp_result_gen = Rcpp::wrap(is_period_text(strings, frequency));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -120,11 +109,10 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_regts_agg_gr", (DL_FUNC) &_regts_agg_gr, 3},
     {"_regts_disagg_spline", (DL_FUNC) &_regts_disagg_spline, 4},
-    {"_regts_list_tbl_2_mat", (DL_FUNC) &_regts_list_tbl_2_mat, 1},
     {"_regts_moving_average", (DL_FUNC) &_regts_moving_average, 5},
     {"_regts_parse_period", (DL_FUNC) &_regts_parse_period, 2},
     {"_regts_parse_period_range", (DL_FUNC) &_regts_parse_period_range, 2},
-    {"_regts_is_period_text_", (DL_FUNC) &_regts_is_period_text_, 2},
+    {"_regts_is_period_text", (DL_FUNC) &_regts_is_period_text, 2},
     {"_regts_get_period_range", (DL_FUNC) &_regts_get_period_range, 1},
     {"_regts_rel2index_cpp", (DL_FUNC) &_regts_rel2index_cpp, 1},
     {NULL, NULL, 0}

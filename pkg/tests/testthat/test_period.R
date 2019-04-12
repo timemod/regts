@@ -11,7 +11,7 @@ test_that("constructor period", {
   expect_identical(as.character(period("1m2")), "1M02")
   expect_identical(as.character(period("2012")), "2012")
   expect_identical(as.character(period(2012)), "2012")
-  expect_identical(as.character(period("2012M3")), "2012M03")
+  expect_identical(as.character(period(as.factor("2012M3"))), "2012M03")
   expect_identical(as.character(period("2001-4", frequency = 4)), "2001Q4")
   expect_identical(as.character(period("2001 4", frequency = 12)), "2001M04")
   expect_identical(as.character(period("4 2001", frequency = 12)), "2001M04")
@@ -34,6 +34,8 @@ test_that("constructor period", {
   expect_identical(p, period(NA, frequency = 12))
   expect_identical(p, period(NA_character_, frequency = 12))
   expect_identical(p, period(NA_real_, frequency = 12))
+
+
 })
 
 
@@ -131,9 +133,8 @@ test_that("arithmetic operators: only + and - allowed", {
   expect_identical(period("2010q2") + 4, 4 + period("2010q2"))
 
   expect_identical(period("2010m2") + c(1, 4),
-                   list(period("2010m3"), period("2010m6")))
-  expect_identical(period("2010") - 1:3,
-                   list(period("2009"), period("2008"), period("2007")))
+                   c(period("2010m3"), period("2010m6")))
+  expect_identical(period("2010") - 1:3, period(2009:2007))
 
   p <- period("2010q1")
   expect_identical(p + NA, period(NA, frequency = 4))
@@ -143,7 +144,7 @@ test_that("arithmetic operators: only + and - allowed", {
   expect_identical(period("2010Q1") - period(NA, frequency = 4), NA_real_)
 
   expect_identical(p + c(1, NA, 0),
-                   list(p + 1, period(NA, frequency = 4), p))
+                   c(p + 1, period(NA, frequency = 4), p))
 
   # errors
   expect_error(period("2010Q1") * 2,
@@ -191,22 +192,28 @@ test_that("as.period.numeric", {
 
 test_that("regts:::is_period_text", {
   expect_identical(regts:::is_period_text(c("2060", "noot", "2012M2",
-                                            "2010-2", "2010Q3QA")),
+                                            "2010-2", "2010Q3QA"),
+                                          frequency = NA),
                    c(TRUE, FALSE, TRUE, TRUE, FALSE))
   expect_identical(regts:::is_period_text(c("2060", "noot", "2012M2",
-                                            "2010-2", "2010Q3QA")),
+                                            "2010-2", "2010Q3QA"),
+                                          frequency = NA),
                    c(TRUE, FALSE, TRUE, TRUE, FALSE))
   expect_true(regts:::is_period_text("2010-2", frequency = 4))
   expect_false(regts:::is_period_text("2010-8", frequency = 4))
   expect_false(regts:::is_period_text("2010Q2", frequency = 1))
   expect_false(regts:::is_period_text("2010Q2", frequency = 12))
   expect_true(regts:::is_period_text("2010Q2", frequency = 4))
-  expect_true(regts:::is_period_text("2010-8"))
-  expect_false(regts:::is_period_text("2010Q8"))
-  expect_false(regts:::is_period_text("2010Q0"))
-  expect_true(regts:::is_period_text("2010.0"))
+  expect_true(regts:::is_period_text("2010-8", frequency = NA))
+  expect_false(regts:::is_period_text("2010Q8", frequency = NA))
+  expect_false(regts:::is_period_text("2010Q0", frequency = NA))
+  expect_true(regts:::is_period_text("2010.0", frequency = NA))
   expect_true(regts:::is_period_text("2010.0", frequency = 1))
   expect_false(regts:::is_period_text("2010.0", frequency = 4))
+  expect_true(regts:::is_period_text("2010.25", frequency = NA))
+  expect_false(regts:::is_period_text("2010.25", frequency = 1))
+  expect_false(regts:::is_period_text(as.character(period(NA_character_, 4)),
+                                                   frequency = 1))
 })
 
 
@@ -257,4 +264,62 @@ test_that("as.character and print", {
   expect_identical(as.character(pm), "12M01")
   expect_output(print(py), "\\[1\\] 12")
   expect_output(print(pm), "\\[1\\] \"12M01\"")
+})
+
+test_that("multiple periods", {
+
+  # create some reference periods
+  pq1 <- period("2010q2")
+  pq2 <- period("2010q3")
+  pq3 <- period(NA, frequency = 4)
+  pq4 <- period("2018q3")
+  pm1 <- period("2018m3")
+  py1 <- period(2010)
+  py2 <- period(2011)
+  py3 <- period(NA, frequency = 1)
+
+  periods <- period(c("2010q2", "2010q3"))
+  expect_identical(periods, c(pq1, pq2))
+  expect_identical(as.list(periods), list(pq1, pq2))
+  periods[2] <- pq4
+  expect_identical(periods, c(pq1, pq4))
+  periods[1:2] <- pq4
+  expect_identical(periods, rep(pq4, 2))
+  expect_identical(period(c("2010q2", "2018m3")), list(pq1, pm1))
+  expect_identical(period(c("2010q2", "2010q3", "2018m3")), list(pq1, pq2, pm1))
+  expect_identical(period(2010:2011), c(py1, py2))
+
+  expect_identical(period(c(2010, NA, 2011), frequency = 1),
+                   c(py1, py3, py2))
+
+  expect_identical(period(c(2010.25, 2010.5, NA), frequency = 4),
+                   c(pq1, pq2, pq3))
+
+  expect_error(period(c(2010, 2010.5), frequency = 1),
+              "If frequency == 1, then x should be an integer.")
+
+  expect_error(period(c(2010, NA, 2011)),
+                      "Argument frequency should be specified.")
+
+  expect_identical(
+    period(c(as.Date("2010-04-01"), as.Date("2010-07-01")), frequency = 4),
+          c(pq1, pq2))
+
+  # multiple texts
+  expect_identical(period(c("2010q2", "2011", "2018m3")), list(pq1, py2, pm1))
+
+  expect_error(period(as.factor(c("2018q1", "2011", "2012m2")), frequency = 4),
+               paste("Specified frequency 4 does not agree with actual",
+                     "frequency in period 2011."))
+
+  expect_error(period(c("2018q1", NA_character_, "2012m2")),
+               "Frequency of NA period unknown. Specify argument frequency.")
+
+  # min and max
+  expect_identical(min(pq2, pq1), pq1)
+  expect_identical(min(c(pq1, pq2), c(pq3, pq4)), pq3)
+  expect_identical(min(c(pq1, pq2), c(pq3, pq4), na.rm = TRUE), pq1)
+
+  expect_error(max(pq1, pq2, pm1), "All periods must have the same frequency")
+  expect_error(max(pq1, pq2, 3), "Inputs must all be periods")
 })
