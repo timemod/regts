@@ -220,7 +220,9 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
 
   found <- FALSE
 
-  if (!missing(rowwise) && !rowwise) {
+  rowwise_specified <- !missing(rowwise)
+
+  if (rowwise_specified && !rowwise) {
     # columnwise
 
     for (col_nr in 1:ncol(tbl)) {
@@ -249,7 +251,7 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
       is_period_row <- is_period_data(row_data, frequency, xlsx, period_fun)
       if (any(is_period_row)) {
         col_nr <- Position(function(x) {x}, is_period_row)
-        if (missing(rowwise)) {
+        if (!rowwise_specified) {
           if (row_nr == first_row_nr) {
             rowwise <- TRUE
           } else {
@@ -345,9 +347,11 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     return(FALSE)
   }
 
+  # possible periods above the current row should be ignored.
+  is_period_col[1:(row_nr - 1)] <- FALSE
+
   is_period_row_sum <- sum(is_period_row)
   is_period_col_sum <- sum(is_period_col)
-
 
   #
   #  SINGLE PERIOD
@@ -383,7 +387,6 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
 
     return(sum(row_data_n_num) <= sum(col_data_n_num))
   }
-
 
   #
   # FREQUENCY > 1
@@ -504,7 +507,6 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     }
   }
 
-
   #
   # FALL BACK CASE
   #
@@ -585,7 +587,7 @@ get_name_info_rowwise <- function(layout, data_tbl, labels, name_fun) {
 
   if (length(name_label_cols) == 0) {
     return(list(row_has_name = rep(FALSE, nrow(data_tbl)), names = character(0),
-                lbls = character(0)))
+                lbls = NULL))
   }
 
   n_label_cols <- length(name_label_cols) - 1
@@ -652,7 +654,7 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
 
   if (length(name_label_rows) == 0) {
     return(list(col_has_name = rep(FALSE, ncol(tbl)), names = character(0),
-                lbls = character(0)))
+                lbls = NULL))
   }
 
   n_label_rows <- length(name_label_rows) - 1
@@ -683,7 +685,7 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
 
   if (!any(col_has_name)) {
     names <- character(0)
-    lbls <- character(0)
+    lbls <- NULL
   } else {
 
     names <- name_row_data[col_has_name]

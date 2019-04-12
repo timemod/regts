@@ -24,23 +24,35 @@ test_that("test1", {
   info1 <- regts:::inspect_tibble(tbl, frequency = NA, xlsx = FALSE)
   expect_identical(info1, expected_result)
 
+
   info2 <- regts:::inspect_tibble(tbl, frequency = 1, xlsx = TRUE)
-  expect_identical(info2, expected_result)
 
-  info3 <- regts:::inspect_tibble(tbl, frequency = NA, rowwise = TRUE,
+  expect_identical(info2,  list(rowwise = FALSE, period_col = 2L,
+                                first_data_row = 2L, last_data_col = NA_integer_,
+                                is_data_col = c(FALSE, FALSE),
+                                is_data_row = c(FALSE, TRUE, TRUE),
+                                names = character(0), lbls = NULL))
+
+
+  info3 <- regts:::inspect_tibble(tbl, frequency = 1, xlsx = TRUE,
+                                  rowwise = TRUE)
+  expect_identical(info3, expected_result)
+
+
+  info4 <- regts:::inspect_tibble(tbl, frequency = NA, rowwise = TRUE,
                                   xlsx = FALSE)
-  expect_identical(info3,  expected_result)
+  expect_identical(info4,  expected_result)
 
-  info4 <- regts:::inspect_tibble(tbl, frequency = NA, rowwise = FALSE,
+  info5 <- regts:::inspect_tibble(tbl, frequency = NA, rowwise = FALSE,
                                   xlsx = TRUE)
-  expect_identical(info4, list(rowwise = FALSE, period_col = 2L,
+  expect_identical(info5, list(rowwise = FALSE, period_col = 2L,
                                first_data_row = 2L, last_data_col = NA_integer_,
                                is_data_col = c(FALSE, FALSE),
                                is_data_row = c(FALSE, TRUE, TRUE),
-                               names = character(0), lbls = character(0)))
+                               names = character(0), lbls = NULL))
 
-  info5 <- regts:::inspect_tibble(tbl, frequency = 4, xlsx = TRUE)
-  expect_null(info5)
+  info6 <- regts:::inspect_tibble(tbl, frequency = 4, xlsx = TRUE)
+  expect_null(info6)
 })
 
 test_that("test2", {
@@ -51,10 +63,11 @@ test_that("test2", {
 
   tbl2 <- tibble(a = list("2010", 1, 2), b = list("aap", 3, 4))
   info2 <- regts:::inspect_tibble(tbl2, frequency = NA, xlsx = TRUE)
-  expect_identical(info2, list(rowwise = TRUE, period_row = 2L,
-                               first_data_col = 2L, last_data_col = 2L,
+  expect_identical(info2, list(rowwise = FALSE, period_col = 1L,
+                               first_data_row = 2L, last_data_col = 2L,
                                is_data_col = c(FALSE, TRUE),
-                               periods = period(3)))
+                               is_data_row = c(FALSE, TRUE, TRUE),
+                               names = "aap", lbls = NULL))
 })
 
 test_that("single period", {

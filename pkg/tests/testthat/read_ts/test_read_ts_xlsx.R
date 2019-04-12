@@ -239,6 +239,12 @@ test_that("example15.xlsx, multiple year frequencies",  {
   expect_equal(result1, expected_result)
 })
 
+test_that("wtm_example1.xlsx", {
 
+  xlsx_file <- "xlsx/wtm_example1.xlsx"
+
+  result <- read_ts_xlsx(xlsx_file, na_string = "NA")
+  expect_known_value(result, file = "expected_output/wtm_example1.rds")
+})
 
 
