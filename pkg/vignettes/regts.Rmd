@@ -490,7 +490,10 @@ When the file contains a deviant period, like this
 cat(readLines("period.csv"), sep = "\n")
 ```
 
-we use a period function when reading the file:
+we can use a period function when reading the file. In this function dates such as 'may 2019' are converted to a string: "2019M05", that is recognised
+by regts. 
+
+Package 'lubridate' contains a function 'dmy' (day-month-year). Therefore we must add a day to the period: '1 may 2019'. This function also has a language/country parameter ('locale') which must be set:
 
 ```{r}
 period_fun <- function(per) {
@@ -503,6 +506,8 @@ period_fun <- function(per) {
   date <- lubridate::dmy(per, locale = "English_United States.1252", quiet = TRUE)
   return(format(date, "%YM%m"))
 }
+
+# Example
 period_fun("may2019")
 ```
 
