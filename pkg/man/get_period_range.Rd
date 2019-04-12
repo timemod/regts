@@ -15,3 +15,6 @@ a \code{period_range}
 \description{
 Returns the \link{period_range} of a timeseries.
 }
+\seealso{
+\code{\link{get_periods}}
+}

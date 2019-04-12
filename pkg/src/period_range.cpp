@@ -37,6 +37,7 @@ PeriodRange get_prd_range(const NumericMatrix &ts) {
 //' @param x a timeseries (\link{ts} or \link{regts})
 //' @return a \code{period_range}
 //' @export
+//' @seealso \code{\link{get_periods}}
 // [[Rcpp::export]]
 NumericVector get_period_range(const SEXP &x) {
     if (!Rf_inherits(x, "ts")) {

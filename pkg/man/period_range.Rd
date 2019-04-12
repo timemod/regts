@@ -78,5 +78,6 @@ period_range(today - 1000, today)
 }
 \seealso{
 \code{\link{period}}, \code{\link{nperiod}},
-\code{\link{start_period}}, \code{\link{end_period}} and \code{\link{seq}}.
+\code{\link{start_period}}, \code{\link{end_period}}, \code{\link{seq}} and
+\code{\link{get_periods}}.
 }
