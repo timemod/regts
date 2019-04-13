@@ -132,6 +132,10 @@
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
 #' start and the end period must be present.
 #' Otherwise the timeseries are filled with \code{NA} for the missing periods.
+#' @param warn_num_text A logical. If \code{TRUE} (the default) a warning is issued
+#' when a cell contains a number as text (e.g. \code{"2012.2"}) when
+#' a numeric value is expected. The text is always converted to a numeric value
+#' assuming the decimal separator \code{"."}.
 
 #' @return a \code{regts} object
 #'
@@ -153,7 +157,8 @@
 read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          skiprow = 0, skipcol = 0, rowwise, frequency = NA,
                          labels = c("after", "before", "no"),
-                         na_string = "", name_fun, period_fun, strict = TRUE) {
+                         na_string = "", name_fun, period_fun, strict = TRUE,
+                         warn_num_text = TRUE) {
 
   # n_inspect if the number of rows to read to determine the layout of the
   # sheet.
@@ -218,10 +223,12 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 
   if (layout$rowwise) {
     ret <- read_ts_rowwise_xlsx(filename, sheet, sheetname, range, na_string,
-                                frequency, labels, name_fun, layout, strict)
+                                frequency, labels, name_fun, layout, strict,
+                                warn_num_text)
   } else {
     ret <- read_ts_columnwise_xlsx(filename, sheet, sheetname, range, na_string,
-                                   frequency, period_fun, layout, strict)
+                                   frequency, period_fun, layout, strict,
+                                   warn_num_text)
   }
 
   return(ret)
@@ -230,7 +237,8 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
 # Internal function to read timeseries rowwise from a tibble, used by
 # read_ts_xlsx
 read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
-                                 frequency, labels, name_fun, layout, strict) {
+                                 frequency, labels, name_fun, layout, strict,
+                                 warn_num_text) {
 
   if (is.list(layout$periods)) {
     # there are periods with different frequencies
@@ -270,7 +278,8 @@ read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
   colnames(mat) <- name_info$names
 
   # print warnings
-  for (warning in select_read_excel_warnings(warnings, rowsel, range$ul[1])) {
+  for (warning in select_read_excel_warnings(warnings, rowsel, range$ul[1],
+                                             warn_num_text)) {
     warning(warning)
   }
 
@@ -289,7 +298,7 @@ read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
 # read_ts_xlsx.
 read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
                                     na_string, frequency, period_fun, layout,
-                                    strict) {
+                                    strict, warn_num_text) {
   #
   # read data
   #
@@ -326,7 +335,8 @@ read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
   row_sel <- is_period_data(data_tbl[[1]], frequency, TRUE, period_fun)
   data_tbl <- data_tbl[row_sel, ]
 
-  for (warning in select_read_excel_warnings(warnings, row_sel, range$ul[1])) {
+  for (warning in select_read_excel_warnings(warnings, row_sel, range$ul[1],
+                                             warn_num_text)) {
     warning(warning)
   }
 
@@ -355,13 +365,21 @@ read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
   return(ret)
 }
 
-select_read_excel_warnings <- function(warnings, row_sel, first_row_nr)  {
-  # select warnings issued by read_excel.  Warning about expecting a numerical
-  # value in a cell should only be given for rows that are actually read.
+select_read_excel_warnings <- function(warnings, row_sel, first_row_nr,
+                                       warn_num_text)  {
+
+  # select warnings issued by read_excel.
+
+  # Warning about expecting a numerical value in a cell should only be given
+  # for rows that are actually read.
   row_nrs <- which(row_sel) + first_row_nr - 1
 
-  pattern <- "((Expecting numeric)|(Coercing text to numeric)) in [A-Z]+(\\d+)"
+  pattern <- "^((Expecting numeric)|(Coercing text to numeric)) in [A-Z]+(\\d+)"
   warning_row_nrs <- as.numeric(str_match(warnings, pattern)[ , 5])
   sel <- is.na(warning_row_nrs) | warning_row_nrs %in% row_nrs
+  if (!warn_num_text) {
+    # remove warnings  about "Coercing text to numeric")
+    sel <- sel & !grepl("^Coercing text to numeric", warnings)
+  }
   return(warnings[sel])
 }

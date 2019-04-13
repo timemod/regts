@@ -43,13 +43,25 @@ test_that("example9.xlsx is read correctly",  {
 
 test_that("example10.xlsx is read correctly",  {
   xlsx_file <- "xlsx/example10.xlsx"
-  expect_warning(result <- read_ts_xlsx(xlsx_file, labels = "after",
-                                        skipcol = 1, strict = FALSE),
-                 "Coercing text to numeric in E8 / R8C5: '10.123'")
+  warnings1 <- capture_warnings(
+    result1 <- read_ts_xlsx(xlsx_file, labels = "after",
+                                        skipcol = 1, strict = FALSE)
+  )
+
   expected_result <- regts(matrix(c(1.12345678901234, NA, NA, 5, 6,
                                     10.123, NA, NA, 50, 60), ncol = 2),
                            names = c("a", "b"),
                            labels = paste("Timeseries", c("a", "b (EUR)")),
                            period =  "2010q2/2011q2")
-  expect_equal(result, expected_result)
+  expect_equal(result1, expected_result)
+  expect_known_output(warnings1, "expected_output/example10_warn1.txt",
+                      print = TRUE)
+
+  warnings2 <- capture_warnings(
+    result2 <- read_ts_xlsx(xlsx_file, labels = "after", skipcol = 1,
+                            strict = FALSE, warn_num_text = FALSE)
+  )
+  expect_equal(result2, expected_result)
+  expect_known_output(warnings2, "expected_output/example10_warn2.txt",
+                      print = TRUE)
 })

@@ -1,0 +1,2 @@
+[1] "Could not determine if timeseries are stored rowwise or columnwise.\nAssuming rowwise based on the number of periods found.\nUse argument rowwise if necessary."
+[2] "Coercing text to numeric in E8 / R8C5: '10.123'"                                                                                                                

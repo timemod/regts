@@ -54,6 +54,11 @@ standard format (see Description).}
 \item{strict}{A logical. If \code{TRUE} (the default) all periods between the
 start and the end period must be present.
 Otherwise the timeseries are filled with \code{NA} for the missing periods.}
+
+\item{warn_text_num}{A logical. If \code{TRUE} (the default) a warning is issued
+when a cell contains a number as text (e.g. \code{"2012.2"}) when
+a numeric value is expected. The text is always converted to a numeric value
+assuming the decimal separator \code{"."}.}
 }
 \value{
 a \code{regts} object
