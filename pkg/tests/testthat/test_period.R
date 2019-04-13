@@ -27,6 +27,9 @@ test_that("constructor period", {
   expect_identical(as.character(period(as.POSIXlt(d), frequency = 3)), "2010-2")
   expect_identical(as.character(period("2001-3", frequency = 9999)), "2001-0003")
 
+  expect_identical(as.character(period("Aug:2010")), "2010M08")
+  expect_identical(as.character(period("2010august")), "2010M08")
+  expect_identical(as.character(period("T2010august")), "2010M08")
 
 
   p <- period(as.Date(NA))

@@ -86,20 +86,28 @@ test_that("example3.xlsx is read correctly (leading empty rows and columns are s
 
   xlsx_file <- "xlsx/example3.xlsx"
 
-  result <- read_ts_xlsx(xlsx_file, period_fun = period_fun, frequency = 4,
+  result1 <- read_ts_xlsx(xlsx_file, period_fun = period_fun, frequency = 4,
                          strict = FALSE)
-  expect_identical(result, correct_result)
+  expect_identical(result1, correct_result)
 
-  # argument labels should have no effect if there are no labels
+  # argument labels should have no effect if there are no labels.
+  # we can also omit period_fun, since the period parser also understands
+  # full month names
+  expected_result2 <- regts(matrix(NA, ncol = 2), names = c("a", "b"),
+                           period = "2010m4/2011m04")
+  expected_result2[c(1, 10, 13), ] <- c(1, 5, 6, 10, 50, 60)
   result2 <- read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", NA)),
-                          labels = "after", period_fun = period_fun,
-                          strict = FALSE)
-  expect_identical(result2, correct_result)
+                          labels = "after", strict = FALSE)
+  expect_identical(result2, expected_result2)
+
+  expect_error(read_ts_xlsx(xlsx_file, range = cellranger::cell_cols(c("B", NA)),
+               labels = "after", strict = FALSE, frequency = 4),
+               "No periods found on sheet 1 of file xlsx/example3.xlsx")
 
   result3 <- read_ts_xlsx(xlsx_file, range = cellranger::cell_rows(c(2, NA)),
                           labels = "before", period_fun = period_fun,
                           strict = FALSE)
-  expect_identical(result2, correct_result)
+  expect_identical(result3, correct_result)
 
   result4 <- read_ts_xlsx(xlsx_file, range = cellranger::cell_rows(c(2, NA)),
                           labels = "before", period_fun = period_fun2,

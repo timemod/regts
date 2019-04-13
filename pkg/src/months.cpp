@@ -20,6 +20,18 @@ static void init_months() {
     months["oct"] = 10;
     months["nov"] = 11;
     months["dec"] = 12;
+
+    months["january"] = 1;
+    months["february"] = 2;
+    months["march"] = 3;
+    months["april"] = 4;
+    months["june"] = 6;
+    months["july"] = 7;
+    months["august"] = 8;
+    months["september"] = 9;
+    months["october"] = 10;
+    months["november"] = 11;
+    months["december"] = 12;
 }
 
 

@@ -3,7 +3,8 @@
 #' Function \code{period} creates a \code{period} object
 #' based on a character string or numeric scalar.
 #' Possible character string formats are for example \code{"2017Q2"},
-#' \code{"2017m2"}, \code{"2017"} or \code{"2017-2"}.
+#' \code{"2017m2"}, \code{"2017"}, \code{"2017-2"},
+#' \code{"aug 2017"} or \code{"august-2017"}.
 #' Possible numeric formats are for example \code{2017} or
 #' \code{2017.25} (the second quarter or the fourth month of 2017).
 #' The function also accepts a \code{\link{Date}},
@@ -32,7 +33,10 @@
 #'
 #' The format for monthly periods is similar as that of
 #' quarterly periods, except that the \code{"Q"} is replaced by
-#' \code{"M"}.
+#' \code{"M"}. Monthly periods may also be specified
+#' with a month name (possibly abbreviated) and year
+#' (e.g. \code{"aug 2017"}, \code{"2018-August"}). The parser only understands
+#' English month names.
 #'
 #' Periods with other frequencies than year, quarter and month can be specified
 #' as for example \code{"2017-2"}. Alternative

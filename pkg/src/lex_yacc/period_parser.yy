@@ -120,6 +120,8 @@ no_periodicity_2 : opt_t NUMBER opt_sep NUMBER   /* e.g. 2010/1 or 5/2010 */
 
 month:     MONTH_NAME opt_sep NUMBER  /* e.g. may 2012 */
             {year = $3; subperiod = $1; freq = 12;}
+          | opt_t NUMBER opt_sep MONTH_NAME /* e.g. 2010 aug */
+            {year = $2; subperiod = $4; freq = 12;}
 ;
 
 %%
