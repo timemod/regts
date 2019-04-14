@@ -319,17 +319,6 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
     is_period_row[1] <- FALSE
     col_nr <- Position(identity, is_period_row)
     if (is.na(col_nr)) return(NULL)
-    if (!rowwise_specified) {
-      # check rowwise/colwise again
-      is_period_col <- is_period_data(tbl[[col_nr]], frequency, xlsx,
-                                      period_fun)
-      rowwise <- is_rowwise(row_nr, col_nr, is_period_row, is_period_col,
-                            tbl, frequency, xlsx)
-      if (is.na(rowwise)) {
-        rowwise <- sum(is_period_row) >= sum(is_period_col)
-        rowwise_guessed <- TRUE
-      }
-    }
   }
 
   if (!rowwise && row_nr == first_row_nr) {
@@ -338,17 +327,6 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
     is_period_col[first_row_nr] <- FALSE
     row_nr <- Position(identity, is_period_col)
     if (is.na(row_nr)) return(NULL)
-    if (!rowwise_specified) {
-      # check rowwise/colwise again
-      row_data <- get_row_tbl(tbl, row_nr, xlsx)
-      is_period_row <- is_period_data(row_data, frequency, xlsx, period_fun)
-      rowwise <- is_rowwise(row_nr, col_nr, is_period_row, is_period_col,
-                            tbl, frequency, xlsx)
-      if (is.na(rowwise)) {
-        rowwise <- sum(is_period_row) >= sum(is_period_col)
-        rowwise_guessed <- TRUE
-      }
-    }
   }
 
 

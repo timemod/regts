@@ -327,17 +327,3 @@ test_that("weird periods in first column", {
   expect_equal(layout1_csv, expected_result1)
 
 })
-
-test_that("extra periods", {
-  tbl1 <- tibble(b = list("2010", NA, NA),
-                 c = list("2010q2", "2010q2", "2010q3"),
-                 d = list("a", 1, 2))
-  layout1 <- regts:::inspect_tibble(tbl1, frequency = NA, xlsx = TRUE)
-
-  expected_result1 <- list(rowwise = FALSE, period_col = 2L,
-                           first_data_row = 2L, last_data_col = 3L,
-                           is_data_col = c(FALSE, FALSE, TRUE),
-                           is_data_row = c(FALSE, TRUE, TRUE),
-                           names = "a", lbls = NULL)
-  expect_identical(layout1, expected_result1)
-})
