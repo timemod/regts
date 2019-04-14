@@ -219,27 +219,27 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
   if (is.na(first_row_nr)) return(NULL)
 
   found <- FALSE
-
   rowwise_specified <- !missing(rowwise)
+  rowwise_guessed <- FALSE
 
   if (rowwise_specified && !rowwise) {
     # columnwise
 
     for (col_nr in 1:ncol(tbl)) {
-      is_period <- is_period_data(tbl[[col_nr]], frequency, xlsx, period_fun)
-      if (any(is_period)) {
-        last_row <- Position(function(x) {x}, is_period, right = TRUE)
-        if (last_row > first_row_nr) {
-          # If last_row == first_row_nr, there is a single period in the first
-          # non-empty row. Since there is no room for possible variable names,
-          # we have probably not found the real period column yet.
-          found <- TRUE
-          break
-        }
+      is_period_col <- is_period_data(tbl[[col_nr]], frequency, xlsx,
+                                      period_fun)
+      if (!any(is_period_col)) next
+      last_row <- Position(identity, is_period_col, right = TRUE)
+      if (last_row > first_row_nr) {
+        # If last_row == first_row_nr, there is a single period in the first
+        # non-empty row. Since there is no room for possible variable names,
+        # we have probably not found the real period column yet.
+        found <- TRUE
+        break
       }
     }
 
-    if (found) row_nr <- Position(function(x) {x}, is_period)
+    if (found) row_nr <- Position(identity, is_period_col)
 
   }  else {
 
@@ -249,74 +249,78 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
     for (row_nr in first_row_nr:nrow(tbl)) {
       row_data <- get_row_tbl(tbl, row_nr, xlsx)
       is_period_row <- is_period_data(row_data, frequency, xlsx, period_fun)
-      if (any(is_period_row)) {
-        col_nr <- Position(identity, is_period_row)
-        if (!rowwise_specified) {
-          if (row_nr == first_row_nr) {
-            rowwise <- TRUE
-          } else if (col_nr == 1 && sum(is_period_row) == 1) {
-            rowwise <- FALSE
-            is_period_col <- is_period_data(tbl[[col_nr]], frequency, xlsx,
-                                            period_fun)
-          } else {
+      if (!any(is_period_row)) next
+      col_nr <- Position(identity, is_period_row)
+      if (!rowwise_specified) {
+        is_period_row_sum <- sum(is_period_row)
+        if (row_nr == first_row_nr) {
+          # If a period occurs in the first non-empty row, then we assume
+          # rowwise. This may not always be correct.
+          rowwise <- TRUE
+        } else if (col_nr == 1 && is_period_row_sum == 1) {
+          # If a period occurs in the first column and there are no periods
+          # in other columns on the same row, then assume columnwise.
+          rowwise <- FALSE
+          is_period_col <- is_period_data(tbl[[col_nr]], frequency, xlsx,
+                                          period_fun)
+        } else {
+          is_period_col <- is_period_data(tbl[[col_nr]], frequency, xlsx,
+                                          period_fun)
+          rowwise <- is_rowwise(row_nr, col_nr, is_period_row, is_period_col,
+                                tbl, frequency, xlsx)
+          if (!is.na(rowwise) && rowwise && col_nr == 1 &&
+              is_period_row_sum > 1) {
+            # If the first rowwise period occurs in the first column, then
+            # that period is ignored, because that column should contain
+            # variable names (see code below). Therefore check again if the
+            # timeseries could be stored columnwise for the next period.
+            is_period_row[1] <- FALSE
+            col_nr <- Position(identity, is_period_row)
             is_period_col <- is_period_data(tbl[[col_nr]], frequency, xlsx,
                                             period_fun)
             rowwise <- is_rowwise(row_nr, col_nr, is_period_row, is_period_col,
                                   tbl, frequency, xlsx)
-            if (!is.na(rowwise) && rowwise && col_nr == 1 &&
-                sum(is_period_row) > 1) {
-              # If the first rowwise period occurs in the first column, then
-              # that period is ignored, because that column should contain
-              # variable names (see code below). Therefore check again if the
-              # timeseries could be stored columnwise for the next period.
-              is_period_row[1] <- FALSE
-              col_nr <- Position(identity, is_period_row)
-              is_period_col <- is_period_data(tbl[[col_nr]], frequency, xlsx,
-                                              period_fun)
-              rowwise <- is_rowwise(row_nr, col_nr, is_period_row, is_period_col,
-                                    tbl, frequency, xlsx)
-            }
-
-
-
-            if (is.na(rowwise)) {
-              # Fall back case" if every other test failed, use the total number of
-              # rowwise / colwise periods.
-              rowwise <- sum(is_period_row) >= sum(is_period_col)
-              text <- if (rowwise) "rowwise" else  "columnwise"
-              warning(paste("Could not determine if timeseries are stored rowwise",
-                            "or columnwise.\nAssuming" , text, "based on the",
-                            "number of periods found.\nUse argument rowwise if",
-                            "necessary."))
-
-            }
           }
-        }
-        if (rowwise) {
-          last_col <- Position(identity, is_period_row, right = TRUE)
-          if (last_col > 1) {
-            # If last_col == 1, there is a single period in the first column.
-            # Since there is no room for possible variable names,
-            # we have probably not found the real period row yet.
-            found <- TRUE
-            break
-          }
-        } else {
-          last_row <- Position(identity, is_period_col, right = TRUE)
-          if (last_row > 1) {
-            found <- TRUE
-            break
+
+          if (is.na(rowwise)) {
+            # Fall back case" if every other test failed, use the total number of
+            # rowwise / colwise periods.
+            rowwise <- sum(is_period_row) >= sum(is_period_col)
+            rowwise_guessed <- TRUE
+          } else {
+            rowwise_guessed <- FALSE
           }
         }
       }
-    }
 
-    if (found) {
-      is_period <- if (rowwise) is_period_row else is_period_col
+      if (rowwise) {
+        last_col <- Position(identity, is_period_row, right = TRUE)
+        if (last_col > 1) {
+          # If last_col == 1, there is a single period in the first column.
+          # Since there is no room for possible variable names,
+          # we have probably not found the real period row yet.
+          found <- TRUE
+          break
+        }
+      } else {
+        last_row <- Position(identity, is_period_col, right = TRUE)
+        if (last_row > 1) {
+          found <- TRUE
+          break
+        }
+      }
     }
   }
 
   if (!found) return(NULL)
+
+  if (rowwise_guessed) {
+    text <- if (rowwise) "rowwise" else  "columnwise"
+    warning(paste("Could not determine if timeseries are stored rowwise",
+                  "or columnwise.\nAssuming" , text, "based on the",
+                  "number of periods found.\nUse argument rowwise if",
+                  "necessary."))
+  }
 
   if (rowwise) {
 
@@ -326,30 +330,30 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
       # a period on the first column for a rowwise timeseries should be ignored,
       # because the column to the left of the first data column should contain
       # variable names
-      is_period[1] <- FALSE
-      first_data_col <- Position(identity, is_period)
+      is_period_row[1] <- FALSE
+      first_data_col <- Position(identity, is_period_row)
       if (is.na(first_data_col)) return(NULL)
     }
 
-    last_data_col <- Position(identity, is_period, right = TRUE)
+    last_data_col <- Position(identity, is_period_row, right = TRUE)
 
-    period_data <- get_row_tbl(tbl[row_nr, is_period], 1, xlsx = xlsx)
+    period_data <- get_row_tbl(tbl[row_nr, is_period_row], 1, xlsx = xlsx)
     periods <- get_periods_data(period_data, frequency, xlsx, period_fun)
 
     return(list(rowwise = TRUE, period_row = row_nr,
                 first_data_col = first_data_col, last_data_col = last_data_col,
-                is_data_col = is_period, periods = periods))
+                is_data_col = is_period_row, periods = periods))
 
   } else {
     # columnwise timeseries
 
     first_data_row <- row_nr
 
-    if (is_period[first_row_nr]) {
+    if (is_period_col[first_row_nr]) {
       # if the first period row is the first non-empty row, then
       # ignore that period, since the row should contain variable names
-      is_period[first_row_nr] <- FALSE
-      first_data_row <- Position(identity, is_period)
+      is_period_col[first_row_nr] <- FALSE
+      first_data_row <- Position(identity, is_period_col)
       if (is.na(first_data_row)) return(NULL)
     }
 
@@ -361,8 +365,9 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
 
     return(list(rowwise = FALSE, period_col = period_col,
                 first_data_row = first_data_row, last_data_col = last_data_col,
-                is_data_col = name_info$col_has_name, is_data_row = is_period,
-                names = name_info$names, lbls = name_info$lbls))
+                is_data_col = name_info$col_has_name,
+                is_data_row = is_period_col, names = name_info$names,
+                lbls = name_info$lbls))
   }
 }
 
@@ -719,7 +724,7 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
 
 get_labels_from_tbl <- function(label_tbl, rowwise) {
   label_tbl[] <- lapply(label_tbl, FUN = function(x)
-              {ifelse(is.na(x),  "", as.character(x))})
+               {ifelse(is.na(x),  "", as.character(x))})
   if (!rowwise) {
     label_tbl <- as_tibble(t(label_tbl), .name_repair = "minimal")
   }
