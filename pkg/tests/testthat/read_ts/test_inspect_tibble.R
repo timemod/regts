@@ -69,8 +69,7 @@ test_that("test2", {
   expect_null(info1)
 
   tbl2 <- tibble(a = list("2010", 1, 2), b = list("aap", 3, 4))
-  expect_warning(info2 <- regts:::inspect_tibble(tbl2, frequency = NA,
-                                                 xlsx = TRUE), wmsg_cw)
+  info2 <- regts:::inspect_tibble(tbl2, frequency = NA, xlsx = TRUE)
   expect_identical(info2, list(rowwise = FALSE, period_col = 1L,
                                first_data_row = 2L, last_data_col = 2L,
                                is_data_col = c(FALSE, TRUE),
@@ -312,15 +311,33 @@ test_that("weird periods in first column", {
 
   layout1 <- regts:::inspect_tibble(tbl1, frequency = NA, xlsx = TRUE)
 
-  expected_result1 <- list(rowwise = TRUE, period_row = 2L,
-                           first_data_col = 2L, last_data_col = 3L,
-                           is_data_col = c(FALSE, TRUE, TRUE),
-                           periods = period(c("2010q2", "2010q3")))
+  expected_result1 <- list(rowwise = FALSE, period_col = 1L,
+                           first_data_row = 2L, last_data_col = NA_real_,
+                           is_data_col = c(FALSE, FALSE, FALSE),
+                           is_data_row = c(FALSE, TRUE, TRUE, TRUE),
+                           names = character(0), lbls = NULL)
   expect_equal(layout1, expected_result1)
 
-  layout1_csv <-  regts:::inspect_tibble(get_csv_tbl(tbl1), frequency = NA,
+  tbl1_csv <- tibble(b = c("2010", "2010q1", 1, 2),
+                 c = c(NA, "2010q2", 1, 2),
+                 d = c(NA, "2010q3", 1, 2))
+
+  layout1_csv <-  regts:::inspect_tibble(tbl1_csv, frequency = NA,
                                          xlsx = FALSE)
   expect_equal(layout1_csv, expected_result1)
 
 })
 
+test_that("extra periods", {
+  tbl1 <- tibble(b = list("2010", NA, NA),
+                 c = list("2010q2", "2010q2", "2010q3"),
+                 d = list("a", 1, 2))
+  layout1 <- regts:::inspect_tibble(tbl1, frequency = NA, xlsx = TRUE)
+
+  expected_result1 <- list(rowwise = FALSE, period_col = 2L,
+                           first_data_row = 2L, last_data_col = 3L,
+                           is_data_col = c(FALSE, FALSE, TRUE),
+                           is_data_row = c(FALSE, TRUE, TRUE),
+                           names = "a", lbls = NULL)
+  expect_identical(layout1, expected_result1)
+})
