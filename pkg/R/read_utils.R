@@ -250,19 +250,50 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
       row_data <- get_row_tbl(tbl, row_nr, xlsx)
       is_period_row <- is_period_data(row_data, frequency, xlsx, period_fun)
       if (any(is_period_row)) {
-        col_nr <- Position(function(x) {x}, is_period_row)
+        col_nr <- Position(identity, is_period_row)
         if (!rowwise_specified) {
           if (row_nr == first_row_nr) {
             rowwise <- TRUE
+          } else if (col_nr == 1 && sum(is_period_row) == 1) {
+            rowwise <- FALSE
+            is_period_col <- is_period_data(tbl[[col_nr]], frequency, xlsx,
+                                            period_fun)
           } else {
             is_period_col <- is_period_data(tbl[[col_nr]], frequency, xlsx,
                                             period_fun)
             rowwise <- is_rowwise(row_nr, col_nr, is_period_row, is_period_col,
                                   tbl, frequency, xlsx)
+            if (!is.na(rowwise) && rowwise && col_nr == 1 &&
+                sum(is_period_row) > 1) {
+              # If the first rowwise period occurs in the first column, then
+              # that period is ignored, because that column should contain
+              # variable names (see code below). Therefore check again if the
+              # timeseries could be stored columnwise for the next period.
+              is_period_row[1] <- FALSE
+              col_nr <- Position(identity, is_period_row)
+              is_period_col <- is_period_data(tbl[[col_nr]], frequency, xlsx,
+                                              period_fun)
+              rowwise <- is_rowwise(row_nr, col_nr, is_period_row, is_period_col,
+                                    tbl, frequency, xlsx)
+            }
+
+
+
+            if (is.na(rowwise)) {
+              # Fall back case" if every other test failed, use the total number of
+              # rowwise / colwise periods.
+              rowwise <- sum(is_period_row) >= sum(is_period_col)
+              text <- if (rowwise) "rowwise" else  "columnwise"
+              warning(paste("Could not determine if timeseries are stored rowwise",
+                            "or columnwise.\nAssuming" , text, "based on the",
+                            "number of periods found.\nUse argument rowwise if",
+                            "necessary."))
+
+            }
           }
         }
         if (rowwise) {
-          last_col <- Position(function(x) {x}, is_period_row, right = TRUE)
+          last_col <- Position(identity, is_period_row, right = TRUE)
           if (last_col > 1) {
             # If last_col == 1, there is a single period in the first column.
             # Since there is no room for possible variable names,
@@ -271,7 +302,7 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
             break
           }
         } else {
-          last_row <- Position(function(x) {x}, is_period_col, right = TRUE)
+          last_row <- Position(identity, is_period_col, right = TRUE)
           if (last_row > 1) {
             found <- TRUE
             break
@@ -281,7 +312,7 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
     }
 
     if (found) {
-      is_period <- if(rowwise) is_period_row else is_period_col
+      is_period <- if (rowwise) is_period_row else is_period_col
     }
   }
 
@@ -340,12 +371,9 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
 
   #
   # This function tries to determine if the timeseries are stored rowwise
-  # or columnwise.
+  # or columnwise. This function makes the assumption that the cell
+  # (row_nr, col_nr) is definitively a period.
   #
-
-  if (col_nr == 1) {
-    return(FALSE)
-  }
 
   # possible periods above the current row should be ignored.
   is_period_col[1:(row_nr - 1)] <- FALSE
@@ -507,20 +535,8 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
     }
   }
 
-  #
-  # FALL BACK CASE
-  #
-
-  # Fall back case" if every other test failed, use the total number of
-  # rowwise / colwise periods.
-  is_rowwise <- is_period_row_sum >= is_period_col_sum
-
-  text <- if (is_rowwise) "rowwise" else  "columnwise"
-  warning(paste("Could not determine if timeseries are stored rowwise or",
-                "columnwise.\nAssuming" , text, "based on the number of periods",
-                "found.\nUse argument rowwise if necessary."))
-
-  return(is_rowwise)
+  # we have been unable to determine is the timeseries are stored rowwise
+  return(NA)
 }
 
 
