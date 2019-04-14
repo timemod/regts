@@ -1,1 +1,1 @@
-[1] "Could not determine if timeseries are stored rowwise or columnwise.\nAssuming rowwise based on the number of periods found.\nUse argument rowwise if necessary."
+character(0)

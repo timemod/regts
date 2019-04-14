@@ -179,6 +179,9 @@ LogicalVector is_period_text(std::vector<std::string> strings,
           if (!ISNA(per.freq) && per.subperiod > per.freq) {
               out[i] = false;
           }
+          if (ISNA(per.freq) && ISNA(frequency)) {
+              out[i] = false;
+          }
      }
      return out;
 }
