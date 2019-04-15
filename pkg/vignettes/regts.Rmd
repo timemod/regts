@@ -496,7 +496,7 @@ write_ts_xlsx(rts, "data.xlsx", sheet_name = "extra", append = TRUE)
 
 In this case a sheet 'extra' is appended to the xlsx file.
 
-### Period function
+### Period conversion
 
 Sometimes the periods in a file are not recognised by `read_ts_xlsx` or
 `read_ts_csv`. For example, Dutch month names are used, as in the following
@@ -505,13 +505,13 @@ example:
 cat(readLines("period.csv"), sep = "\n")
 ```
 
-Since `regts` does not understand Dutch month names, we have to convert these
-periods to a standard format. This is possible by using argument `period_fun` 
-of function `read_ts_xlsx` or `read_ts_csv`. `period_fun` is a function that
-converts a text to a format that `regts` recognises.
-To convert the Dutch month names we can employ function `dmy` (day-month-year) of 
-package `lubridate`. This function can converts texts such as `"1 mei 2019"` to a
-`Date` object which can then be easily formatted to a standard period in 
+`regts` only understands English month names.
+To read this file, we can use argument  `period_fun`  to specify a function that
+converts a text to a format that `regts` recognises. 
+Function `dmy` (day-month-year) of 
+package `lubridate` can be used to convert Dutch month names.  This function 
+can converts texts such as `"1 mei 2019"` 
+to a `Date` object which can be easily formatted to a standard period in 
 `regts` format. Thus we must add a day 1 before the month as shown  in the 
 example below.
 
@@ -524,8 +524,10 @@ period_fun <- function(per) {
   # convert input to day-month-year (add day 1) so we can use function dmy
   per <- paste("1", per)
   
-  # use locale "Dutch". This work on Windows only (on Linux use "nl_NL.utf8").
+  # use locale "Dutch". This work on Windows only.
   date <- lubridate::dmy(per, locale = "Dutch", quiet = TRUE)
+  
+  # convert Date to string in regts format and return 
   return(format(date, "%YM%m"))
 }
 # Example
@@ -538,7 +540,7 @@ period_fun("mei 2019")
 
 # try to set the locale to Dutch 
 tryCatch({
-  Sys.setlocale("Dutch")
+  Sys.setlocale("LC_TIME", "Dutch")
   dutch_loc_present <<- TRUE
 }, warning = function(w) {
   dutch_loc_present <<- FALSE
@@ -560,17 +562,19 @@ if (dutch_loc_present) {
 
 Function `dmy` has a language/country parameter (`locale`),  which must be 
 set if the current locale is not Dutch.  In the example above, we used the
-name of the Dutch locale on Windows[^1]. Obviously this code only works if
-the Dutch locale has been installed. 
+name of the Dutch locale on Windows[^1]. Obviously this code only works on Windows
+if the Dutch locale has been installed. 
 
 [^1]: The names of the locales are platform dependent. For example, the Dutch
-locale is `"Dutch"` on Windws and `"nl_NL\.utf8"` on Linux.
+locale is `"Dutch"` on Windws and `"nl_NL.utf8"` on Linux.
 
 With function `period_fun` defined above we can read an `xlsx` file as 
 follows:
 ```{r eval = FALSE}
 read_ts_xlsx("period.xlsx", period_fun = period_fun)
 ```
+
+
 ```{r echo = FALSE, results = "hide"}
 if (dutch_loc_present) {
   read_ts_xlsx("period.xlsx", period_fun = period_fun)
