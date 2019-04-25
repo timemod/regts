@@ -32,6 +32,10 @@ test_that("constructor period", {
   expect_identical(as.character(period("T2010august")), "2010M08")
 
 
+  expect_identical(as.character(period("2018 1234", frequency = 2000)),
+                   "2018-1234")
+
+
   p <- period(as.Date(NA))
   expect_identical(as.numeric(p), NA_real_)
   expect_identical(p, period(NA, frequency = 12))
@@ -83,8 +87,10 @@ test_that("errors", {
                     "in period 2001Q4."))
   expect_error(period("xxx"), "Illegal period xxx")
   expect_error(period("2010M2a"), "Illegal period 2010M2a")
+  expect_error(period("20103"), "Illegal period 20103")
   expect_error(period("2010z2"), "Illegal period 2010z2")
   expect_error(period("a2010M2"), "Illegal period a2010M2")
+  expect_error(period("-2m2"), "Illegal period -2m2")
 
   expect_error(period("2010Q8"), "Illegal period 2010Q8")
   expect_error(period("2010.0", frequency = 12), "Illegal period 2010.0")
@@ -100,6 +106,13 @@ test_that("errors", {
 
   msg <- "12 is not divisible by frequency timeseries \\(5\\)."
   expect_error(as.Date(period("2010-3", frequency = 5)), msg)
+
+  expect_error(period("2018 1234"),
+               paste("Frequency of period 2018 1234 unknown.",
+                     "Specify argument frequency."))
+  expect_error(period("2018 1234", frequency = 4),
+               paste("Subperiod of period 2018 1234 is larger than the",
+                     "specified frequency 4"))
 })
 
 test_that("frequency", {
