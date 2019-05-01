@@ -294,13 +294,13 @@ print.tsdif <- function(x, ...) {
         # absolute values to get largest values per timeseries with function max
         absdif <- abs(dif)
         maxdif <- as.numeric(apply(absdif, FUN = max, MARGIN = 2))
-        # print only nmax values
-        maxdif <- maxdif[1:nmax]
 
         # reorder maxdif, with Na's first
         # maxdif can contain Na values, we want to print them first, followed
         # by names with highest differences
         max_index <- order(maxdif, decreasing = TRUE, na.last = FALSE)
+        # print only nmax values
+        max_index <- max_index[1:nmax]
 
         # find period index of maxdif values, if NA search for position NA
         period_index_func <- function(i){
