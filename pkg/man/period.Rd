@@ -71,7 +71,7 @@ separators (blank, dot, etc.) are possible. In this case argument
 \code{frequency} should be specified.
 
 The string format is case insensitive, and may be prefixed
-with \code{"Y"} or \code{"T"}. Thus for exampe \code{"t2017q3"}
+with \code{"Y"} or \code{"T"}. Thus for example \code{"t2017q3"}
 is also an allowed period string.
 
 \strong{numeric format}
@@ -109,8 +109,8 @@ as.period(p)
 d <- Sys.Date()
 period(d)
 
-# create a sequence of period objects
-seq(period("2018q2"), period("2019q4"))
+# create a vector of period objects
+period(c(period("2018q2"), period("2019q4")))
 }
 \seealso{
 \code{\link{period_range}} and \code{\link{seq}}

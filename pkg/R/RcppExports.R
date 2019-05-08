@@ -25,7 +25,7 @@ is_period_text <- function(strings, frequency) {
     .Call(`_regts_is_period_text`, strings, frequency)
 }
 
-#' Returns the \link{period_range} of a timeseries.
+#' Return the \link{period_range} of a timeseries.
 #'
 #' @param x a timeseries (\link{ts} or \link{regts})
 #' @return a \code{period_range}

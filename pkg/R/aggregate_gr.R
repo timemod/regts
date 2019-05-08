@@ -5,7 +5,7 @@
 #' relative or percentage changes, the 'cumulative growth methods'. There are
 #' four different type of methods for different types of input timeseries.
 #'
-#' The \code{dif1s} and \code{dif} methods assume that the input timeseries
+#' The \code{dif1s} and \code{dif1} methods assume that the input timeseries
 #' contain a first difference of length 1 (for \code{dif1s} the input is also
 #' scaled). The result is a first difference of length 1 in the output frequency.
 #' The \code{pct} and \code{rel} methods assume timeseries that contain
@@ -15,7 +15,7 @@
 #' More details of the aggregation methods are  provided in the Vignette
 #' "Introduction to package regts".
 #'
-#' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object
+#' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} object
 #' @param nfrequency the frequency of the result. This should be higher than
 #' the frequency of timeseries \code{x}
 #' @param method Aggregation method: \code{"dif1s"}, \code{"dif1"}, \code{"pct"}

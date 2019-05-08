@@ -1,7 +1,7 @@
 #' Create a \code{\link{period}} object
 #'
 #' Function \code{period} creates a \code{period} object
-#' based on a character string or numeric scalar.
+#' based on a character or numeric vector.
 #' Possible character string formats are for example \code{"2017Q2"},
 #' \code{"2017m2"}, \code{"2017"}, \code{"2017-2"},
 #' \code{"aug 2017"} or \code{"august-2017"}.
@@ -15,8 +15,8 @@
 #' Function \code{as.period}
 #' coerces an R object to a \code{period} object if possible.
 #'
-#' The function \code{period} accepts a character string or
-#' a numeric scalar as arguments. The specific format is described below.
+#' The function \code{period} accepts a character or numeric vector
+#' as arguments. The specific format is described below.
 #'
 #' \strong{string format}
 #'
@@ -44,7 +44,7 @@
 #' \code{frequency} should be specified.
 #'
 #' The string format is case insensitive, and may be prefixed
-#' with \code{"Y"} or \code{"T"}. Thus for exampe \code{"t2017q3"}
+#' with \code{"Y"} or \code{"T"}. Thus for example \code{"t2017q3"}
 #' is also an allowed period string.
 #'
 #' \strong{numeric format}
@@ -93,8 +93,8 @@
 #' d <- Sys.Date()
 #' period(d)
 #'
-#' # create a sequence of period objects
-#' seq(period("2018q2"), period("2019q4"))
+#' # create a vector of period objects
+#' period(c("2018q2", "2019q4"))
 #' @importFrom Rcpp sourceCpp
 #' @seealso \code{\link{period_range}} and \code{\link{seq}}
 #' @export
@@ -292,7 +292,7 @@ get_subperiod__ <- function(x) {
   return(as.numeric(x) %% frequency(x) + 1)
 }
 
-#' Return the year of a \code{\link{period}}
+#' This function returns the year of a \code{\link{period}}
 #' @param x a \code{\link{period}}
 #' @return the year
 #' @examples
@@ -430,6 +430,13 @@ Summary.period <- function(..., na.rm = FALSE){
 #' seq(p1, length.out = 4)
 #' seq(p1, "2019q4")
 #' seq(p1, "2019q4", by = 2)
+#'
+#' # use seq in a for loop
+#' ts <- regts(1:10, start = "2018q1")
+#' seqp <- seq(period("2018q1"), "2020q1", by = 4)
+#' print first quarters ts
+#' for (i in as.list(seqp)){print(ts[i])}
+#'
 #' @seealso \code{\link[regts]{period}} and \code{\link[regts]{period_range}}
 #' @export
 seq.period <- function(from, to, by, length.out, ...) {

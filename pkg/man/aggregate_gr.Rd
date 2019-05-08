@@ -9,7 +9,7 @@ aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"),
   nfrequency = 1)
 }
 \arguments{
-\item{x}{a \code{\link[stats]{ts}} of \code{\link{regts}} object}
+\item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object}
 
 \item{method}{Aggregation method: \code{"dif1s"}, \code{"dif1"}, \code{"pct"}
 or \code{"rel"}. See details.}
@@ -26,7 +26,7 @@ relative or percentage changes, the 'cumulative growth methods'. There are
 four different type of methods for different types of input timeseries.
 }
 \details{
-The \code{dif1s} and \code{dif} methods assume that the input timeseries
+The \code{dif1s} and \code{dif1} methods assume that the input timeseries
 contain a first difference of length 1 (for \code{dif1s} the input is also
 scaled). The result is a first difference of length 1 in the output frequency.
 The \code{pct} and \code{rel} methods assume timeseries that contain

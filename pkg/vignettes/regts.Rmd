@@ -292,7 +292,7 @@ ts["2017"]
 ```
 
 If a selection is specified outside the defined range, the timeseries is filled 
-with NA values for that range:
+with `NA` values for that range:
 
 ```{r}
 ts["/2018q2"]
@@ -314,7 +314,7 @@ The period of the timeseries can also be extended:
 rts1["2009q1/2009q2"] <- rts1["2010q3/2010q4"]
 rts1
 ```
-The missing quarters (`2009q3` and `2009q4`) are filled in with NA values.
+The missing quarters (`2009q3` and `2009q4`) are filled in with `NA` values.
 
 <!-- Special header: a bold line with some whitespace before, because we
 want no header in the table of contents -->
@@ -333,7 +333,7 @@ rts["2011q2"]                      # the , is not necessary
 rts["2011q1/2012q2", c("b","c")]   # extended selection
 ```
 
-All the extended elements become NA.
+All the extended elements become `NA`.
 
 Select a combination of period and columns:
 
@@ -413,11 +413,9 @@ Sometimes the csv file is transposed, as in the following example:
 cat(readLines("transpose.csv"), sep = "\n")
 ```
 
-Now the periods are in the first row (column headers), the next rows contain the 
-timeseries. Note that `;` is the field separator and that quarter `2017q3` is
-missing in the file, which is why parameter `strict is needed. By default 
-(`strict = TRUE`) is checked if the period is complete. When  `strict = FALSE`
-NA's are filled in for the missing periods.
+Now the periods are in the first row (column headers), the next rows contain the timeseries. Note that `;` is the field separator and that quarter `2017q3` is missing in the file, which is why parameter `strict is needed. By default 
+(`strict = TRUE`) is checked if the period is complete. When `strict = FALSE`
+`NAs` are filled in for the missing periods.
 
 
 ```{r}
@@ -427,7 +425,7 @@ The `sep` argument is not needed, separator `;` (as well as `,` and `tab`) is re
 
 Since `regts` (&agrave;nd `ts`) objects always have a continuous period^[`regts` 
 and `ts` objects are regular timeseries. Packages `xts` and `zoo` provide also 
-irregularly spaced timeseries objects. Then periods can be missing.], the missing quarters are filled with NA values.
+irregularly spaced timeseries objects. Then periods can be missing.], the missing quarters are filled with `NA` values.
 
 The timeseries names in this file are in uppercase. You can convert them while
 reading:
@@ -480,10 +478,7 @@ When reading this file a `regts` object is returned:
 read_ts_xlsx("series.xlsx", skiprow = 2, name_fun = tolower, na_string = c("","NA"))
 ```
 
-The function skips the first 2 lines, analyses where the period begins, converts
-the timeseries names to lowercase and recognises that empty cells and cells with
-text `NA` are not available.
-
+The function skips the first 2 lines, analyses where the period begins, converts the timeseries names to lowercase and recognises that empty cells and cells with text `NA` are not available.
 
 Function `write_ts_xlsx` is used for writing a `regts` object to an xlsx file.
 It creates or opens an Excel workbook depending on argument `append`. Appending
@@ -667,6 +662,8 @@ Now check the labels:
 ts_labels(series)
 ```
 
+By default labels are read from columns between the names column and the data columns. Use argument `labels = no` to prevent this.
+
 Labels and timeseries can also be stored columnwise:
 
 ```{r echo = FALSE, comment=""}
@@ -677,7 +674,7 @@ Read this file with result `tseries` and look at the labels:
 
 
 ```{r}
-tseries <- read_ts_xlsx("testlabels.xlsx", labels = "after")
+tseries <- read_ts_xlsx("testlabels.xlsx", labels = "before")
 ts_labels(tseries)
 ```
 
@@ -817,7 +814,7 @@ cbind(rt1, rt2, union = TRUE)
 ```{r}
 cbind(rt1, rt2, union = FALSE)
 ```
-For `union = TRUE` the result is padded with NA's if needed.
+For `union = TRUE` the result is padded with `NAs` if needed.
 
 ```{r echo = FALSE, results = "hide"}
 data <- matrix(1:8, ncol = 2)
@@ -920,10 +917,7 @@ The elements `e` and `f` are repeated for the whole period and the value `TRUE` 
 Sometimes you want to use a multivariate timeseries to update another
 multivariate timeseries. Function `update_ts` updates the columns of a timeseries with the values in the columns of another timeseries with the same name. 
 
-Of course the two timeseries must have the same frequency
-but their period ranges may be different (non overlapping periods will be set to
-NA). For the result timeseries the union of the ranges is taken. There are 
-three different methods to deal with NA values. Possible methods for this function `update_ts` are:
+Of course the two timeseries must have the same frequency but their period ranges may be different (non overlapping periods will be set to `NA`). For the result timeseries the union of the ranges is taken. There are three different methods to deal with `NA` values. Possible methods for this function `update_ts` are:
 
 \newpage
 
@@ -931,7 +925,7 @@ three different methods to deal with NA values. Possible methods for this functi
 
 * `replace` replace the first timeseries with the second timeseries
 
-* `updna` only replace NA values in the first timeseries with values from the second timeseries
+* `updna` only replace `NA` values in the first timeseries with values from the second timeseries
 
 * `updval` only use valid values in the second timeseries to update the first
 timeseries
@@ -951,7 +945,7 @@ update_ts(series1, series2, method = "upd")
 update_ts(series1, series2, method = "updna")
 update_ts(series1, series2, method = "updval")
 ```
-In the first result as much values as possible are updated. A difference between the second and the last result: variable "a" is left unchanged, because it is not "NA", or updated, because of valid values in the second series.
+In the first result as much values as possible are updated. A difference between the second and the last result: variable "a" is left unchanged, because it is not `NA`, or updated, because of valid values in the second series.
 
 
 
@@ -1027,10 +1021,10 @@ period or the period_range, as shown further on in this section.
 A `period` object can be created with the `period` function. 
 
 ```{r}
-prd1 <- period("2016q4")
+prd <- period("2016q4")
+prd
+prd1 <- period("2015-2", frequency = 4)
 prd1
-prd2 <- period("2015-2", frequency = 4)
-prd2
 ```
 
 In the last example the `frequency` has to be specified. `"2015-2"` is 
@@ -1039,19 +1033,27 @@ a month indicator or a half year. The `frequency` argument is required if you
 want to define a period with a frequency other than 1, 4 or 12, since there is 
 no special format for these frequencies.
 
+A `period` object may contain several periods of the same frequency.
+In the next example a period vector is created of length 2:
+
+```{r}
+prd2 <- period(c("2019q1", "2020q3"))
+prd2
+```
+
 Special functions have been designed for the `period` class e.g. to extract 
 a subperiod or the year:
 
 ```{r}
-get_subperiod(prd1)
-get_year(prd2)
+get_subperiod(prd2)
+get_year(prd1)
 ```
 
 `period` objects can be used as input for the `start` and `end` arguments of 
 the `regts` function.
 
 ```{r eval = TRUE}
-ts    <- regts(1:10, start = prd1)
+ts    <- regts(1:10, start = prd)
 ```
 
 When printed, a `period` variable seems to be nothing more than a character 
@@ -1075,11 +1077,15 @@ range
 period_range("2014q4/2017q4")
 ```
 
-The lower or upper bound of the range may be undetermined:
+The lower or upper bound of the range may be undetermined, by skipping arguments or using `NULL`:
+
 
 ```{r}
 period_range("2017q1", NULL)      # No upper bound
+period_range( , "2017q1")         # No lower bound
 ```
+
+Use equal periods, like `period_range("2021q2", "2021q2")`, to create a range of one period.
 
 A `period_range` variable can be used in the `regts` function, specifying the 
 `period` argument:
@@ -1109,26 +1115,6 @@ end_period(range1)
 range2 <- period_range(start_period(range1)+1, end_period(range1)-1)
 ts <- regts(data, period = range2)
 ```
-
-## Shifting period(s)\label{shifting}
-With operators `+` and `-` the period can be shifted. Some examples for `period`: 
-
-```{r}
-period("2016q4") + 1
-p1 <- period("2015q1")
-p1-5
-```
-
-And for a `period_range`:
-
-```{r}
-period_range("2016q4", "2017q4") + 1
-period_range(p1, p1+4)            # a `period` as input
-```
-
-Note that one of the operands must be numeric^[Command `period("2015q1") + period("2015q2")` results in an error message: 'Arithmetic operation on two 
-periods is not allowed.'].
-
 
 ## Selection with period(_range) objects
 
@@ -1164,6 +1150,39 @@ rts
 Note that because timeseries `xx` is created with an extended period, all 
 timeseries in (multivariate regts) object `rts` are extended.
 
+## Period vectors
+Two functions are available for creating a vector of consecutive periods: `get_periods` and `seq`.
+Function `get_periods` returns a period vector of all periods in a range or
+timeseries:
+```{r}
+get_periods(period_range("2019.1q", "2020.1q"))
+```
+
+Function `seq` creates a sequence of periods, based on a start and an end period:
+```{r}
+seq(period("2019.1q"), period("2020.1q"))
+```
+
+Unfortunately a period vector cannot be used directly in a for-loop. First convert the vector, e.g. to a list or to a character vector.
+
+## Shifting period(s)\label{shifting}
+With operators `+` and `-` the period can be shifted. Some examples for `period`: 
+
+```{r}
+period("2016q4") + 1
+p1 <- period("2015q1")
+p1-5
+```
+
+And for a `period_range`:
+
+```{r}
+period_range("2016q4", "2017q4") + 1
+period_range(p1, p1+4)            # a `period` as input
+```
+
+Note that one of the operands must be numeric^[Command `period("2015q1") + period("2015q2")` results in an error message: 'Arithmetic operation on two 
+periods is not allowed.'].
 
 
 
@@ -1182,7 +1201,7 @@ ts
 ```
 
 The function `regts` employs the `data.matrix` function in the `base` package to 
-convert a data frame to a numeric matrix^[Columns with text strings are converted to NA]. By default the column names of the data frame are used for the timeseries names.
+convert a data frame to a numeric matrix^[Columns with text strings are converted to `NA`]. By default the column names of the data frame are used for the timeseries names.
 
 As with matrix input, it is also possible to specify names or add labels. Specifying names is already described in section \ref{multits}. Labeling of `data frames` will be discussed in section \ref{dflabels}.
 

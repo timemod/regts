@@ -18,7 +18,7 @@
 #'          Must be a positive number.
 #' @param keep_range if \code{TRUE} (the default), then the output
 #' timeseries has the same period range as the input timeseries.
-#' Then the result timeseries will have \code{n} \code{NA} values at the
+#' The result timeseries will have \code{n} \code{NA} values at the
 #' beginning. If \code{FALSE} the period range of the result timeseries is
 #' shifted by \code{n} periods. The result timeseries
 #' starts and ends \code{n} periods later.
@@ -61,11 +61,11 @@ lag_ts.default <- function(x, n = 1, keep_range = TRUE, ...) {
 #' @param x a univariate or multivariate timeseries.
 #' Can also be a vector, matrix or data frame (see details).
 #
-#' @param n the number leads (in units of observations).
+#' @param n the number of leads (in units of observations).
 #'          Must be a positive number.
 #' @param keep_range if \code{TRUE} (the default), then the output
 #' timeseries has the same period range as the input timeseries.
-#' Then the result timeseries will have \code{n} \code{NA} values at the
+#' The result timeseries will have \code{n} \code{NA} values at the
 #' beginning end.
 #' If \code{FALSE} the period range of the result timeseries is shifted
 #' by \code{n} periods. The result timeseries

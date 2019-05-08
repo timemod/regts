@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{get_period_range}
 \alias{get_period_range}
-\title{Returns the \link{period_range} of a timeseries.}
+\title{Return the \link{period_range} of a timeseries.}
 \usage{
 get_period_range(x)
 }
@@ -13,7 +13,7 @@ get_period_range(x)
 a \code{period_range}
 }
 \description{
-Returns the \link{period_range} of a timeseries.
+Return the \link{period_range} of a timeseries.
 }
 \seealso{
 \code{\link{get_periods}}

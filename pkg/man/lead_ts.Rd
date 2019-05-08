@@ -16,12 +16,12 @@ lead_ts(x, n = 1, keep_range = TRUE, ...)
 \item{x}{a univariate or multivariate timeseries.
 Can also be a vector, matrix or data frame (see details).}
 
-\item{n}{the number leads (in units of observations).
+\item{n}{the number of leads (in units of observations).
 Must be a positive number.}
 
 \item{keep_range}{if \code{TRUE} (the default), then the output
 timeseries has the same period range as the input timeseries.
-Then the result timeseries will have \code{n} \code{NA} values at the
+The result timeseries will have \code{n} \code{NA} values at the
 beginning end.
 If \code{FALSE} the period range of the result timeseries is shifted
 by \code{n} periods. The result timeseries

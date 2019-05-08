@@ -20,8 +20,7 @@ of the joined objects.}
 \item{suffixes}{Suffixes appended to the column names for all overlapping
 columns. This argument is obligatory if the timeseries have overlapping
 column names. Length suffixes must be equal to the number of joined timeseries
-or objects.
-have overlapping columns.}
+or objects.}
 }
 \description{
 Bind two or more timeseries objects with a common frequency.
