@@ -27,7 +27,7 @@ otherwise a list of \code{period} objects.
 }
 \description{
 Function \code{period} creates a \code{period} object
-based on a character string or numeric scalar.
+based on a character or numeric vector.
 Possible character string formats are for example \code{"2017Q2"},
 \code{"2017m2"}, \code{"2017"}, \code{"2017-2"},
 \code{"aug 2017"} or \code{"august-2017"}.
@@ -42,8 +42,8 @@ Function \code{as.period}
 coerces an R object to a \code{period} object if possible.
 }
 \details{
-The function \code{period} accepts a character string or
-a numeric scalar as arguments. The specific format is described below.
+The function \code{period} accepts a character or numeric vector
+as arguments. The specific format is described below.
 
 \strong{string format}
 
@@ -110,7 +110,7 @@ d <- Sys.Date()
 period(d)
 
 # create a vector of period objects
-period(c(period("2018q2"), period("2019q4")))
+period(c("2018q2", "2019q4"))
 }
 \seealso{
 \code{\link{period_range}} and \code{\link{seq}}

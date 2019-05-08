@@ -35,6 +35,13 @@ p1 <- period("2018q2")
 seq(p1, length.out = 4)
 seq(p1, "2019q4")
 seq(p1, "2019q4", by = 2)
+
+# use seq in a for loop
+ts <- regts(1:10, start = "2018q1")
+seqp <- seq(period("2018q1"), "2020q1", by = 4)
+# print first quarters ts
+for (i in as.list(seqp)){print(ts[i])}
+
 }
 \seealso{
 \code{\link[regts]{period}} and \code{\link[regts]{period_range}}

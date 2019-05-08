@@ -44,15 +44,15 @@ values from the second timeseries.
 timeseries are replaced by the values in the second timeseries for the total
 period range of these second timeseries.
 Outside this period the values in the first timeseries will become
-\code{NA}).
+\code{NA}.
 
 The non overlapping columns in both timeseries are added to the result.
 
 The period range of the result is the union of the period ranges of the
 first and second timeseries, except for the \code{updval} method.
-For this method the result period range is the union of the first timeseries
-and the timeseries obtained by applying function \code{na_trim} to the
-second timeseries.
+For this method the result period range is the union of the period ranges
+of the first timeseries and the timeseries obtained by applying function
+\code{na_trim} to the second timeseries.
 }
 \examples{
 x1 <- regts(matrix(data = rep(1:9), nc = 3), period = "2000/2002",
