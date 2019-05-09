@@ -1,34 +1,25 @@
 # This is a gnu makefile with several commands to build, document and test
 # the package.  The actual building and installation of the package is achieved
-# with the standard R commands R CMD BUOLD and R CMD INSTALL.
-
-OSNAME := $(shell uname | tr A-Z a-z)
-ifeq ($(findstring windows, $(OSNAME)), windows)
-    OSTYPE = windows
-else
-    # Linux or MAC OSX
-    OSTYPE = unix
-endif
+# with the standard R commands R CMD BUILD and R CMD INSTALL.
 
 PKGDIR=pkg
 INSTALL_FLAGS=--no-multiarch --with-keep.source
+
+OSTYPE=$(shell Rscript -e "cat(.Platform[['OS.type']])")
+PKG_CXXFLAGS = $(shell Rscript -e "Rcpp:::CxxFlags()")
+
 ifeq ($(OSTYPE), windows) 
 # for unknown reason R CMD check --as-cran does not work on Windows
-# (the same problem occurs in for example package nleqslv).
 RCHECKARG=--no-multiarch
 else
 RCHECKARG=--no-multiarch --as-cran
 endif
-
-R_HOME=$(shell R RHOME)
-PKG_CXXFLAGS = `"$(R_HOME)/bin/Rscript" -e "Rcpp:::CxxFlags()"`
 
 # Package name, Version and date from DESCIPTION
 PKG=$(shell grep 'Package:' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2)
 PKGTAR=$(PKG)_$(shell grep 'Version' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2).tar.gz
 PKGDATE=$(shell grep 'Date' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2)
 TODAY=$(shell date "+%Y-%m-%d")
-
 
 help:
 	@echo
@@ -56,20 +47,17 @@ CXX=$(shell R CMD config CXX)
 CPP_FLAGS=$(shell R CMD config --cppflags)
 
 flags:
-	@echo "R_HOME=$(R_HOME)"
 	@echo "OSTYPE=$(OSTYPE)"
-	@echo "SHELL=$(SHELL)"
 	@echo "CPP_FLAGS=$(CPP_FLAGS)"
 	@echo "PKG_CXXFLAGS=$(PKG_CXXFLAGS)"
 	@echo "PKGDIR=$(PKGDIR)"
 	@echo "PKG=$(PKG)"
 	@echo "PKGTAR=$(PKGTAR)"
 	@echo "PKGDATE=$(PKGDATE)"
-	@echo "FC=$(FC)"
-	@echo "F77=$(F77)"
-	@echo "CC=$(CC)"
 	@echo "CPP=$(CPP)"
 	@echo "CPP_FLAGS=$(CPP_FLAGS)"
+	@echo "RCHECKARG=$(RCHECKARG)"
+	@echo "libPaths:"
 	@R --no-save --quiet --slave -e '.libPaths()'
 
 test:
@@ -85,21 +73,13 @@ check: cleanx syntax
 	@rm -f  $(PKGTAR)
 	@echo "Today                           : $(TODAY)"
 	@echo "Checked package description date: $(PKGDATE)"
-# 	@Rscript -e 'cat("Installed version date          :",packageDescription("nleqslv", fields="Date"))'
 	@echo ""
 
 syntax:
-ifneq ($(findstring windows, $(OSNAME)), windows)
-	$(CXX) "$(CPP_FLAGS)" $(PKG_CXXFLAGS) -c -fsyntax-only -Wall -pedantic $(PKGDIR)/src/*.c*
-else
-        # On Windows, the compiler complains about misssig Rcpp.h.
-        # I have no idea why (the path to the Rcpp headers is added, see PKG_CXXFLAGS).
-        # It appears to have something to do with the make system of Rtools.
-	@echo syntax checking does not work yet on Windows
-endif
+	$(CXX) $(CPP_FLAGS) $(PKG_CXXFLAGS) -c -fsyntax-only -Wall -pedantic $(PKGDIR)/src/*.c*
 
 cleanx:
-ifneq ($(findstring windows, $(OSNAME)), windows)
+ifneq ($(OSTYPE), windows) 
 # Apple Finder rubbish
 	@find . -name '.DS_Store' -delete
 	@rm -f $(PKGTAR)
