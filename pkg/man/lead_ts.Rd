@@ -38,6 +38,13 @@ backwards by a given number of periods.
 Vector, matrix and data frame arguments are first converted to a \code{regts}
 with function \code{\link{regts}}. This conversion results in a timeseries
 with frequency 1 and starting at year 1.
+
+Function \code{lead_ts} is an alternative for function \code{\link[stats]{lag}}
+in the \code{stats} package which computes both lags and leads.
+By default in \code{lead_ts} the resulting timeseries has the same
+period range as the input timeseries. In function \code{lag} the time base
+is always shifted. \code{lead_ts(x, 1, keep_range = FALSE)} is the same as
+\code{lag(x, 1)}
 }
 \examples{
 x <- regts(1:10, start = "2018q3")

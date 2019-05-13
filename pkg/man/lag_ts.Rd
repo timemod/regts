@@ -36,15 +36,14 @@ with function \code{\link{regts}}. This conversion results in a timeseries
 with frequency 1 and starting at year 1.
 
 \code{lag_ts} differs from \code{\link[stats]{lag}}
-in the \code{stats} package in that the specified number of lags or leads
+in the \code{stats} package in that the specified number of lags
 is positive, and that by default the resulting timeseries has the same
-period range as the input timeseries.
+period range as the input timeseries. In function \code{lag} the time base
+is always shifted. \code{lag_ts(x, 1, keep_range = FALSE)} is the same as
+\code{lag(x, -1)}
 }
 \examples{
 x <- regts(1:10, start = "2018q3")
 lag_ts(x)
 lag_ts(x, k = 2, keep_range = FALSE)
-}
-\seealso{
-\code{\link{lead_ts}} and \code{\link{diff_ts}}
 }
