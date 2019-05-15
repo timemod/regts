@@ -183,7 +183,7 @@ test_that("as.regts.data.frame with different frequencies", {
 test_that("as.regts.data.frame with argument fun", {
   df <- data.frame(a = 1:2, b = 3:4)
   rownames(df) <- c("3", "4")
-  fun <- function(x, ...) {period(paste0(2018, x), ...)}
+  fun <- function(x, ...) {period(paste(2018, x), ...)}
   ts1 <- as.regts(df, frequency = 4, fun = fun)
   ts2 <- regts(matrix(1:4, ncol =  2), start = "2018Q3", names = c("a", "b"))
   expect_identical(ts1, ts2)

@@ -8,4 +8,4 @@ regts.Rcheck
 regts*zip
 regts*tar.gz
 tmp/
-
+archive

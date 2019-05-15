@@ -1609,7 +1609,8 @@ ParsedPeriod parse_period_text(const std::string &period_text, double frequency)
 
     if (!error_flag) {
         error_flag = subperiod == 0 ||
-           (!ISNA(freq) && subperiod > freq);
+           (!ISNA(freq) && subperiod > freq) ||
+           year > 9999;
     }
 
     return ParsedPeriod(year, subperiod, freq, error_flag > 0);
