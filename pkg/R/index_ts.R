@@ -64,12 +64,15 @@ index_ts <- function(x, base = start_period(x), scale = 100) {
 
   psel <- (startp_base : endp_base) - startp_x + 1
 
-
   if (is.mts(x)) {
     # multivariate timeseries
-    if (any(is.na(x[psel, ]))) {
-      warning(paste("Input timeseries contains NA values in base period",
-                    base))
+    x_base_is_na <- is.na(x[psel, , drop = FALSE])
+    if (any(x_base_is_na)) {
+      na_col_sel <- apply(x_base_is_na, MARGIN = 2, FUN = any)
+      na_cols <- colnames(x)[na_col_sel]
+      warning(paste0("Input timeseries contains NA values in base period ",
+                    base, " for columns: ", paste(na_cols, collapse = ", "),
+                    "."))
     }
     x[] <- apply(x, FUN = function(c) {c / mean(c[psel])}, MARGIN = 2)
     return(scale * x)
