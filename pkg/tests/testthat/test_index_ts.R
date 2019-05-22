@@ -62,7 +62,8 @@ test_that("NA values", {
 
   ab_NA <- ab
   ab_NA["2019Q3", "a"] <- NA
-  warning <- "Input timeseries contains NA values in base period 2019Q3/2019Q4"
+  warning <- paste("Input timeseries contains NA values in base period",
+                   "2019Q3/2019Q4 for columns: a.")
   expect_warning(ab_NA_i <- index_ts(ab_NA,  base = "2019Q3/2019Q4"), warning)
 
   expected_result  <-100 * ab_NA / 15
@@ -77,5 +78,31 @@ test_that("NA values", {
   expected_result  <-100 * ab_NA / 14
   expected_result$a <- NA
   expect_equal(ab_NA_i, expected_result)
+
+  abc_NA <- ab
+  abc_NA$c <- 2
+  abc_NA["2019Q3", "a"] <- NA
+  abc_NA["2019q4", "c"] <- NA
+  warning <- paste("Input timeseries contains NA values in base period",
+                   "2019Q3/2019Q4 for columns: a, c.")
+  expect_warning(abc_NA_i <- index_ts(abc_NA,  base = "2019Q3/2019Q4"), warning)
+
+  expected_result  <- 100 * abc_NA / 15
+  expected_result$a <- NA
+  expected_result$c <- NA
+  expect_equal(abc_NA_i, expected_result)
+
+  big_NA <- ab
+  big_NA[ , paste0("x_", 1:1000)] <- 2
+  big_NA["2019Q3", "a"] <- NA
+  big_NA["2019q4", 2:1002] <- NA
+  warning <- paste("Input timeseries contains NA values in base period",
+                   "2019Q3/2019Q4 for columns: a, b")
+  expect_warning(big_NA_i <- index_ts(big_NA,  base = "2019Q3/2019Q4"), warning)
+
+  expected_result  <- 100 * big_NA / 15
+  expected_result$a <- NA
+  expected_result[ , 2:1002] <- NA
+  expect_equal(big_NA_i, expected_result)
 })
 
