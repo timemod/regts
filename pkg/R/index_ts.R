@@ -69,7 +69,9 @@ index_ts <- function(x, base = start_period(x), scale = 100) {
     x_base_is_na <- is.na(x[psel, , drop = FALSE])
     if (any(x_base_is_na)) {
       na_col_sel <- apply(x_base_is_na, MARGIN = 2, FUN = any)
-      na_cols <- colnames(x)[na_col_sel]
+      cnames <- colnames(x)
+      if (is.null(cnames)) cnames <- seq_len(ncol(x))
+      na_cols <- cnames[na_col_sel]
       warning(paste0("Input timeseries contains NA values in base period ",
                     base, " for columns: ", paste(na_cols, collapse = ", "),
                     "."))
