@@ -47,3 +47,6 @@ x <- regts(1:10, start = "2018q3")
 lag_ts(x)
 lag_ts(x, k = 2, keep_range = FALSE)
 }
+\seealso{
+\code{\link{lead_ts}}, \code{\link{diff_ts}} and \code{\link[stats]{lag}}
+}

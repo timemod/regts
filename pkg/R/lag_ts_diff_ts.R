@@ -26,7 +26,7 @@
 #' starts and ends \code{n} periods later.
 #' @param ... further arguments to be passed to or from methods
 #'            (currently not used in package \code{regts})
-#' @seealso \code{\link{lead_ts}}, \code{\link{diff_ts}} and \code{\link[stats]{lag}
+#' @seealso \code{\link{lead_ts}}, \code{\link{diff_ts}} and \code{\link[stats]{lag}}
 #' @examples
 #' x <- regts(1:10, start = "2018q3")
 #' lag_ts(x)

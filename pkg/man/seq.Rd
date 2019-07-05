@@ -39,10 +39,17 @@ seq(p1, "2019q4", by = 2)
 # use seq in a for loop
 ts <- regts(1:10, start = "2018q1")
 seqp <- seq(period("2018q1"), "2020q1", by = 4)
+
 # print first quarters ts
-for (i in as.list(seqp)){print(ts[i])}
+for (prd in as.list(seqp))
+  {print(ts[prd])
+}
+
+# Note that we do not loop directly over the period vector, but first convert
+# the vector to a list. Otherwise the \\code{period} class is lost.
 
 }
 \seealso{
-\code{\link[regts]{period}} and \code{\link[regts]{period_range}}
+\code{\link[regts]{period}}, \code{\link[regts]{period_range}} and
+\code{\link[regts]{get_periods}}
 }
