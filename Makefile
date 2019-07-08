@@ -8,7 +8,7 @@ INSTALL_FLAGS=--no-multiarch --with-keep.source
 OSTYPE=$(shell Rscript -e "cat(.Platform[['OS.type']])")
 PKG_CXXFLAGS = $(shell Rscript -e "Rcpp:::CxxFlags()")
 
-ifeq ($(OSTYPE), windows) 
+ifeq ($(OSTYPE), windows)
 # for unknown reason R CMD check --as-cran does not work on Windows
 RCHECKARG=--no-multiarch
 else
@@ -79,7 +79,7 @@ syntax:
 	$(CXX) $(CPP_FLAGS) $(PKG_CXXFLAGS) -c -fsyntax-only -Wall -pedantic $(PKGDIR)/src/*.c*
 
 cleanx:
-ifneq ($(OSTYPE), windows) 
+ifneq ($(OSTYPE), windows)
 # Apple Finder rubbish
 	@find . -name '.DS_Store' -delete
 	@rm -f $(PKGTAR)
@@ -90,7 +90,7 @@ endif
 # build source package for submission to CRAN
 # after building do a check as CRAN does it
 mkpkg: cleanx syntax install_deps
-ifeq ($(OSTYPE), windows) 
+ifeq ($(OSTYPE), windows)
 	@echo Please run mkpkg on Linux or MAC OSX
 else
 	R CMD build $(PKGDIR)
@@ -110,7 +110,7 @@ bin: install_deps
 	R CMD INSTALL $(INSTALL_FLAGS) -l ./tmp --build $(PKGTAR)
 
 document: install_deps
-	-@rm -f $(PKGDIR).pdf
+	-@rm -f regts.pdf
 	R -e "devtools::document('"$(PKGDIR)"')"
 	R CMD Rd2pdf --batch $(PKGDIR) -o regts.pdf 2>$(PKGDIR).log
 
