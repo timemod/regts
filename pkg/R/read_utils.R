@@ -716,6 +716,7 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
   } else {
 
     names <- name_row_data[col_has_name]
+    if (!missing(name_fun)) names <- name_fun(names)
 
     # labels
     if (labels != "no") {

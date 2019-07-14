@@ -104,5 +104,19 @@ test_that("NA values", {
   expected_result$a <- NA
   expected_result[ , 2:1002] <- NA
   expect_equal(big_NA_i, expected_result)
+
+  # now test a timeseries without column names
+  no_colnames <- big_NA
+  colnames(no_colnames) <- NULL
+  warning <- paste("Input timeseries contains NA values in base period",
+                   "2019Q3/2019Q4 for columns: 1, 2, 3, 4")
+
+  expect_warning(no_colnames_i <- index_ts(no_colnames,
+                                           base = "2019Q3/2019Q4"), warning)
+
+  expected_result  <- 100 * no_colnames / 15
+  expected_result[ , 1] <- NA
+  expected_result[ , 2:1002] <- NA
+  expect_equal(no_colnames_i, expected_result)
 })
 
