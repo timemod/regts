@@ -259,10 +259,10 @@ as.character.period_range <- function(x, ...) {
 }
 
 
-
-#' Return the number of periods in a \code{\link{period_range}} object.
+#' Return the number of periods in a period range
 #'
-#' @param  x a \code{period_range}
+#' @param  x a \code{\link{period_range}} or an object that can be coerced
+#' to a \code{period_range}
 #' @return The number of periods in the range, or \code{Inf} if the
 #' range is not bounded
 #' @examples
@@ -270,9 +270,7 @@ as.character.period_range <- function(x, ...) {
 #' nperiod(range)  # the result will be 6
 #' @export
 nperiod  <- function(x) {
-  if (!inherits(x, "period_range")) {
-    stop("Variable should be a period_range object")
-  }
+  x <- as.period_range(x)
   if (is.na(x[1]) | is.na(x[2])) {
     return (Inf)
   }
