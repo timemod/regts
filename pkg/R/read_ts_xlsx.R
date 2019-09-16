@@ -232,7 +232,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   }
 
   # check for duplicate names
-  test_duplicates(ret)
+  test_duplicates(ret, filename, sheetname)
 
   return(ret)
 }

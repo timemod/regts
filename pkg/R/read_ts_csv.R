@@ -191,7 +191,7 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
   }
 
   # check for duplicate names
-  test_duplicates(ret)
+  test_duplicates(ret, filename)
 
   return(ret)
 }
