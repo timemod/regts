@@ -221,13 +221,6 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                  filename))
   }
 
-  # check for duplicate names
-  dupl <- duplicated(layout$names)
-  if (any(dupl)){
-    warning(sprintf("Duplicate names in file: %s\n",
-                    paste(layout$names[dupl], collapse = ", ")))
-  }
-
   if (layout$rowwise) {
     ret <- read_ts_rowwise_xlsx(filename, sheet, sheetname, range, na_string,
                                 frequency, labels, name_fun, layout, strict,
@@ -237,6 +230,9 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                                    frequency, period_fun, layout, strict,
                                    warn_num_text)
   }
+
+  # check for duplicate names
+  test_duplicates(ret)
 
   return(ret)
 }
