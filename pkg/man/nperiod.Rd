@@ -2,19 +2,20 @@
 % Please edit documentation in R/period_range.R
 \name{nperiod}
 \alias{nperiod}
-\title{Return the number of periods in a \code{\link{period_range}} object.}
+\title{Return the number of periods in a period range}
 \usage{
 nperiod(x)
 }
 \arguments{
-\item{x}{a \code{period_range}}
+\item{x}{a \code{\link{period_range}} or an object that can be coerced
+to a \code{period_range}}
 }
 \value{
 The number of periods in the range, or \code{Inf} if the
 range is not bounded
 }
 \description{
-Return the number of periods in a \code{\link{period_range}} object.
+Return the number of periods in a period range
 }
 \examples{
 range <- period_range("2010Q2", "2011Q3")
