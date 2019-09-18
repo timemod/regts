@@ -35,9 +35,7 @@ knitr::opts_chunk$set(collapse = FALSE, comment = "", prompt = TRUE)
 options(width = 100)
 
 ```
-\longerpage[1]
 
-\newpage
 
 # Introduction
 
@@ -593,7 +591,7 @@ return some sort of `data frame`.
 After some processing (e.g. selecting and/or deleting (parts of) rows and columns) the data frame can be converted to a `regts` as explained in section \ref{deviant}.
 
 
-
+\newpage
 # Manipulating timeseries
 
 ## Operators and functions for `regts`
@@ -631,7 +629,7 @@ diff(tx)
 plot(tx)
 ```
 
-Almost all functions work exactly the same for `regts` and `ts`. The only exceptions are `cbind` (discussed below) and `aggregate` ( described in vignette _Aggregation for (growth) timeseries_).
+Almost all functions work exactly the same for `regts` and `ts`. The only exceptions are `cbind` (discussed below) and `aggregate` ( described in vignette _Temporal aggregation of (growth) timeseries_).
 For some functions alternative implementations are available (`lag_ts`, `lead_ts`, `diff_ts`, see section \ref{laglead})
 
   
@@ -679,6 +677,26 @@ cbind(rt1, rt2, suffixes = c("_1","_2"))
 
 Another difference between `cbind.regts` and `cbind.ts` (which is an alias for `ts.union`) is the treatment of the column names: in `cbind.regts` the column names are always preserved.
 
+
+## Lags, leads and differences in timeseries\label{laglead}
+
+For lagging or leading timeseries two functions are included in the `regts` package: `lag_ts` and `lead_ts`.
+In these functions the specified number of lags or leads, respectively, is always positive. By default the resulting timeseries has the same period range as the input timeseries, 
+in some cases this is handy. They are alternatives for the `lag` function in the `stats` package.
+An example:
+
+```{r}
+tx
+lag_ts(tx, n = 2)
+```
+```{r}
+lag_ts(tx, n = 2, keep_range = FALSE)
+```
+As you can verify:
+
+`lag_ts(x, n = 2, keep_range = FALSE)` is the same as `lag(x, -2)`
+
+For lagged differences the function `diff_ts` is available which works similarly as function `diff` in the `stats` package, except that the period range of the result is by default the same as that of the input timeseries.
 
 
 ## Update function
@@ -848,33 +866,11 @@ dif_bc$equal
 As you can see the ordering of the columns makes no difference.
 
 
-## Lags, leads and differences in timeseries\label{laglead}
-
-For lagging or leading timeseries two functions are included in the `regts` package: `lag_ts` and `lead_ts`.
-In these functions the specified number of lags or leads, respectively, is always positive. By default the resulting timeseries has the same period range as the input timeseries, 
-in some cases this is handy. They are alternatives for the `lag` function in the `stats` package.
-An example:
-
-```{r}
-tx
-lag_ts(tx, n = 2)
-```
-```{r}
-lag_ts(tx, n = 2, keep_range = FALSE)
-```
-As you can verify:
-
-`lag_ts(x, n = 2, keep_range = FALSE)` is the same as `lag(x, -2)`
-
-For lagged differences the function `diff_ts` is available which works similarly as function `diff` in the `stats` package, except that the period range of the result is by default the same as that of the input timeseries.
-
-
 # Labels \label{labels}
-A label is a way to document an object or the elements of an object. Labels in 
-base R exist but only for objects. 
+In R it is possible to attach a label to an object, a text string describing the object. However in base R it is not possible to label the columns in a matrix or timeseries.
+
 In the `regts` package each timeseries in a `regts` object can be equipped with 
-a label. Labels can be defined when the series are created and they are preserved 
-in most timeseries functions.
+a label. Labels can be defined when the series are created and they are preserved in most timeseries functions.
 
 ```{r}
 t1 <- regts(data1, start = "2017q1", names = c("child", "adult", "senior"),
