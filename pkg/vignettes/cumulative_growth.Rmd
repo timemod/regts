@@ -42,7 +42,7 @@ This vignette discusses temporal aggregation of timeseries, i.e. the conversion
 of a timeseries to a lower frequency. 
 The vignette is an extension of the vignette "Introduction to package regts", but can be read independently.
 
-Section 2 describes the standard aggregation funcion `aggregate`. Section 3 discusses aggregation with the so called cumulative growth methods, which are described in detail in section 4.
+Section 2 describes the standard aggregation function `aggregate`. Section 3 discusses aggregation with the so called cumulative growth methods, which are described in detail in section 4.
 
 
 # Function aggregate
@@ -81,7 +81,7 @@ aggregate(regq2, FUN = sum)
 The quarters in 2017 add up to 26 as before. But now the information for 2016 
 is also not complete, and therefore ignored. 
 
-Thus for `regts` objects the `aggregate` function skips all incomplete years at the beginning and end of the timeseries. However the implementation of `aggregate` for standard timeseries (`ts`) only skips incomplete years at the end.
+Thus for `regts` objects the `aggregate` function skips all incomplete years at the beginning and end of the timeseries. However for standard timeseries (`ts`) the implementation of `aggregate` only skips incomplete years at the end.
 
 The previous example but now with a `ts` timeseries:
 
@@ -91,22 +91,32 @@ tq2
 aggregate(tq2, FUN = sum)
 ```
 
-The result is an unconventional timeseries with frequency `year` but a shifted period (the start is 2016.25). The result for 2016.25 is the sum of the observations in period `2016q2/2017q1`. 
+The result is an unconventional timeseries with frequency `year` but a shifted period (the start is 2016.25). The result for 2016.25 is the sum of the observations in period `2016Q2/2017Q1`. 
 
 In all other cases the `aggregate` function works exactly the same for `regts` and `ts` objects.
 
 
 # Aggregation of growth timeseries 
-As is shown in the next section the function `aggregate` does not yield correct results for timeseries with absolute, relative or percentage changes. For example, for a quarterly growth series the yearly aggregates also depend on the quarterly observations of the previous year.
+As is shown in the next section the function `aggregate` does not yield correct results for timeseries with absolute, relative or percentage changes. 
 
 For growth timeseries the function `aggregate_gr` can be used. This function implements the so called 'cumulative growth'-methods and can be employed for both `regts` and `ts` timeseries. 
 
 All methods convert input timeseries with high frequency to low frequency 
-outputseries. There are four different type of methods for different types of 
-input timeseries: `dif1`, `dif1s`, `rel` and `pct`.
+outputseries. For different types of input timeseries there are four different type of methods : `dif1`, `dif1s`, `rel` and `pct`.
 
 Methods `dif1` and `dif1s` assume that the input timeseries is a first 
-difference of length 1 in units of observation. For method `dif1s` the input series is assumed to be scaled with the output frequency. Specifically, for `dif1s` the input series is the first difference of length 1 (in units of observation) multiplied with the ratio of the high and the low frequency. They calculate a first difference of length 1 in the output frequency. 
+difference: 
+\begin{displaymath}
+ x_{t} = z_{t} - z_{t-1}
+\end{displaymath}
+where `t` is the period (like year or quarter).
+For method `dif1s` the input series is assumed to be scaled with the output frequency (for example an annualized quarterly series). 
+\begin{displaymath}
+ x_{t} = n (z_{t} - z_{t-1} )
+\end{displaymath}
+where `n` is the ratio of the high and the low frequency . 
+
+These methods calculate a timeseries with first difference in the output frequency. 
 
 The `rel` and `pct` methods assume that the input timeseries is a one-period 
 relative or percentage change and calculate the exact relative or percentage 
@@ -129,7 +139,9 @@ aggregate_gr(xdif, method = "dif1s", nfrequency = 1)  # result is also scaled
 
 
 # The cumulative growth methods 
-We are temporally aggregating a timeseries $x$ with $n$ subperiods to a 
+This section describes the cumulative growth methods implemented in function `aggregate_gr` introduced in the previous section.
+
+Suppose we are temporally aggregating a timeseries $x$ with $n$ subperiods to a 
 timeseries $X$ with a lower frequency. In other words we want to convert a timeseries x with a high frequency (monthly, quarterly) to a new timeseries with a lower frequency (quarterly, annual).
 
 Let $x_{t,i}$   stand for the value of $x$ in subperiod $i$ of main period $t$.
@@ -142,7 +154,7 @@ For example the \texttt{mean} method calculates $X_t$ as follows
 X_t = \sum_{i=1}^{i=n} x_{t,i}/n
 \end{displaymath}
 
-However there are transformations which are not so straightforward. A case in point is when `x` is a high frequency first difference and must be converted to a low frequency first difference. A simple averaging of `n` high frequency observations will not give the correct answer. In this section a more detailed description of the four previously defined frequency conversion methods is given.
+However there are transformations which are not so straightforward. A case in point is when `x` is a high frequency first difference and must be converted to a low frequency first difference. A simple averaging of `n` high frequency observations will not give the correct answer. For example, for a quarterly growth series the yearly aggregates also depend on the quarterly observations of the previous year. Therefore we cannot use function `aggregate`, function `aggregate_gr` must be applied. In the next subsections a more detailed description of the available frequency conversion methods is given.
 
 ## `dif1` method 
 Define $x$ to be the first difference  of $z$. Thus
@@ -207,16 +219,11 @@ Thus
 \begin{displaymath}
  x_{t,i} = n ( z_{t,i} - z_{t,i-1} )
 \end{displaymath}
-We can also define $z_{t,i}$ in terms of $x$ as follows
-\begin{eqnarray*}
-z_{t,i} & = & z_{t,i-1} + x_{t,i}/n\\
-        & = & z_{t-1,n} + \sum_{j=1}^{i} x_{t,j}/n
-\end{eqnarray*}
 
 Further derivations are analogous to the case for the \texttt{dif1} method
 described in the previous section.
 
-The result is
+Now the result for `dif1s` is the result for `dif1` divided by `n`:
 \begin{displaymath}
 X_t =  \left(  \sum_{j=2}^n  (j-1) x_{t-1,j} +  \sum_{j=1}^n  (n - j + 1) x_{t,j} \right) / n
 \end{displaymath}
