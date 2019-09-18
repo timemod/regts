@@ -754,10 +754,10 @@ test_duplicates <- function(rts, filename, sheetname = NULL){
   if (any(dupl)){
 
     if (is.null(sheetname)){
-      warning(sprintf("Duplicate names in file %s: %s\n", filename,
+      warning(sprintf("Duplicate names in file %s: %s", filename,
                       paste(colnames(rts)[dupl], collapse = ", ")))
     } else{
-      warning(sprintf("Duplicate names on sheet %s of file %s: %s\n", sheetname,
+      warning(sprintf("Duplicate names on sheet %s of file %s: %s", sheetname,
                       filename, paste(colnames(rts)[dupl], collapse = ", ")))
     }
   }

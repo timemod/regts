@@ -7,5 +7,5 @@ xlsx_file <- "xlsx/example_duplicate_names.xlsx"
 warnings <- capture_warnings(result <- read_ts_xlsx(xlsx_file, strict = FALSE))
 
 expect_identical(warnings,
-c("Duplicate names on sheet 1 of file xlsx/example_duplicate_names.xlsx: b, a\n"))
+c("Duplicate names on sheet 1 of file xlsx/example_duplicate_names.xlsx: b, a"))
 })

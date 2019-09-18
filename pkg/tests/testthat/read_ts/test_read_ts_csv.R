@@ -269,6 +269,6 @@ test_that("double_row.csv is read correctly and gives warning",  {
   csv_file <- "csv/double_row.csv"
   warnings <- capture_warnings(result <- read_ts_csv(csv_file, strict = FALSE))
 
-  expect_identical(warnings, c("Duplicate names in file csv/double_row.csv: a\n"))
+  expect_identical(warnings, c("Duplicate names in file csv/double_row.csv: a"))
 
 })
