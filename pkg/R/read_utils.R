@@ -747,3 +747,19 @@ get_labels_from_tbl <- function(label_tbl, rowwise) {
   if (!any(nzchar(lbls))) lbls <- NULL
   return(lbls)
 }
+
+test_duplicates <- function(rts, filename, sheetname = NULL){
+  # test duplicate names in xlsx or csv
+  dupl <- duplicated(colnames(rts))
+  if (any(dupl)){
+
+    if (is.null(sheetname)){
+      warning(sprintf("Duplicate names in file %s: %s", filename,
+                      paste(colnames(rts)[dupl], collapse = ", ")))
+    } else{
+      warning(sprintf("Duplicate names on sheet %s of file %s: %s", sheetname,
+                      filename, paste(colnames(rts)[dupl], collapse = ", ")))
+    }
+  }
+  return(invisible(NULL))
+}

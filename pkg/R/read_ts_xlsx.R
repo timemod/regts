@@ -170,7 +170,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     range$ul[2] <- skipcol + 1
   } else {
     range <- as.cell_limits(range)
-    # Function read_excel skips leading empty rows and columns if the the first
+    # Function read_excel skips leading empty rows and columns if the first
     # row or column in range is NA (i.e. not-specified). This is not desired
     # here, because otherwise we do no longer know to which part of the sheet
     # the readed data corresponds.
@@ -230,6 +230,9 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                                    frequency, period_fun, layout, strict,
                                    warn_num_text)
   }
+
+  # check for duplicate names
+  test_duplicates(ret, filename, sheetname)
 
   return(ret)
 }
