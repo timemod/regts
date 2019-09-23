@@ -35,7 +35,6 @@ knitr::opts_chunk$set(collapse = FALSE, comment = "", prompt = TRUE)
 options(width = 100)
 
 ```
-\newpage
 
 # Introduction
 This vignette discusses temporal aggregation of timeseries, i.e. the conversion 
@@ -71,9 +70,6 @@ years at the end.
 
 ```{r}
 regq2 <- regts(2:10, start = "2016q2")
-```
-\newpage
-```{r}
 regq2
 aggregate(regq2, FUN = sum)
 ```
@@ -91,6 +87,7 @@ tq2
 aggregate(tq2, FUN = sum)
 ```
 
+\longerpage[1]
 The result is an unconventional timeseries with frequency `year` but a shifted period (the start is 2016.25). The result for 2016.25 is the sum of the observations in period `2016Q2/2017Q1`. 
 
 In all other cases the `aggregate` function works exactly the same for `regts` and `ts` objects.
@@ -154,7 +151,6 @@ X_t = \sum_{i=1}^{i=n} x_{t,i}/n
 
 However there are transformations which are not so straightforward. A case in point is when `x` is a high frequency first difference and must be converted to a low frequency first difference. A simple averaging of `n` high frequency observations will not give the correct answer. For example, for a quarterly growth series the yearly aggregates also depend on the quarterly observations of the previous year. Therefore we cannot use function `aggregate`, function `aggregate_gr` must be applied. In the next subsections a more detailed description of the available frequency conversion methods for this function is given.
 
-\newpage
 ## `dif1` method 
 Define $x$ to be the first difference  of $z$. Thus
 \begin{displaymath}
@@ -226,7 +222,6 @@ X_t =  \left(  \sum_{j=2}^n  (j-1) x_{t-1,j} +  \sum_{j=1}^n  (n - j + 1) x_{t,j
 \end{displaymath}
 
 
-\newpage
 ## `rel` method 
 Define $x$ to be the relative change in $z$. Thus
 \begin{displaymath}
