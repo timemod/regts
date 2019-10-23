@@ -508,9 +508,8 @@ It is also possible to change for example cell styles, column widths or the defa
 
 When reading external files with `read_ts_xlsx` or `read_ts_csv`, several period 
 formats are recognised: dates, integer values (like `2019`) or texts. 
-The texts must have formats recognised by function `period` (for details see 
-section \ref{period}).
-
+The texts must have formats recognised by function `period` 
+(see section \ref{period}).
 But sometimes the periods in a file are not recognised. For example when Dutch 
 month names are used, as in the following example:
 ```{r echo = FALSE, comment=""}
@@ -1064,9 +1063,10 @@ prd <- period("2016q4")
 prd
 ```
 
-This function can handle several period formats: `2020`, "`2019Q4`", "`2019.4q`",
-"`2019/4Q`", "`2019-4q`", "`2019_q4`", ...
-where no distinction is made between 'q' and 'Q'.
+This function can handle several period formats. For example integers (e.g. 2020),
+date objects and texts (e.g. `"2019Q4`", `"2019.4q"`, `"2019/4Q"`, `"2019-4q"` and 
+`"2019_q4"`, where no distinction is made between 'q' and 'Q').
+For more details see help("period").
 
 Another example:
 ```{r}
