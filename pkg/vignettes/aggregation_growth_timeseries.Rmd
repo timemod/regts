@@ -12,7 +12,7 @@ linkcolor: blue
 ---
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Introduction package regts}
+%\VignetteIndexEntry{Temporal aggregation of (growth) timeseries}
 -->
 
 \newcommand{\longerpage}[1][1]{\enlargethispage{#1\baselineskip}}

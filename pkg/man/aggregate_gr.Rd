@@ -27,14 +27,14 @@ four different type of methods for different types of input timeseries.
 }
 \details{
 The \code{dif1s} and \code{dif1} methods assume that the input timeseries
-contain a first difference of length 1 (for \code{dif1s} the input is also
-scaled). The result is a first difference of length 1 in the output frequency.
+contain a first difference (for \code{dif1s} the input is also
+scaled). The result is a first difference in the output frequency.
 The \code{pct} and \code{rel} methods assume timeseries that contain
 percentage or relative change. They calculate the exact percentage or
 relative change for the output timeseries.
 
-More details of the aggregation methods are  provided in the Vignette
-"Introduction to package regts".
+More details of the aggregation methods are provided in the Vignette
+"Temporal aggregation of (growth) timeseries".
 }
 \examples{
 ts_q <- regts(rnorm(10), start = "2016Q1")
