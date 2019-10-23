@@ -501,7 +501,7 @@ In this case a sheet 'extra' is appended to the xlsx file.
 
 Writing sheets is also possible with function `write_ts_sheet` in
 combination with library `openxlsx`. 
-`write_ts_sheet` can be used to write to multiple sheets to the same file. This is more efficiënt than repeatedly using `write_ts_xlsx` with the `append_sheet` parameter.
+`write_ts_sheet` can be used to write to multiple sheets to the same file. This is more efficient than repeatedly using `write_ts_xlsx` with the `append_sheet` parameter.
 It is also possible to change for example cell styles, column widths or the default font of the workbook.
 
 ### Periods in files\label{fileperiods}
