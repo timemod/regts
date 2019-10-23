@@ -1,6 +1,6 @@
 
 ---
-title: "Temporal aggregation of (growth) timeseries"
+title: "Temporal Aggregation of (Growth) Timeseries"
 author: "Rob van Harrevelt and Anita van der Roest"
 date: '`r Sys.Date()`'
 output:
@@ -12,7 +12,7 @@ linkcolor: blue
 ---
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Temporal aggregation of (growth) timeseries}
+%\VignetteIndexEntry{Temporal Aggregation of (Growth) Timeseries}
 -->
 
 \newcommand{\longerpage}[1][1]{\enlargethispage{#1\baselineskip}}
@@ -39,7 +39,7 @@ options(width = 100)
 # Introduction
 This vignette discusses temporal aggregation of timeseries, i.e. the conversion 
 of a timeseries to a lower frequency. 
-The vignette is an extension of the vignette "Introduction to package regts", but can be read independently.
+The vignette is an extension of the vignette [_"Introduction to regts"_](regts.pdf), but can be read independently.
 
 Section 2 describes the standard aggregation function `aggregate`. Section 3 discusses aggregation for growth timeseries with several methods, which are described in detail in section 4.
 

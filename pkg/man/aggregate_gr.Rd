@@ -2,7 +2,7 @@
 % Please edit documentation in R/aggregate_gr.R
 \name{aggregate_gr}
 \alias{aggregate_gr}
-\title{Convert timeseries with absolute or relative growth rates to a lower
+\title{Convert timeseries with absolute or relative changes to a lower
 frequency}
 \usage{
 aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"),
@@ -12,7 +12,7 @@ aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"),
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object}
 
 \item{method}{Aggregation method: \code{"dif1s"}, \code{"dif1"}, \code{"pct"}
-or \code{"rel"}. See details.}
+or \code{"rel"}. See Details.}
 
 \item{nfrequency}{the frequency of the result. This should be higher than
 the frequency of timeseries \code{x}}
@@ -21,11 +21,14 @@ the frequency of timeseries \code{x}}
 a \code{regts} with frequency \code{nfrequency}
 }
 \description{
-Special aggregation methods are needed for timeseries that contain absolute,
-relative or percentage changes, the 'cumulative growth methods'. There are
-four different type of methods for different types of input timeseries.
+This function implements temporal aggregation for timeseries with absolute,
+relative or percentage changes. As shown in vignette "Temporal Aggregation of
+(Growth) Timeseries",
+the standard function \code{\link[stats]{aggregate}} does not yield correct
+results for these type of timeseries.
 }
 \details{
+There are methods for different types of input timeseries.
 The \code{dif1s} and \code{dif1} methods assume that the input timeseries
 contain a first difference (for \code{dif1s} the input is also
 scaled). The result is a first difference in the output frequency.
@@ -33,8 +36,8 @@ The \code{pct} and \code{rel} methods assume timeseries that contain
 percentage or relative change. They calculate the exact percentage or
 relative change for the output timeseries.
 
-More details of the aggregation methods are provided in the Vignette
-"Temporal aggregation of (growth) timeseries".
+More details are provided in vignette
+\emph{"Temporal Aggregation of (Growth) Timeseries"}.
 }
 \examples{
 ts_q <- regts(rnorm(10), start = "2016Q1")

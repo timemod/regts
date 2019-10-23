@@ -1,6 +1,6 @@
 
 ---
-title: "Introduction to package regts"
+title: "Introduction to regts"
 author: "Rob van Harrevelt and Anita van der Roest"
 date: '`r Sys.Date()`'
 output:
@@ -12,7 +12,7 @@ linkcolor: blue
 ---
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Introduction package regts}
+%\VignetteIndexEntry{Introduction to regts}
 -->
 
 \newcommand{\longerpage}[1][1]{\enlargethispage{#1\baselineskip}}
@@ -628,7 +628,7 @@ diff(tx)
 plot(tx)
 ```
 
-Most functions work exactly the same for `regts` and `ts`. Exceptions are for instance `cbind` (discussed below) and `aggregate` (described in vignette _Temporal aggregation of (growth) timeseries_)
+Most functions work exactly the same for `regts` and `ts`. Exceptions are for instance `cbind` (discussed below) and `aggregate` (described in vignette [_"Temporal Aggregation of (Growth) Timeseries"_](aggregation.pdf)
 For some functions alternative implementations are available (`lag_ts`, `lead_ts`, `diff_ts`, see section \ref{laglead})
 
   
