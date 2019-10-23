@@ -716,6 +716,7 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
   } else {
 
     names <- name_row_data[col_has_name]
+    if (!missing(name_fun)) names <- name_fun(names)
 
     # labels
     if (labels != "no") {
@@ -745,4 +746,20 @@ get_labels_from_tbl <- function(label_tbl, rowwise) {
   }
   if (!any(nzchar(lbls))) lbls <- NULL
   return(lbls)
+}
+
+test_duplicates <- function(rts, filename, sheetname = NULL){
+  # test duplicate names in xlsx or csv
+  dupl <- duplicated(colnames(rts))
+  if (any(dupl)){
+
+    if (is.null(sheetname)){
+      warning(sprintf("Duplicate names in file %s: %s", filename,
+                      paste(colnames(rts)[dupl], collapse = ", ")))
+    } else{
+      warning(sprintf("Duplicate names on sheet %s of file %s: %s", sheetname,
+                      filename, paste(colnames(rts)[dupl], collapse = ", ")))
+    }
+  }
+  return(invisible(NULL))
 }

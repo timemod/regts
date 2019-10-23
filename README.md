@@ -3,3 +3,9 @@
 ## regts
 
 Package `regts` makes it easier to work with regular timeseries, particularly for annual, quarterly and monthly timeseries.
+
+## Documentation
+
+[Reference manual](regts.pdf)
+
+[Vignette](pkg/vignettes/regts.pdf)

@@ -94,7 +94,7 @@ test_that("as.character.period_range", {
 })
 
 
-test_that("length subrange", {
+test_that("nperiod", {
   r <- period_range("2010Q4", "2011Q3")
   s <- period_range("2016Q1", "2016Q4")
   expect_identical(nperiod(r), nperiod(s))
@@ -102,8 +102,9 @@ test_that("length subrange", {
   r <- period_range("2010", "2013")
   s <- period_range("2014", "2017")
   expect_identical(nperiod(r), nperiod(s))
-  t <- as.character(r)
-  expect_error(nperiod(t), "Variable should be a period_range object")
+  expect_identical(nperiod(as.character(r)), nperiod(s))
+  expect_identical(nperiod(2), 1)
+  expect_error(nperiod("xxx"), "Illegal period xxx.")
 })
 
 test_that("logical operators", {
