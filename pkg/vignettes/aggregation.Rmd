@@ -1,0 +1,264 @@
+
+---
+title: "Temporal Aggregation of (Growth) Timeseries"
+author: "Rob van Harrevelt and Anita van der Roest"
+date: '`r Sys.Date()`'
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+linkcolor: blue    
+---
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Temporal Aggregation of (Growth) Timeseries}
+-->
+
+\newcommand{\longerpage}[1][1]{\enlargethispage{#1\baselineskip}}
+\newcommand{\shorterpage}[1][1]{\enlargethispage{-#1\baselineskip}}
+\newcommand{\needlines}[1]{\Needspace{#1\baselineskip}}
+
+
+```{r echo = FALSE, message = FALSE}
+library(regts)
+library(Hmisc)
+library(readxl)
+data <- matrix(c(3,2,4,3,5,2,5,3), ncol = 2)
+data1 <- matrix(c(1,3,2,6,4,8,3,0,9), ncol = 3)
+
+# input/output chunks are separated
+# R inputlines start with >, outputlines with nothing
+knitr::opts_chunk$set(collapse = FALSE, comment = "", prompt = TRUE)
+
+# set options for page width = 100
+options(width = 100)
+
+```
+
+# Introduction
+This vignette discusses temporal aggregation of timeseries, i.e. the conversion 
+of a timeseries to a lower frequency. 
+The vignette is an extension of the vignette [_"Introduction to regts"_](regts.pdf), but can be read independently.
+
+Section 2 describes the standard aggregation function `aggregate`. Section 3 discusses aggregation for growth timeseries with several methods, which are described in detail in section 4.
+
+
+# Function aggregate
+The standard function `aggregate` can be used to convert a timeseries to a lower 
+frequency, for example a quarterly to an annual timeseries, or a monthly to a quarterly timeseries.
+
+An example with a monthly timeseries:
+```{r}
+regm <- regts(1:24, start = "2016M1")
+regm
+aggregate(regm, FUN = mean, nfrequency = 4)
+```
+The observations in the timeseries are split into blocks for each quarter and `FUN` is applied to the three observations in that quarter. The result is a quarterly timeseries holding the aggregated values.
+
+Another example with a quarterly timeseries:
+```{r}
+regq <- regts(1:10, start = "2016q1")
+regq
+aggregate(regq, FUN = sum)
+```
+The quarters in 2016 add up to 10, the quarters in 2017 to 26. Note that the two 
+quarters in 2018 are ignored. The `aggregate` function skips the incomplete 
+years at the end.
+
+Incomplete years at the beginning are also skipped. For example, the next timeseries starts in the second quarter:
+
+```{r}
+regq2 <- regts(2:10, start = "2016q2")
+regq2
+aggregate(regq2, FUN = sum)
+```
+
+The quarters in 2017 add up to 26 as before. But now the information for 2016 
+is also not complete, and therefore ignored. 
+
+Thus for `regts` objects the `aggregate` function skips all incomplete years at the beginning and end of the timeseries. However for standard timeseries (`ts`) the implementation of `aggregate` only skips incomplete years at the end.
+The previous example but now with a `ts` timeseries:
+
+```{r}
+tq2 <- ts(2:10, start = c(2016,2), frequency = 4)
+tq2
+aggregate(tq2, FUN = sum)
+```
+
+\longerpage[1]
+The result is an unconventional timeseries with frequency `year` but a shifted period (the start is 2016.25). The result for 2016.25 is the sum of the observations in period `2016Q2/2017Q1`. 
+
+In all other cases the `aggregate` function works exactly the same for `regts` and `ts` objects.
+
+\newpage
+# Aggregation of growth timeseries 
+As is shown in the next section the function `aggregate` does not yield correct results for timeseries with absolute, relative or percentage changes. 
+For growth timeseries the function `aggregate_gr` can be used. It accepts both `regts` and `ts` timeseries. The function implements several methods (`dif1`, `dif1s`, `rel` and `pct`) for different types of input timeseries.
+
+Methods `dif1` and `dif1s` assume that the input timeseries is a first 
+difference: 
+\begin{displaymath}
+ x_{t} = z_{t} - z_{t-1}
+\end{displaymath}
+where $t$ is the period (like year or quarter). These methods calculate the low frequency first difference timeseries. For method `dif1s` the result is also scaled.
+An example for both methods, the results are annual timeseries:
+
+```{r}
+xdif <- diff(regts(1:8, start = "2019q1"))
+xdif
+aggregate_gr(xdif, method = "dif1")
+aggregate_gr(xdif, method = "dif1s")  # result is also scaled
+```
+
+The `rel` and `pct` methods assume that the input timeseries is a one-period 
+relative or percentage change and calculate the exact low frequency relative or percentage change.
+The methods are described in detail in the next section.
+
+# Aggregation methods for growth timeseries
+This section describes the methods implemented in function `aggregate_gr`, including the derivation of the corresponding mathematical formulas. 
+
+Suppose we are temporally aggregating a timeseries $x$ with $n$ subperiods to a 
+timeseries $X$ with a lower frequency. In other words we want to convert a timeseries x with a high frequency (monthly, quarterly) to a new timeseries with a lower frequency (quarterly, annual).
+
+Let $x_{t,i}$   stand for the value of $x$ in subperiod $i$ of main period $t$.
+The index $i$ takes on values in the range $1 .. n$.
+We always interpret $x_{t,0}$ to mean $x_{t-1,n}$.
+The time index $t$ refers to the periods in the time domain of $X$.
+Many conversion methods only need the observations subperiod $i$ of main period $t$.
+For example the \texttt{mean} method calculates $X_t$ as follows
+\begin{displaymath}
+X_t = \sum_{i=1}^{n} x_{t,i}/n
+\end{displaymath}
+
+However there are transformations which are not so straightforward. A case in point is when $x$ is a high frequency first difference and must be converted to a low frequency first difference. A simple averaging of $n$ high frequency observations will not give the correct answer. For example, for a quarterly growth series the yearly aggregates also depend on the quarterly observations of the previous year. Therefore we cannot use function `aggregate`, function `aggregate_gr` must be applied. In the next subsections a more detailed description of the available frequency conversion methods for this function is given.
+
+## `dif1` method 
+Define $x$ to be the first difference  of $z$. Thus
+\begin{displaymath}
+ x_{t,i} = z_{t,i} - z_{t,i-1}
+\end{displaymath}
+We can also define $z_{t,i}$ in terms of $x$ as follows
+\begin{eqnarray*}
+z_{t,i} & = & z_{t,i-1} + x_{t,i}\\
+        & = & z_{t-1,n} + \sum_{j=1}^{i} x_{t,j}
+\end{eqnarray*}
+Now define $Z_t$ as the level timeseries in time domain $t$ corresponding
+to $z$
+\begin{eqnarray*}
+Z_t &=& \sum_{i=1}^{n} z_{t,i}\\
+    &=& \sum_{i=1}^{n} z_{t-1,n} + \sum_{i=1}^{n} \sum_{j=1}^{i} x_{t,j}\\
+    &=& \sum_{i=1}^{n} z_{t-2,n} + \sum_{i=1}^{n} \sum_{j=1}^{n} x_{t-1,j} + \sum_{i=1}^{n} \sum_{j=1}^{i} x_{t,j}
+\end{eqnarray*}
+Then $X$ in any period $t$ can be calculated from
+\begin{displaymath}
+X_t = Z_t - Z_{t-1}
+\end{displaymath}
+Since $Z_{t-1}$ can be written as
+\begin{displaymath}
+Z_{t-1} = \sum_{i=1}^{n} z_{t-2,n} + \sum_{i=1}^{n} \sum_{j=1}^{i} x_{t-1,j}\\
+\end{displaymath}
+it is easy to show that $X_t$ does not depend on $z_{t-2,n}$.
+In any practical algorithm $z_{t-2,n}$ can be set to 0.
+
+A compact equation for $X_t$ can be derived by substituting the equations for
+$Z_t$ and $Z_{t-1}$ into the definition of $X_t$
+\begin{displaymath}
+X_t = \sum_{i=1}^n
+        \left(
+          \sum_{j=i+1}^n x_{t-1,j} + \sum_{j=1}^i x_{t,j}
+        \right) 
+\end{displaymath}
+This expression can be futher simplified by changing the order of summation.
+For the first summation, we can write
+\begin{displaymath}
+ \sum_{i=1}^n  \sum_{j=i+1}^n x_{t-1,j} = \sum_{j=2}^n \sum_{i=1}^{j-1} x_{t-1,j}
+                    = \sum_{j=2}^n  (j-1) x_{t-1,j}
+\end{displaymath}
+Similarly,
+\begin{displaymath}
+ \sum_{i=1}^n  \sum_{j=1}^i x_{t,j} = \sum_{j=1}^n  \sum_{i=j}^{n} x_{t,j} =
+                             \sum_{j=1}^n  (n - j + 1) x_{t,j}
+\end{displaymath}
+The final equation is given by
+\begin{displaymath}
+X_t =  \left(  \sum_{j=2}^n  (j-1) x_{t-1,j} +  \sum_{j=1}^n  (n - j + 1) x_{t,j} \right) 
+\end{displaymath}
+
+
+## `dif1s` method 
+The `dif1s` method is similar to the `dif1` method described in the previous 
+subsection. The only difference is that  the aggregate $Z_t$ is calculated with
+an average instead of a sum:
+\begin{eqnarray*}
+Z_t &=& \sum_{i=1}^{n} z_{t,i}/n\\
+\end{eqnarray*}
+Further derivations are analogous.
+The result for `dif1s` is the result for `dif1` divided by $n$:
+\begin{displaymath}
+X_t =  \left(  \sum_{j=2}^n  (j-1) x_{t-1,j} +  \sum_{j=1}^n  (n - j + 1) x_{t,j} \right) / n
+\end{displaymath}
+
+
+## `rel` method 
+Define $x$ to be the relative change in $z$. Thus
+\begin{displaymath}
+ x_{t,i} = (z_{t,i} - z_{t,i-1}) / z_{t,i-1}
+\end{displaymath}
+We can also define $z_{t,i}$ in terms of $x$ as follows
+\begin{eqnarray*}
+z_{t,i} & = & z_{t,i-1}(1 + x_{t,i})\\
+        & = & z_{t-1,n}  \prod_{j=1}^{i}(1+ x_{t,j})\\
+        & = & z_{t-2,n} \prod_{j=1}^{n}(1+ x_{t-1,j}) \prod_{j=1}^{i}(1+ x_{t,j})
+\end{eqnarray*}
+Now define $Z_t$ as the level timeseries in time domain $t$ corresponding
+to $z$
+\begin{eqnarray*}
+Z_t &=& \sum_{i=1}^{n} z_{t,i}\\
+    &=&  z_{t-1,n} \sum_{i=1}^{n} \prod_{j=1}^{i}(1+ x_{t,j})\\
+    &=&  z_{t-2,n} \prod_{j=1}^{n}(1+ x_{t-1,j}) \sum_{i=1}^{n} \prod_{j=1}^{i}(1+ x_{t,j})
+\end{eqnarray*}
+Then $X$ in any period $t$ can be calculated from
+\begin{displaymath}
+X_t = Z_t / Z_{t-1} - 1
+\end{displaymath}
+Using the expression for $Z_{t-1}$
+\begin{displaymath}
+Z_{t-1} = z_{t-2,n}  \sum_{i=1}^{n} \prod_{j=1}^{i}(1+ x_{t-1,j})
+\end{displaymath}
+we obtain
+\begin{displaymath}
+X_t = \frac{\prod_{j=2}^{n}(1+ x_{t-1,j}) \sum_{i=1}^{n} \prod_{j=1}^{i}(1+ x_{t,j})}
+{1 + \sum_{i=2}^{n} \prod_{j=2}^{i}(1+ x_{t-1,j})} - 1
+\end{displaymath}
+
+
+## `pct` method 
+Define $x$ to be the percentage change in $z$. Thus
+\begin{displaymath}
+ x_{t,i} = 100 (z_{t,i} - z_{t,i-1}) / z_{t,i-1}
+\end{displaymath}
+
+The derivations are analogous to the `rel` method described in the previous subsection. 
+
+The result is
+\begin{displaymath}
+X_t = 100 \frac{\prod_{j=2}^{n}(1+ x_{t-1,j}/100) \sum_{i=1}^{n} \prod_{j=1}^{i}(1+ x_{t,j}/100)}
+{1 + \sum_{i=2}^{n} \prod_{j=2}^{i}(1+ x_{t-1,j}/100)} - 1
+\end{displaymath}
+
+<!--
+-->
+
+
+
+
+
+
+
+
+
+
+
+
+

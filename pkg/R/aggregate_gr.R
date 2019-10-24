@@ -1,25 +1,28 @@
-#' Convert timeseries with absolute or relative growth rates to a lower
+#' Convert timeseries with absolute or relative changes to a lower
 #' frequency
 #'
-#' Special aggregation methods are needed for timeseries that contain absolute,
-#' relative or percentage changes, the 'cumulative growth methods'. There are
-#' four different type of methods for different types of input timeseries.
+#' This function implements temporal aggregation for timeseries with absolute,
+#' relative or percentage changes. As shown in vignette \emph{"Temporal Aggregation of
+#' (Growth) Timeseries"},
+#' the standard function \code{\link[stats]{aggregate}} does not yield correct
+#' results for these type of timeseries.
 #'
-#' The \code{dif1s} and \code{dif} methods assume that the input timeseries
-#' contain a first difference of length 1 (for \code{dif1s} the input is also
-#' scaled). The result is a first difference of length 1 in the output frequency.
+#' There are methods for different types of input timeseries.
+#' The \code{dif1s} and \code{dif1} methods assume that the input timeseries
+#' contain a first difference (for \code{dif1s} the input is also
+#' scaled). The result is a first difference in the output frequency.
 #' The \code{pct} and \code{rel} methods assume timeseries that contain
 #' percentage or relative change. They calculate the exact percentage or
 #' relative change for the output timeseries.
 #'
-#' More details of the aggregation methods are  provided in the Vignette
-#' "Introduction to package regts".
+#' More details are provided in vignette
+#' \emph{"Temporal Aggregation of (Growth) Timeseries"}.
 #'
-#' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object
+#' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} object
 #' @param nfrequency the frequency of the result. This should be higher than
 #' the frequency of timeseries \code{x}
 #' @param method Aggregation method: \code{"dif1s"}, \code{"dif1"}, \code{"pct"}
-#' or \code{"rel"}. See details.
+#' or \code{"rel"}. See Details.
 #' @return a \code{regts} with frequency \code{nfrequency}
 #' @examples
 #' ts_q <- regts(rnorm(10), start = "2016Q1")

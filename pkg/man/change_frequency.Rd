@@ -49,9 +49,9 @@ higher or lower frequency
 
 \examples{
 p <- period("2017M4")
-print(change_frequency(p, 4))
+change_frequency(p, 4)
 
 range <- period_range("2017Q3/2018Q1")
-print(change_frequency(range, 12))
-print(change_frequency(range, 1))
+change_frequency(range, 12)
+change_frequency(range, 1)
 }

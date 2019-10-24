@@ -17,7 +17,6 @@
 #' columns. This argument is obligatory if the timeseries have overlapping
 #' column names. Length suffixes must be equal to the number of joined timeseries
 #' or objects.
-#' have overlapping columns.
 #' @seealso \code{\link{as.list}}
 #' @importFrom stats ts.union ts.intersect
 #' @examples

@@ -16,12 +16,12 @@ lead_ts(x, n = 1, keep_range = TRUE, ...)
 \item{x}{a univariate or multivariate timeseries.
 Can also be a vector, matrix or data frame (see details).}
 
-\item{n}{the number leads (in units of observations).
+\item{n}{the number of leads (in units of observations).
 Must be a positive number.}
 
 \item{keep_range}{if \code{TRUE} (the default), then the output
 timeseries has the same period range as the input timeseries.
-Then the result timeseries will have \code{n} \code{NA} values at the
+The result timeseries will have \code{n} \code{NA} values at the
 beginning end.
 If \code{FALSE} the period range of the result timeseries is shifted
 by \code{n} periods. The result timeseries
@@ -38,6 +38,13 @@ backwards by a given number of periods.
 Vector, matrix and data frame arguments are first converted to a \code{regts}
 with function \code{\link{regts}}. This conversion results in a timeseries
 with frequency 1 and starting at year 1.
+
+Function \code{lead_ts} is an alternative for function \code{\link[stats]{lag}}
+in the \code{stats} package which computes both lags and leads.
+By default in \code{lead_ts} the resulting timeseries has the same
+period range as the input timeseries. In function \code{lag} the time base
+is always shifted. \code{lead_ts(x, 1, keep_range = FALSE)} is the same as
+\code{lag(x, 1)}
 }
 \examples{
 x <- regts(1:10, start = "2018q3")

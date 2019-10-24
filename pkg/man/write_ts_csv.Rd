@@ -32,7 +32,7 @@ The csv file is actually written by function
 \code{\link[data.table]{fwrite}} of package \code{data.table}.
 }
 \examples{
-# create two timeseries objects
+# create a timeseries object
 ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
              labels = c("Timeseries a", "Timeseries b"), start = "2017Q2")
 

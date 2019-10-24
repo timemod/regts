@@ -8,9 +8,11 @@
 #' with frequency 1 and starting at year 1.
 #'
 #' \code{lag_ts} differs from \code{\link[stats]{lag}}
-#' in the \code{stats} package in that the specified number of lags or leads
+#' in the \code{stats} package in that the specified number of lags
 #' is positive, and that by default the resulting timeseries has the same
-#' period range as the input timeseries.
+#' period range as the input timeseries. In function \code{lag} the time base
+#' is always shifted. \code{lag_ts(x, 1, keep_range = FALSE)} is the same as
+#' \code{lag(x, -1)}
 #'
 #' @param x a univariate or multivariate timeseries.
 #' Can also be a vector, matrix or data frame (see details).
@@ -18,13 +20,13 @@
 #'          Must be a positive number.
 #' @param keep_range if \code{TRUE} (the default), then the output
 #' timeseries has the same period range as the input timeseries.
-#' Then the result timeseries will have \code{n} \code{NA} values at the
+#' The result timeseries will have \code{n} \code{NA} values at the
 #' beginning. If \code{FALSE} the period range of the result timeseries is
 #' shifted by \code{n} periods. The result timeseries
 #' starts and ends \code{n} periods later.
 #' @param ... further arguments to be passed to or from methods
 #'            (currently not used in package \code{regts})
-#' @seealso \code{\link{lead_ts}} and \code{\link{diff_ts}}
+#' @seealso \code{\link{lead_ts}}, \code{\link{diff_ts}} and \code{\link[stats]{lag}}
 #' @examples
 #' x <- regts(1:10, start = "2018q3")
 #' lag_ts(x)
@@ -58,14 +60,21 @@ lag_ts.default <- function(x, n = 1, keep_range = TRUE, ...) {
 #' with function \code{\link{regts}}. This conversion results in a timeseries
 #' with frequency 1 and starting at year 1.
 #'
+#' Function \code{lead_ts} is an alternative for function \code{\link[stats]{lag}}
+#' in the \code{stats} package which computes both lags and leads.
+#' By default in \code{lead_ts} the resulting timeseries has the same
+#' period range as the input timeseries. In function \code{lag} the time base
+#' is always shifted. \code{lead_ts(x, 1, keep_range = FALSE)} is the same as
+#' \code{lag(x, 1)}
+#'
 #' @param x a univariate or multivariate timeseries.
 #' Can also be a vector, matrix or data frame (see details).
 #
-#' @param n the number leads (in units of observations).
+#' @param n the number of leads (in units of observations).
 #'          Must be a positive number.
 #' @param keep_range if \code{TRUE} (the default), then the output
 #' timeseries has the same period range as the input timeseries.
-#' Then the result timeseries will have \code{n} \code{NA} values at the
+#' The result timeseries will have \code{n} \code{NA} values at the
 #' beginning end.
 #' If \code{FALSE} the period range of the result timeseries is shifted
 #' by \code{n} periods. The result timeseries

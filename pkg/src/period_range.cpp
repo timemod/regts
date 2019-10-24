@@ -13,7 +13,7 @@ NumericVector PeriodRange::get_period_range() {
     return (result);
 }
 
-// Returns the period range based on the tsp attribute of a timeseries
+// Return the period range based on the tsp attribute of a timeseries
 PeriodRange get_prd_range(const NumericVector &tsp) {
     PeriodRange per;
     per.freq  = tsp[2];
@@ -26,13 +26,13 @@ PeriodRange get_prd_range(const NumericVector &tsp) {
     return per;
 }
 
-// Returns the PeriodRange of a numerical timeseries.
+// Return the PeriodRange of a numerical timeseries.
 PeriodRange get_prd_range(const NumericMatrix &ts) {
     NumericVector tsp = ts.attr("tsp");
     return get_prd_range(tsp);
 }
 
-//' Returns the \link{period_range} of a timeseries.
+//' Return the \link{period_range} of a timeseries.
 //'
 //' @param x a timeseries (\link{ts} or \link{regts})
 //' @return a \code{period_range}

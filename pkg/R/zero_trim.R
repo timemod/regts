@@ -21,6 +21,7 @@
 #' rts <- regts(data, start = "2010Q2", names = c("a", "b", "c"))
 #' zero_trim(rts, method = "last")
 #'
+#' # removing zeros in a multivariate regts
 #' data <- matrix(c(0, 3, 0, 0, 5, 6, 0, 7, 0), ncol = 3)
 #' rts <- regts(data, start = "2010Q1", names = c("a", "b", "c"))
 #' # remove leading zeros if all elements in the row are zero

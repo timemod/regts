@@ -25,7 +25,7 @@
 #' In this way the observations are distributed evenly over the past
 #' and future. An alternative approach is to use the same number
 #' of observations as the order but use one more observation from the past
-#' than from the future, or the other way around. These methods can be be used
+#' than from the future, or the other way around. These methods can be used
 #' by specifying argument \code{method}. Possible methods are
 #' \describe{
 #' \item{\code{centre}}{Standard method
