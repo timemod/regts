@@ -22,8 +22,9 @@ a \code{regts} with frequency \code{nfrequency}
 }
 \description{
 This function implements temporal aggregation for timeseries with absolute,
-relative or percentage changes. As shown in vignette \emph{"Temporal Aggregation of
-(Growth) Timeseries"},
+relative or percentage changes. As shown in vignette
+ \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
+(Growth) Timeseries"}},
 the standard function \code{\link[stats]{aggregate}} does not yield correct
 results for these type of timeseries.
 }
@@ -37,7 +38,8 @@ percentage or relative change. They calculate the exact percentage or
 relative change for the output timeseries.
 
 More details are provided in vignette
-\emph{"Temporal Aggregation of (Growth) Timeseries"}.
+ \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
+(Growth) Timeseries"}}.
 }
 \examples{
 ts_q <- regts(rnorm(10), start = "2016Q1")

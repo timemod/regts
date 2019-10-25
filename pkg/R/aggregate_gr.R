@@ -2,8 +2,9 @@
 #' frequency
 #'
 #' This function implements temporal aggregation for timeseries with absolute,
-#' relative or percentage changes. As shown in vignette \emph{"Temporal Aggregation of
-#' (Growth) Timeseries"},
+#' relative or percentage changes. As shown in vignette
+#'  \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
+#' (Growth) Timeseries"}},
 #' the standard function \code{\link[stats]{aggregate}} does not yield correct
 #' results for these type of timeseries.
 #'
@@ -16,7 +17,8 @@
 #' relative change for the output timeseries.
 #'
 #' More details are provided in vignette
-#' \emph{"Temporal Aggregation of (Growth) Timeseries"}.
+#'  \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
+#' (Growth) Timeseries"}}.
 #'
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} object
 #' @param nfrequency the frequency of the result. This should be higher than
