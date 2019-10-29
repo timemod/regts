@@ -9,4 +9,5 @@ Package `regts` makes it easier to work with regular timeseries, particularly fo
 [Reference manual](regts.pdf)
 
 [Vignette *Introduction to `regts`*](pkg/vignettes/regts.pdf)
+
 [Vignette *Temporal Aggregation of (Growth) Timeseries*](pkg/vignettes/aggregation.pdf)
