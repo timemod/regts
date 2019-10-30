@@ -285,4 +285,5 @@ nperiod__  <- function(x) {
 #' @export
 print.period_range <- function(x, ...) {
   print(as.character(x))
+  return(invisible(x))
 }
