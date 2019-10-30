@@ -375,4 +375,5 @@ print.tsdif <- function(x, ...) {
       }
     }
   })
+  return(invisible(x))
 }
