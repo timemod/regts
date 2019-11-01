@@ -41,7 +41,8 @@ print.regts <- function(x, ...) {
     periods <- sapply(0 : (NROW(x) - 1),
                       FUN = function(i) as.character(first_period + i))
     rownames(print_mat) <- periods
-    return(print(print_mat, ...))
+    print(print_mat, ...)
+    return(invisible(x))
   } else  if (f  == 4 || f == 12) {
     # print.ts prints quarterly and monthly timeseries nicely, therefore use the
     # standard method for ts objects
@@ -125,7 +126,8 @@ print_vec_regts <- function(x, ...) {
                     FUN = function(i) as.character(first_period + i))
   values <- as.numeric(x)
   names(values) <- periods
-  return(print(values))
+  print(values)
+  return(invisible(x))
 }
 
 

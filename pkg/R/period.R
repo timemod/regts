@@ -352,6 +352,7 @@ print.period <- function(x, ...) {
   } else {
     print(as.character(x))
   }
+  return(invisible(x))
 }
 
 # Create a period vector based on the number of subperiods after Christ.
