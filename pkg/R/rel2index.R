@@ -70,8 +70,8 @@ rel2index <- function(x, base = start_period(x) - 1, scale = 100,
   if (scale != 1) data <- data * scale
 
   if (keep_range) {
-    # remove first row
-    data <- data[-1, ]
+    # remove first rowS
+    data <- data[-1, , drop = FALSE]
     new_start = new_start + 1
   }
 
@@ -79,8 +79,6 @@ rel2index <- function(x, base = start_period(x) - 1, scale = 100,
     # convert the vector to data
     dim(data) <- NULL
   }
-
-
 
   return(regts(data, start = new_start, names = colnames(x),
                labels = ts_labels(x)))

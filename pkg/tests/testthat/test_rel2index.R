@@ -12,6 +12,9 @@ test_that("rel2index univariate timeseries", {
   ts1_index <- rel2index(ts1_rel, keep_range = FALSE)
   expect_equal(ts1, ts1_index)
 
+  ts1_index_2 <- rel2index(ts1_rel["2010q3"], keep_range = TRUE)
+  expect_equal(ts1["2010q3"], ts1_index_2)
+
   ts1_index2 <- rel2index(ts1_rel, base = "2010Q4")
   expected <- (100 * ts1 / as.numeric(ts1["2010Q4"]))[get_period_range(ts1_rel)]
   expect_equal(ts1_index2, expected)
@@ -26,12 +29,22 @@ test_that("rel2index multivariate timeseries", {
   p <- get_period_range(ts1_rel)
   expect_equal(ts1[p], ts1_index[p])
 
+  ts1_index_2 <- rel2index(ts1_rel["2010q3"], keep_range = TRUE, scale = 1)
+  expect_equal(ts1["2010q3"], ts1_index_2)
+
   ts1_index2 <- rel2index(ts1_rel, base = "2011Q3", scale = 1,
                           keep_range = FALSE)
   expected <- ts1
   i <- period("2011Q3") - period("2010Q2") + 1
   expected[] <- apply(expected, MARGIN = 2, FUN = function(x) {x /x[i]})
   expect_equal(ts1_index2, expected)
+
+  # empty timeseries
+  ts1_rel_empty <- ts1_rel[ , character(0)]
+  ts1_empty <- ts1[ , character(0)]
+  expect_equal(rel2index(ts1_rel_empty, keep_range = FALSE), ts1_empty)
+  expect_equal(rel2index(ts1_rel_empty, keep_range = TRUE), ts1_empty[p],
+               check.attributes = FALSE)
 })
 
 test_that("pct2index", {
