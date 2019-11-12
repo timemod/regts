@@ -312,9 +312,9 @@ test_that("weird periods in first column", {
   layout1 <- regts:::inspect_tibble(tbl1, frequency = NA, xlsx = TRUE)
 
   expected_result1 <- list(rowwise = FALSE, period_col = 1L,
-                           first_data_row = 2L, last_data_col = NA_real_,
+                           first_data_row = 1L, last_data_col = NA_real_,
                            is_data_col = c(FALSE, FALSE, FALSE),
-                           is_data_row = c(FALSE, TRUE, TRUE, TRUE),
+                           is_data_row = c(TRUE, TRUE, TRUE, TRUE),
                            names = character(0), lbls = NULL)
   expect_equal(layout1, expected_result1)
 
@@ -326,4 +326,26 @@ test_that("weird periods in first column", {
                                          xlsx = FALSE)
   expect_equal(layout1_csv, expected_result1)
 
+  tbl2 <- tibble(b = list("2010", "2010q1", 1, 2),
+                 c = list(NA, "2010q2", 1, 2),
+                 d = list("x", "2010q3", 1, 2))
+
+  layout2 <- regts:::inspect_tibble(tbl2, frequency = NA, xlsx = TRUE)
+
+
+  expected_result2 <- list(rowwise = FALSE, period_col = 1L,
+                           first_data_row = 2L, last_data_col = 3,
+                           is_data_col = c(FALSE, FALSE, TRUE),
+                           is_data_row = c(FALSE, TRUE, TRUE, TRUE),
+                           names = "x", lbls = NULL)
+
+  expect_equal(layout2, expected_result2)
+
+  tbl2_csv <- tibble(b = c("2010", "2010q1", 1, 2),
+                     c = c(NA, "2010q2", 1, 2),
+                     d = c("x", "2010q3", 1, 2))
+
+  layout2_csv <-  regts:::inspect_tibble(tbl2_csv, frequency = NA,
+                                         xlsx = FALSE)
+  expect_equal(layout2_csv, expected_result2)
 })

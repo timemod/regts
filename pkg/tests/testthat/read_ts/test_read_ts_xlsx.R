@@ -230,6 +230,7 @@ test_that("example5.xlsx, missing periods",  {
                             labels = "no"), msg)
 })
 
+
 test_that("example11.xlsx, missing periods",  {
 
   xlsx_file <- "xlsx/example11.xlsx"
@@ -256,3 +257,13 @@ test_that("wtm_example1.xlsx", {
 })
 
 
+test_that("example 16 and 17", {
+
+  expected_result <- regts(matrix(0, nrow = 2, ncol = 0), start = "2010q1")
+
+  result_16 <- read_ts_xlsx("xlsx/example16.xlsx")
+  expect_identical(result_16, expected_result)
+
+  result_17 <- read_ts_xlsx("xlsx/example17.xlsx")
+  expect_identical(result_17, expected_result)
+})

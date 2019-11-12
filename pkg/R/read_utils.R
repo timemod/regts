@@ -252,10 +252,11 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
       if (!any(is_period_row)) next
       col_nr <- Position(identity, is_period_row)
       if (!rowwise_specified) {
+        last_period_col <- Position(identity, is_period_row, right = TRUE)
         is_period_row_sum <- sum(is_period_row)
-        if (row_nr == first_row_nr) {
-          # If a period occurs in the first non-empty row, then we assume
-          # for the time being rowwise.
+        if (row_nr == first_row_nr && last_period_col > 1) {
+          # If a period occurs in the first non-empty row for columns > 1,
+          # then we assume for the time being rowwise.
           rowwise <- TRUE
         } else if (col_nr == 1) {
           # If a period occurs in the first column, then assume columnwise.
@@ -282,8 +283,8 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
           }
 
           if (is.na(rowwise)) {
-            # Fall back case" if every other test failed, use the total number of
-            # rowwise / colwise periods.
+            # Fall back case" if every other test failed, use the total number
+            # of rowwise / colwise periods.
             rowwise <- sum(is_period_row) >= sum(is_period_col)
             rowwise_guessed <- TRUE
           } else {
@@ -313,17 +314,19 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
 
   if (!found) return(NULL)
 
-  if (rowwise && col_nr == 1) {
-    # period in first colum should be ignored, since this column should
-    # contain variable names. Skip to the next column.
+  if (rowwise && col_nr == 1 &&
+      get_last_non_empty_row(tbl[, 1]) != 1) {
+    # The period in first colum should be ignored, since this column probably
+    # contains variable names.
     is_period_row[1] <- FALSE
     col_nr <- Position(identity, is_period_row)
     if (is.na(col_nr)) return(NULL)
   }
 
-  if (!rowwise && row_nr == first_row_nr) {
-    # if the first period row is the first non-empty row, then
-    # ignore that period, since the row should contain variable names
+  if (!rowwise && row_nr == first_row_nr &&
+     get_last_non_empty_column(tbl[row_nr, ]) != 1) {
+    # The first period in the period column should be ignored, because the other
+    # columns of this rows probably contain variable names.
     is_period_col[first_row_nr] <- FALSE
     row_nr <- Position(identity, is_period_col)
     if (is.na(row_nr)) return(NULL)
@@ -367,7 +370,7 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
     last_data_col <- Position(identity, name_info$col_has_name, right = TRUE)
 
     is_data_row <- is_period_col
-    is_data_row[1:(first_data_row - 1)] <- FALSE
+    if (first_data_row > 1) is_data_row[1:(first_data_row - 1)] <- FALSE
 
     return(list(rowwise = FALSE, period_col = period_col,
                 first_data_row = first_data_row, last_data_col = last_data_col,
@@ -602,7 +605,6 @@ get_row_tbl <- function(tbl, row_nr, xlsx) {
 
 get_name_info_rowwise <- function(layout, data_tbl, labels, name_fun) {
   # get the names and labels for a rowwise tibble containing timeseries data.
-
   if (layout$first_data_col > 1) {
     pre_data_cols <- 1 : (layout$first_data_col - 1)
     pre_data_tbl <- data_tbl[ , pre_data_cols]

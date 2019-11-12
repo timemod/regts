@@ -272,3 +272,16 @@ test_that("double_row.csv is read correctly and gives warning",  {
   expect_identical(warnings, c("Duplicate names in file csv/double_row.csv: a"))
 
 })
+
+test_that("example 9 and 10", {
+
+  expected_result <- regts(matrix(NA_real_, nrow = 2, ncol = 0),
+                           start = "2010q1")
+
+  result_9 <- read_ts_csv("csv/example9.csv")
+  expect_identical(result_9, expected_result)
+
+  result_10 <- read_ts_csv("csv/example10.csv", rowwise = FALSE)
+  expect_identical(result_10, expected_result)
+})
+
