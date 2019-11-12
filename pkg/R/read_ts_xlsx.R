@@ -272,8 +272,10 @@ read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
                            .name_repair = "minimal")
   })
 
+  # When all cells in the specified range are empty, then read_excel returns
+  # a tibble with dimension 0 x 0 (0 rows and 0 columns). Therefore this case
+  # should be handled separately.
   has_data <- nrow(data_tbl) > 0
-
 
   if (has_data) {
 
