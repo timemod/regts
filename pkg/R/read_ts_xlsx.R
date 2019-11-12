@@ -370,7 +370,7 @@ read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
   mat <- as.matrix(data_tbl[-1])
 
   if (ncol(mat) == 0) {
-    # mat is a logival matrix, convert to numeric
+    # mat is a logical matrix, convert to numeric
     mat[] <- as.numeric(mat)
   } else {
     colnames(mat) <- layout$names
