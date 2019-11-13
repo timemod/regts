@@ -272,25 +272,38 @@ read_ts_rowwise_xlsx <- function(filename, sheet, sheetname, range, na_string,
                            .name_repair = "minimal")
   })
 
-  name_info <- get_name_info_rowwise(layout, data_tbl, labels, name_fun)
+  # When all cells in the specified range are empty, then read_excel returns
+  # a tibble with dimension 0 x 0 (0 rows and 0 columns). Therefore this case
+  # should be handled separately.
+  has_data <- nrow(data_tbl) > 0
 
-  # convert data columns to a numeric matrix
-  rowsel <- name_info$row_has_name
-  colsel <- layout$first_data_col : ncol(data_tbl)
-  mat <- t(data_tbl[rowsel, colsel])
-  colnames(mat) <- name_info$names
+  if (has_data) {
 
-  # print warnings
-  for (warning in select_read_excel_warnings(warnings, rowsel, range$ul[1],
-                                             warn_num_text)) {
-    warning(warning)
+    name_info <- get_name_info_rowwise(layout, data_tbl, labels, name_fun)
+
+    # convert data columns to a numeric matrix
+    rowsel <- name_info$row_has_name
+    colsel <- layout$first_data_col : ncol(data_tbl)
+    mat <- t(data_tbl[rowsel, colsel])
+    colnames(mat) <- name_info$names
+
+    # print warnings
+    for (warning in select_read_excel_warnings(warnings, name_info$row_has_name,
+                                               range$ul[1], warn_num_text)) {
+      warning(warning)
+    }
+
+  } else {
+    mat <- matrix(NA_real_,
+                  nrow = layout$last_data_col - layout$first_data_col + 1,
+                  ncol = 0)
   }
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
   ret <- matrix2regts_(mat, layout$periods, numeric = FALSE, strict = strict)
 
-  if (!is.null(name_info$lbls)) {
+  if (has_data && !is.null(name_info$lbls)) {
     ts_labels(ret) <- name_info$lbls
   }
 
@@ -355,7 +368,14 @@ read_ts_columnwise_xlsx <- function(filename, sheet, sheetname, range,
   }
 
   mat <- as.matrix(data_tbl[-1])
-  colnames(mat) <- layout$names
+
+  if (ncol(mat) == 0) {
+    # mat is a logical matrix, convert to numeric
+    mat[] <- as.numeric(mat)
+  } else {
+    colnames(mat) <- layout$names
+  }
+
 
   # convert the matrix to a regts, using numeric = FALSE because we already
   # know that mat is numeric
