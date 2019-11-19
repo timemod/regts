@@ -8,8 +8,7 @@
 \usage{
 movavb(x, order, keep_range = TRUE)
 
-movavc(x, order, keep_range = TRUE, method = c("centre", "left",
-  "right"))
+movavc(x, order, keep_range = TRUE, method = c("centre", "left", "right"))
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object}
@@ -60,11 +59,11 @@ than from the future, or the other way around. These methods can be used
 by specifying argument \code{method}. Possible methods are
 \describe{
 \item{\code{centre}}{Standard method
- e.g.  (0.5 x[t - 2] + x[t - 1] + x[t] + x[t + 1] + 0.5 x[t + 2]) / 4}
+e.g.  (0.5 x\link{t - 2} + x\link{t - 1} + x\link{t} + x\link{t + 1} + 0.5 x\link{t + 2}) / 4}
 \item{\code{left  }}{Use one more observation from the past, e.g.
-(x[t - 2] + x[t - 1] + x[t] + x[t + 1]) / 4}
+(x\link{t - 2} + x\link{t - 1} + x\link{t} + x\link{t + 1}) / 4}
 \item{\code{right }}{Use one more observation from the future, e.g.
-(x[t - 1] + x[t] + x[t + 1] + x[t + 2]) / 4}
+(x\link{t - 1} + x\link{t} + x\link{t + 1} + x\link{t + 2}) / 4}
 }
 }
 \section{Functions}{

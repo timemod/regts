@@ -7,11 +7,9 @@
 \title{Calculate an index timeseries from a timeseries with relative or
 percentage changes.}
 \usage{
-rel2index(x, base = start_period(x) - 1, scale = 100,
-  keep_range = TRUE)
+rel2index(x, base = start_period(x) - 1, scale = 100, keep_range = TRUE)
 
-pct2index(x, base = start_period(x) - 1, scale = 100,
-  keep_range = TRUE)
+pct2index(x, base = start_period(x) - 1, scale = 100, keep_range = TRUE)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a multivariate
@@ -28,7 +26,7 @@ If \code{FALSE} then the result timeseries starts 1 period earlier.}
 }
 \description{
 This is the inverse of function \code{\link{growth}}.
-The relative change, or growth, of a timeseries x[t]
+The relative change, or growth, of a timeseries x\link{t}
 is defined as \code{growth[t] = (x[t] - x[t-1]) / |x[t-1]|}.
 Suppose that \code{growth[t]} is given but \code{x[t]} is not known.
 Then it is possible to calculate the index series

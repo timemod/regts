@@ -12,7 +12,7 @@ transpose_df(x, colname_column, label_column)
 \item{colname_column}{the name or the index of the column that contains
 the column names of the transposed data frame. By default the
 row names of the original data frame are used as column names of the new data
- frame.}
+frame.}
 
 \item{label_column}{a numeric or character vector with the
 indices or the names of the columns that contains

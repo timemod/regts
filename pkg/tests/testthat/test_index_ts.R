@@ -45,8 +45,11 @@ test_that("errors", {
   msg <-  paste0("Base period \\(2017M01\\) should not have a higher frequency",
                  " than the input timeseries \\(4\\)")
   expect_error(index_ts(a, base  = "2017M1"), msg)
+  expect_error(index_ts(a, scale = -10),
+               "Argument scale must be a positive number.")
+  expect_error(index_ts(a, scale = NaN),
+               "Argument scale must be a positive number.")
 })
-
 
 test_that("NA values", {
 
@@ -118,5 +121,67 @@ test_that("NA values", {
   expected_result[ , 1] <- NA
   expected_result[ , 2:1002] <- NA
   expect_equal(no_colnames_i, expected_result)
+})
+
+test_that("negative value at base period", {
+
+  a2 <- a
+  a2["2018q2"] <- -3
+  expect_equal(index_ts(a2), a2 * 100)
+
+  expect_error(index_ts(a2, base = "2018q2"),
+               "Input timeseries has negative \\(average\\) value at base period 2018Q2.")
+  expect_error(index_ts(a2, base = "2018q1/2018q2"),
+               "Input timeseries has negative \\(average\\) value at base period 2018Q1/2018Q2.")
+
+  ab2 <- ab
+  ab2["2018q1", 1] <- -10
+
+  expected_result  <- 50 * ab2
+  expected_result$b <- expected_result$b / 2
+
+  expect_equal(index_ts(ab2, base = "2018q2"), expected_result)
+
+  expect_error(index_ts(ab2),
+               "Input timeseries has negative \\(average\\) value at base period 2018Q1 for columns: a.")
+
+  ab2["2018q1", 2] <- -5
+  expect_error(index_ts(ab2,  base = "2018q1/2018q2"),
+               "Input timeseries has negative \\(average\\) value at base period 2018Q1/2018Q2 for columns: a, b.")
+
+
+  ab2["2018q1", 1] <- -2
+  expect_warning(
+    expect_error(index_ts(ab2,  base = "2018q1/2018q2"),
+               "Input timeseries has negative \\(average\\) value at base period 2018Q1/2018Q2 for columns: b."),
+    "Input timeseries has zero \\(average\\) value at base period 2018Q1/2018Q2 for columns: a.")
+})
+
+test_that("zero value at base period", {
+
+  a2 <- a
+  a2["2018q1"] <- 0
+
+  expect_warning(result <- index_ts(a2),
+                 "Input timeseries has zero \\(average\\) value at base period 2018Q1.")
+  expect_equal(result, a2 *Inf)
+
+  ab2 <- ab
+  ab2["2018q2", 1] <- 0
+
+  expect_warning(
+    result <- index_ts(ab2, base = "2018q2"),
+     "Input timeseries has zero \\(average\\) value at base period 2018Q2 for columns: a.")
+
+  expected_result  <- 25 * ab2
+  expected_result$a <- expected_result$a * Inf
+  expect_equal(result, expected_result)
+
+  ab2["2018q2", ] <- c(-1, -2)
+
+  expect_warning(
+    result <- index_ts(ab2, base = "2018q1/2018q2"),
+    "Input timeseries has zero \\(average\\) value at base period 2018Q1/2018Q2 for columns: a, b")
+  expect_equal(result, ab2 * Inf)
 })
 

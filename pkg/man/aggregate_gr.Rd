@@ -5,8 +5,7 @@
 \title{Convert timeseries with absolute or relative changes to a lower
 frequency}
 \usage{
-aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"),
-  nfrequency = 1)
+aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"), nfrequency = 1)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object}
@@ -23,7 +22,7 @@ a \code{regts} with frequency \code{nfrequency}
 \description{
 This function implements temporal aggregation for timeseries with absolute,
 relative or percentage changes. As shown in vignette
- \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
+\href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
 (Growth) Timeseries"}},
 the standard function \code{\link[stats]{aggregate}} does not yield correct
 results for these type of timeseries.
@@ -38,7 +37,7 @@ percentage or relative change. They calculate the exact percentage or
 relative change for the output timeseries.
 
 More details are provided in vignette
- \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
+\href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
 (Growth) Timeseries"}}.
 }
 \examples{

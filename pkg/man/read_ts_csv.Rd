@@ -4,10 +4,10 @@
 \alias{read_ts_csv}
 \title{Read timeseries from a csv file}
 \usage{
-read_ts_csv(filename, skiprow = 0, skipcol = 0, rowwise,
-  frequency = NA, labels = c("after", "before", "no"), sep = "auto",
-  fill = FALSE, dec = if (sep != ".") "." else ",", na_string = "",
-  name_fun, period_fun, strict = TRUE)
+read_ts_csv(filename, skiprow = 0, skipcol = 0, rowwise, frequency = NA,
+  labels = c("after", "before", "no"), sep = "auto", fill = FALSE,
+  dec = if (sep != ".") "." else ",", na_string = "", name_fun, period_fun,
+  strict = TRUE)
 }
 \arguments{
 \item{filename}{a string with the filename.}

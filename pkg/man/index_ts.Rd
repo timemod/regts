@@ -10,24 +10,29 @@ index_ts(x, base = start_period(x), scale = 100)
 \item{x}{a \code{\link[stats]{ts}} of \code{\link{regts}} object}
 
 \item{base}{a \code{\link{period}} or a
-\code{\link{period_range}} specifying the base period or an object that can
+\code{\link{period_range}} specifying the base period, or an object that can
 be coerced to a \code{period} or \code{period_range}.
 By default the base period is the first period of the input timeseries.}
 
 \item{scale}{the (average) value of the index series at the base period
-(by default 100).}
+(by default 100). This should be a positive number.}
 }
 \description{
 This function scales a timeseries by dividing all observations by
 one selected observation or by the mean of a range of observations.
-The index series is calculated with \code{i[t] = s * x[t] / mean(X[base])},
-where \code{s} is an arbitrary scale and \code{base} an arbitrary base period.
+The index series \code{i} is calculated from the input series \code{x} as\preformatted{i[t] = scale * x[t] / mean(X[base]),
+}
+
+where \code{scale} is usually 100 and \code{base} the base period, which can be
+a single \code{period} or a \code{period_range} (by default the base period is the
+first period of \code{x}). The function gives an error when the
+average value of \code{mean(X[base])} is negative.
 }
 \examples{
 \dontshow{
 set.seed(123)
 }
-ab <- regts(matrix(rnorm(18), ncol = 2), start = "2016Q1",
+ab <- regts(matrix(1:18 + rnorm(18), ncol = 2), start = "2016Q1",
             names = c("a", "b"))
 
 index_ts(ab)

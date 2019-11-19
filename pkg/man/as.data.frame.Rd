@@ -5,8 +5,8 @@
 \alias{as.data.frame.regts}
 \title{Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}}
 \usage{
-\method{as.data.frame}{regts}(x, ..., rowwise = FALSE,
-  row_names = TRUE, period_as_date = FALSE)
+\method{as.data.frame}{regts}(x, ..., rowwise = FALSE, row_names = TRUE,
+  period_as_date = FALSE)
 }
 \arguments{
 \item{x}{a \code{\link{regts}}}

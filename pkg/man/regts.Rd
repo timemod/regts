@@ -88,8 +88,8 @@ The function \code{\link{is.regts}} can be used to test if an object is a
 \code{regts}.
 
 The S3 generic \code{\link{as.regts}} can be used to coerce an R object to a
- \code{regts}. There are currently methods for \code{\link[stats]{ts}} and
- \code{\link[base]{data.frame}}.
+\code{regts}. There are currently methods for \code{\link[stats]{ts}} and
+\code{\link[base]{data.frame}}.
 
 \code{\link{as.data.frame}} and \code{\link{as.list}} can be used
 to convert \code{regts} to a \code{\link[base]{data.frame}} or a
