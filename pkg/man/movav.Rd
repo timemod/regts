@@ -36,7 +36,7 @@ function \code{movavc} the centered moving average.
 
 For example, the backward moving average of order 3 is defined as
 
-\code{A[t] = (x[t-2] + x[t-1] + x[t]) / 3},
+\code{A[t] = (x[t - 2] + x[t - 1] + x[t]) / 3},
 
 while the centered moving average of order 3 is calculated as
 
@@ -59,11 +59,11 @@ than from the future, or the other way around. These methods can be used
 by specifying argument \code{method}. Possible methods are
 \describe{
 \item{\code{centre}}{Standard method
-e.g.  (0.5 x\link{t - 2} + x\link{t - 1} + x\link{t} + x\link{t + 1} + 0.5 x\link{t + 2}) / 4}
+e.g.  (\verb{0.5 x[t - 2] + x[t - 1] + x[t] + x[t + 1] + 0.5 x[t + 2]) / 4}}
 \item{\code{left  }}{Use one more observation from the past, e.g.
-(x\link{t - 2} + x\link{t - 1} + x\link{t} + x\link{t + 1}) / 4}
+(\verb{x[t - 2] + x[t - 1] + x[t] + x[t + 1]) / 4}}
 \item{\code{right }}{Use one more observation from the future, e.g.
-(x\link{t - 1} + x\link{t} + x\link{t + 1} + x\link{t + 2}) / 4}
+(\verb{x[t - 1] + x[t] + x[t + 1] + x[t + 2]) / 4}}
 }
 }
 \section{Functions}{
