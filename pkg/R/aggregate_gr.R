@@ -13,13 +13,19 @@
 #' contain a first difference (for \code{dif1s} the input is also
 #' scaled). The result is a first difference in the output frequency.
 #' The \code{pct} and \code{rel} methods assume timeseries that contain
-#' percentage or relative change. They calculate the exact percentage or
-#' relative change for the output timeseries.
-#'
-#' More details are provided in vignette
+#' percentage or relative change of a timeseries with only positive values.
+#' They calculate
+#' the exact percentage or relative change for the output timeseries.
+#' More details for the various methods are provided in vignette
 #'  \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
 #' (Growth) Timeseries"}}.
 #'
+#' As explained before, the \code{pct} and \code{rel} methods assume timeseries
+#' that contain percentage or relative change of a timeseries with only positive
+#' values. This imposes restrictions on the input timeseries
+#' `x`. For the `pct` method, `(1 + x / 100) >= 0`  and for
+#' `rel`, `(1 + x) >= 0`. Function `aggregate_gr` gives an error  if these
+#' conditions are not satisfied.
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} object
 #' @param nfrequency the frequency of the result. This should be higher than
 #' the frequency of timeseries \code{x}
@@ -27,16 +33,17 @@
 #' or \code{"rel"}. See Details.
 #' @return a \code{regts} with frequency \code{nfrequency}
 #' @examples
-#' ts_q <- regts(rnorm(10), start = "2016Q1")
+#' ts_q <- regts(abs(rnorm(10)), start = "2016Q1")
 #' aggregate_gr(ts_q, method = "dif1s")
 #'
-#' ts_m <- regts(matrix(rnorm(20), ncol = 2), start = "2017M1", names = c("a", "b"))
+#' ts_m <- regts(matrix(abs(rnorm(20)), ncol = 2), start = "2017M1", names = c("a", "b"))
 #' aggregate_gr(ts_m, method = "rel", nfrequency = 4)
 #' @export
 #' @useDynLib regts, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 aggregate_gr <- function(x, method = c("dif1s", "dif1", "pct", "rel"),
                          nfrequency = 1) {
+
   method <- match.arg(method)
   if (!is.ts(x)) {
     stop("Argument x is not a timeseries")
@@ -51,6 +58,8 @@ aggregate_gr <- function(x, method = c("dif1s", "dif1", "pct", "rel"),
     is_mat <- TRUE
   }
 
+  if (method %in% c("pct", "rel")) check_growth_factors(x, is_mat, method)
+
   # call C++ function agg_gr (see src/agg_gr.cpp)
   res <- agg_gr(x, nfrequency, method)
   data  <- res[[1]]
@@ -62,6 +71,30 @@ aggregate_gr <- function(x, method = c("dif1s", "dif1", "pct", "rel"),
     dim(data) <- NULL
   }
 
-  return (create_regts(data, range_new[1], range_new[2], range_new[3],
-                       ts_labels(x)))
+  return(create_regts(data, range_new[1], range_new[2], range_new[3],
+                      ts_labels(x)))
+}
+
+# Check for negative growth factors (1 + gr). The pct and rel aggregation
+# methods assume that the timeseries are always positive. This is only
+# ppossible of the growth factors are larger than or equal to zero.
+check_growth_factors <- function(x, is_mat, method) {
+
+  if (method == "pct") x <- x / 100
+  x <- 1 + x
+  problem_cols <- apply(x, FUN = function(x) {any(!is.na(x) & x < 0)},
+                        MARGIN = 2)
+
+  if (any(problem_cols)) {
+    if (is_mat) {
+      cnames <- colnames(x)
+      if (is.null(cnames)) cnames <- seq_len(ncol(x))
+      problem_cols <- cnames[problem_cols]
+      stop(paste0("Input timeseries contains negative growth factors",
+                  " for columns: ", paste(problem_cols, collapse = ", "), "."))
+    } else {
+      stop("Input timeseries contains negative growth factors.")
+    }
+  }
+  return(invisible(NULL))
 }

@@ -37,7 +37,7 @@ argument \code{x}) is positive. See Details.
 \cr\cr
 Function \code{pct2index} computes the index series
 from a timeseries of percentage changes, defined as \verb{100 g[t]}.
-Thus expression \code{pct2index(x)} has the same result as \code{rel2index(x / 100)}
+Thus expression \code{pct2index(x)} gives the same result as \code{rel2index(x / 100)}.
 }
 \details{
 If \code{g[t]} is given but \code{z[t]} is unknown, we can compute

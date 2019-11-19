@@ -14,7 +14,7 @@
 #' \cr\cr
 #' Function `pct2index` computes the index series
 #' from a timeseries of percentage changes, defined as `100 g[t]`.
-#' Thus expression `pct2index(x)` gives the same result as `rel2index(x / 100)`
+#' Thus expression `pct2index(x)` gives the same result as `rel2index(x / 100)`.
 #'
 #'
 #' If `g[t]` is given but `z[t]` is unknown, we can compute
