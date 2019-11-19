@@ -12,8 +12,8 @@ rel2index(x, base = start_period(x) - 1, scale = 100, keep_range = TRUE)
 pct2index(x, base = start_period(x) - 1, scale = 100, keep_range = TRUE)
 }
 \arguments{
-\item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a multivariate
-timeseries)}
+\item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a
+multivariate timeseries) with the relative of percentage changes.}
 
 \item{base}{base period of the index timeseries (a \code{\link{period}}
 object or an object that can be coerced to a \code{period} object)}
@@ -25,18 +25,34 @@ timeseries has the same period range as the input timeseries.
 If \code{FALSE} then the result timeseries starts 1 period earlier.}
 }
 \description{
-This is the inverse of function \code{\link{growth}}.
-The relative change, or growth, of a timeseries x\link{t}
-is defined as \code{growth[t] = (x[t] - x[t-1]) / |x[t-1]|}.
-Suppose that \code{growth[t]} is given but \code{x[t]} is not known.
-Then it is possible to calculate the index series
-\code{i[t] = s * x[t] / x[t*]}, where \code{s} is arbitrary scale and
-\code{t*} an arbitrary base period.
-Function \code{rel2index} computes this index series \code{i[t]}
+Function \code{rel2index} is the inverse of function \code{\link{growth}}.
+The growth \code{g[t]} (also called the relative change) of a timeseries \code{z[t]}
+is defined as\preformatted{g[t] = (z[t] - z[t - 1]) / |z[t - 1]|.
+}
+
+The function constructs an index series for \code{z[t]} given the values of
+\code{g[t]}, assuming that the value of timeseries \code{z} at the
+period before the start period of timeseries \code{g} (specified with
+argument \code{x}) is positive. See Details.
 \cr\cr
-Similarly, function \code{pct2index} computes the index series
-for a timeseries of percentage changes, defined as
-\code{100 (x[t] - x[t-1]) / | x[t-1]|}.
+Function \code{pct2index} computes the index series
+from a timeseries of percentage changes, defined as \verb{100 g[t]}.
+Thus expression \code{pct2index(x)} has the same result as \code{rel2index(x / 100)}
+}
+\details{
+If \code{g[t]} is given but \code{z[t]} is unknown, we can compute
+\code{z[t]} as\preformatted{z[t] = z[t - 1] * (1 + sign(z[t - 1]) g[t]).
+}
+
+Given an initial value for \code{z} at some period (say \code{z[0]}), the equation
+above can be used repeatedly to calculate the values of \code{z[t]} for \code{t > 0}.
+The magnitude of \code{z[0]} is, however, irrelevant if we construct an
+index series\preformatted{i[t] =  scale * z[t] / z[t*],
+}
+
+where \verb{t*} is the base period. If we assume that \code{z[0]} is positive,
+we can simplfy set it to 1. If this assumption is not correct and
+\code{z[0]} is actually negative, then \code{rel2index} does not give correct results.
 }
 \section{Functions}{
 \itemize{

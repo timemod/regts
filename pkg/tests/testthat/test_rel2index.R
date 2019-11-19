@@ -5,8 +5,13 @@ context("conversion functions for timeseries")
 
 set.seed(123)
 
+data <- c(-0.56047565, -0.23017749,  1.55870831,  0.07050839,  0.12928774,
+           1.71506499,  0.46091621, -1.26506123, -0.68685285, -0.44566197,
+           1.22408180,  0.35981383,  0.40077145,  0.11068272, -0.55584113,
+           1.78691314,  0.49785048, -1.96661716,  0.70135590, -0.47279141)
+
 test_that("rel2index univariate timeseries", {
-  ts1 <- regts(rnorm(10), start = "2010Q2")
+  ts1 <- regts(data[1:10], start = "2010Q2")
   ts1 <- 100 * ts1 / ts1[1]
   ts1_rel <- diff(ts1) / abs(lag(ts1, -1))
   ts1_index <- rel2index(ts1_rel, keep_range = FALSE)
@@ -15,13 +20,16 @@ test_that("rel2index univariate timeseries", {
   ts1_index_2 <- rel2index(ts1_rel["2010q3"], keep_range = TRUE)
   expect_equal(ts1["2010q3"], ts1_index_2)
 
-  ts1_index2 <- rel2index(ts1_rel, base = "2010Q4")
-  expected <- (100 * ts1 / as.numeric(ts1["2010Q4"]))[get_period_range(ts1_rel)]
+  expect_error(rel2index(ts1_rel, base = "2010Q4"),
+               "Cumulated timeseries has negative value at base period 2010Q4.")
+
+  ts1_index2 <- rel2index(ts1_rel, "2010q3")
+  expected <- (100 * ts1 / as.numeric(ts1["2010Q3"]))[get_period_range(ts1_rel)]
   expect_equal(ts1_index2, expected)
 })
 
 test_that("rel2index multivariate timeseries", {
-  ts1 <- regts(matrix(rnorm(20), ncol = 2), start = "2010Q2",
+  ts1 <- regts(matrix(data, ncol = 2), start = "2010Q2",
                names = c("a", "b"), labels = paste("Timeseries", c("a", "b")))
   ts1[] <- apply(ts1, MARGIN = 2, FUN = function(x) {x /x[1]})
   ts1_rel <- diff(ts1) / abs(lag(ts1, -1))
@@ -32,10 +40,15 @@ test_that("rel2index multivariate timeseries", {
   ts1_index_2 <- rel2index(ts1_rel["2010q3"], keep_range = TRUE, scale = 1)
   expect_equal(ts1["2010q3"], ts1_index_2)
 
-  ts1_index2 <- rel2index(ts1_rel, base = "2011Q3", scale = 1,
+  expect_error(rel2index(ts1_rel, base = "2011Q3", scale = 1),
+               "Cumulated timeseries has negative value at base period 2011Q3 for columns: a.")
+  expect_error(rel2index(ts1_rel, base = "2011Q2", scale = 1),
+               "Cumulated timeseries has negative value at base period 2011Q2 for columns: a, b.")
+
+  ts1_index2 <- rel2index(ts1_rel, base = "2012Q2", scale = 1,
                           keep_range = FALSE)
   expected <- ts1
-  i <- period("2011Q3") - period("2010Q2") + 1
+  i <- period("2012Q2") - period("2010Q2") + 1
   expected[] <- apply(expected, MARGIN = 2, FUN = function(x) {x /x[i]})
   expect_equal(ts1_index2, expected)
 
@@ -48,7 +61,7 @@ test_that("rel2index multivariate timeseries", {
 })
 
 test_that("pct2index", {
-  ts1 <- regts(matrix(rnorm(20), ncol = 2), start = "2010Q2",
+  ts1 <- regts(matrix(data, ncol = 2), start = "2010Q2",
                names = c("a", "b"), labels = paste("Timeseries", c("a", "b")))
   ts1[] <- apply(ts1, MARGIN = 2, FUN = function(x) {x /x[1]})
   ts1_rel <- 100 * diff(ts1) / abs(lag(ts1, -1))
