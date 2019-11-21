@@ -55,18 +55,17 @@ test_that("NA values", {
 
   a_NA <- a
   a_NA["2019Q3"] <- NA
-  warning <- "Input timeseries contains NA values in base period 2019Q3/2019Q4"
+  warning <- "NA values in base period 2019Q3/2019Q4"
   expect_warning(a_NA_i <- index_ts(a_NA,  base = "2019Q3/2019Q4"), warning)
   expect_equal(a_NA_i, NA * a)
 
-  warning <- "Input timeseries contains NA values in base period 2019Q3"
+  warning <- "NA values in base period 2019Q3"
   expect_warning(a_NA_i <- index_ts(a_NA,  base = "2019Q3"), warning)
   expect_equal(a_NA_i, NA * a)
 
   ab_NA <- ab
   ab_NA["2019Q3", "a"] <- NA
-  warning <- paste("Input timeseries contains NA values in base period",
-                   "2019Q3/2019Q4 for columns: a.")
+  warning <- paste("NA values in base period 2019Q3/2019Q4 for columns: a.")
   expect_warning(ab_NA_i <- index_ts(ab_NA,  base = "2019Q3/2019Q4"), warning)
 
   expected_result  <-100 * ab_NA / 15
@@ -75,7 +74,7 @@ test_that("NA values", {
 
   ab_NA <- ab
   ab_NA["2019Q3", "a"] <- NA
-  warning <- "Input timeseries contains NA values in base period 2019Q3"
+  warning <- "NA values in base period 2019Q3"
   expect_warning(ab_NA_i <- index_ts(ab_NA,  base = "2019Q3"), warning)
 
   expected_result  <-100 * ab_NA / 14
@@ -86,8 +85,7 @@ test_that("NA values", {
   abc_NA$c <- 2
   abc_NA["2019Q3", "a"] <- NA
   abc_NA["2019q4", "c"] <- NA
-  warning <- paste("Input timeseries contains NA values in base period",
-                   "2019Q3/2019Q4 for columns: a, c.")
+  warning <- paste("NA values in base period 2019Q3/2019Q4 for columns: a, c.")
   expect_warning(abc_NA_i <- index_ts(abc_NA,  base = "2019Q3/2019Q4"), warning)
 
   expected_result  <- 100 * abc_NA / 15
@@ -99,8 +97,7 @@ test_that("NA values", {
   big_NA[ , paste0("x_", 1:1000)] <- 2
   big_NA["2019Q3", "a"] <- NA
   big_NA["2019q4", 2:1002] <- NA
-  warning <- paste("Input timeseries contains NA values in base period",
-                   "2019Q3/2019Q4 for columns: a, b")
+  warning <- "NA values in base period 2019Q3/2019Q4 for columns: a, b"
   expect_warning(big_NA_i <- index_ts(big_NA,  base = "2019Q3/2019Q4"), warning)
 
   expected_result  <- 100 * big_NA / 15
@@ -111,7 +108,7 @@ test_that("NA values", {
   # now test a timeseries without column names
   no_colnames <- big_NA
   colnames(no_colnames) <- NULL
-  warning <- paste("Input timeseries contains NA values in base period",
+  warning <- paste("NA values in base period",
                    "2019Q3/2019Q4 for columns: 1, 2, 3, 4")
 
   expect_warning(no_colnames_i <- index_ts(no_colnames,
@@ -130,9 +127,9 @@ test_that("negative value at base period", {
   expect_equal(index_ts(a2), a2 * 100)
 
   expect_error(index_ts(a2, base = "2018q2"),
-               "Input timeseries has negative \\(average\\) value at base period 2018Q2.")
+               "Negative \\(average\\) value at base period 2018Q2.")
   expect_error(index_ts(a2, base = "2018q1/2018q2"),
-               "Input timeseries has negative \\(average\\) value at base period 2018Q1/2018Q2.")
+               "Negative \\(average\\) value at base period 2018Q1/2018Q2.")
 
   ab2 <- ab
   ab2["2018q1", 1] <- -10
@@ -143,18 +140,18 @@ test_that("negative value at base period", {
   expect_equal(index_ts(ab2, base = "2018q2"), expected_result)
 
   expect_error(index_ts(ab2),
-               "Input timeseries has negative \\(average\\) value at base period 2018Q1 for columns: a.")
+               "Negative \\(average\\) value at base period 2018Q1 for columns: a.")
 
   ab2["2018q1", 2] <- -5
   expect_error(index_ts(ab2,  base = "2018q1/2018q2"),
-               "Input timeseries has negative \\(average\\) value at base period 2018Q1/2018Q2 for columns: a, b.")
+               "Negative \\(average\\) value at base period 2018Q1/2018Q2 for columns: a, b.")
 
 
   ab2["2018q1", 1] <- -2
   expect_warning(
     expect_error(index_ts(ab2,  base = "2018q1/2018q2"),
-               "Input timeseries has negative \\(average\\) value at base period 2018Q1/2018Q2 for columns: b."),
-    "Input timeseries has zero \\(average\\) value at base period 2018Q1/2018Q2 for columns: a.")
+               "Negative \\(average\\) value at base period 2018Q1/2018Q2 for columns: b."),
+    "Zero \\(average\\) value at base period 2018Q1/2018Q2 for columns: a.")
 })
 
 test_that("zero value at base period", {
@@ -163,7 +160,7 @@ test_that("zero value at base period", {
   a2["2018q1"] <- 0
 
   expect_warning(result <- index_ts(a2),
-                 "Input timeseries has zero \\(average\\) value at base period 2018Q1.")
+                 "Zero \\(average\\) value at base period 2018Q1.")
   expect_equal(result, a2 *Inf)
 
   ab2 <- ab
@@ -171,7 +168,7 @@ test_that("zero value at base period", {
 
   expect_warning(
     result <- index_ts(ab2, base = "2018q2"),
-     "Input timeseries has zero \\(average\\) value at base period 2018Q2 for columns: a.")
+     "Zero \\(average\\) value at base period 2018Q2 for columns: a.")
 
   expected_result  <- 25 * ab2
   expected_result$a <- expected_result$a * Inf
@@ -181,7 +178,7 @@ test_that("zero value at base period", {
 
   expect_warning(
     result <- index_ts(ab2, base = "2018q1/2018q2"),
-    "Input timeseries has zero \\(average\\) value at base period 2018Q1/2018Q2 for columns: a, b")
+    "Zero \\(average\\) value at base period 2018Q1/2018Q2 for columns: a, b")
   expect_equal(result, ab2 * Inf)
 })
 

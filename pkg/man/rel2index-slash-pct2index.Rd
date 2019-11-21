@@ -7,16 +7,20 @@
 \title{Calculate an index timeseries from a timeseries with relative or
 percentage changes.}
 \usage{
-rel2index(x, base = start_period(x) - 1, scale = 100, keep_range = TRUE)
+rel2index(x, base = NULL, scale = 100, keep_range = TRUE)
 
-pct2index(x, base = start_period(x) - 1, scale = 100, keep_range = TRUE)
+pct2index(x, base = NULL, scale = 100, keep_range = TRUE)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a
 multivariate timeseries) with the relative of percentage changes.}
 
-\item{base}{base period of the index timeseries (a \code{\link{period}}
-object or an object that can be coerced to a \code{period} object)}
+\item{base}{a \code{\link{period}} or a
+\code{\link{period_range}} specifying the base period, or an object that can
+be coerced to a \code{period} or \code{period_range}.
+By default the base period is the period before the first period of the
+input timeseries \code{x}. For example,  if \code{x} starts at \verb{2018q1}, then the
+default base period is \verb{2017q3}}
 
 \item{scale}{the value of the index series at the base period (by default 100)}
 
@@ -46,13 +50,14 @@ If \code{g[t]} is given but \code{z[t]} is unknown, we can compute
 
 Given an initial value for \code{z} at some period (say \code{z[0]}), the equation
 above can be used repeatedly to calculate the values of \code{z[t]} for \code{t > 0}.
-The magnitude of \code{z[0]} is, however, irrelevant if we construct an
-index series\preformatted{i[t] =  scale * z[t] / z[t*],
+In function \code{rel2index} \code{z[0]} is not known.
+However, the index series defined as\preformatted{i[t] =  scale * z[t] / z[base],
 }
 
-where \verb{t*} is the base period. If we assume that \code{z[0]} is positive,
-we can simplfy set it to 1. If this assumption is not correct and
-\code{z[0]} is actually negative, then \code{rel2index} does not give correct results.
+is independent on the absolute value of \code{z[0]}. However, the index series
+does depend on the sign of \code{z[0]}. In \code{rel2index} and \code{pct2index} we assume that
+\code{z[0]} is positive. It this is not the case then the results
+are not correct.
 }
 \section{Functions}{
 \itemize{

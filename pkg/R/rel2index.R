@@ -24,19 +24,24 @@
 #' ```
 #' Given an initial value for `z` at some period (say `z[0]`), the equation
 #' above can be used repeatedly to calculate the values of `z[t]` for `t > 0`.
-#' The magnitude of `z[0]` is, however, irrelevant if we construct an
-#' index series
+#' In function `rel2index` `z[0]` is not known.
+#' However, the index series defined as
 #' ```
-#' i[t] =  scale * z[t] / z[t*],
+#' i[t] =  scale * z[t] / z[base],
 #' ```
-#' where `t*` is the base period. If we assume that `z[0]` is positive,
-#' we can simplfy set it to 1. If this assumption is not correct and
-#' `z[0]` is actually negative, then `rel2index` does not give correct results.
+#' is independent on the absolute value of `z[0]`. However, the index series
+#' does depend on the sign of `z[0]`. In `rel2index` and `pct2index` we assume that
+#' `z[0]` is positive. It this is not the case then the results
+#' are not correct.
 #'
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a
 #' multivariate timeseries) with the relative of percentage changes.
-#' @param base base period of the index timeseries (a \code{\link{period}}
-#' object or an object that can be coerced to a \code{period} object)
+#' @param base a \code{\link{period}} or a
+#' \code{\link{period_range}} specifying the base period, or an object that can
+#' be coerced to a \code{period} or \code{period_range}.
+#' By default the base period is the period before the first period of the
+#' input timeseries `x`. For example,  if `x` starts at `2018q1`, then the
+#' default base period is `2017q3`
 #' @param scale the value of the index series at the base period (by default 100)
 #' @param keep_range if \code{TRUE} (the default), then the output
 #' timeseries has the same period range as the input timeseries.
@@ -53,8 +58,8 @@ NULL
 #' @describeIn rel2index-slash-pct2index Calculates an index timeseries from a
 #' timeseries with relative changes
 #' @export
-rel2index <- function(x, base = start_period(x) - 1, scale = 100,
-                      keep_range = TRUE) {
+rel2index <- function(x, base = NULL, scale = 100,
+                          keep_range = TRUE) {
 
   x <- as.regts(x)
 
@@ -67,98 +72,58 @@ rel2index <- function(x, base = start_period(x) - 1, scale = 100,
   # to perform the cumulation.
   data <- rel2index_cpp(x)
 
-  # determine result period range
-  new_start <- start_period(x) - 1
-  new_end <- end_period(x)
+  if (is.null(base)) {
 
-  if (!missing(base)) {
-    base <- as.period(base)
-    if (!identical(base, new_start)) {
-      data <- rel2index_rebase(data, base, new_start, new_end, x_is_matrix,
-                               colnames(x))
+    # the base period has not been specified, thus it is the first
+    # period before the start of timeseries x.
+    # For efficiency, the data is prepared first and the timeseries
+    # is created only at the last stage.
+
+    if (keep_range) {
+      # remove first row
+      data <- data[-1, , drop = FALSE]
+      new_start <- start_period(x)
+    } else {
+      new_start <- start_period(x) - 1
     }
+
+    if (!x_is_matrix) {
+      # convert the vector to data
+      dim(data) <- NULL
+    }
+
+    if (scale != 1) data <- data * scale
+
+    return(regts(data, start = new_start, names = colnames(x),
+                 labels = ts_labels(x)))
+
+  } else {
+
+    # base period specified
+
+    if (!x_is_matrix) {
+      # convert the vector to data
+      dim(data) <- NULL
+    }
+
+    # prepare a timeseries that can be passed to function index_ts.
+
+    result <- regts(data, start = start_period(x) - 1, names = colnames(x),
+                    labels = ts_labels(x))
+
+    result <- index_ts(result, base, scale = scale)
+
+    if (keep_range) {
+      result <- result[get_period_range(x)]
+    }
+    return(result)
   }
-
-  if (scale != 1) data <- data * scale
-
-  if (keep_range) {
-    # remove first row
-    data <- data[-1, , drop = FALSE]
-    new_start = new_start + 1
-  }
-
-  if (!x_is_matrix) {
-    # convert the vector to data
-    dim(data) <- NULL
-  }
-
-  return(regts(data, start = new_start, names = colnames(x),
-               labels = ts_labels(x)))
 }
 
 #' @describeIn rel2index-slash-pct2index Calculates an index timeseries from a
 #' timeseries with percentage changes
 #' @export
-pct2index <- function(x, base = start_period(x) - 1, scale = 100,
-                      keep_range = TRUE) {
+pct2index <- function(x, base = NULL, scale = 100, keep_range = TRUE) {
   return(rel2index(x / 100, base = base, scale = scale,
                    keep_range = keep_range))
-}
-
-
-# rebase the calculated index series: the index series had a base period
-# at new_start, but should now have  a base_period at base.
-rel2index_rebase <- function(data, base, new_start, new_end, x_is_matrix,
-                             cnames) {
-
-  if (frequency(base) != frequency(new_start)) {
-    stop(paste0("The base period ", base, " has a different frequency",
-                " than the timeseries (", frequency(new_start), ")."))
-  }
-  base_index <- base - new_start + 1
-  if (base_index < 1 || base_index > nrow(data)) {
-    stop(paste0("The base period should lie between ",
-                new_start, " and ", new_end, "."))
-  }
-
-  factors <- data[base_index, ]
-  if (is.null(cnames)) cnames <- seq_len(ncol(data))
-  if (any(na_sel <- is.na(factors))) {
-    # WARNING: result timeseries will be NA
-    if (x_is_matrix) {
-      neg_cols <- cnames[na_sel]
-      warning(paste0("Cumulated timeseries has NA value at base",
-                  " period ", base, " for columns: ",
-                  paste(neg_cols, collapse = ", "), "."))
-    } else {
-      warning(sprintf(paste("Cumulated timeseries has NA value at",
-                         "base period %s."), as.character(base)))
-    }
-  }
-  if (any(zero_sel <- !is.na(factors) & factors == 0)) {
-    # WARNING: result timeseries with be Inf or -Inf
-    if (x_is_matrix) {
-      zero_cols <- cnames[zero_sel]
-      warning(paste0("Cumulated timeseries has zero value at base",
-                  " period ", base, " for columns: ",
-                  paste(neg_cols, collapse = ", "), "."))
-    } else {
-      warning(sprintf(paste("Cumulated timeseries has zero value at",
-                         "base period %s."), as.character(base)))
-    }
-  }
-  if (any(neg_sel <- !is.na(factors) & factors < 0)) {
-    # ERROR: if the value in the base period is negative, it is not
-    # possible to construct a meaningful index series
-    if (x_is_matrix) {
-      neg_cols <- cnames[neg_sel]
-      stop(paste0("Cumulated timeseries has negative value at base",
-                  " period ", base, " for columns: ",
-                  paste(neg_cols, collapse = ", "), "."))
-    } else {
-      stop(sprintf(paste("Cumulated timeseries has negative value at",
-                         "base period %s."), as.character(base)))
-    }
-  }
-  return(data * rep(1 / factors, each = nrow(data)))
 }

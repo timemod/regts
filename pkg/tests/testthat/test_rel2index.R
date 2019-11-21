@@ -21,7 +21,7 @@ test_that("rel2index univariate timeseries", {
   expect_equal(ts1["2010q3"], ts1_index_2)
 
   expect_error(rel2index(ts1_rel, base = "2010Q4"),
-               "Cumulated timeseries has negative value at base period 2010Q4.")
+               "Negative \\(average\\) value at base period 2010Q4.")
 
   ts1_index2 <- rel2index(ts1_rel, "2010q3")
   expected <- (100 * ts1 / as.numeric(ts1["2010Q3"]))[get_period_range(ts1_rel)]
@@ -41,9 +41,9 @@ test_that("rel2index multivariate timeseries", {
   expect_equal(ts1["2010q3"], ts1_index_2)
 
   expect_error(rel2index(ts1_rel, base = "2011Q3", scale = 1),
-               "Cumulated timeseries has negative value at base period 2011Q3 for columns: a.")
+               "Negative \\(average\\) value at base period 2011Q3 for columns: a.")
   expect_error(rel2index(ts1_rel, base = "2011Q2", scale = 1),
-               "Cumulated timeseries has negative value at base period 2011Q2 for columns: a, b.")
+               "Negative \\(average\\) value at base period 2011Q2 for columns: a, b.")
 
   ts1_index2 <- rel2index(ts1_rel, base = "2012Q2", scale = 1,
                           keep_range = FALSE)
@@ -93,9 +93,9 @@ test_that("Inf values", {
 
 test_that("errors", {
   ts1 <- regts(c(1, 2, 3), start = "2010Q2")
-  msg <- "The base period should lie between 2010Q1 and 2010Q4."
+  msg <- "Base period \\(2018Q3\\) not within timeseries period \\(2010Q1/2010Q4\\)"
   expect_error(rel2index(ts1, base = "2018Q3"), msg)
-  msg <- paste("The base period 2018M03 has a different frequency than the",
-               "timeseries \\(4\\).")
+  msg <- paste("Base period \\(2018M03\\) should not have a higher frequency",
+               "than the input timeseries \\(4\\)")
   expect_error(rel2index(ts1, base = "2018M3"), msg)
 })

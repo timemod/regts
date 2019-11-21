@@ -4,7 +4,7 @@
 \alias{index_ts}
 \title{Construct an index timeseries by scaling}
 \usage{
-index_ts(x, base = start_period(x), scale = 100)
+index_ts(x, base = NULL, scale = 100)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} of \code{\link{regts}} object}

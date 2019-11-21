@@ -32,13 +32,13 @@
 #' index_ts(ab, base = "2017", scale = 1)
 #'
 #' @export
-index_ts <- function(x, base = start_period(x), scale = 100) {
+index_ts <- function(x, base = NULL, scale = 100) {
 
   if (!is.ts(x)) {
     stop("Argument x is not a timeseries")
   }
 
-  if (!missing(base)) {
+  if (!is.null(base)) {
     base <- as.period_range(base)
     freq_base <- frequency(base)
     freq_x <- frequency(x)
@@ -50,7 +50,7 @@ index_ts <- function(x, base = start_period(x), scale = 100) {
       base <- change_frequency(base, new_frequency = freq_x)
     }
   } else {
-    base <- period_range(base, base)
+    base <- as.period_range(start_period(x))
   }
 
   if (!missing(scale)) {
@@ -87,14 +87,14 @@ index_ts <- function(x, base = start_period(x), scale = 100) {
     if (any(na_sel <- is.na(means))) {
       # result series will be NA or NaN
       na_cols <- cnames[na_sel]
-      warning(paste0("Input timeseries contains NA values in base period ",
+      warning(paste0("NA values in base period ",
                      base, " for columns: ", paste(na_cols, collapse = ", "),
                      "."))
     }
     if (any(zero_sel <- !is.na(means) & means == 0)) {
       # result series will be Inf or -Inf
       zero_cols <- cnames[zero_sel]
-      warning(paste0("Input timeseries has zero (average) value at base period ",
+      warning(paste0("Zero (average) value at base period ",
                      base, " for columns: ", paste(zero_cols, collapse = ", "),
                      "."))
     }
@@ -102,7 +102,7 @@ index_ts <- function(x, base = start_period(x), scale = 100) {
       # error: if the value in the base period is negative, it is not
       # possible to construct a meaningful index series
       neg_cols <- cnames[neg_sel]
-      stop(paste0("Input timeseries has negative (average) value at base",
+      stop(paste0("Negative (average) value at base",
                   " period ", base, " for columns: ",
                   paste(neg_cols, collapse = ", "), "."))
     }
@@ -112,14 +112,13 @@ index_ts <- function(x, base = start_period(x), scale = 100) {
     # univariate timeseries
     m  <- mean(x[psel])
     if (is.na(m)) {
-      warning(sprintf("Input timeseries contains NA values in base period %s.",
-                     as.character(base)))
+      warning(sprintf("NA values in base period %s", as.character(base)))
     } else if (m == 0) {
-      warning(sprintf(paste("Input timeseries has zero (average) value at base",
-                            "period %s."), as.character(base)))
+      warning(sprintf(paste("Zero (average) value at base period %s."),
+                      as.character(base)))
     } else if (m < 0) {
-      stop(sprintf(paste("Input timeseries has negative (average) value at",
-                         "base period %s."), as.character(base)))
+      stop(sprintf(paste("Negative (average) value at base period %s."),
+                   as.character(base)))
     }
     return(scale * x / m)
   }
