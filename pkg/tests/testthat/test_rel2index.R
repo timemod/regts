@@ -98,4 +98,97 @@ test_that("errors", {
   msg <- paste("Base period \\(2018M03\\) should not have a higher frequency",
                "than the input timeseries \\(4\\)")
   expect_error(rel2index(ts1, base = "2018M3"), msg)
+
+  ts2 <- lag_ts(ts1, keep_range = FALSE)
+
+  expect_error(rel2index(ts2, base = "2010"),
+               paste("Base period \\(2010Q1/2010Q4\\) not within timeseries",
+                      "period \\(2010Q2/2011Q1\\)"))
+
+})
+
+test_that("Base period is period range, univariate series", {
+  t1 <- regts(abs(rnorm(20)), start = "2010q1", labels = "series")
+  i1 <- index_ts(t1, base = "2010")
+  r1 <- growth(i1, keep_range = FALSE)
+  i2 <- rel2index(r1, base = "2010", keep_range = FALSE)
+  expect_identical(ts_labels(i2), "series")
+  expect_equal(i1, i2)
+  i3 <- rel2index(r1, base = "2010q1/2010q4", keep_range = FALSE)
+  expect_equal(i1, i3)
+})
+
+test_that("Base period is period range, multivariate series", {
+  t1a <- regts(abs(rnorm(20)), start = "2010q2", labels = "series1")
+  t1b <- 2 * t1a
+  ts_labels(t1b) <- "series2"
+  t1 <- cbind(t1a, t1b)
+  i1 <- index_ts(t1, base = "2010Q2/2010q3")
+  r1 <- growth(i1, keep_range = FALSE)
+  i2 <- rel2index(r1, base = "2010q2/2010q3", keep_range = FALSE)
+  expect_identical(ts_labels(i2), c(t1a = "series1", t1b = "series2"))
+  expect_equal(i1, i2)
+  i3 <- rel2index(r1, base = "2010q2/2010q3", keep_range = TRUE)
+  expect_equal(i1["2010q3/"], i3)
+})
+
+test_that("negative timeseries (1)", {
+  i1 <- regts(c(1, -3, 4, -2, -2, -1, 0, 1), start = "2010q2")
+  r1 <- growth(i1, keep_range = FALSE)
+  i2 <- rel2index(r1, scale  = 1, keep_range = FALSE)
+
+  expected_result <- i1
+  expected_result["2012q1"] <- NaN
+  expect_equal(i2,  expected_result)
+
+  msg <- "Zero \\(average\\) value at base period 2010Q4/2011Q2."
+  expect_warning(i3 <- rel2index(r1, base = "2010q4/2011q2", keep_range = FALSE),
+                 msg)
+  expect_warning(i4 <- index_ts(i2, base = "2010q4/2011q2"))
+
+  expect_equal(i3, i4)
+
+  r3 <- cbind(x = r1, y = 2 * r1)
+  r3["2012q1", "x"] <- 2
+
+  i5 <- rel2index(r3, scale = 1, keep_range = FALSE)
+
+  x_expected <- i1
+  x_expected["2012q1"] <- 0
+  expect_equal(i5$x, x_expected)
+
+  i5_y_gr <- growth(i5$y, keep_range = FALSE)
+
+  expected_result <- r3$y
+  expected_result["2011q4/2012q1"] <- NaN
+  expect_equal(i5_y_gr, expected_result)
+
+  msg <-"Zero \\(average\\) value at base period 2011Q4 for columns: x, y."
+  expect_warning(
+   i6 <- rel2index(r3, scale = 1, keep_range = FALSE, base = "2011q4"),
+   "Zero \\(average\\) value at base period 2011Q4 for columns: x, y.")
+  expect_warning(i7 <- index_ts(i5, base = "2011q4"), msg)
+  expect_equal(i6, i7)
+
+  expect_error(rel2index(r3, scale = 100, keep_range = FALSE, base = "2011q1"),
+               "Negative \\(average\\) value at base period 2011Q1 for columns: x, y.")
+  expect_error(rel2index(r3, scale = 100, keep_range = FALSE, base = "2011q3"),
+               "Negative \\(average\\) value at base period 2011Q3 for columns: x.")
+  expect_warning(
+    i8 <- rel2index(r3[ , "y"], scale = 100, base = "2012q1"),
+    "NA values in base period 2012Q1")
+  expect_equal(i8, regts(NaN, period = "2010q3/2012q1"))
+})
+
+test_that("negative timeseries (2)", {
+
+  # create a timeseries that starts with a positive value
+  t1 <- regts(c(1, rnorm(10)), start = "2019q1")
+  t2 <- pct2index(100 * growth(t1, keep_range = FALSE), keep_range = FALSE, scale = 1)
+  expect_equal(t1, t2)
+
+  t3 <- cbind(x = t1, y = 1 / t1)
+  ts_labels(t3) <- c(x = "var x ", y = "var y")
+  t4 <- pct2index(100 * growth(t3, keep_range = FALSE), keep_range = FALSE, scale = 1)
+  expect_equal(t3, t4)
 })

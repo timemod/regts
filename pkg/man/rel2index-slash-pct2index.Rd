@@ -20,9 +20,11 @@ multivariate timeseries) with the relative of percentage changes.}
 be coerced to a \code{period} or \code{period_range}.
 By default the base period is the period before the first period of the
 input timeseries \code{x}. For example,  if \code{x} starts at \verb{2018q1}, then the
-default base period is \verb{2017q3}}
+default base period is \verb{2017q3}. If the base period is a \code{period_range},
+then the average value of the index series will be equal to \code{scale}.}
 
-\item{scale}{the value of the index series at the base period (by default 100)}
+\item{scale}{the (average) value of the index series at the base period
+(by default 100)}
 
 \item{keep_range}{if \code{TRUE} (the default), then the output
 timeseries has the same period range as the input timeseries.
@@ -40,7 +42,7 @@ period before the start period of timeseries \code{g} (specified with
 argument \code{x}) is positive. See Details.
 \cr\cr
 Function \code{pct2index} computes the index series
-from a timeseries of percentage changes, defined as \verb{100 g[t]}.
+from a timeseries of percentage changes, defined as \code{100 * g[t]}.
 Thus expression \code{pct2index(x)} gives the same result as \code{rel2index(x / 100)}.
 }
 \details{
@@ -50,14 +52,14 @@ If \code{g[t]} is given but \code{z[t]} is unknown, we can compute
 
 Given an initial value for \code{z} at some period (say \code{z[0]}), the equation
 above can be used repeatedly to calculate the values of \code{z[t]} for \code{t > 0}.
-In function \code{rel2index} \code{z[0]} is not known.
-However, the index series defined as\preformatted{i[t] =  scale * z[t] / z[base],
+In function \code{rel2index} \code{z[0]} is not known, but if we assume that it is
+positive, this value is not needed if we calculate the index series
+defined as\preformatted{i[t] =  scale * z[t] / z[base].
 }
 
-is independent on the absolute value of \code{z[0]}. However, the index series
-does depend on the sign of \code{z[0]}. In \code{rel2index} and \code{pct2index} we assume that
-\code{z[0]} is positive. It this is not the case then the results
-are not correct.
+The index series \code{i} is independent on the absolute value of \code{z[0]}, but
+does depend on the sign of \code{z[0]}. If \code{z[0]} is actually negative
+then the results of \code{rel2index} and \code{pct2index} are not correct.
 }
 \section{Functions}{
 \itemize{

@@ -13,7 +13,7 @@
 #' argument `x`) is positive. See Details.
 #' \cr\cr
 #' Function `pct2index` computes the index series
-#' from a timeseries of percentage changes, defined as `100 g[t]`.
+#' from a timeseries of percentage changes, defined as `100 * g[t]`.
 #' Thus expression `pct2index(x)` gives the same result as `rel2index(x / 100)`.
 #'
 #'
@@ -24,15 +24,15 @@
 #' ```
 #' Given an initial value for `z` at some period (say `z[0]`), the equation
 #' above can be used repeatedly to calculate the values of `z[t]` for `t > 0`.
-#' In function `rel2index` `z[0]` is not known.
-#' However, the index series defined as
+#' In function `rel2index` `z[0]` is not known, but if we assume that it is
+#' positive, this value is not needed if we calculate the index series
+#' defined as
 #' ```
-#' i[t] =  scale * z[t] / z[base],
+#' i[t] =  scale * z[t] / z[base].
 #' ```
-#' is independent on the absolute value of `z[0]`. However, the index series
-#' does depend on the sign of `z[0]`. In `rel2index` and `pct2index` we assume that
-#' `z[0]` is positive. It this is not the case then the results
-#' are not correct.
+#' The index series `i` is independent on the absolute value of `z[0]`, but
+#' does depend on the sign of `z[0]`. If `z[0]` is actually negative
+#' then the results of `rel2index` and `pct2index` are not correct.
 #'
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a
 #' multivariate timeseries) with the relative of percentage changes.
@@ -41,8 +41,10 @@
 #' be coerced to a \code{period} or \code{period_range}.
 #' By default the base period is the period before the first period of the
 #' input timeseries `x`. For example,  if `x` starts at `2018q1`, then the
-#' default base period is `2017q3`
-#' @param scale the value of the index series at the base period (by default 100)
+#' default base period is `2017q3`. If the base period is a `period_range`,
+#' then the average value of the index series will be equal to `scale`.
+#' @param scale the (average) value of the index series at the base period
+#' (by default 100)
 #' @param keep_range if \code{TRUE} (the default), then the output
 #' timeseries has the same period range as the input timeseries.
 #' If \code{FALSE} then the result timeseries starts 1 period earlier.

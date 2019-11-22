@@ -148,10 +148,8 @@ test_that("negative value at base period", {
 
 
   ab2["2018q1", 1] <- -2
-  expect_warning(
-    expect_error(index_ts(ab2,  base = "2018q1/2018q2"),
-               "Negative \\(average\\) value at base period 2018Q1/2018Q2 for columns: b."),
-    "Zero \\(average\\) value at base period 2018Q1/2018Q2 for columns: a.")
+  expect_error(index_ts(ab2,  base = "2018q1/2018q2"),
+               "Negative \\(average\\) value at base period 2018Q1/2018Q2 for columns: b.")
 })
 
 test_that("zero value at base period", {

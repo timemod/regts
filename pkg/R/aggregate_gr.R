@@ -75,23 +75,25 @@ aggregate_gr <- function(x, method = c("dif1s", "dif1", "pct", "rel"),
                       ts_labels(x)))
 }
 
-# Check for negative growth factors (1 + gr). The pct and rel aggregation
-# methods assume that the timeseries are always positive. This is only
-# ppossible of the growth factors are larger than or equal to zero.
+
 check_growth_factors <- function(x, is_mat, method) {
+  # Check for negative growth factors (1 + x). The pct and rel aggregation
+  # methods assume that the timeseries are always positive. This is only
+  # poossible if the growth factors are larger than or equal to zero.
 
   if (method == "pct") x <- x / 100
-  x <- 1 + x
-  problem_cols <- apply(x, FUN = function(x) {any(!is.na(x) & x < 0)},
+
+  problem_cols <- apply(x, FUN = function(x) {any(!is.na(x) & x < -1)},
                         MARGIN = 2)
 
   if (any(problem_cols)) {
     if (is_mat) {
       cnames <- colnames(x)
       if (is.null(cnames)) cnames <- seq_len(ncol(x))
-      problem_cols <- cnames[problem_cols]
+      problem_col_names <- cnames[problem_cols]
       stop(paste0("Input timeseries contains negative growth factors",
-                  " for columns: ", paste(problem_cols, collapse = ", "), "."))
+                  " for columns: ", paste(problem_col_names, collapse = ", "),
+                  "."))
     } else {
       stop("Input timeseries contains negative growth factors.")
     }

@@ -8,8 +8,8 @@
 #'  ```
 #' where `scale` is usually 100 and `base` the base period, which can be
 #' a single `period` or a `period_range` (by default the base period is the
-#' first period of `x`). The function gives an error when the
-#' average value of `mean(X[base])` is negative.
+#' first period of `x`). The function gives an error when
+#'  `mean(X[base])` is negative.
 #'
 #' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object
 #' @param base a \code{\link{period}} or a
@@ -84,6 +84,14 @@ index_ts <- function(x, base = NULL, scale = 100) {
     means <- as.numeric(colMeans(xdat))
     cnames <- colnames(x)
     if (is.null(cnames)) cnames <- seq_len(ncol(x))
+    if (any(neg_sel <- !is.na(means) & means < 0)) {
+      # error: if the value in the base period is negative, it is not
+      # possible to construct a meaningful index series
+      neg_cols <- cnames[neg_sel]
+      stop(paste0("Negative (average) value at base",
+                  " period ", base, " for columns: ",
+                  paste(neg_cols, collapse = ", "), "."))
+    }
     if (any(na_sel <- is.na(means))) {
       # result series will be NA or NaN
       na_cols <- cnames[na_sel]
@@ -97,14 +105,6 @@ index_ts <- function(x, base = NULL, scale = 100) {
       warning(paste0("Zero (average) value at base period ",
                      base, " for columns: ", paste(zero_cols, collapse = ", "),
                      "."))
-    }
-    if (any(neg_sel <- !is.na(means) & means < 0)) {
-      # error: if the value in the base period is negative, it is not
-      # possible to construct a meaningful index series
-      neg_cols <- cnames[neg_sel]
-      stop(paste0("Negative (average) value at base",
-                  " period ", base, " for columns: ",
-                  paste(neg_cols, collapse = ", "), "."))
     }
     x[] <- x * rep(1 / means, each = nrow(x))
     return(scale * x)

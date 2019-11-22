@@ -25,8 +25,8 @@ The index series \code{i} is calculated from the input series \code{x} as\prefor
 
 where \code{scale} is usually 100 and \code{base} the base period, which can be
 a single \code{period} or a \code{period_range} (by default the base period is the
-first period of \code{x}). The function gives an error when the
-average value of \code{mean(X[base])} is negative.
+first period of \code{x}). The function gives an error when
+\code{mean(X[base])} is negative.
 }
 \examples{
 \dontshow{
