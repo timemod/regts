@@ -43,9 +43,9 @@ More details for the various methods are provided in vignette
 As explained before, the \code{pct} and \code{rel} methods assume timeseries
 that contain percentage or relative change of a timeseries with only positive
 values. This imposes restrictions on the input timeseries
-\code{x}. For the \code{pct} method, \code{(1 + x / 100) >= 0}  and for
-\code{rel}, \code{(1 + x) >= 0}. Function \code{aggregate_gr} gives an error  if these
-conditions are not satisfied.
+\code{x}: for the \code{pct} method, \verb{x >= -100\%} and for
+\code{rel}, \code{x >= -1}. Function \code{aggregate_gr} gives an error  if this
+condition is not satisfied.
 }
 \examples{
 ts_q <- regts(abs(rnorm(10)), start = "2016Q1")

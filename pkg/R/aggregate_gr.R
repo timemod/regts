@@ -23,9 +23,9 @@
 #' As explained before, the \code{pct} and \code{rel} methods assume timeseries
 #' that contain percentage or relative change of a timeseries with only positive
 #' values. This imposes restrictions on the input timeseries
-#' `x`. For the `pct` method, `(1 + x / 100) >= 0`  and for
-#' `rel`, `(1 + x) >= 0`. Function `aggregate_gr` gives an error  if these
-#' conditions are not satisfied.
+#' `x`: for the `pct` method, `x >= -100%` and for
+#' `rel`, `x >= -1`. Function `aggregate_gr` gives an error  if this
+#' condition is not satisfied.
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} object
 #' @param nfrequency the frequency of the result. This should be higher than
 #' the frequency of timeseries \code{x}
@@ -91,11 +91,11 @@ check_growth_factors <- function(x, is_mat, method) {
       cnames <- colnames(x)
       if (is.null(cnames)) cnames <- seq_len(ncol(x))
       problem_col_names <- cnames[problem_cols]
-      stop(paste0("Input timeseries contains negative growth factors",
+      stop(paste0("Relative growth smaller than -1 for one or more periods",
                   " for columns: ", paste(problem_col_names, collapse = ", "),
                   "."))
     } else {
-      stop("Input timeseries contains negative growth factors.")
+      stop("Relative growth smaller than -1 for one or more periods.")
     }
   }
   return(invisible(NULL))

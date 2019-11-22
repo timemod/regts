@@ -75,7 +75,7 @@ test_that("dif1s and rel, monthly to quarterly, two timeseries", {
                ref_rel)
 })
 
-test_that("dif1s and dif1, quarterly to year, single timeseries with NA values", {
+test_that("dif1/dif1s/rel, quarterly to year, single timeseries with NA values", {
   p         <- period_range("2009Q1", "2015Q4")
   ts_q      <- regts(abs(rnorm(nperiod(p))), start = start_period(p))
   ts_q["2009Q1"] <- NA
@@ -87,7 +87,7 @@ test_that("dif1s and dif1, quarterly to year, single timeseries with NA values",
   expect_equal(agg_reldiff_2(ts_q, method = "rel"), ref_rel)
 })
 
-test_that("dif1s and dif1, timeseries with Inf, -Inf or NaN values", {
+test_that("dif1s/dif1/reldif, timeseries with Inf, -Inf or NaN values", {
   p  <- period_range("2009Q1", "2015Q4")
   ts_q <- regts(abs(rnorm(nperiod(p))), start = start_period(p))
   ts_q["2009Q1"] <- 1/0
@@ -109,4 +109,22 @@ test_that("errors", {
   msg <- "Argument x should be a numeric timeseries"
   ts_t <- regts(c("a", "b", "c"), start = "2017Q1")
   expect_error(aggregate_gr(ts_t), msg)
+})
+
+test_that("rel and pct for negative timeseries", {
+  t1 <- regts(c(1, -3, 4, -2, -2, -1, 0.1, 1, 2, 3, -2, -3), start = "2010q1")
+  r1 <- growth(t1)
+  expect_error(aggregate_gr(r1, method = "rel"),
+               "Relative growth smaller than -1 for one or more periods.")
+
+  r2 <- 100 * cbind(x = r1, y = 2 * r1)
+  expect_error(aggregate_gr(r2, method = "pct"),
+               "Relative growth smaller than -1 for one or more periods for columns: x, y.")
+
+  r3 <- r2
+  r3$x <- ifelse(r3$x < -100, -100, r3$x)
+
+  expect_error(aggregate_gr(r3, method = "pct"),
+               "Relative growth smaller than -1 for one or more periods for columns: y.")
+
 })
