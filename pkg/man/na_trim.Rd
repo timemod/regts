@@ -4,8 +4,7 @@
 \alias{na_trim}
 \title{Function for removing leading and trailing NAs}
 \usage{
-na_trim(x, method = c("both", "first", "last"), is_na = c("all",
-  "any"))
+na_trim(x, method = c("both", "first", "last"), is_na = c("all", "any"))
 }
 \arguments{
 \item{x}{a \code{\link{regts}} object}

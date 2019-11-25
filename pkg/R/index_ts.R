@@ -2,23 +2,30 @@
 #'
 #' This function scales a timeseries by dividing all observations by
 #' one selected observation or by the mean of a range of observations.
-#' The index series is calculated with \code{i[t] = s * x[t] / mean(X[base])},
-#' where \code{s} is an arbitrary scale and \code{base} an arbitrary base period.
+#' The index series `i` is calculated from the input series `x` as
+#'  ```
+#'  i[t] = scale * x[t] / mean(x[base]),
+#'  ```
+#' where `scale` is usually 100 and `base` the base period, which can be
+#' a single `period` or a `period_range` (by default the base period is the
+#' first period of `x`).
+#' If  `mean(x[base])` is negative then a warning is given and the (mean) value
+#' of the resulting index series at the  base period will be `-scale`.
 #'
 #' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object
 #' @param base a \code{\link{period}} or a
-#' \code{\link{period_range}} specifying the base period or an object that can
+#' \code{\link{period_range}} specifying the base period, or an object that can
 #' be coerced to a \code{period} or \code{period_range}.
 #' By default the base period is the first period of the input timeseries.
 #' @param scale the (average) value of the index series at the base period
-#' (by default 100).
+#' (by default 100). This should be a positive number.
 #'
 #' @seealso \code{\link{rel2index}} and \code{\link{pct2index}}
 #' @examples
 #' \dontshow{
 #' set.seed(123)
 #' }
-#' ab <- regts(matrix(rnorm(18), ncol = 2), start = "2016Q1",
+#' ab <- regts(matrix(1:18 + rnorm(18), ncol = 2), start = "2016Q1",
 #'             names = c("a", "b"))
 #'
 #' index_ts(ab)
@@ -26,13 +33,11 @@
 #' index_ts(ab, base = "2017", scale = 1)
 #'
 #' @export
-index_ts <- function(x, base = start_period(x), scale = 100) {
+index_ts <- function(x, base = NULL, scale = 100) {
 
-  if (!is.ts(x)) {
-    stop("Argument x is not a timeseries")
-  }
+  x <- as.regts(x)
 
-  if (!missing(base)) {
+  if (!is.null(base)) {
     base <- as.period_range(base)
     freq_base <- frequency(base)
     freq_x <- frequency(x)
@@ -44,7 +49,14 @@ index_ts <- function(x, base = start_period(x), scale = 100) {
       base <- change_frequency(base, new_frequency = freq_x)
     }
   } else {
-    base <- period_range(base, base)
+    base <- as.period_range(start_period(x))
+  }
+
+  if (!missing(scale)) {
+    if (!is.numeric(scale) || is.na(scale[1]) || scale[1] < 0) {
+      stop("Argument scale must be a positive number.")
+    }
+    if (length(scale) > 1) stop("Argument scale should be a single number.")
   }
 
   p_x <- get_period_range(x)
@@ -66,24 +78,49 @@ index_ts <- function(x, base = start_period(x), scale = 100) {
 
   if (is.mts(x)) {
     # multivariate timeseries
-    x_base_is_na <- is.na(x[psel, , drop = FALSE])
-    if (any(x_base_is_na)) {
-      na_col_sel <- apply(x_base_is_na, MARGIN = 2, FUN = any)
-      cnames <- colnames(x)
-      if (is.null(cnames)) cnames <- seq_len(ncol(x))
-      na_cols <- cnames[na_col_sel]
-      warning(paste0("Input timeseries contains NA values in base period ",
-                    base, " for columns: ", paste(na_cols, collapse = ", "),
-                    "."))
+
+    xdat <- x[psel, , drop = FALSE]
+    means <- as.numeric(colMeans(xdat))
+    cnames <- colnames(x)
+    if (is.null(cnames)) cnames <- seq_len(ncol(x))
+    if (any(neg_sel <- !is.na(means) & means < 0)) {
+      # error: if the value in the base period is negative, it is not
+      # possible to construct a meaningful index series
+      means[neg_sel] <- -means[neg_sel]
+      neg_cols <- cnames[neg_sel]
+      warning(paste0("Negative (average) value at base",
+                  " period ", base, " for columns: ",
+                  paste(neg_cols, collapse = ", "), "."))
+
     }
-    x[] <- apply(x, FUN = function(c) {c / mean(c[psel])}, MARGIN = 2)
+    if (any(na_sel <- is.na(means))) {
+      # result series will be NA or NaN
+      na_cols <- cnames[na_sel]
+      warning(paste0("NA values in base period ",
+                     base, " for columns: ", paste(na_cols, collapse = ", "),
+                     "."))
+    }
+    if (any(zero_sel <- !is.na(means) & means == 0)) {
+      # result series will be Inf or -Inf
+      zero_cols <- cnames[zero_sel]
+      warning(paste0("Zero (average) value at base period ",
+                     base, " for columns: ", paste(zero_cols, collapse = ", "),
+                     "."))
+    }
+    x[] <- x * rep(1 / means, each = nrow(x))
     return(scale * x)
   } else {
     # univariate timeseries
     m  <- mean(x[psel])
     if (is.na(m)) {
-      warning(paste("Input timeseries contains NA values in base period",
-                    base))
+      warning(sprintf("NA values in base period %s", as.character(base)))
+    } else if (m == 0) {
+      warning(sprintf(paste("Zero (average) value at base period %s."),
+                      as.character(base)))
+    } else if (m < 0) {
+      warning(sprintf(paste("Negative (average) value at base period %s."),
+                   as.character(base)))
+      m <- -m
     }
     return(scale * x / m)
   }

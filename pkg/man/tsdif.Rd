@@ -24,33 +24,33 @@ if the absolute value of \code{x2} is larger than 1.}
 }
 \value{
 a list with class "tsdif", with the following components
- \item{equal}{\code{TRUE} if \code{x1} and \code{x2} have the same column names
-              and period ranges,
-             and if all differences are smaller than or equal to \code{tol}}
- \item{difnames}{The names of the timeseries with differences
-                  larger than \code{tol}}
- \item{dif}{A \code{regts} with the computed differences,
- or \code{NULL} if there are no differences larger than \code{tol}.
- Only timeseries with differences larger than \code{tol} are included.
- Leading and trailing rows with differences less than \code{tol} have also been
- removed.}
- \item{common_names}{the names of the common columns}
- \item{missing_names1}{The names of columns present in \code{x2} but missing
-                       in \code{x1}}
- \item{missing_names2}{The names of columns present in \code{x1} but missing
-                       in \code{x2}}
- \item{period_range1}{The period ranges of \code{x1} as a
- \code{\link{period_range}} object}
- \item{period_range2}{The period ranges of \code{x2} as a
- \code{period_range} object}
- \item{common_range}{The intersection of the period ranges }
- \item{ranges_equal}{A logical indicating whether the period ranges of
- \code{x1} and \code{x2} differ}
- \item{ts_names}{a character string giving the names of the two input
- timeseries}
- \item{tol}{The tolerance parameter}
- \item{fun}{a character string specifying the supplied function \code{fun},
- or \code{NULL} if \code{fun} has not been specified}
+\item{equal}{\code{TRUE} if \code{x1} and \code{x2} have the same column names
+and period ranges,
+and if all differences are smaller than or equal to \code{tol}}
+\item{difnames}{The names of the timeseries with differences
+larger than \code{tol}}
+\item{dif}{A \code{regts} with the computed differences,
+or \code{NULL} if there are no differences larger than \code{tol}.
+Only timeseries with differences larger than \code{tol} are included.
+Leading and trailing rows with differences less than \code{tol} have also been
+removed.}
+\item{common_names}{the names of the common columns}
+\item{missing_names1}{The names of columns present in \code{x2} but missing
+in \code{x1}}
+\item{missing_names2}{The names of columns present in \code{x1} but missing
+in \code{x2}}
+\item{period_range1}{The period ranges of \code{x1} as a
+\code{\link{period_range}} object}
+\item{period_range2}{The period ranges of \code{x2} as a
+\code{period_range} object}
+\item{common_range}{The intersection of the period ranges }
+\item{ranges_equal}{A logical indicating whether the period ranges of
+\code{x1} and \code{x2} differ}
+\item{ts_names}{a character string giving the names of the two input
+timeseries}
+\item{tol}{The tolerance parameter}
+\item{fun}{a character string specifying the supplied function \code{fun},
+or \code{NULL} if \code{fun} has not been specified}
 }
 \description{
 This function can be used to compare two multivariate timeseries objects.

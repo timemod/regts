@@ -5,8 +5,7 @@
 \title{Convert timeseries with absolute or relative changes to a lower
 frequency}
 \usage{
-aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"),
-  nfrequency = 1)
+aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"), nfrequency = 1)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object}
@@ -23,7 +22,7 @@ a \code{regts} with frequency \code{nfrequency}
 \description{
 This function implements temporal aggregation for timeseries with absolute,
 relative or percentage changes. As shown in vignette
- \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
+\href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
 (Growth) Timeseries"}},
 the standard function \code{\link[stats]{aggregate}} does not yield correct
 results for these type of timeseries.
@@ -34,17 +33,23 @@ The \code{dif1s} and \code{dif1} methods assume that the input timeseries
 contain a first difference (for \code{dif1s} the input is also
 scaled). The result is a first difference in the output frequency.
 The \code{pct} and \code{rel} methods assume timeseries that contain
-percentage or relative change. They calculate the exact percentage or
-relative change for the output timeseries.
-
-More details are provided in vignette
- \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
+percentage or relative changes of a timeseries with only positive values.
+They calculate
+the exact percentage or relative change for the output timeseries.
+More details for the various methods are provided in vignette
+\href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
 (Growth) Timeseries"}}.
+
+As explained before, the \code{pct} and \code{rel} methods assume that \code{x} is
+is a percentage or relative change of a series with only
+positive values.  This imposes a restriction on  \code{x}: for the \code{pct} method,
+\verb{x >= -100\%}, and for \code{rel}, \code{x >= -1}. Function \code{aggregate_gr} gives an
+error if this condition is not satisfied.
 }
 \examples{
-ts_q <- regts(rnorm(10), start = "2016Q1")
+ts_q <- regts(abs(rnorm(10)), start = "2016Q1")
 aggregate_gr(ts_q, method = "dif1s")
 
-ts_m <- regts(matrix(rnorm(20), ncol = 2), start = "2017M1", names = c("a", "b"))
+ts_m <- regts(matrix(abs(rnorm(20)), ncol = 2), start = "2017M1", names = c("a", "b"))
 aggregate_gr(ts_m, method = "rel", nfrequency = 4)
 }

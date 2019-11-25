@@ -8,11 +8,9 @@
 \usage{
 diff_ts(x, lag = 1, differences = 1, keep_range = TRUE, ...)
 
-\method{diff_ts}{ts}(x, lag = 1, differences = 1, keep_range = TRUE,
-  ...)
+\method{diff_ts}{ts}(x, lag = 1, differences = 1, keep_range = TRUE, ...)
 
-\method{diff_ts}{default}(x, lag = 1, differences = 1,
-  keep_range = TRUE, ...)
+\method{diff_ts}{default}(x, lag = 1, differences = 1, keep_range = TRUE, ...)
 }
 \arguments{
 \item{x}{a univariate or multivariate timeseries.

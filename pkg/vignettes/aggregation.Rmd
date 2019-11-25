@@ -201,7 +201,7 @@ X_t =  \left(  \sum_{j=2}^n  (j-1) x_{t-1,j} +  \sum_{j=1}^n  (n - j + 1) x_{t,j
 
 
 ## `rel` method 
-Define $x$ to be the relative change in $z$. Thus
+Define $x$ to be the relative change in $z$. Thus, assuming that $z >= 0$,
 \begin{displaymath}
  x_{t,i} = (z_{t,i} - z_{t,i-1}) / z_{t,i-1}
 \end{displaymath}
@@ -234,7 +234,8 @@ X_t = \frac{\prod_{j=2}^{n}(1+ x_{t-1,j}) \sum_{i=1}^{n} \prod_{j=1}^{i}(1+ x_{t
 
 
 ## `pct` method 
-Define $x$ to be the percentage change in $z$. Thus
+Define $x$ to be the percentage change in $z$. Thus,
+as before assuming that $z >= 0$,
 \begin{displaymath}
  x_{t,i} = 100 (z_{t,i} - z_{t,i-1}) / z_{t,i-1}
 \end{displaymath}

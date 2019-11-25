@@ -76,7 +76,7 @@ function \code{\link[openxlsx]{createWorkbook}} of package
 \code{openxlsx} and then add a sheet with \code{write_ts_sheet}.
 The latter approach is more efficient.
 When the workbook is written to a file with function
- \code{\link[openxlsx]{saveWorkbook}}, it is often useful to
+\code{\link[openxlsx]{saveWorkbook}}, it is often useful to
 set the minimum column width option for package \code{openxlsx},
 as shown in the example below.
 }

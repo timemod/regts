@@ -1,24 +1,52 @@
 #' Calculate an index timeseries from a timeseries with relative or
 #' percentage changes.
 #'
-#' This is the inverse of function \code{\link{growth}}.
-#' The relative change, or growth, of a timeseries x[t]
-#' is defined as \code{growth[t] = (x[t] - x[t-1]) / |x[t-1]|}.
-#' Suppose that \code{growth[t]} is given but \code{x[t]} is not known.
-#' Then it is possible to calculate the index series
-#' \code{i[t] = s * x[t] / x[t*]}, where \code{s} is arbitrary scale and
-#' \code{t*} an arbitrary base period.
-#' Function \code{rel2index} computes this index series \code{i[t]}
+#' Function `rel2index` is the inverse of function \code{\link{growth}}.
+#' The growth `x[t]` (also called the relative change) of a timeseries `z[t]`
+#' is defined as
+#' ```
+#' x[t] = (z[t] - z[t - 1]) / |z[t - 1]|.
+#' ```
+#' The function constructs an index series for `z[t]` given the values of
+#' `x[t]`, assuming that the value of timeseries `z` at the
+#' period before the start period of timeseries `x` is positive. See Details.
 #' \cr\cr
-#' Similarly, function \code{pct2index} computes the index series
-#' for a timeseries of percentage changes, defined as
-#' \code{100 (x[t] - x[t-1]) / | x[t-1]|}.
+#' Function `pct2index` computes the index series
+#' from a timeseries of percentage changes, defined as `100 * g[t]`.
+#' Thus expression `pct2index(x)` gives the same result as `rel2index(x / 100)`.
 #'
-#' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a multivariate
-#' timeseries)
-#' @param base base period of the index timeseries (a \code{\link{period}}
-#' object or an object that can be coerced to a \code{period} object)
-#' @param scale the value of the index series at the base period (by default 100)
+#' If `x[t]` is given but `z[t]` is unknown, we can compute
+#' `z[t]` as
+#' ```
+#' z[t] = z[t - 1] * (1 + sign(z[t - 1]) x[t]).
+#' ```
+#' Given an initial value for `z` at some period (say `z[0]`), the equation
+#' above can be used repeatedly to calculate the values of `z[t]` for `t > 0`.
+#' In function `rel2index` `z[0]` is not known, but if we assume that it is
+#' positive, then this value is not needed if we calculate the index series
+#' defined as
+#' ```
+#' i[t] =  scale * z[t] / mean(z[base]),
+#' ```
+#' where `base` is the base period.
+#' The index series `i` is independent of the absolute value of `z[0]`, but
+#' does depend on the sign of `z[0]`. If `z[0]` is actually negative
+#' then the results of `rel2index` and `pct2index` are not correct.
+#'
+#' If  `mean(x[base])` is negative then a warning is given and the (mean) value
+#' of the resulting index series in the  base period  will be `-scale`.
+#'
+#' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a
+#' multivariate timeseries) with the relative of percentage changes.
+#' @param base a \code{\link{period}} or a
+#' \code{\link{period_range}} specifying the base period, or an object that can
+#' be coerced to a \code{period} or \code{period_range}.
+#' By default the base period is the period before the first period of the
+#' input timeseries `x`. For example,  if `x` starts at `2018q1`, then the
+#' default base period is `2017q4`. If the base period is a `period_range`,
+#' then the average value of the index series will be equal to `scale`.
+#' @param scale the (average) value of the index series at the base period
+#' (by default 100)
 #' @param keep_range if \code{TRUE} (the default), then the output
 #' timeseries has the same period range as the input timeseries.
 #' If \code{FALSE} then the result timeseries starts 1 period earlier.
@@ -34,8 +62,8 @@ NULL
 #' @describeIn rel2index-slash-pct2index Calculates an index timeseries from a
 #' timeseries with relative changes
 #' @export
-rel2index <- function(x, base = start_period(x) - 1, scale = 100,
-                      keep_range = TRUE) {
+rel2index <- function(x, base = NULL, scale = 100,
+                          keep_range = TRUE) {
 
   x <- as.regts(x)
 
@@ -48,48 +76,58 @@ rel2index <- function(x, base = start_period(x) - 1, scale = 100,
   # to perform the cumulation.
   data <- rel2index_cpp(x)
 
-  # determine result period range
-  old_range <- get_period_range(x)
-  new_start <- start_period(x) - 1
+  if (is.null(base)) {
 
-  if (!missing(base)) {
-    base <- as.period(base)
-    if (frequency(base) != frequency(x)) {
-      stop(paste0("The base period ", base, " has a different frequency",
-                  " than the timeseries (", frequency(x), ")."))
+    # the base period has not been specified, thus it is the first
+    # period before the start of timeseries x.
+    # For efficiency, the data is prepared first and the timeseries
+    # is created only at the last stage.
+
+    if (keep_range) {
+      # remove first row
+      data <- data[-1, , drop = FALSE]
+      new_start <- start_period(x)
+    } else {
+      new_start <- start_period(x) - 1
     }
-    base_index <- base - new_start + 1
-    if (base_index < 1 || base_index > nrow(data)) {
-      stop(paste0("The base period should lie between ",
-          new_start, " and ", end_period(old_range), "."))
+
+    if (!x_is_matrix) {
+      # convert the vector to data
+      dim(data) <- NULL
     }
-    data <- apply(data, MARGIN = 2,
-                  FUN = function(x) {x /x[base_index]})
+
+    if (scale != 1) data <- data * scale
+
+    return(regts(data, start = new_start, names = colnames(x),
+                 labels = ts_labels(x)))
+
+  } else {
+
+    # base period specified
+
+    if (!x_is_matrix) {
+      # convert the vector to data
+      dim(data) <- NULL
+    }
+
+    # prepare a timeseries that can be passed to function index_ts.
+
+    result <- regts(data, start = start_period(x) - 1, names = colnames(x),
+                    labels = ts_labels(x))
+
+    result <- index_ts(result, base, scale = scale)
+
+    if (keep_range) {
+      result <- result[get_period_range(x)]
+    }
+    return(result)
   }
-
-  if (scale != 1) data <- data * scale
-
-  if (keep_range) {
-    # remove first rowS
-    data <- data[-1, , drop = FALSE]
-    new_start = new_start + 1
-  }
-
-  if (!x_is_matrix) {
-    # convert the vector to data
-    dim(data) <- NULL
-  }
-
-  return(regts(data, start = new_start, names = colnames(x),
-               labels = ts_labels(x)))
 }
 
 #' @describeIn rel2index-slash-pct2index Calculates an index timeseries from a
 #' timeseries with percentage changes
 #' @export
-pct2index <- function(x, base = start_period(x) - 1, scale = 100,
-                      keep_range = TRUE) {
-  return(rel2index(x/100, base = base, scale = scale, keep_range = keep_range))
+pct2index <- function(x, base = NULL, scale = 100, keep_range = TRUE) {
+  return(rel2index(x / 100, base = base, scale = scale,
+                   keep_range = keep_range))
 }
-
-
