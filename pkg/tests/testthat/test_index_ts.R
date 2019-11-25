@@ -126,10 +126,12 @@ test_that("negative value at base period", {
   a2["2018q2"] <- -3
   expect_equal(index_ts(a2), a2 * 100)
 
-  expect_error(index_ts(a2, base = "2018q2"),
+  expect_warning(a2_i1 <- index_ts(a2, base = "2018q2"),
                "Negative \\(average\\) value at base period 2018Q2.")
-  expect_error(index_ts(a2, base = "2018q1/2018q2"),
+  expect_equal(a2_i1, 100 * a2/ 3)
+  expect_warning(a2_i2 <- index_ts(a2, base = "2018q1/2018q2"),
                "Negative \\(average\\) value at base period 2018Q1/2018Q2.")
+  expect_equal(a2_i2, 100 * a2)
 
   ab2 <- ab
   ab2["2018q1", 1] <- -10
@@ -139,17 +141,23 @@ test_that("negative value at base period", {
 
   expect_equal(index_ts(ab2, base = "2018q2"), expected_result)
 
-  expect_error(index_ts(ab2),
+  expect_warning(ab2_i1 <- index_ts(ab2),
                "Negative \\(average\\) value at base period 2018Q1 for columns: a.")
+  expect_equal(ab2_i1, ab2 * rep(c(10, 50), each = nrow(ab2)))
+
 
   ab2["2018q1", 2] <- -5
-  expect_error(index_ts(ab2,  base = "2018q1/2018q2"),
+  expect_warning(ab2_i2 <- index_ts(ab2,  base = "2018q1/2018q2"),
                "Negative \\(average\\) value at base period 2018Q1/2018Q2 for columns: a, b.")
-
+  expect_equal(ab2_i2, ab2 * rep(c(25, 200), each = nrow(ab2)))
 
   ab2["2018q1", 1] <- -2
-  expect_error(index_ts(ab2,  base = "2018q1/2018q2"),
-               "Negative \\(average\\) value at base period 2018Q1/2018Q2 for columns: b.")
+  warnings <- capture_warnings(ab2_i3 <- index_ts(ab2,  base = "2018q1/2018q2"))
+  expect_equal(ab2_i3, ab2 * rep(c(Inf, 200), each = nrow(ab2)))
+
+  expect_equal(warnings,
+               c("Negative (average) value at base period 2018Q1/2018Q2 for columns: b.",
+                 "Zero (average) value at base period 2018Q1/2018Q2 for columns: a."))
 })
 
 test_that("zero value at base period", {

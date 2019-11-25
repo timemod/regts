@@ -20,37 +20,47 @@ test_that("rel2index univariate timeseries", {
   ts1_index_2 <- rel2index(ts1_rel["2010q3"], keep_range = TRUE)
   expect_equal(ts1["2010q3"], ts1_index_2)
 
-  expect_error(rel2index(ts1_rel, base = "2010Q4"),
-               "Negative \\(average\\) value at base period 2010Q4.")
-
-  ts1_index2 <- rel2index(ts1_rel, "2010q3")
-  expected <- (100 * ts1 / as.numeric(ts1["2010Q3"]))[get_period_range(ts1_rel)]
+  expect_warning(ts1_index2 <- rel2index(ts1_rel, base = "2010Q4"),
+                 "Negative \\(average\\) value at base period 2010Q4.")
+  expected <- (100 * ts1 / abs(as.numeric(ts1["2010Q4"])))[get_period_range(ts1_rel)]
   expect_equal(ts1_index2, expected)
+
+  ts1_index3 <- rel2index(ts1_rel, "2010q3")
+  expected <- (100 * ts1 / as.numeric(ts1["2010Q3"]))[get_period_range(ts1_rel)]
+  expect_equal(ts1_index3, expected)
 })
 
 test_that("rel2index multivariate timeseries", {
-  ts1 <- regts(matrix(data, ncol = 2), start = "2010Q2",
-               names = c("a", "b"), labels = paste("Timeseries", c("a", "b")))
-  ts1[] <- apply(ts1, MARGIN = 2, FUN = function(x) {x /x[1]})
-  ts1_rel <- diff(ts1) / abs(lag(ts1, -1))
-  ts1_index <- rel2index(ts1_rel, scale = 1, keep_range = TRUE)
-  p <- get_period_range(ts1_rel)
-  expect_equal(ts1[p], ts1_index[p])
+    ts1 <- regts(matrix(data, ncol = 2), start = "2010Q2",
+                 names = c("a", "b"), labels = paste("Timeseries", c("a", "b")))
+    ts1[] <- apply(ts1, MARGIN = 2, FUN = function(x) {x /x[1]})
+    ts1_rel <- diff(ts1) / abs(lag(ts1, -1))
+    ts1_index <- rel2index(ts1_rel, scale = 1, keep_range = TRUE)
+    p <- get_period_range(ts1_rel)
+    expect_equal(ts1[p], ts1_index[p])
 
-  ts1_index_2 <- rel2index(ts1_rel["2010q3"], keep_range = TRUE, scale = 1)
-  expect_equal(ts1["2010q3"], ts1_index_2)
+    ts1_index_2 <- rel2index(ts1_rel["2010q3"], keep_range = TRUE, scale = 1)
+    expect_equal(ts1["2010q3"], ts1_index_2)
 
-  expect_error(rel2index(ts1_rel, base = "2011Q3", scale = 1),
-               "Negative \\(average\\) value at base period 2011Q3 for columns: a.")
-  expect_error(rel2index(ts1_rel, base = "2011Q2", scale = 1),
-               "Negative \\(average\\) value at base period 2011Q2 for columns: a, b.")
+    expect_warning(ts1_index_3 <- rel2index(ts1_rel, base = "2011Q3", scale = 1),
+                 "Negative \\(average\\) value at base period 2011Q3 for columns: a.")
+    prd <- get_period_range(ts1_rel)
+    expected_result <- ts1 * rep(1 / abs(as.numeric(ts1["2011q3"])), each = nrow(ts1))
+    expected_result <- expected_result[prd]
+    expect_equal(ts1_index_3,  expected_result)
 
-  ts1_index2 <- rel2index(ts1_rel, base = "2012Q2", scale = 1,
-                          keep_range = FALSE)
-  expected <- ts1
-  i <- period("2012Q2") - period("2010Q2") + 1
-  expected[] <- apply(expected, MARGIN = 2, FUN = function(x) {x /x[i]})
-  expect_equal(ts1_index2, expected)
+    expect_warning(ts1_index_4 <- rel2index(ts1_rel, base = "2011Q2", scale = 1),
+                 "Negative \\(average\\) value at base period 2011Q2 for columns: a, b.")
+    expected_result <- ts1 * rep(1 / abs(as.numeric(ts1["2011q2"])), each = nrow(ts1))
+    expected_result <- expected_result[prd]
+    expect_equal(ts1_index_4,  expected_result)
+
+    ts1_index5 <- rel2index(ts1_rel, base = "2012Q2", scale = 1,
+                            keep_range = FALSE)
+    expected <- ts1
+    i <- period("2012Q2") - period("2010Q2") + 1
+    expected[] <- apply(expected, MARGIN = 2, FUN = function(x) {x /x[i]})
+    expect_equal(ts1_index5, expected)
 
   # empty timeseries
   ts1_rel_empty <- ts1_rel[ , character(0)]
@@ -170,14 +180,20 @@ test_that("negative timeseries (1)", {
   expect_warning(i7 <- index_ts(i5, base = "2011q4"), msg)
   expect_equal(i6, i7)
 
-  expect_error(rel2index(r3, scale = 100, keep_range = FALSE, base = "2011q1"),
+  expect_warning(i8 <- rel2index(r3, scale = 100, keep_range = FALSE, base = "2011q1"),
                "Negative \\(average\\) value at base period 2011Q1 for columns: x, y.")
-  expect_error(rel2index(r3, scale = 100, keep_range = FALSE, base = "2011q3"),
+  expect_warning(i9 <- index_ts(i5, base = "2011q1"))
+  expect_equal(i8, i9)
+
+  expect_warning(i10  <-rel2index(r3, scale = 100, keep_range = FALSE, base = "2011q3"),
                "Negative \\(average\\) value at base period 2011Q3 for columns: x.")
+  expect_warning(i11 <- index_ts(i5, base = "2011q3"))
+  expect_equal(i10, i11)
+
   expect_warning(
-    i8 <- rel2index(r3[ , "y"], scale = 100, base = "2012q1"),
+    i12 <- rel2index(r3[ , "y"], scale = 100, base = "2012q1"),
     "NA values in base period 2012Q1")
-  expect_equal(i8, regts(NaN, period = "2010q3/2012q1"))
+  expect_equal(i12, regts(NaN, period = "2010q3/2012q1"))
 })
 
 test_that("negative timeseries (2)", {

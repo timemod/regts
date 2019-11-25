@@ -13,19 +13,19 @@
 #' contain a first difference (for \code{dif1s} the input is also
 #' scaled). The result is a first difference in the output frequency.
 #' The \code{pct} and \code{rel} methods assume timeseries that contain
-#' percentage or relative change of a timeseries with only positive values.
+#' percentage or relative changes of a timeseries with only positive values.
 #' They calculate
 #' the exact percentage or relative change for the output timeseries.
 #' More details for the various methods are provided in vignette
 #'  \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
 #' (Growth) Timeseries"}}.
 #'
-#' As explained before, the \code{pct} and \code{rel} methods assume timeseries
-#' that contain percentage or relative change of a timeseries with only positive
-#' values. This imposes restrictions on the input timeseries
-#' `x`: for the `pct` method, `x >= -100%` and for
-#' `rel`, `x >= -1`. Function `aggregate_gr` gives an error  if this
-#' condition is not satisfied.
+#' As explained before, the \code{pct} and \code{rel} methods assume that `x` is
+#' is a percentage or relative change of a series with only
+#' positive values.  This imposes a restriction on  `x`: for the `pct` method,
+#' `x >= -100%`, and for `rel`, `x >= -1`. Function `aggregate_gr` gives an
+#' error if this condition is not satisfied.
+#'
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} object
 #' @param nfrequency the frequency of the result. This should be higher than
 #' the frequency of timeseries \code{x}

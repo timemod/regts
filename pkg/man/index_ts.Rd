@@ -20,13 +20,14 @@ By default the base period is the first period of the input timeseries.}
 \description{
 This function scales a timeseries by dividing all observations by
 one selected observation or by the mean of a range of observations.
-The index series \code{i} is calculated from the input series \code{x} as\preformatted{i[t] = scale * x[t] / mean(X[base]),
+The index series \code{i} is calculated from the input series \code{x} as\preformatted{i[t] = scale * x[t] / mean(x[base]),
 }
 
 where \code{scale} is usually 100 and \code{base} the base period, which can be
 a single \code{period} or a \code{period_range} (by default the base period is the
-first period of \code{x}). The function gives an error when
-\code{mean(X[base])} is negative.
+first period of \code{x}).
+If  \code{mean(x[base])} is negative then a warning is given and the (mean) value
+of the resulting index series at the  base period will be \code{-scale}.
 }
 \examples{
 \dontshow{

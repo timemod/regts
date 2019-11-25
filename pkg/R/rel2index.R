@@ -2,37 +2,39 @@
 #' percentage changes.
 #'
 #' Function `rel2index` is the inverse of function \code{\link{growth}}.
-#' The growth `g[t]` (also called the relative change) of a timeseries `z[t]`
+#' The growth `x[t]` (also called the relative change) of a timeseries `z[t]`
 #' is defined as
 #' ```
-#' g[t] = (z[t] - z[t - 1]) / |z[t - 1]|.
+#' x[t] = (z[t] - z[t - 1]) / |z[t - 1]|.
 #' ```
 #' The function constructs an index series for `z[t]` given the values of
-#' `g[t]`, assuming that the value of timeseries `z` at the
-#' period before the start period of timeseries `g` (specified with
-#' argument `x`) is positive. See Details.
+#' `x[t]`, assuming that the value of timeseries `z` at the
+#' period before the start period of timeseries `x` is positive. See Details.
 #' \cr\cr
 #' Function `pct2index` computes the index series
 #' from a timeseries of percentage changes, defined as `100 * g[t]`.
 #' Thus expression `pct2index(x)` gives the same result as `rel2index(x / 100)`.
 #'
-#'
-#' If `g[t]` is given but `z[t]` is unknown, we can compute
+#' If `x[t]` is given but `z[t]` is unknown, we can compute
 #' `z[t]` as
 #' ```
-#' z[t] = z[t - 1] * (1 + sign(z[t - 1]) g[t]).
+#' z[t] = z[t - 1] * (1 + sign(z[t - 1]) x[t]).
 #' ```
 #' Given an initial value for `z` at some period (say `z[0]`), the equation
 #' above can be used repeatedly to calculate the values of `z[t]` for `t > 0`.
 #' In function `rel2index` `z[0]` is not known, but if we assume that it is
-#' positive, this value is not needed if we calculate the index series
+#' positive, then this value is not needed if we calculate the index series
 #' defined as
 #' ```
-#' i[t] =  scale * z[t] / z[base].
+#' i[t] =  scale * z[t] / mean(z[base]),
 #' ```
-#' The index series `i` is independent on the absolute value of `z[0]`, but
+#' where `base` is the base period.
+#' The index series `i` is independent of the absolute value of `z[0]`, but
 #' does depend on the sign of `z[0]`. If `z[0]` is actually negative
 #' then the results of `rel2index` and `pct2index` are not correct.
+#'
+#' If  `mean(x[base])` is negative then a warning is given and the (mean) value
+#' of the resulting index series in the  base period  will be `-scale`.
 #'
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a
 #' multivariate timeseries) with the relative of percentage changes.
@@ -41,7 +43,7 @@
 #' be coerced to a \code{period} or \code{period_range}.
 #' By default the base period is the period before the first period of the
 #' input timeseries `x`. For example,  if `x` starts at `2018q1`, then the
-#' default base period is `2017q3`. If the base period is a `period_range`,
+#' default base period is `2017q4`. If the base period is a `period_range`,
 #' then the average value of the index series will be equal to `scale`.
 #' @param scale the (average) value of the index series at the base period
 #' (by default 100)

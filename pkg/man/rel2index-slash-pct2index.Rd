@@ -20,7 +20,7 @@ multivariate timeseries) with the relative of percentage changes.}
 be coerced to a \code{period} or \code{period_range}.
 By default the base period is the period before the first period of the
 input timeseries \code{x}. For example,  if \code{x} starts at \verb{2018q1}, then the
-default base period is \verb{2017q3}. If the base period is a \code{period_range},
+default base period is \verb{2017q4}. If the base period is a \code{period_range},
 then the average value of the index series will be equal to \code{scale}.}
 
 \item{scale}{the (average) value of the index series at the base period
@@ -32,34 +32,37 @@ If \code{FALSE} then the result timeseries starts 1 period earlier.}
 }
 \description{
 Function \code{rel2index} is the inverse of function \code{\link{growth}}.
-The growth \code{g[t]} (also called the relative change) of a timeseries \code{z[t]}
-is defined as\preformatted{g[t] = (z[t] - z[t - 1]) / |z[t - 1]|.
+The growth \code{x[t]} (also called the relative change) of a timeseries \code{z[t]}
+is defined as\preformatted{x[t] = (z[t] - z[t - 1]) / |z[t - 1]|.
 }
 
 The function constructs an index series for \code{z[t]} given the values of
-\code{g[t]}, assuming that the value of timeseries \code{z} at the
-period before the start period of timeseries \code{g} (specified with
-argument \code{x}) is positive. See Details.
+\code{x[t]}, assuming that the value of timeseries \code{z} at the
+period before the start period of timeseries \code{x} is positive. See Details.
 \cr\cr
 Function \code{pct2index} computes the index series
 from a timeseries of percentage changes, defined as \code{100 * g[t]}.
 Thus expression \code{pct2index(x)} gives the same result as \code{rel2index(x / 100)}.
 }
 \details{
-If \code{g[t]} is given but \code{z[t]} is unknown, we can compute
-\code{z[t]} as\preformatted{z[t] = z[t - 1] * (1 + sign(z[t - 1]) g[t]).
+If \code{x[t]} is given but \code{z[t]} is unknown, we can compute
+\code{z[t]} as\preformatted{z[t] = z[t - 1] * (1 + sign(z[t - 1]) x[t]).
 }
 
 Given an initial value for \code{z} at some period (say \code{z[0]}), the equation
 above can be used repeatedly to calculate the values of \code{z[t]} for \code{t > 0}.
 In function \code{rel2index} \code{z[0]} is not known, but if we assume that it is
-positive, this value is not needed if we calculate the index series
-defined as\preformatted{i[t] =  scale * z[t] / z[base].
+positive, then this value is not needed if we calculate the index series
+defined as\preformatted{i[t] =  scale * z[t] / mean(z[base]),
 }
 
-The index series \code{i} is independent on the absolute value of \code{z[0]}, but
+where \code{base} is the base period.
+The index series \code{i} is independent of the absolute value of \code{z[0]}, but
 does depend on the sign of \code{z[0]}. If \code{z[0]} is actually negative
 then the results of \code{rel2index} and \code{pct2index} are not correct.
+
+If  \code{mean(x[base])} is negative then a warning is given and the (mean) value
+of the resulting index series in the  base period  will be \code{-scale}.
 }
 \section{Functions}{
 \itemize{

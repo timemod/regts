@@ -4,12 +4,13 @@
 #' one selected observation or by the mean of a range of observations.
 #' The index series `i` is calculated from the input series `x` as
 #'  ```
-#'  i[t] = scale * x[t] / mean(X[base]),
+#'  i[t] = scale * x[t] / mean(x[base]),
 #'  ```
 #' where `scale` is usually 100 and `base` the base period, which can be
 #' a single `period` or a `period_range` (by default the base period is the
-#' first period of `x`). The function gives an error when
-#'  `mean(X[base])` is negative.
+#' first period of `x`).
+#' If  `mean(x[base])` is negative then a warning is given and the (mean) value
+#' of the resulting index series at the  base period will be `-scale`.
 #'
 #' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object
 #' @param base a \code{\link{period}} or a
@@ -34,9 +35,7 @@
 #' @export
 index_ts <- function(x, base = NULL, scale = 100) {
 
-  if (!is.ts(x)) {
-    stop("Argument x is not a timeseries")
-  }
+  x <- as.regts(x)
 
   if (!is.null(base)) {
     base <- as.period_range(base)
@@ -87,10 +86,12 @@ index_ts <- function(x, base = NULL, scale = 100) {
     if (any(neg_sel <- !is.na(means) & means < 0)) {
       # error: if the value in the base period is negative, it is not
       # possible to construct a meaningful index series
+      means[neg_sel] <- -means[neg_sel]
       neg_cols <- cnames[neg_sel]
-      stop(paste0("Negative (average) value at base",
+      warning(paste0("Negative (average) value at base",
                   " period ", base, " for columns: ",
                   paste(neg_cols, collapse = ", "), "."))
+
     }
     if (any(na_sel <- is.na(means))) {
       # result series will be NA or NaN
@@ -117,8 +118,9 @@ index_ts <- function(x, base = NULL, scale = 100) {
       warning(sprintf(paste("Zero (average) value at base period %s."),
                       as.character(base)))
     } else if (m < 0) {
-      stop(sprintf(paste("Negative (average) value at base period %s."),
+      warning(sprintf(paste("Negative (average) value at base period %s."),
                    as.character(base)))
+      m <- -m
     }
     return(scale * x / m)
   }
