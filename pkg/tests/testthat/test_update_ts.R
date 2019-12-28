@@ -5,9 +5,9 @@ context("update_ts regts with methods: upd, updna, updval and replace")
 
 test_that("equal periods", {
 
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
-  x2 <- regts(matrix(data = rep(2), nc = 3), period = "2000/2003",
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2000/2003",
               names = c("a", "c", "d"))
 
   u1 <- update_ts(x1, x2, "upd")
@@ -28,9 +28,9 @@ test_that("equal periods", {
 
 test_that("equal periods, NA values in x1", {
 
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
-  x2 <- regts(matrix(data = rep(2), nc = 3), period = "2000/2003",
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2000/2003",
               names = c("a", "c", "d"))
 
   x1["2000", "a"] <- NA
@@ -58,9 +58,9 @@ test_that("equal periods, NA values in x1", {
 
 test_that("equal periods, NA values in x2", {
 
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
-  x2 <- regts(matrix(data = rep(2), nc = 3), period = "2000/2003",
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2000/2003",
               names = c("a", "c", "d"))
 
   x2["2003", "d"] <- NA
@@ -90,9 +90,9 @@ test_that("equal periods, NA values in x2", {
 
 test_that("equal periods, NA values in x1 and x2", {
 
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
-  x2 <- regts(matrix(data = rep(2), nc = 3), period = "2000/2003",
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2000/2003",
               names = c("a", "c", "d"))
 
   x1["2001", c("b","d")] <- NA
@@ -121,9 +121,9 @@ test_that("equal periods, NA values in x1 and x2", {
 
 test_that("overlapping periods, no NA values", {
 
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
-  x2 <- regts(matrix(data = rep(2), nc = 3), period = "2002/2006",
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2002/2006",
               names = c("a", "c", "d"))
 
   u1 <- update_ts(x1, x2, "upd")
@@ -148,9 +148,9 @@ test_that("overlapping periods, no NA values", {
 
 test_that("overlapping periods, NA values", {
 
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
-  x2 <- regts(matrix(data = rep(2), nc = 3), period = "2002/2006",
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2002/2006",
               names = c("a", "c", "d"))
 
   x1["2000", c("a","b","c")] <- NA
@@ -176,9 +176,9 @@ test_that("overlapping periods, NA values", {
 
 test_that("period x1 encloses period x2, no NA values", {
 
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2006",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2006",
               names = c("a", "b", "c"))
-  x2 <- regts(matrix(data = rep(2), nc = 3), period = "2002/2005",
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2002/2005",
               names = c("a", "c", "d"))
 
   u1 <- update_ts(x1, x2, "upd")
@@ -198,9 +198,9 @@ test_that("period x1 encloses period x2, no NA values", {
 
 test_that("period x1 encloses period x2, NA values", {
 
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2006",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2006",
               names = c("a", "b", "c"))
-  x2 <- regts(matrix(data = rep(2), nc = 3), period = "2002/2005",
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2002/2005",
               names = c("a", "c", "d"))
   x1["2000", c("a","b","c")] <- NA
 
@@ -224,9 +224,9 @@ test_that("period x1 encloses period x2, NA values", {
 
 test_that("no overlapping periods, NA values", {
 
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
-  x2 <- regts(matrix(data = rep(2), nc = 3), period = "2006/2008",
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2006/2008",
               names = c("a", "c", "d"))
 
   x1["2000", c("a","b","c")] <- NA
@@ -253,9 +253,9 @@ test_that("no overlapping periods, NA values", {
 
 test_that("no overlapping columns, NA values", {
 
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
-  x2 <- regts(matrix(data = rep(2), nc = 2), period = "2002/2005",
+  x2 <- regts(matrix(data = 2, nc = 2), period = "2002/2005",
               names = c("d", "e"))
 
   x1["2000", c("a","b","c")] <- NA
@@ -298,15 +298,15 @@ test_that("no column names", {
 
 test_that("update an univariate timeseries: matrix and vector", {
 
-  x1 <- regts(matrix(data = rep(2), nc = 1), period = "2002/2005",
+  x1 <- regts(matrix(data = 2, nc = 1), period = "2002/2005",
               names = c("a"))
   a <- regts(rep(2), period = "2002/2005")
 
-  x2 <- regts(matrix(data = rep(1), nc = 1), period = "2000/2003",
+  x2 <- regts(matrix(data = 1, nc = 1), period = "2000/2003",
               names = c("b"))
   b <- regts(rep(1), period = "2000/2003")
 
-  x3 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+  x3 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
 
   u1 <- update_ts(x1, x2, "upd")
@@ -323,10 +323,10 @@ test_that("update an univariate timeseries: matrix and vector", {
 
 test_that("update with univariate timeseries: matrix and vector", {
 
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
 
-  x2 <- regts(matrix(data = rep(2), nc = 1), period = "2002/2005",
+  x2 <- regts(matrix(data = 2, nc = 1), period = "2002/2005",
               names = c("a"))
   a <- regts(rep(2), period = "2002/2005")
 
@@ -344,15 +344,15 @@ test_that("update with univariate timeseries: matrix and vector", {
 
 test_that("update with several NA timeseries and method updval", {
 
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
                         names = c("a", "b", "c"))
 
-  x2 <- regts(matrix(data = rep(NA), nc = 3), period = "2000/2003",
+  x2 <- regts(matrix(data = NA, nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
 
-  x3 <- regts(matrix(data = rep(NA), nc = 1), period = "2002/2005",
+  x3 <- regts(matrix(data = NA, nc = 1), period = "2002/2005",
                         names = c("a"))
-  a <- regts(rep(NA), period = "2002/2005")
+  a <- regts(NA, period = "2002/2005")
 
   u1 <- update_ts(x1, x2, "updval")
   u2 <- update_ts(x1, x3, "updval")
@@ -364,9 +364,9 @@ test_that("update with several NA timeseries and method updval", {
 })
 
 test_that("errors", {
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
-  x2 <- regts(matrix(data = rep(2), nc = 3), period = "2002q1/2006q4",
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2002q1/2006q4",
               names = c("a", "c", "d"))
   nr <- 2
   expect_error(update_ts(x1, nr, "replace"),
@@ -380,7 +380,7 @@ test_that("labels", {
 
   names1 <- c("a", "b", "c")
   labels1 <- paste("Timeseries", names1)
-  x1 <- regts(matrix(data = rep(1), nc = 3), period = "2000/2003",
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
             names = names1, labels = labels1)
 
   names2 <- c("b", "c", "d")
@@ -409,3 +409,17 @@ test_that("labels", {
   expect_identical(result2, expected_result2)
 })
 
+test_that("single period, no missing names", {
+
+  # this test failed in regts version <= 1.0.0
+
+  x1 <- regts(matrix(data = 1, nc = 2), period = "2000",
+              names = c("a", "b"))
+  x2 <- regts(matrix(data = 2, nc = 1), period = "2000",
+              names = c("b"))
+
+  result <- update_ts(x1, x2)
+
+  expect_identical(result$a, x1$a)
+  expect_identical(result$b, x2$b)
+})

@@ -125,8 +125,12 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
   update <- calculate_update(x1, x2, common_names, p1, p2, method)
 
   # update result with non common names
-  update[p2, missing_names1] <- x2[p2, missing_names1]
-  update[p1, missing_names2] <- x1[p1, missing_names2]
+  if (length(missing_names1) > 0) {
+    update[p2, missing_names1] <- x2[p2, missing_names1]
+  }
+  if (length(missing_names2) > 0) {
+    update[p1, missing_names2] <- x1[p1, missing_names2]
+  }
 
   if (length(missing_names1) > 0) {
     # add labels of missing_names1 in x2 to the result
