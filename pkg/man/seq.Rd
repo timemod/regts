@@ -46,7 +46,7 @@ for (prd in as.list(seqp))
 }
 
 # Note that we do not loop directly over the period vector, but first convert
-# the vector to a list. Otherwise the \\code{period} class is lost.
+# the vector to a list. Otherwise the \code{period} class is lost.
 
 }
 \seealso{

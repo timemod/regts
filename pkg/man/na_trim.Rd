@@ -21,13 +21,14 @@ objects this argument has no effect.}
 }
 \value{
 A \code{\link{regts}} object in which leading and/or trailing NAs have
-been removed.
+been removed, or \code{NULL} if all values are \code{NA}.
 }
 \description{
 This function removes leading or trailing NAs or both from a (multivariate)
 regts object.
 For multivariate regts a row will by default be regarded as NA if all elements
 in the row are NA. Use argument \code{is.na = "any"} to change this behaviour.
+The function returns \code{NULL} if all values are \code{NA}.
 }
 \examples{
 # remove only leading NAs

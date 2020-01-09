@@ -28,10 +28,14 @@
 #' @export
 remove_na_columns <- function (x, is_na = c("all", "any")) {
 
-  if (!is.ts(x)) {
+  # Use function inherits instead of is.ts to check if x1 is a timeseries.
+  # is.ts returns FALSE if x1 is a timeseries with 0 columns
+  if (!inherits(x, "ts")) {
       stop("Argument x is not a (multivariate) timeseries")
   }
   isna <- match.arg(is_na)
+
+  if (NCOL(x) == 0) return(x)
 
   if (!is.matrix(x)) {
     elem <- which(!is.na(x))
