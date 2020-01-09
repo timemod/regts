@@ -60,11 +60,13 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
 
   method <- match.arg(method)
 
-  if (!is.ts(x1)) {
+  # Use function inherits instead of is.ts to check if x1 is a timeseries.
+  # is.ts returns FALSE if x1 is a timeseries with 0 columns
+  if (!inherits(x1, "ts")) {
     stop(paste0("Argument x1 (", series_name1,
                 ") is not a timeseries"))
   }
-  if (!is.ts(x2)) {
+  if (!inherits(x2, "ts")) {
     stop(paste0("Argument x2 (", series_name2,
                ") is not a timeseries"))
   }
@@ -81,7 +83,7 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
   names2 <- colnames(x2)
 
   # create colnames if x1 or x2 does not have colnames
-  if (is.null(names1)) {
+  if (is.null(names1) && NCOL(x1) > 0) {
     if (is.matrix(x1)) {
       names1 <- paste("column", 1 : ncol(x1))
     } else {
@@ -91,7 +93,8 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
     }
     colnames(x1) <- names1
   }
-  if (is.null(names2)) {
+
+  if (is.null(names2) && NCOL(x2) > 0) {
     if (is.matrix(x2)) {
       names2 <- paste("column", 1 : ncol(x2))
     } else {
@@ -104,7 +107,7 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
 
   # for method updval first remove all leading and trailing rows and all
   # columns from x2 with only NA
-  if (method == "updval") {
+  if (method == "updval" && ncol(x2) > 0) {
     x2 <- na_trim(x2)
     if (!is.null(x2)) {
       x2 <- remove_na_columns(x2)
@@ -114,13 +117,15 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
     }
   }
 
+  if (ncol(x1) == 0) return(x2)
+  if (ncol(x2) == 0) return(x1)
+
   common_names   <- intersect(names1, names2)
   missing_names1 <- setdiff(names2, names1)
   missing_names2 <- setdiff(names1, names2)
 
   p1 <- get_period_range(x1)
   p2 <- get_period_range(x2)
-
 
   update <- calculate_update(x1, x2, common_names, p1, p2, method)
 

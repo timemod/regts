@@ -423,3 +423,23 @@ test_that("single period, no missing names", {
   expect_identical(result$a, x1$a)
   expect_identical(result$b, x2$b)
 })
+
+
+test_that("timeseries with zero columns", {
+
+  x1 <- regts(matrix(0, nr = 3, nc = 0), period = "2000/2003")
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2000/2003",
+              names = c("a", "c", "d"))
+
+  expect_equal(update_ts(x1, x2), x2)
+  expect_equal(update_ts(x1, x1), x1)
+  expect_equal(update_ts(x2, x1), x2)
+
+  # update ts with zero columns with univariate timeseries
+  expected_result <- x2[, "a", drop = FALSE]
+  colnames(expected_result) <- "x2$a"
+  expect_equal(update_ts(x1, x2$a), expected_result)
+
+  # update  univariate timeseries with ts with zero columns
+   expect_equal(update_ts(x2$a, x1), expected_result)
+})
