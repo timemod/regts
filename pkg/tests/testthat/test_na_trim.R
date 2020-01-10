@@ -1,3 +1,6 @@
+library(testthat)
+library(regts)
+
 context("na_trim")
 
 test_that("univariate timeseries", {
@@ -60,6 +63,7 @@ test_that("preserve labels", {
 
     data <- matrix(c(1,2,NA,3,4,NA,NA,6,NA), ncol = 3)
     prd <- period_range("2017Q1/2017Q3")
+
     rts <- regts(data, period = prd, names = c("a", "b", "c"),
                  labels = c("label_a", "label_b", "label_c"))
 
@@ -71,4 +75,9 @@ test_that("preserve labels", {
 
     rts3 <- na_trim(rts, is_na = "any")
     expect_identical(ts_labels(rts), ts_labels(rts3))
+})
+
+test_that("timeseries with zero columns", {
+    x1 <- regts(matrix(0, nr = 3, nc = 0), period = "2000/2003")
+    expect_equal(na_trim(x1), x1)
 })

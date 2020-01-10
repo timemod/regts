@@ -31,3 +31,9 @@ test_that("errors", {
   expect_error(remove_na_columns("aap"), msg)
 })
 
+test_that("timeseries with zero columns", {
+  x1 <- regts(matrix(0, nr = 3, nc = 0), period = "2000/2003")
+  expect_equal(remove_na_columns(x1), x1)
+})
+
+
