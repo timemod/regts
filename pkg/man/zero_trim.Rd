@@ -14,13 +14,15 @@ zero_trim(x, method = c("both", "first", "last"))
 or just at the end.}
 }
 \value{
-A \code{\link{regts}} object in which leading and/or trailing zeros have been removed.
+A \code{\link{regts}} object in which leading and/or trailing zeros
+have been removed, or \code{NULL} if all values in the timeseries are zero.
 }
 \description{
 This function removes leading or trailing zeros or both from a (multivariate)
 regts object.
 For multivariate regts a row will by default be regarded as 0 if all elements
 in the row are 0.
+The function returns \code{NULL} if all values are zero.
 }
 \examples{
 # remove only leading zeros

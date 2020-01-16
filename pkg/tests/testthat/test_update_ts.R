@@ -345,13 +345,13 @@ test_that("update with univariate timeseries: matrix and vector", {
 test_that("update with several NA timeseries and method updval", {
 
   x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
-                        names = c("a", "b", "c"))
+              names = c("a", "b", "c"))
 
   x2 <- regts(matrix(data = NA, nc = 3), period = "2000/2003",
               names = c("a", "b", "c"))
 
   x3 <- regts(matrix(data = NA, nc = 1), period = "2002/2005",
-                        names = c("a"))
+              names = c("a"))
   a <- regts(NA, period = "2002/2005")
 
   u1 <- update_ts(x1, x2, "updval")
@@ -381,12 +381,12 @@ test_that("labels", {
   names1 <- c("a", "b", "c")
   labels1 <- paste("Timeseries", names1)
   x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
-            names = names1, labels = labels1)
+              names = names1, labels = labels1)
 
   names2 <- c("b", "c", "d")
   labels2 <- paste("Variable", names2)
   x2 <- regts(matrix(data = rep(2), nc = 3), period = "2000/2003",
-            names = names2, labels = labels2)
+              names = names2, labels = labels2)
   x2["2001", "c"] <- NA
   x2[, "d"] <- NA
 
@@ -422,4 +422,31 @@ test_that("single period, no missing names", {
 
   expect_identical(result$a, x1$a)
   expect_identical(result$b, x2$b)
+})
+
+
+test_that("timeseries with zero columns", {
+
+  x1 <- regts(matrix(0, nr = 3, nc = 0), period = "2000/2003")
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2000/2003",
+              names = c("a", "c", "d"))
+
+  expect_equal(update_ts(x1, x2), x2)
+  expect_equal(update_ts(x1, x1), x1)
+  expect_equal(update_ts(x2, x1), x2)
+
+  # update ts with zero columns with univariate timeseries
+  expected_result <- x2[, "a", drop = FALSE]
+  colnames(expected_result) <- "x2$a"
+  expect_equal(update_ts(x1, x2$a), expected_result)
+
+  # update  univariate timeseries with ts with zero columns
+  expect_equal(update_ts(x2$a, x1), expected_result)
+
+  x2_NA <- x2
+  x2_NA["2003"] <- NA
+  x2_NA$a <- NA
+  expect_equal(update_ts(x1, x2_NA), x2_NA)
+  expect_equal(update_ts(x1, x2_NA, method = "updval"),
+               x2["2000/2002", c("c", "d")])
 })

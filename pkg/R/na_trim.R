@@ -4,6 +4,7 @@
 #' regts object.
 #' For multivariate regts a row will by default be regarded as NA if all elements
 #' in the row are NA. Use argument \code{is.na = "any"} to change this behaviour.
+#' The function returns \code{NULL} if all values are \code{NA}.
 #'
 #' @param x a \code{\link{regts}} object
 #' @param method character string with values \code{"both",} \code{"first"} or
@@ -15,7 +16,7 @@
 #' regarded as \code{NA} if it has any \code{NA}s. For one dimensional regts
 #' objects this argument has no effect.
 #' @return A \code{\link{regts}} object in which leading and/or trailing NAs have
-#' been removed.
+#' been removed, or \code{NULL} if all values are \code{NA}.
 #'
 #' @seealso \code{\link{zero_trim}}
 #'
@@ -40,11 +41,15 @@
 na_trim <- function (x, method = c("both", "first","last"),
                      is_na = c("all", "any")) {
 
-    if (!is.ts(x)) {
+  # Use function inherits instead of is.ts to check if x1 is a timeseries.
+  # is.ts returns FALSE if x1 is a timeseries with 0 columns
+    if (!inherits(x, "ts")) {
         stop("Argument x is not a timeseries")
     } else if (!is.regts(x)) {
       x <- as.regts(x)
     }
+
+    if (NCOL(x) == 0) return(x)
 
     side <- match.arg(method)
     isna <- match.arg(is_na)

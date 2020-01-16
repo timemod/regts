@@ -137,3 +137,9 @@ test_that("multivariate timeseries with NAs", {
   expect_identical(zero_trim(rts3), rts3["2017Q2/2017Q3", ])
 })
 
+test_that("timeseries with zero columns", {
+  x1 <- regts(matrix(0, nr = 3, nc = 0), period = "2000/2003")
+  expect_equal(zero_trim(x1), x1)
+})
+
+
