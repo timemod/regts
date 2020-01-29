@@ -6,9 +6,7 @@ rm(list = ls())
 context("as.regts.numeric")
 
 
-
-
-test_that("no names of names without invalid periods", {
+test_that("no names or names with invalid periods", {
 
   ref_ts <- regts(1:3, start = "1")
 
