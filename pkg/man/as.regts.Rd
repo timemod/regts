@@ -5,6 +5,7 @@
 \alias{as.regts.ts}
 \alias{as.regts.data.frame}
 \alias{as.regts.matrix}
+\alias{as.regts.numeric}
 \alias{as.regts.default}
 \title{Coerce an object to a \code{\link{regts}} timeseries object}
 \usage{
@@ -15,6 +16,8 @@ as.regts(x, ...)
 \method{as.regts}{data.frame}(x, time_column = 0, numeric = TRUE, fun = period, strict = TRUE, ...)
 
 \method{as.regts}{matrix}(x, numeric = TRUE, fun = period, strict = TRUE, ...)
+
+\method{as.regts}{numeric}(x, fun = period, strict = TRUE, ...)
 
 \method{as.regts}{default}(x, ...)
 }
@@ -33,8 +36,9 @@ a function which converts a data frame to \code{period} vector.}
 By default they are converted to numeric. This can be changed by setting
 \code{numeric = FALSE}.}
 
-\item{fun}{a function for converting values in the row names or
-time column(s) to \code{\link{period}} objects. Normally this is a function
+\item{fun}{a function for converting values in the row names,
+time column(s), or names of a numeric vector to \code{\link{period}} objects.
+Normally this is a function
 which converts a vector to a \code{period} vector (for example
 function \code{period}). See argument \code{time_column} for exceptions.}
 
@@ -60,8 +64,10 @@ of the matrix
 \item \code{matrix}: Convert a \code{\link{matrix}} to a
 \code{regts}
 
+\item \code{numeric}: Convert a numeric vector to a \code{regts}
+
 \item \code{default}: Default method to convert an R object to a
-\code{regts}. This method first employs \code{\link[stats:ts]{as.ts}}
+\code{regts}. This method first employs \code{\link[stats]{as.ts}}
 and then \code{\link{as.regts.ts}}
 }}
 

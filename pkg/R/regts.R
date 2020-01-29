@@ -232,8 +232,9 @@ is.regts <- function(x) {
 #' @param numeric logical: should non numeric values be converted to numeric data.
 #' By default they are converted to numeric. This can be changed by setting
 #' \code{numeric = FALSE}.
-#' @param fun a function for converting values in the row names or
-#' time column(s) to \code{\link{period}} objects. Normally this is a function
+#' @param fun a function for converting values in the row names,
+#' time column(s), or names of a numeric vector to \code{\link{period}} objects.
+#' Normally this is a function
 #' which converts a vector to a \code{period} vector (for example
 #' function \code{period}). See argument \code{time_column} for exceptions.
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
@@ -532,14 +533,56 @@ matrix2regts_ <- function(x, periods, numeric, strict) {
   return (ret)
 }
 
+#' @describeIn as.regts Convert a numeric vector to a \code{regts}
+#' @export
+as.regts.numeric <- function(x, fun = period, strict = TRUE, ...) {
+
+  if (length(x) > 0 && !is.null(periods <- names(x))) {
+
+    # x is a named vector. The names possiby contain period texts
+
+    if (missing(fun) && missing(strict)) {
+
+      # If fun and strict have not been specified, then ignore the names
+      # if the names are not valid period texts.
+      error <- FALSE
+      tryCatch(
+        periods <- convert_periods(periods, fun = fun, ...),
+      error = function(e) {
+        # use standard method (ignoring names)
+        error <<- TRUE
+
+      })
+      if (error) return(as.regts(as.ts(x, ...)))
+    } else {
+      # fun an strict have been specified: now we can give an error
+      # if a period not valid
+      periods <- convert_periods(periods, fun = fun, ...)
+    }
+
+    if (is.list(periods)) {
+      stop("The names contain periods with different frequencies.")
+    }
+
+    result <- matrix2regts_(as.matrix(x), periods, numeric = FALSE,
+                             strict = strict)
+    return(result[, 1])
+
+  } else {
+
+     # x is not a named vector: use standard ts method
+    return(as.regts(as.ts(x, ...)))
+  }
+}
+
 
 #' @describeIn as.regts Default method to convert an R object to a
-#' \code{regts}. This method first employs \code{\link[stats:ts]{as.ts}}
+#' \code{regts}. This method first employs \code{\link[stats]{as.ts}}
 #' and then \code{\link{as.regts.ts}}
 #' @importFrom stats as.ts
 #' @export
 as.regts.default <- function(x, ...) {
-  return (as.regts(as.ts(x, ...)))
+  return(as.regts(as.ts(x, ...)))
 }
 
 # Add columns with names new_colnames to x, and fill with NA
