@@ -38,28 +38,23 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   args <- lapply(args, FUN = function(x) {
                    if (NCOL(x) == 0) return(NULL) else return(x)})
 
-  if (union) {
-    ret <- do.call(ts.union, args)
-  } else {
-    ret <- do.call(ts.intersect, args)
-  }
+  ts_names <- .get_ts_names(...)
+
+  ret <- .cbind.regts(args, ts_names, union = union)
 
   if (!is.mts(ret)) {
     return(ret)
   }
-
 
   cnames <- lapply(args, FUN = colnames)
 
   # Creates column names for arguments that do not have column names.
   # We do not like the column names created by ts.union and ts.intersect.
   missing_colnames <- sapply(cnames, FUN = is.null)
-
-
   if (any(missing_colnames)) {
     # create colnames for arguments without colnames.
     # this mechanism is the same as in ts.intersect and ts.union.
-    ts_names <- get_ts_names(...)
+
     get_colnames <- function(i) {
       if (missing_colnames[[i]]) {
         if (is.null(args[[i]])) {
@@ -92,12 +87,12 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
     dupl <- duplicated(all_names)
     if (missing(suffixes)) {
       stop(paste0("Duplicate column names (",
-                   paste(unique(all_names[dupl]), collapse = " "),
-                   "). Specify argument suffixes."))
+                  paste(unique(all_names[dupl]), collapse = " "),
+                  "). Specify argument suffixes."))
     } else if (length(suffixes) < length(args)) {
       stop(paste0("Length of argument suffixes is smaller than the",
-                   " number of objects to be joined (", length(args),
-                   ")."))
+                  " number of objects to be joined (", length(args),
+                  ")."))
     }
     add_suffix <- lapply(cnames, function(x) x %in% all_names[dupl])
     fix_dupl <- function(i) {
@@ -113,7 +108,7 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   return(add_labels(as.regts(ret), args))
 }
 
-get_ts_names <- function(...) {
+.get_ts_names <- function(...) {
   # Returns the names of the ... arguments.
   # For example, if cbind was called as cbind(a, b), then this
   # function returns c("a", "b"). However, if cbind was called as
@@ -136,6 +131,86 @@ get_ts_names <- function(...) {
   }
   return (nm)
 }
+
+#' @importFrom stats tsp
+# This function is a copy of stats:::cbind.ts
+.cbind.regts <- function (sers, nmsers, union = TRUE)
+{
+  nulls <- vapply(sers, is.null, NA)
+  sers <- sers[!nulls]
+  nser <- length(sers)
+  if (nser == 0L)
+    return(NULL)
+  if (nser == 1L) return(sers[[1L]])
+  tsser <- vapply(sers, function(x) length(tsp(x)) > 0L, NA)
+  if (!any(tsser))
+    stop("no time series supplied")
+  sers <- lapply(sers, as.ts)
+  nsers <- vapply(sers, NCOL, 1)
+  tsps <- sapply(sers[tsser], tsp)
+  freq <- mean(tsps[3, ])
+  if (max(abs(tsps[3, ] - freq)) > getOption("ts.eps")) {
+    stop("not all series have the same frequency")
+  }
+  if (union) {
+    st <- min(tsps[1, ])
+    en <- max(tsps[2, ])
+  }
+  else {
+    st <- max(tsps[1, ])
+    en <- min(tsps[2, ])
+    if (st > en) {
+      warning("non-intersecting series")
+      return(NULL)
+    }
+  }
+  p <- c(st, en, freq)
+  n <- round(freq * (en - st) + 1)
+  if (any(!tsser)) {
+    ln <- vapply(sers[!tsser], NROW, 1)
+    #if (any(ln != 1 && ln != n))
+    if (any(ln != 1 & ln != n))
+      stop("non-time series not of the correct length")
+    for (i in (1L:nser)[!tsser]) {
+      sers[[i]] <- ts(sers[[i]], start = st, end = en,
+                      frequency = freq)
+    }
+    tsps <- sapply(sers, tsp)
+  }
+
+  ns <- sum(nsers)
+  x <- matrix(NA, n, ns)
+  cs <- c(0, cumsum(nsers))
+  nm <- character(ns)
+  for (i in 1L:nser) if (nsers[i] > 1) {
+    cn <- colnames(sers[[i]])
+    if (is.null(cn))
+      cn <- 1L:nsers[i]
+    nm[(1 + cs[i]):cs[i + 1]] <- paste(nmsers[i], cn,
+                                       sep = ".")
+  }
+  else nm[cs[i + 1]] <- nmsers[i]
+  dimnames(x) <- list(NULL, nm)
+
+  for (i in 1L:nser) {
+    if (union) {
+      xx <- if (nsers[i] > 1)
+        rbind(matrix(NA, round(freq * (tsps[1, i] - st)),
+                     nsers[i]), sers[[i]], matrix(NA, round(freq *
+                                                              (en - tsps[2, i])), nsers[i]))
+      else c(rep.int(NA, round(freq * (tsps[1, i] - st))),
+             sers[[i]], rep.int(NA, round(freq * (en - tsps[2,
+                                                            i]))))
+    }
+    else {
+      xx <- window(sers[[i]], st, en)
+    }
+    x[, (1 + cs[i]):cs[i + 1]] <- xx
+  }
+
+  return(ts(x, start = st, frequency = freq))
+}
+
 
 add_labels <- function(x, args) {
   # Add ts_labels in args to x.
@@ -163,4 +238,6 @@ add_labels <- function(x, args) {
   ts_labels(x) <- labels
   return(x)
 }
+
+
 
