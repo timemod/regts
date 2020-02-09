@@ -21,6 +21,10 @@ tic("cbind.ts")
 x_regts <- cbind(ts1, ts2)
 toc()
 
+tic("do.call")
+x_regts <- do.call(cbind, list(ts1, ts2))
+toc()
+
 rts1_lbls <- rts1
 rts2_lbls <- rts2
 ts_labels(rts1_lbls) <- colnames(rts1)
