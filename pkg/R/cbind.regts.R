@@ -31,15 +31,15 @@
 #' @export
 cbind.regts <- function(..., union = TRUE, suffixes) {
 
-  args <- list(...)
-
-  # ts.union and ts.intersect do not handle multivariate ts objects with
-  # zero columns properly, therefore replace them with NULL
-  args <- lapply(args, FUN = function(x) {
-                   if (NCOL(x) == 0) return(NULL) else return(x)})
-
+  # construct names for the input arguments
   ts_names <- .get_ts_names(...)
 
+  args <- list(...)
+
+  # Do not use do.call(ts.union, args) or do.call(ts.intersect, args).
+  # This is very slow for for large timersies objects, for unknown reasons.
+  # Instead use function .cbind.regts (which is used by ts.union or ts.intersect),
+  # which is a copy of function stats:::.cbind.ts
   ret <- .cbind.regts(args, ts_names, union = union)
 
   if (!is.mts(ret)) {
@@ -132,12 +132,14 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   return (nm)
 }
 
-#' @importFrom stats tsp
-# This function is a copy of stats:::cbind.ts
-.cbind.regts <- function (sers, nmsers, union = TRUE)
-{
-  nulls <- vapply(sers, is.null, NA)
-  sers <- sers[!nulls]
+# This function is based on stats:::cbind.ts
+.cbind.regts <- function(sers, nmsers, union = TRUE) {
+
+  # remove NULL and data with zero columns
+  skip  <- vapply(sers, function(x) {is.null(x) || NCOL(x) == 0} , NA)
+  sers <- sers[!skip]
+  nmsers <- nmsers[!skip]
+
   nser <- length(sers)
   if (nser == 0L)
     return(NULL)
@@ -145,70 +147,44 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   tsser <- vapply(sers, function(x) length(tsp(x)) > 0L, NA)
   if (!any(tsser))
     stop("no time series supplied")
-  sers <- lapply(sers, as.ts)
+  sers <- lapply(sers, as.regts)
   nsers <- vapply(sers, NCOL, 1)
   tsps <- sapply(sers[tsser], tsp)
-  freq <- mean(tsps[3, ])
-  if (max(abs(tsps[3, ] - freq)) > getOption("ts.eps")) {
+  ranges <- lapply(sers[tsser], get_period_range)
+  freq <- vapply(ranges, frequency, NA_real_)
+  if (length(unique(freq)) > 1) {
     stop("not all series have the same frequency")
   }
-  if (union) {
-    st <- min(tsps[1, ])
-    en <- max(tsps[2, ])
-  }
-  else {
-    st <- max(tsps[1, ])
-    en <- min(tsps[2, ])
-    if (st > en) {
-      warning("non-intersecting series")
-      return(NULL)
+
+  if (length(unique(ranges)) > 1) {
+    if (union) {
+      range <- Reduce(range_union, ranges)
+    } else {
+      range <- Reduce(range_intersect, ranges)
     }
+    sers[tsser] <- lapply(sers[tsser], FUN = function(x) {x[range]})
+  } else {
+    range <- ranges[[1]]
   }
-  p <- c(st, en, freq)
-  n <- round(freq * (en - st) + 1)
+
+  n <- nperiod(range)
+
+  # handle non-timeseries objects: convert them to a timeseries
   if (any(!tsser)) {
     ln <- vapply(sers[!tsser], NROW, 1)
-    #if (any(ln != 1 && ln != n))
     if (any(ln != 1 & ln != n))
       stop("non-time series not of the correct length")
-    for (i in (1L:nser)[!tsser]) {
-      sers[[i]] <- ts(sers[[i]], start = st, end = en,
-                      frequency = freq)
-    }
-    tsps <- sapply(sers, tsp)
+    sers[!tsser] <- lapply(sers[!tsser],
+                           function(x) {regts(x, period = range)})
   }
 
-  ns <- sum(nsers)
-  x <- matrix(NA, n, ns)
-  cs <- c(0, cumsum(nsers))
-  nm <- character(ns)
-  for (i in 1L:nser) if (nsers[i] > 1) {
-    cn <- colnames(sers[[i]])
-    if (is.null(cn))
-      cn <- 1L:nsers[i]
-    nm[(1 + cs[i]):cs[i + 1]] <- paste(nmsers[i], cn,
-                                       sep = ".")
-  }
-  else nm[cs[i + 1]] <- nmsers[i]
-  dimnames(x) <- list(NULL, nm)
+  # check column names
 
-  for (i in 1L:nser) {
-    if (union) {
-      xx <- if (nsers[i] > 1)
-        rbind(matrix(NA, round(freq * (tsps[1, i] - st)),
-                     nsers[i]), sers[[i]], matrix(NA, round(freq *
-                                                              (en - tsps[2, i])), nsers[i]))
-      else c(rep.int(NA, round(freq * (tsps[1, i] - st))),
-             sers[[i]], rep.int(NA, round(freq * (en - tsps[2,
-                                                            i]))))
-    }
-    else {
-      xx <- window(sers[[i]], st, en)
-    }
-    x[, (1 + cs[i]):cs[i + 1]] <- xx
-  }
 
-  return(ts(x, start = st, frequency = freq))
+  mats <- lapply(sers, as_matrix)
+  mat_data <- do.call(cbind, mats)
+
+  return(regts(mat_data, period = range))
 }
 
 
