@@ -283,15 +283,19 @@ as.regts <- function(x, ...) {
 
 #' @export
 as.regts.regts <- function(x, ...) {
-  return (x)
+  return(x)
 }
 
 #' @describeIn as.regts Coerce a \code{\link[stats]{ts}} to a
 #' \code{regts}
 #' @export
 as.regts.ts <- function(x, ...) {
+  f <- frequency(x)
+  if (floor(f) != f) {
+    stop(sprintf("Non-integer frequency (%.15g) not allowed for regts objects.", f))
+  }
   class(x) <- c("regts", class(x))
-  return (x)
+  return(x)
 }
 
 #' @export

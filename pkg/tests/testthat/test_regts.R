@@ -460,3 +460,14 @@ test_that("undefined columns selected", {
   expect_identical(err2$message, "subscript out of bounds")
   expect_identical(as.character(err2$call), c("[.default", "regts1", "", "50"))
 })
+
+
+test_that("as.regts.ts for non-integer frequencies", {
+
+  x <- ts(1:10, start = 2010, frequency = 4.001)
+  msg <- paste("Non-integer frequency \\(4.001\\) not allowed for regts",
+               "objects\\.")
+  expect_error(as.regts(x), msg)
+  expect_error(as.regts(cbind(x, x)), msg)
+}
+)
