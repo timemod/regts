@@ -5,13 +5,14 @@
 \title{Convert timeseries with absolute or relative changes to a lower
 frequency}
 \usage{
-aggregate_gr(x, method = c("dif1s", "dif1", "pct", "rel"), nfrequency = 1)
+aggregate_gr(x, method = c("pct", "rel", "difmean", "difsum", "dif1s",
+  "dif1"), nfrequency = 1)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object}
 
-\item{method}{Aggregation method: \code{"dif1s"}, \code{"dif1"}, \code{"pct"}
-or \code{"rel"}. See Details.}
+\item{method}{aggregation methods: \code{"pct"}, \code{"rel"}, \code{"difmean"},
+\code{"difsum"}. See Details.}
 
 \item{nfrequency}{the frequency of the result. This should be higher than
 the frequency of timeseries \code{x}}
@@ -28,10 +29,6 @@ the standard function \code{\link[stats]{aggregate}} does not yield correct
 results for these type of timeseries.
 }
 \details{
-There are methods for different types of input timeseries.
-The \code{dif1s} and \code{dif1} methods assume that the input timeseries
-contain a first difference (for \code{dif1s} the input is also
-scaled). The result is a first difference in the output frequency.
 The \code{pct} and \code{rel} methods assume timeseries that contain
 percentage or relative changes of a timeseries with only positive values.
 They calculate
@@ -39,6 +36,10 @@ the exact percentage or relative change for the output timeseries.
 More details for the various methods are provided in vignette
 \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
 (Growth) Timeseries"}}.
+There are methods for different types of input timeseries.
+The \code{difmean} and \code{difsum} methods assume that the input timeseries
+contain a first difference (for \code{difmean} the input is also
+scaled). The result is a first difference in the output frequency.
 
 As explained before, the \code{pct} and \code{rel} methods assume that \code{x} is
 is a percentage or relative change of a series with only
@@ -48,7 +49,7 @@ error if this condition is not satisfied.
 }
 \examples{
 ts_q <- regts(abs(rnorm(10)), start = "2016Q1")
-aggregate_gr(ts_q, method = "dif1s")
+aggregate_gr(ts_q, method = "difmean")
 
 ts_m <- regts(matrix(abs(rnorm(20)), ncol = 2), start = "2017M1", names = c("a", "b"))
 aggregate_gr(ts_m, method = "rel", nfrequency = 4)
