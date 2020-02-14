@@ -12,6 +12,11 @@ tic("as.list")
 x_l1 <- as.list(rts1)
 toc()
 
+tic("as.regts.list")
+x <- as.regts(x_l1)
+toc()
+quit()
+
 tic("do.call cbind regts")
 x <- do.call(cbind, x_l1)
 toc()

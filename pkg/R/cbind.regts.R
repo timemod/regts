@@ -71,7 +71,8 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
 # nmsers: names of the objects in the function call
 # suffices: suffices added to the timeseries in case of duplicate columns
 #' @importFrom stats tsp
-.cbind.regts <- function(sers, nmsers, suffixes, union = TRUE) {
+.cbind.regts <- function(sers, nmsers, suffixes, union = TRUE,
+                         check_unique = TRUE) {
 
   ninput <- length(sers)
 
@@ -153,37 +154,36 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
 
   names <- unlist(cnames, use.names = FALSE)
 
-
-
-
   #
   # handle non-unique names
   #
 
   # check for duplicate names in different timeseries objects, but ignore
   # duplicates in the same timeseries objects
-  cnames_unique <- lapply(cnames, FUN = unique)
-  all_names <- unlist(cnames_unique)
-  if (anyDuplicated(all_names)) {
-    dupl_names <- unique(all_names[duplicated(all_names)])
-    if (missing(suffixes)) {
-      stop(paste0("Duplicate column names (", paste(dupl_names, collapse = " "),
-                  "). Specify argument suffixes."))
-    } else if (length(suffixes) < ninput) {
-      stop(paste0("Length of argument 'suffixes' is smaller than the",
-                  " number of objects to be joined (", ninput,
-                  ")."))
+  if (check_unique) {
+    cnames_unique <- lapply(cnames, FUN = unique)
+    all_names <- unlist(cnames_unique)
+    if (anyDuplicated(all_names)) {
+      dupl_names <- unique(all_names[duplicated(all_names)])
+      if (missing(suffixes)) {
+        stop(paste0("Duplicate column names (", paste(dupl_names, collapse = " "),
+                    "). Specify argument suffixes."))
+      } else if (length(suffixes) < ninput) {
+        stop(paste0("Length of argument 'suffixes' is smaller than the",
+                    " number of objects to be joined (", ninput,
+                    ")."))
+      }
+      suffixes <- suffixes[!skip]
+      add_suffix <- lapply(cnames, function(x) x %in% dupl_names)
+      fix_names <- vapply(add_suffix, FUN = any, NA)
+      fix_name <- function(cnames, add_suff, suff) {
+        return(ifelse(add_suff, paste0(cnames, suff), cnames))
+      }
+      cnames[fix_names] <- mapply(fix_name, cnames[fix_names],
+                                  add_suffix[fix_names], suffixes[fix_names],
+                                  SIMPLIFY = FALSE)
+      names <- unlist(cnames, use.names = FALSE)
     }
-    suffixes <- suffixes[!skip]
-    add_suffix <- lapply(cnames, function(x) x %in% dupl_names)
-    fix_names <- vapply(add_suffix, FUN = any, NA)
-    fix_name <- function(cnames, add_suff, suff) {
-      return(ifelse(add_suff, paste0(cnames, suff), cnames))
-    }
-    cnames[fix_names] <- mapply(fix_name, cnames[fix_names],
-                                add_suffix[fix_names], suffixes[fix_names],
-                                SIMPLIFY = FALSE)
-    names <- unlist(cnames, use.names = FALSE)
   }
 
   #

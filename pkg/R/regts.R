@@ -240,6 +240,11 @@ is.regts <- function(x) {
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
 #' start and the end period must be present.
 #' Otherwise the timeseries are filled with \code{NA} for the missing periods.
+#' @param union A logical (default \code{TRUE}). Only used in \code{as.regts.list}.
+#' If the list contains multiple timeseries and \code{union} is \code{TRUE},
+#' then the period range of the result is the union of the period ranges of
+#' the individual timeseries objecct in the list. Otherwise the period range is
+#' the intersection of the period ranges of the individual timeseries.
 #' @param ... arguments passed to \code{fun}.
 #' @return a \code{regts} object
 #' @seealso \code{\link{regts}}, \code{\link{is.regts}},
@@ -362,8 +367,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
   return (ret)
 }
 
-#' @describeIn as.regts Convert a \code{\link{matrix}} to a
-#' \code{regts}
+#' @describeIn as.regts Convert a \code{\link{matrix}} to a \code{regts}
 #' @export
 as.regts.matrix <- function(x, numeric = TRUE, fun = period, strict = TRUE,
                             ...) {
@@ -384,6 +388,28 @@ as.regts.matrix <- function(x, numeric = TRUE, fun = period, strict = TRUE,
   # we assume that the periods are in the rownames of the matrix
   return(matrix2regts_(x, periods, numeric = numeric, strict = strict))
 }
+
+#' @describeIn as.regts Convert a \code{\link{list}} to a \code{regts}. At least
+#' one of the elements of the list should contain a timeseries. The result is a
+#' multivariate timeseries with the combined timeseries
+#' @export
+as.regts.list <- function(x, union = TRUE, ...) {
+
+  x_name <- deparse(substitute(x))
+
+  # check names
+  if (is.null(ts_names <- names(x))) {
+    ts_names <- paste(x_name, seq_along(x), sep = ".")
+  } else {
+    ts_names <- ifelse(is.na(ts_names) | nchar(ts_names) == 0,
+                       paste(x_name, seq_along(x), sep = "."),
+                       ts_names)
+  }
+
+  return(.cbind.regts(x, ts_names, NULL, union = union,
+                      check_unique = FALSE))
+}
+
 
 
 # numeric_matrix is an internal function to convert a data.frame to a numeric
