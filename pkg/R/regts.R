@@ -395,19 +395,17 @@ as.regts.matrix <- function(x, numeric = TRUE, fun = period, strict = TRUE,
 #' @export
 as.regts.list <- function(x, union = TRUE, ...) {
 
-  x_name <- deparse(substitute(x))
-
   # check names
+  x_name <- deparse(substitute(x))
+  default_names <- paste(x_name, seq_along(x), sep = ".")
   if (is.null(ts_names <- names(x))) {
-    ts_names <- paste(x_name, seq_along(x), sep = ".")
+    ts_names <- default_names
   } else {
-    ts_names <- ifelse(is.na(ts_names) | nchar(ts_names) == 0,
-                       paste(x_name, seq_along(x), sep = "."),
+    ts_names <- ifelse(is.na(ts_names) | nchar(ts_names) == 0, default_names,
                        ts_names)
   }
 
-  return(.cbind.regts(x, ts_names, NULL, union = union,
-                      check_unique = FALSE))
+  return(.cbind.regts(x, ts_names, NULL, union = union, check_dupl = FALSE))
 }
 
 

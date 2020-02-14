@@ -14,17 +14,20 @@ rts2 <- rts2["/2300"]
 tic("cbind.regts")
 x_regts <- cbind(rts1, rts2)
 toc()
+cat("\n")
 
 ts1 <- as.ts(rts1)
 ts2 <- as.ts(rts2)
 tic("cbind.ts")
 x_regts <- cbind(ts1, ts2)
 toc()
+cat("\n")
 
 
 tic("do.call regts")
 x_regts <- do.call(cbind, list(rts1, rts2))
 toc()
+cat("\n")
 
 tic("do.call ts.union regts")
 x_regts <- do.call(ts.union, list(ts1, ts2))

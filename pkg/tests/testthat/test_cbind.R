@@ -90,19 +90,48 @@ test_that("multivariate timeseries", {
   expect_identical(cbind(regts1, NULL), regts1)
   expect_identical(cbind(NULL, regts1), regts1)
 
-  expect_identical(cbind(regts2, regts1[ , character(0)]), regts2)
-  expect_identical(as.regts(list(regts2, regts1[ , character(0)])), regts2)
+  # test zero columns
 
-  expect_identical(cbind(regts1[ , character(0)], regts2), regts2)
-  expect_identical(as.regts(list(regts1[ , character(0)], regts2)), regts2)
+  p_union <- range_union(get_period_range(regts1), get_period_range(regts2))
+  expected_result <- regts2[p_union]
 
-  expect_identical(cbind(regts2$c, regts1[ , character(0)]), regts2$c)
-  expect_identical(as.regts(list(regts2$c, regts1[ , character(0)])), regts2$c)
+  expect_identical(cbind(regts2, regts1[ , character(0)]), expected_result)
+  expect_identical(as.regts(list(regts2, regts1[ , character(0)])),
+                   expected_result)
+
+  expect_identical(cbind(regts1[ , character(0)], regts2), expected_result)
+  expect_identical(as.regts(list(regts1[ , character(0)], regts2)),
+                   expected_result)
+
+  expect_identical(cbind(regts2$c, regts1[ , character(0)]), expected_result$c)
+  expect_identical(as.regts(list(regts2$c, regts1[ , character(0)])),
+                   expected_result$c)
 
   expect_identical(cbind(regts2[ , "c", drop = FALSE],
-                         regts1[ , character(0)]), regts2[ , "c", drop = FALSE])
+                         regts1[ , character(0)]), regts2[p_union , "c", drop = FALSE])
   expect_identical(as.regts(list(regts2[ , "c", drop = FALSE],
-                         regts1[ , character(0)])), regts2[ , "c", drop = FALSE])
+                         regts1[ , character(0)])), regts2[p_union , "c", drop = FALSE])
+
+  expected_result <- regts2[p_union , character(0)]
+  ts_labels(expected_result) <- NULL
+  dimnames(expected_result) <- list(NULL, NULL)
+  expect_identical(cbind(regts2[ , character(0), drop = FALSE],
+                         regts1[ , character(0)]),
+                         expected_result)
+  expect_identical(as.regts(list(regts2[ , character(0), drop = FALSE],
+                                 regts1[ , character(0)])), expected_result)
+
+  expect_identical(cbind(regts2[ , character(0), drop = FALSE]),
+                   cbind(regts2[ , character(0), drop = FALSE]))
+
+  expected_result <- regts(2, period = get_period_range(regts2))
+  expect_equal(cbind(regts2[ , character(0), drop = FALSE], 2),
+               expected_result)
+
+  expect_equal(cbind(2, regts2[ , character(0), drop = FALSE]),
+               expected_result)
+
+
 })
 
 test_that("multivariate timeseries without labels", {
@@ -117,8 +146,12 @@ test_that("multivariate timeseries without labels", {
   expect_identical(cbind(regts1, NULL), regts1)
   expect_identical(as.regts(list(regts1, NULL)), regts1)
 
-  expect_identical(cbind(regts2, regts1[ , character(0)]), regts2)
-  expect_identical(as.regts(list(regts2, regts1[ , character(0)])), regts2)
+  # zero columns
+  p_int <- range_intersect(get_period_range(regts1), get_period_range(regts2))
+  expect_identical(cbind(regts2, regts1[ , character(0)], union = FALSE),
+                   regts2[p_int])
+  expect_identical(as.regts(list(regts2, regts1[ , character(0)]), union = FALSE),
+                   regts2[p_int])
 })
 
 
