@@ -2,7 +2,7 @@ library(regts)
 library(tictoc)
 rm(list = ls())
 
-ncol  <- 20000
+ncol  <- 2000
 nt <- 2000
 rts1 <- regts(matrix(as.numeric(1 : (ncol * nt)), ncol = ncol), start = "2018q1")
 colnames(rts1) <- paste0("ts1_", 1:ncol)
@@ -21,9 +21,15 @@ tic("cbind.ts")
 x_regts <- cbind(ts1, ts2)
 toc()
 
-tic("do.call")
-x_regts <- do.call(cbind, list(ts1, ts2))
+
+tic("do.call regts")
+x_regts <- do.call(cbind, list(rts1, rts2))
 toc()
+
+tic("do.call ts.union regts")
+x_regts <- do.call(ts.union, list(ts1, ts2))
+toc()
+quit()
 
 rts1_lbls <- rts1
 rts2_lbls <- rts2

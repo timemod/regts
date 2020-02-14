@@ -38,83 +38,17 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
 
   # Do not use do.call(ts.union, args) or do.call(ts.intersect, args).
   # This is very slow for for large timersies objects, for unknown reasons.
-  # Instead use function .cbind.regts (which is used by ts.union or ts.intersect),
-  # which is a copy of function stats:::.cbind.ts
-  ret <- .cbind.regts(args, ts_names, union = union)
-
-  if (!is.mts(ret)) {
-    return(ret)
-  }
-
-  cnames <- lapply(args, FUN = colnames)
-
-  # Creates column names for arguments that do not have column names.
-  # We do not like the column names created by ts.union and ts.intersect.
-  missing_colnames <- sapply(cnames, FUN = is.null)
-  if (any(missing_colnames)) {
-    # create colnames for arguments without colnames.
-    # this mechanism is the same as in ts.intersect and ts.union.
-
-    get_colnames <- function(i) {
-      if (missing_colnames[[i]]) {
-        if (is.null(args[[i]])) {
-          return(NULL)
-        }
-        nc <- NCOL(args[[i]])
-        if (nc == 0) {
-          return(NULL)
-        } else if (nc > 1) {
-          return(paste(ts_names[[i]], 1 : nc, sep = "."))
-        } else {
-          return(ts_names[[i]])
-        }
-      } else {
-        return(cnames[[i]])
-      }
-    }
-    cnames <- lapply(seq_along(args), FUN = get_colnames)
-  } else {
-    cnames <- unname(cnames)
-  }
-
-  #
-  # handle non-unique names
-  #
-  cnames_unique <- lapply(cnames, FUN = unique)
-  all_names <- unlist(cnames_unique)
-
-  if (anyDuplicated(all_names)) {
-    dupl <- duplicated(all_names)
-    if (missing(suffixes)) {
-      stop(paste0("Duplicate column names (",
-                  paste(unique(all_names[dupl]), collapse = " "),
-                  "). Specify argument suffixes."))
-    } else if (length(suffixes) < length(args)) {
-      stop(paste0("Length of argument suffixes is smaller than the",
-                  " number of objects to be joined (", length(args),
-                  ")."))
-    }
-    add_suffix <- lapply(cnames, function(x) x %in% all_names[dupl])
-    fix_dupl <- function(i) {
-      return (ifelse(add_suffix[[i]], paste0(cnames[[i]], suffixes[i]),
-                     cnames[[i]]))
-    }
-    cnames <- lapply(seq_along(args), fix_dupl)
-  }
-
-  cnames <- unlist(cnames)
-  colnames(ret) <- cnames
-
-  return(add_labels(as.regts(ret), args))
+  # Instead use function .cbind.regts
+  return(.cbind.regts(list(...), ts_names, suffixes, union = union))
 }
 
-.get_ts_names <- function(...) {
-  # Returns the names of the ... arguments.
-  # For example, if cbind was called as cbind(a, b), then this
-  # function returns c("a", "b"). However, if cbind was called as
-  # cbind(x = a, y= b), then the returned value if c("x", "y").
-  # This code is based on the function stats:::.makeNamesTs.
 
+# Returns the names of the ... arguments.
+# For example, if cbind was called as cbind(a, b), then this
+# function returns c("a", "b"). However, if cbind was called as
+# cbind(x = a, y= b), then the returned value if c("x", "y").
+# This code is based on the function stats:::.makeNamesTs.
+.get_ts_names <- function(...) {
   l <- as.list(substitute(list(...)))[-1L]
   nm <- names(l)
   fixup <- if (is.null(nm)) {
@@ -132,8 +66,14 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   return (nm)
 }
 
-# This function is based on stats:::cbind.ts
-.cbind.regts <- function(sers, nmsers, union = TRUE) {
+# This function is based on stats:::cbind.ts.
+# sers: objects to be joined
+# nmsers: names of the objects in the function call
+# suffices: suffices added to the timeseries in case of duplicate columns
+#' @importFrom stats tsp
+.cbind.regts <- function(sers, nmsers, suffixes, union = TRUE) {
+
+  ninput <- length(sers)
 
   # remove NULL and data with zero columns
   skip  <- vapply(sers, function(x) {is.null(x) || NCOL(x) == 0} , NA)
@@ -143,13 +83,33 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   nser <- length(sers)
   if (nser == 0L)
     return(NULL)
-  if (nser == 1L) return(sers[[1L]])
+
   tsser <- vapply(sers, function(x) length(tsp(x)) > 0L, NA)
   if (!any(tsser))
     stop("no time series supplied")
   sers <- lapply(sers, as.regts)
-  nsers <- vapply(sers, NCOL, 1)
-  tsps <- sapply(sers[tsser], tsp)
+
+  create_colnames <- function(x, xname) {
+    # function that creates dimmy column nanes
+    if ((nc <- NCOL(x)) > 1) {
+      return(paste(xname, 1 : nc, sep = "."))
+    } else {
+      return(xname)
+    }
+  }
+
+  if (nser == 1) {
+    # only one timeseries: fix colnames and return
+    ret <- sers[[1]]
+    if (is.matrix(ret) && is.null(colnames(ret))) {
+      colnames(ret) <- create_colnames(ret, nmsers[[1]])
+    }
+    return(ret)
+  }
+
+  #
+  # determine period range result
+  #
   ranges <- lapply(sers[tsser], get_period_range)
   freq <- vapply(ranges, frequency, NA_real_)
   if (length(unique(freq)) > 1) {
@@ -166,25 +126,81 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   } else {
     range <- ranges[[1]]
   }
-
-  n <- nperiod(range)
+  nperiods <- nperiod(range)
 
   # handle non-timeseries objects: convert them to a timeseries
   if (any(!tsser)) {
     ln <- vapply(sers[!tsser], NROW, 1)
-    if (any(ln != 1 & ln != n))
+    if (any(ln != 1 & ln != nperiods)) {
       stop("non-time series not of the correct length")
+    }
     sers[!tsser] <- lapply(sers[!tsser],
                            function(x) {regts(x, period = range)})
   }
 
-  # check column names
+  cnames <- lapply(sers, FUN = colnames)
+
+  #
+  # fix missing column names
+  #
+  no_cnames <- sapply(cnames, FUN = is.null)
+  if (any(no_cnames)) {
+    # create colnames for arguments without colnames.
+    # this mechanism is the same as in ts.intersect and ts.union.
+    cnames[no_cnames] <- mapply(create_colnames, sers[no_cnames],
+                                nmsers[no_cnames], SIMPLIFY = FALSE)
+  }
+
+  names <- unlist(cnames, use.names = FALSE)
 
 
-  mats <- lapply(sers, as_matrix)
-  mat_data <- do.call(cbind, mats)
 
-  return(regts(mat_data, period = range))
+
+  #
+  # handle non-unique names
+  #
+
+  # check for duplicate names in different timeseries objects, but ignore
+  # duplicates in the same timeseries objects
+  cnames_unique <- lapply(cnames, FUN = unique)
+  all_names <- unlist(cnames_unique)
+  if (anyDuplicated(all_names)) {
+    dupl_names <- unique(all_names[duplicated(all_names)])
+    if (missing(suffixes)) {
+      stop(paste0("Duplicate column names (", paste(dupl_names, collapse = " "),
+                  "). Specify argument suffixes."))
+    } else if (length(suffixes) < ninput) {
+      stop(paste0("Length of argument 'suffixes' is smaller than the",
+                  " number of objects to be joined (", ninput,
+                  ")."))
+    }
+    suffixes <- suffixes[!skip]
+    add_suffix <- lapply(cnames, function(x) x %in% dupl_names)
+    fix_names <- vapply(add_suffix, FUN = any, NA)
+    fix_name <- function(cnames, add_suff, suff) {
+      return(ifelse(add_suff, paste0(cnames, suff), cnames))
+    }
+    cnames[fix_names] <- mapply(fix_name, cnames[fix_names],
+                                add_suffix[fix_names], suffixes[fix_names],
+                                SIMPLIFY = FALSE)
+    names <- unlist(cnames, use.names = FALSE)
+  }
+
+  #
+  # bind columns together
+  #
+  ndim <- vapply(sers, FUN = NCOL,  NA_integer_)
+  cs <- c(0, cumsum(ndim))
+  mat_data <- matrix(NA, nrow = nperiods, ncol = sum(ndim))
+  for (i in 1:nser) {
+    mat_data[  , (1 + cs[i]) : cs[i + 1]] <- sers[[i]]
+  }
+
+  # create regts object
+  ret <- regts(mat_data, period = range, names = names)
+
+  # add labels and return
+  return(add_labels(ret, sers))
 }
 
 

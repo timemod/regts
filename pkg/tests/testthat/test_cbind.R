@@ -38,7 +38,7 @@ test_that("univariate timeseries", {
   expect_error(cbind(a, a, a),
                "Duplicate column names \\(a\\). Specify argument suffixes.")
   expect_error(cbind(a, a, suffixes = "a"),
-               paste("Length of argument suffixes is smaller than the number",
+               paste("Length of argument 'suffixes' is smaller than the number",
                      "of objects to be joined \\(2\\)"))
 })
 
