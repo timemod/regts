@@ -24,10 +24,12 @@ test_that("univariate timeseries", {
   ref <- as.regts(ts.union(a, b))
   colnames(ref)[2] <- "var_b"
   expect_identical(cbind(a, b), ref)
+  expect_identical(as.regts(list(a = a, b = b)), ref)
 
   ref <- as.regts(ts.intersect(a, a))
   colnames(ref) <- c("a", "a_2")
   expect_identical(cbind(a, a, suffixes = c("", "_2")), ref)
+  expect_identical(as.regts(list(a = a, a_2 = a)), ref)
 
   expect_identical(cbind(a, NULL, a, suffixes = c("", "", "_2")), ref)
 
@@ -47,8 +49,10 @@ test_that("univariate timeseries and vector", {
   a <- regts(1:5, start = "2010Q2")
   vec <- 21:25
   expect_identical(cbind(a, vec), as.regts(ts.union(a, vec)))
-  expect_identical(cbind(a, vec, union = FALSE),
-                   as.regts(ts.intersect(a, vec)))
+  expected_result <- as.regts(ts.intersect(a, vec))
+  expect_identical(cbind(a, vec, union = FALSE), expected_result)
+  expect_identical(as.regts(list(a = a, vec = vec), union = FALSE),
+                   expected_result)
 })
 
 test_that("univariate timeseries and matrix", {
@@ -67,6 +71,7 @@ test_that("univariate timeseries and matrix", {
   colnames(ref)[3:4] <- c("x", "y")
   ts_labels(ref) <- c("Timeseries a", "",  "", "")
   expect_identical(cbind(a, b, m, union = FALSE), ref)
+  expect_identical(as.regts(list(a = a, b = b, m = m), union = FALSE), ref)
 })
 
 test_that("multivariate timeseries", {
@@ -80,15 +85,24 @@ test_that("multivariate timeseries", {
   colnames(ref) <- c(colnames(regts1), colnames(regts2))
   ts_labels(ref) <- c(labels1, labels2)
   expect_identical(cbind(regts1, regts2), ref)
+  expect_identical(as.regts(list(regts1, regts2)), ref)
 
   expect_identical(cbind(regts1, NULL), regts1)
   expect_identical(cbind(NULL, regts1), regts1)
 
   expect_identical(cbind(regts2, regts1[ , character(0)]), regts2)
+  expect_identical(as.regts(list(regts2, regts1[ , character(0)])), regts2)
+
   expect_identical(cbind(regts1[ , character(0)], regts2), regts2)
+  expect_identical(as.regts(list(regts1[ , character(0)], regts2)), regts2)
+
   expect_identical(cbind(regts2$c, regts1[ , character(0)]), regts2$c)
+  expect_identical(as.regts(list(regts2$c, regts1[ , character(0)])), regts2$c)
+
   expect_identical(cbind(regts2[ , "c", drop = FALSE],
                          regts1[ , character(0)]), regts2[ , "c", drop = FALSE])
+  expect_identical(as.regts(list(regts2[ , "c", drop = FALSE],
+                         regts1[ , character(0)])), regts2[ , "c", drop = FALSE])
 })
 
 test_that("multivariate timeseries without labels", {
@@ -101,7 +115,10 @@ test_that("multivariate timeseries without labels", {
   expect_identical(cbind(regts1, regts2), ref)
 
   expect_identical(cbind(regts1, NULL), regts1)
+  expect_identical(as.regts(list(regts1, NULL)), regts1)
+
   expect_identical(cbind(regts2, regts1[ , character(0)]), regts2)
+  expect_identical(as.regts(list(regts2, regts1[ , character(0)])), regts2)
 })
 
 
@@ -117,12 +134,14 @@ test_that("multivariate timeseries without colnames", {
   colnames(ref) <- c("regts1.1", "regts1.2", "regts2.1", "regts2.2")
   ts_labels(ref) <- c(labels1, labels2)
   expect_identical(cbind(regts1, regts2), ref)
+  expect_identical(as.regts(list(regts1 = regts1, regts2 = regts2)), ref)
 
   ref2 <- ref
   colnames(ref2) <- c("a.1", "a.2", "regts2.1", "regts2.2")
   ts_labels(ref2) <- ts_labels(ref)
 
   expect_identical(cbind(a = regts1, regts2), ref2)
+  expect_identical(as.regts(list(a = regts1, regts2 = regts2)), ref2)
 
   ref3 <- regts1
   colnames(ref3) <- paste("regts1", 1:2, sep = ".")
@@ -133,4 +152,5 @@ test_that("univariate timeseries with labels", {
 
   a <- regts(1:5, start = "2010Q2", labels = "ts a")
   expect_equal(cbind(a, NULL), a)
+  expect_equal(as.regts(list(a, NULL)), a)
 })
