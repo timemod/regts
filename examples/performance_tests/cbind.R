@@ -4,6 +4,7 @@ rm(list = ls())
 
 ncol  <- 2000
 nt <- 2000
+nt <- 200
 rts1 <- regts(matrix(as.numeric(1 : (ncol * nt)), ncol = ncol), start = "2018q1")
 colnames(rts1) <- paste0("ts1_", 1:ncol)
 
@@ -19,15 +20,16 @@ cat("\n")
 ts1 <- as.ts(rts1)
 ts2 <- as.ts(rts2)
 tic("cbind.ts")
-x_regts <- cbind(ts1, ts2)
+#x_regts <- cbind(ts1, ts2)
 toc()
 cat("\n")
 
-
+# vraag: waarom is onderstaande code zo traag?
 tic("do.call regts")
 x_regts <- do.call(cbind, list(rts1, rts2))
 toc()
 cat("\n")
+quit()
 
 tic("do.call ts.union regts")
 x_regts <- do.call(ts.union, list(ts1, ts2))

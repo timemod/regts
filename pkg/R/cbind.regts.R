@@ -34,8 +34,6 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   # construct names for the input arguments
   ts_names <- .get_ts_names(...)
 
-  args <- list(...)
-
   # Do not use do.call(ts.union, args) or do.call(ts.intersect, args).
   # This is very slow for for large timersies objects, for unknown reasons.
   # Instead use function .cbind.regts
@@ -49,21 +47,38 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
 # cbind(x = a, y= b), then the returned value if c("x", "y").
 # This code is based on the function stats:::.makeNamesTs.
 .get_ts_names <- function(...) {
+
   l <- as.list(substitute(list(...)))[-1L]
   nm <- names(l)
+
   fixup <- if (is.null(nm)) {
     seq_along(l)
   } else {
     nm == ""
   }
-  dep <- sapply(l[fixup], function(x) deparse(x)[1L])
+
+  if (!is.null(nm) && !any(fixup)) {
+    return(nm)
+  }
+
+  default_names <- paste0("x_", seq_along(l))
+  create_name <- function(x, default_name) {
+    if (is.language(x)) {
+      return(deparse(x)[1L])
+    } else {
+      # this case occurs if cbind is called via do.call(cbind, args)
+      return(default_name)
+    }
+  }
+  dep <- mapply(create_name, l[fixup], default_names[fixup])
+
   if (is.null(nm)) {
     return(dep)
   }
   if (any(fixup)) {
     nm[fixup] <- dep
   }
-  return (nm)
+  return(nm)
 }
 
 # This function is based on stats:::cbind.ts.

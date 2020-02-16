@@ -145,12 +145,19 @@ test_that("multivariate timeseries", {
                    cbind(regts2[ , character(0), drop = FALSE]))
 
   expected_result_5 <- regts(2, period = get_period_range(regts2))
-  expected_result_5 <- univec2unimat(expected_result_5, "2")
+  expected_result_5 <- univec2unimat(expected_result_5, "x_2")
   expect_equal(cbind(regts2[ , character(0), drop = FALSE], 2),
                expected_result_5)
 
+  expected_result_6 <- univec2unimat(regts(2, period = get_period_range(regts2)),
+                                     "x_1")
   expect_equal(cbind(2, regts2[ , character(0), drop = FALSE]),
-               expected_result_5)
+               expected_result_6)
+
+  expected_result_7 <- regts(matrix(1:10, ncol = 2), period = get_period_range(regts2),
+                             names = paste0("matrix(1:10, ncol = 2).", 1:2))
+  expect_equal(cbind(matrix(1:10, ncol=2), regts2[ , character(0), drop = FALSE]),
+               expected_result_7)
 })
 
 test_that("multivariate timeseries without labels", {

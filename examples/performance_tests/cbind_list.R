@@ -22,10 +22,11 @@ tic("do.call cbind regts")
 x <- do.call(cbind, x_l1)
 toc()
 cat("\n")
-quit()
 
+
+x_l1_ts <- lapply(x_l1, FUN = as.ts)
 tic("do call ts.union")
-x <- do.call(ts.union, x_l1)
+x <- do.call(ts.union, x_l1_ts)
 toc()
 
 
