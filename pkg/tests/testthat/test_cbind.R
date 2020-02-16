@@ -5,6 +5,8 @@ rm(list = ls())
 
 context("cbind")
 
+source("utils/univec2unimat.R")
+
 test_that("univariate timeseries", {
 
   a <- regts(1:5, start = "2010Q2")
@@ -17,8 +19,9 @@ test_that("univariate timeseries", {
   expect_identical(cbind(a, b, union = FALSE),
                    as.regts(ts.intersect(a, b)))
 
-  expect_identical(cbind(a, NULL), a)
-  expect_identical(cbind(NULL, a), a)
+  expected_result <- univec2unimat(a, "a")
+  expect_identical(cbind(a, NULL), expected_result)
+  expect_identical(cbind(NULL, a), expected_result)
 
   colnames(b) <- "var_b"
   ref <- as.regts(ts.union(a, b))
@@ -32,6 +35,10 @@ test_that("univariate timeseries", {
   expect_identical(as.regts(list(a = a, a_2 = a)), ref)
 
   expect_identical(cbind(a, NULL, a, suffixes = c("", "", "_2")), ref)
+
+  zerocol <- regts(matrix(0, ncol =0, nrow = length(a)),
+                   period = get_period_range(a))
+  expect_identical(cbind(a, zerocol, NULL, a, suffixes = c("", "", "", "_2")), ref)
 
   ref <- as.regts(ts.intersect(a, a))
   colnames(ref) <- c("a", "a_copy")
@@ -87,10 +94,16 @@ test_that("multivariate timeseries", {
   expect_identical(cbind(regts1, regts2), ref)
   expect_identical(as.regts(list(regts1, regts2)), ref)
 
+  expect_identical(cbind(regts1, NULL, regts2), ref)
   expect_identical(cbind(regts1, NULL), regts1)
   expect_identical(cbind(NULL, regts1), regts1)
 
   # test zero columns
+  expect_identical(cbind(regts1[ , character(0)], regts1), regts1)
+
+  expect_identical(cbind(regts1, NULL, regts1[ , character(0)], regts2), ref)
+  expect_identical(cbind(regts2[ , character(0)], regts1,
+                         regts1[ , character(0)], regts2), ref)
 
   p_union <- range_union(get_period_range(regts1), get_period_range(regts2))
   expected_result <- regts2[p_union]
@@ -103,14 +116,21 @@ test_that("multivariate timeseries", {
   expect_identical(as.regts(list(regts1[ , character(0)], regts2)),
                    expected_result)
 
-  expect_identical(cbind(regts2$c, regts1[ , character(0)]), expected_result$c)
-  expect_identical(as.regts(list(regts2$c, regts1[ , character(0)])),
-                   expected_result$c)
+  expected_result_2 <-  expected_result[, "c", drop = FALSE]
+  expect_identical(cbind(c = regts2$c, regts1[ , character(0)]),
+                   expected_result_2)
+  expect_identical(as.regts(list(c = regts2$c, regts1[ , character(0)])),
+                   expected_result_2)
 
+  expected_result_3 <-  expected_result[, "c", drop = FALSE]
+  colnames(expected_result_3) <- "regts2$c"
+  expect_identical(cbind(regts2$c, regts1[ , character(0)]), expected_result_3)
+
+  expected_result_4 <- regts2[p_union , "c", drop = FALSE]
   expect_identical(cbind(regts2[ , "c", drop = FALSE],
-                         regts1[ , character(0)]), regts2[p_union , "c", drop = FALSE])
+                         regts1[ , character(0)]), expected_result_4)
   expect_identical(as.regts(list(regts2[ , "c", drop = FALSE],
-                         regts1[ , character(0)])), regts2[p_union , "c", drop = FALSE])
+                         regts1[ , character(0)])), expected_result_4)
 
   expected_result <- regts2[p_union , character(0)]
   ts_labels(expected_result) <- NULL
@@ -124,14 +144,13 @@ test_that("multivariate timeseries", {
   expect_identical(cbind(regts2[ , character(0), drop = FALSE]),
                    cbind(regts2[ , character(0), drop = FALSE]))
 
-  expected_result <- regts(2, period = get_period_range(regts2))
+  expected_result_5 <- regts(2, period = get_period_range(regts2))
+  expected_result_5 <- univec2unimat(expected_result_5, "2")
   expect_equal(cbind(regts2[ , character(0), drop = FALSE], 2),
-               expected_result)
+               expected_result_5)
 
   expect_equal(cbind(2, regts2[ , character(0), drop = FALSE]),
-               expected_result)
-
-
+               expected_result_5)
 })
 
 test_that("multivariate timeseries without labels", {
@@ -182,8 +201,13 @@ test_that("multivariate timeseries without colnames", {
 })
 
 test_that("univariate timeseries with labels", {
-
   a <- regts(1:5, start = "2010Q2", labels = "ts a")
-  expect_equal(cbind(a, NULL), a)
-  expect_equal(as.regts(list(a, NULL)), a)
+  expected_result <- univec2unimat(a, "a")
+  expect_equal(cbind(a, NULL), expected_result)
+  expect_equal(as.regts(list(a = a, NULL)), expected_result)
+
+  expected_result_2 <- expected_result
+  colnames(expected_result_2) <- "list(a, NULL).1"
+  expect_equal(as.regts(list(a, NULL)), expected_result_2)
+
 })

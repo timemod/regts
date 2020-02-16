@@ -4,6 +4,8 @@ library(testthat)
 rm(list = ls())
 context("list")
 
+source("utils/univec2unimat.R")
+
 set.seed(12345)
 
 test_that("as.list and as.regts.list for univariate timeseries without colnames", {
@@ -14,7 +16,7 @@ test_that("as.list and as.regts.list for univariate timeseries without colnames"
     expect_identical(names(l1), "a")
     expect_identical(lapply(l1, FUN = ts_labels), list(a = labels[1]))
 
-    ref <- a
+    ref <- univec2unimat(a, "a")
     ts_labels(ref) <- ts_labels(ref)  # add names
     expect_identical(do.call(cbind, l1), ref)
     expect_identical(as.regts(l1), ref)
@@ -42,8 +44,9 @@ test_that("as.list for univariate timeseries with colnames", {
     dim(ref) <- NULL
     names(ts_labels(ref)) <- NULL
 
-    expect_identical(do.call(cbind, l1), ref)
-    expect_identical(as.regts(l1), ref)
+    expected_result <- univec2unimat(ref, "a")
+    expect_identical(do.call(cbind, l1), expected_result)
+    expect_identical(as.regts(l1), expected_result)
 
     # for a list with one element, ts.intersect gives the same result as
     # cbind
@@ -128,8 +131,10 @@ test_that("as.regts.list differrent periods", {
     b <- regts(matrix(rnorm(3), ncol = 1), start = "2010Q3", names = "b",
                labels = "Var b")
 
-    expect_identical(as.regts(list(a)), a)
-    expect_identical(as.regts(list(a, NULL)), a)
+    expect_identical(as.regts(list(a)),
+                     univec2unimat(a, "list(a).1"))
+    expect_identical(as.regts(list(a, NULL)),
+                     univec2unimat(a, "list(a, NULL).1"))
 
     expected_result_union <- cbind(a, b, 2)
     colnames(expected_result_union) <- c("l.1", "b", "l.3")

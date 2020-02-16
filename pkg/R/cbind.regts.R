@@ -84,43 +84,24 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   nmsers <- nmsers[!null_objects]
 
   nser <- length(sers)
-  if (nser == 0L)
-    return(NULL)
+  if (nser == 0L) return(NULL)
 
+  # check if there is any timeseries in sers
   tsser <- vapply(sers, function(x) length(tsp(x)) > 0L, NA)
-  if (!any(tsser))
-    stop("no time series supplied")
+  # TODO: alternative?
+  #tsser <- vapply(sers, function(x) inheris(x, "ts"), NA)
+  if (!any(tsser)) stop("no time series supplied")
 
-  # convert to regts
-  sers <- lapply(sers, as.regts)
-
-  # get number of columns for the objects to be joined
-  nsers <- vapply(sers, FUN = NCOL,  NA_integer_)
-
-  # function that creates column nanes
-  create_colnames <- function(x, nc, xname) {
-    if (nc > 1) {
-      return(paste(xname, 1 : nc, sep = "."))
-    } else {
-      return(xname)
-    }
-  }
-
-  if (nser == 1) {
-    # only one timeseries: fix colnames and return
-    ret <- sers[[1]]
-    if (is.matrix(ret) && is.null(colnames(ret)) && nsers[[1]] > 0) {
-      colnames(ret) <- create_colnames(ret, nsers[[1]], nmsers[[1]])
-    }
-    return(ret)
-  }
+  # convert all timeseries to a a regts
+  sers[tsser] <- lapply(sers[tsser], as.regts)
 
   #
-  # determine period range result
+  # determine period range result from all timeseries, including timeseries
+  # with zero columns.
   #
   ranges <- lapply(sers[tsser], get_period_range)
-  freq <- vapply(ranges, frequency, NA_real_)
-  if (length(unique(freq)) > 1) {
+  freqs <- vapply(ranges, frequency, NA_real_)
+  if (length(unique(freqs)) > 1) {
     stop("not all series have the same frequency")
   }
   if (length(unique(ranges)) > 1) {
@@ -135,10 +116,11 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   }
   nperiods <- nperiod(range)
 
+  # get number of columns for the objects to be joined
+  nsers <- vapply(sers, FUN = NCOL,  NA_integer_)
+
   #
-  # remove sers with zero columns. Note: we do this after the period
-  # range of the result is determined, as timeseries with zero columns
-  # are used to determine the period range of the result.
+  # now remove timeseries with zero columns.
   #
   zero_cols  <- nsers == 0
   sers <- sers[!zero_cols]
@@ -152,7 +134,7 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
     return(regts(matrix(NA_real_, ncol = 0, nrow = nperiods), period = range))
   }
 
-  # handle non-timeseries objects: convert them to a timeseries
+  # convert non-timeseries objects to timeseries with the specified period
   if (any(!tsser)) {
     ln <- vapply(sers[!tsser], NROW, 1)
     if (any(ln != 1 & ln != nperiods)) {
@@ -162,6 +144,7 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
                            function(x) {regts(x, period = range)})
   }
 
+  # get list of column names of the objects ot be joined
   cnames <- lapply(sers, FUN = colnames)
 
   #
@@ -171,25 +154,24 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   if (any(no_cnames)) {
     # create colnames for arguments without colnames.
     # this mechanism is the same as in ts.intersect and ts.union.
+    create_colnames <- function(x, nc, xname) {
+      if (nc > 1) {
+        return(paste(xname, 1 : nc, sep = "."))
+      } else {
+        return(xname)
+      }
+    }
     cnames[no_cnames] <- mapply(create_colnames, sers[no_cnames],
                                 nsers[no_cnames], nmsers[no_cnames],
                                 SIMPLIFY = FALSE)
   }
 
-  names <- unlist(cnames, use.names = FALSE)
-
-  if (nser == 1) {
-    # only one timeseries with nonzero columns: return
-    return(sers[[1]])
-  }
-
   #
-  # handle non-unique names
+  # fix duplicate names
   #
-
-  # check for duplicate names in different timeseries objects, but ignore
-  # duplicates in the same timeseries objects
-  if (check_dupl) {
+  if (nser > 1 && check_dupl) {
+    # check for duplicate names in different timeseries objects, but ignore
+    # duplicates in the same timeseries objects
     cnames_unique <- lapply(cnames, FUN = unique)
     all_names <- unlist(cnames_unique)
     if (anyDuplicated(all_names)) {
@@ -211,10 +193,8 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
       cnames[fix_names] <- mapply(fix_name, cnames[fix_names],
                                   add_suffix[fix_names], suffixes[fix_names],
                                   SIMPLIFY = FALSE)
-      names <- unlist(cnames, use.names = FALSE)
     }
   }
-
 
   #
   # bind columns together
@@ -227,19 +207,22 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   }
 
   # create regts object
+  names <- unname(unlist(cnames, use.names = FALSE))
   ret <- regts(mat_data, period = range, names = names)
 
-  # add labels and return
-  return(add_labels(ret, sers))
+  # handle labels
+  if (!is.null(lbls <- .create_labels(sers))) ts_labels(ret) <- lbls
+
+  return(ret)
 }
 
 
-add_labels <- function(x, args) {
-  # Add ts_labels in args to x.
+.create_labels <- function(sers) {
+  # Add labels from a list of timeseries objects in args to x.
 
-  if (all(sapply(args, FUN = function(x) is.null(ts_labels(x))))) {
+  if (all(sapply(sers, FUN = function(x) is.null(ts_labels(x))))) {
     # no arguments with labels
-    return(x)
+    return(NULL)
   }
 
   get_labels <- function(x) {
@@ -256,7 +239,5 @@ add_labels <- function(x, args) {
     }
   }
 
-  labels <- unname(unlist(lapply(args, FUN = get_labels)))
-  ts_labels(x) <- labels
-  return(x)
+  return(do.call(c, unname(lapply(sers, FUN = get_labels))))
 }
