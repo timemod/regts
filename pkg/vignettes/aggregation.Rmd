@@ -97,10 +97,10 @@ As is shown in the next section the function `aggregate` does not yield correct
 results for timeseries with absolute, relative or percentage changes. 
 For growth timeseries the function `aggregate_gr` can be used. It accepts both 
 `regts` and `ts` timeseries. The function implements several methods 
-(`rel`, `pct`, `difmean` and `difsum`) for different types of input timeseries.
+(`"rel"`, `"pct"`, `"difmean"` and `"difsum"`) for different types of input timeseries.
 The methods are described in detail in the next section.
 
-The `rel` and `pct` methods assume that the input timeseries is a one-period 
+The `'rel"` and `"pct"` methods assume that the input timeseries is a one-period 
 relative or percentage change and calculate the exact low frequency relative or 
 percentage change. An example for a percentage change series:
 ```{r eval = FALSE}
@@ -109,7 +109,7 @@ aggregate_gr(xgrowth, method = "rel")
 ```
 By default the result is an annual timeseries.
 
-Methods `difmean` and `difsum` assume that the input timeseries 
+Methods `"difmean"` and `"difsum"` assume that the input timeseries 
 is a first difference. An example:
 ```{r}
 xdif <- diff(regts(1:8, start = "2019q1"))
@@ -148,7 +148,7 @@ Therefore we cannot use function `aggregate`, function `aggregate_gr` must be
 applied. In the next subsections a more detailed description of the available 
 frequency conversion methods for this function is given.
 
-## `difsum` method 
+## `difsum` 
 Define $x$ to be the first difference  of $z$. Thus
 \begin{displaymath}
  x_{t,i} = z_{t,i} - z_{t,i-1}
@@ -201,7 +201,7 @@ X_t =  \left(  \sum_{j=2}^n  (j-1) x_{t-1,j} +  \sum_{j=1}^n  (n - j + 1) x_{t,j
 \end{displaymath}
 
 
-## `difmean` method 
+## `difmean` 
 The `difmean` method is similar to the `difsum` method described in the previous 
 subsection. The only difference is that  the aggregate $Z_t$ is calculated with
 an average instead of a sum:
@@ -215,7 +215,7 @@ X_t =  \left(  \sum_{j=2}^n  (j-1) x_{t-1,j} +  \sum_{j=1}^n  (n - j + 1) x_{t,j
 \end{displaymath}
 
 
-## `rel` method 
+## `rel` 
 Define $x$ to be the relative change in $z$. Thus, assuming that $z >= 0$,
 \begin{displaymath}
  x_{t,i} = (z_{t,i} - z_{t,i-1}) / z_{t,i-1}
@@ -248,7 +248,7 @@ X_t = \frac{\prod_{j=2}^{n}(1+ x_{t-1,j}) \sum_{i=1}^{n} \prod_{j=1}^{i}(1+ x_{t
 \end{displaymath}
 
 
-## `pct` method 
+## `pct` 
 Define $x$ to be the percentage change in $z$. Thus,
 as before assuming that $z >= 0$,
 \begin{displaymath}
