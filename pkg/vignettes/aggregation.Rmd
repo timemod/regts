@@ -100,7 +100,7 @@ For growth timeseries the function `aggregate_gr` can be used. It accepts both
 (`"rel"`, `"pct"`, `"difmean"` and `"difsum"`) for different types of input timeseries.
 The methods are described in detail in the next section.
 
-The `'rel"` and `"pct"` methods assume that the input timeseries is a one-period 
+The `"rel"` and `"pct"` methods assume that the input timeseries is a one-period 
 relative or percentage change and calculate the exact low frequency relative or 
 percentage change. An example for a percentage change series:
 ```{r eval = FALSE}
