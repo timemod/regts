@@ -8,17 +8,17 @@
 #' the standard function \code{\link[stats]{aggregate}} does not yield correct
 #' results for these type of timeseries.
 #'
+#' There are methods for different types of input timeseries.
 #' The \code{pct} and \code{rel} methods assume timeseries that contain
 #' percentage or relative changes of a timeseries with only positive values.
-#' They calculate
-#' the exact percentage or relative change for the output timeseries.
-#' More details for the various methods are provided in vignette
-#'  \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
-#' (Growth) Timeseries"}}.
-#' There are methods for different types of input timeseries.
+#' They calculate the exact percentage or relative change for the output timeseries.
 #' The \code{difmean} and \code{difsum} methods assume that the input timeseries
-#' contain a first difference (for \code{difmean} the input is also
-#' scaled). The result is a first difference in the output frequency.
+#' contain a first difference. The result is a first difference in the output frequency.
+#' Method name \code{"dif1s"} has been replaced by \code{"difmean"}, method name
+#' \code{"dif1"} has been replaced by \code{"difsum"}.
+#' More details for the various methods are provided in vignette
+#' \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
+#' (Growth) Timeseries"}}.
 #'
 #' As explained before, the \code{pct} and \code{rel} methods assume that `x` is
 #' is a percentage or relative change of a series with only
@@ -29,8 +29,7 @@
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} object
 #' @param nfrequency the frequency of the result. This should be higher than
 #' the frequency of timeseries \code{x}
-#' @param method aggregation methods: \code{"pct"}, \code{"rel"}, \code{"difmean"},
-#' \code{"difsum"}. See Details.
+#' @param method aggregation methods. See Details.
 #' @return a \code{regts} with frequency \code{nfrequency}
 #' @examples
 #' ts_q <- regts(abs(rnorm(10)), start = "2016Q1")

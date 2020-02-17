@@ -29,17 +29,15 @@ the standard function \code{\link[stats]{aggregate}} does not yield correct
 results for these type of timeseries.
 }
 \details{
+There are methods for different types of input timeseries.
 The \code{pct} and \code{rel} methods assume timeseries that contain
 percentage or relative changes of a timeseries with only positive values.
-They calculate
-the exact percentage or relative change for the output timeseries.
+They calculate the exact percentage or relative change for the output timeseries.
+The \code{difmean} and \code{difsum} methods assume that the input timeseries
+contain a first difference. The result is a first difference in the output frequency.
 More details for the various methods are provided in vignette
 \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
 (Growth) Timeseries"}}.
-There are methods for different types of input timeseries.
-The \code{difmean} and \code{difsum} methods assume that the input timeseries
-contain a first difference (for \code{difmean} the input is also
-scaled). The result is a first difference in the output frequency.
 
 As explained before, the \code{pct} and \code{rel} methods assume that \code{x} is
 is a percentage or relative change of a series with only

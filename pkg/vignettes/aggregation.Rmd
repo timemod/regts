@@ -93,33 +93,42 @@ In all other cases the `aggregate` function works exactly the same for `regts` a
 
 \newpage
 # Aggregation of growth timeseries 
-As is shown in the next section the function `aggregate` does not yield correct results for timeseries with absolute, relative or percentage changes. 
-For growth timeseries the function `aggregate_gr` can be used. It accepts both `regts` and `ts` timeseries. The function implements several methods (`difmean`, `difsum`, `rel` and `pct`) for different types of input timeseries.
+As is shown in the next section the function `aggregate` does not yield correct 
+results for timeseries with absolute, relative or percentage changes. 
+For growth timeseries the function `aggregate_gr` can be used. It accepts both 
+`regts` and `ts` timeseries. The function implements several methods 
+(`rel`, `pct`, `difmean` and `difsum`) for different types of input timeseries.
 
-Methods `difmean` and `difsum` assume that the input timeseries is a first 
-difference: 
-\begin{displaymath}
- x_{t} = z_{t} - z_{t-1}
-\end{displaymath}
-where $t$ is the period (like year or quarter). These methods calculate the low frequency first difference timeseries. For method `difmean` the result is also scaled.
-An example for both methods, the results are annual timeseries:
+The `rel` and `pct` methods assume that the input timeseries is a one-period 
+relative or percentage change and calculate the exact low frequency relative or 
+percentage change. Methods `difmean` and `difsum` assume that the input timeseries 
+is a first difference. 
+Some examples for change timeseries, the results are (by default) annual timeseries:
+An example for a percentage change series:
+```{r eval = FALSE}
+xgrowth <- growth(regts(1:8, start = "2019q1"))
+aggregate_gr(xgrowth, method = "rel")
+```
 
+Examples for difference series:
 ```{r}
 xdif <- diff(regts(1:8, start = "2019q1"))
 xdif
-aggregate_gr(xdif, method = "difsum")
-aggregate_gr(xdif, method = "difmean")  # result is also scaled
+aggregate_gr(xdif, method = "difmean")
+aggregate_gr(xdif, method = "difsum")  
 ```
+Note that the results differ factor 4.
 
-The `rel` and `pct` methods assume that the input timeseries is a one-period 
-relative or percentage change and calculate the exact low frequency relative or percentage change.
 The methods are described in detail in the next section.
 
 # Aggregation methods for growth timeseries
-This section describes the methods implemented in function `aggregate_gr`, including the derivation of the corresponding mathematical formulas. 
+This section describes the methods implemented in function `aggregate_gr`, 
+including the derivation of the corresponding mathematical formulas. 
 
 Suppose we are temporally aggregating a timeseries $x$ with $n$ subperiods to a 
-timeseries $X$ with a lower frequency. In other words we want to convert a timeseries x with a high frequency (monthly, quarterly) to a new timeseries with a lower frequency (quarterly, annual).
+timeseries $X$ with a lower frequency. In other words we want to convert a 
+timeseries x with a high frequency (monthly, quarterly) to a new timeseries with 
+a lower frequency (quarterly, annual).
 
 Let $x_{t,i}$   stand for the value of $x$ in subperiod $i$ of main period $t$.
 The index $i$ takes on values in the range $1 .. n$.
@@ -131,7 +140,14 @@ For example the \texttt{mean} method calculates $X_t$ as follows
 X_t = \sum_{i=1}^{n} x_{t,i}/n
 \end{displaymath}
 
-However there are transformations which are not so straightforward. A case in point is when $x$ is a high frequency first difference and must be converted to a low frequency first difference. A simple averaging of $n$ high frequency observations will not give the correct answer. For example, for a quarterly growth series the yearly aggregates also depend on the quarterly observations of the previous year. Therefore we cannot use function `aggregate`, function `aggregate_gr` must be applied. In the next subsections a more detailed description of the available frequency conversion methods for this function is given.
+However there are transformations which are not so straightforward. A case in point 
+is when $x$ is a high frequency first difference and must be converted to a low 
+frequency first difference. A simple averaging of $n$ high frequency observations 
+will not give the correct answer. For example, for a quarterly growth series the 
+yearly aggregates also depend on the quarterly observations of the previous year. 
+Therefore we cannot use function `aggregate`, function `aggregate_gr` must be 
+applied. In the next subsections a more detailed description of the available 
+frequency conversion methods for this function is given.
 
 ## `difsum` method 
 Define $x$ to be the first difference  of $z$. Thus
