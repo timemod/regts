@@ -109,6 +109,12 @@ test_that("errors", {
   msg <- "Argument x should be a numeric timeseries"
   ts_t <- regts(c("a", "b", "c"), start = "2017Q1")
   expect_error(aggregate_gr(ts_t), msg)
+
+  msg <- "Method name 'dif1s' is obsolete, use 'difmean' instead"
+  p  <- period_range("2009Q1", "2015Q4")
+  ts_q <- regts(abs(rnorm(nperiod(p))), start = start_period(p))
+  expect_warning(aggregate_gr(ts_q, method = "dif1s"), msg)
+
 })
 
 test_that("rel and pct for negative timeseries", {

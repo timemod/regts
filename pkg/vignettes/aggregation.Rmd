@@ -94,21 +94,21 @@ In all other cases the `aggregate` function works exactly the same for `regts` a
 \newpage
 # Aggregation of growth timeseries 
 As is shown in the next section the function `aggregate` does not yield correct results for timeseries with absolute, relative or percentage changes. 
-For growth timeseries the function `aggregate_gr` can be used. It accepts both `regts` and `ts` timeseries. The function implements several methods (`dif1`, `dif1s`, `rel` and `pct`) for different types of input timeseries.
+For growth timeseries the function `aggregate_gr` can be used. It accepts both `regts` and `ts` timeseries. The function implements several methods (`difmean`, `difsum`, `rel` and `pct`) for different types of input timeseries.
 
-Methods `dif1` and `dif1s` assume that the input timeseries is a first 
+Methods `difmean` and `difsum` assume that the input timeseries is a first 
 difference: 
 \begin{displaymath}
  x_{t} = z_{t} - z_{t-1}
 \end{displaymath}
-where $t$ is the period (like year or quarter). These methods calculate the low frequency first difference timeseries. For method `dif1s` the result is also scaled.
+where $t$ is the period (like year or quarter). These methods calculate the low frequency first difference timeseries. For method `difmean` the result is also scaled.
 An example for both methods, the results are annual timeseries:
 
 ```{r}
 xdif <- diff(regts(1:8, start = "2019q1"))
 xdif
-aggregate_gr(xdif, method = "dif1")
-aggregate_gr(xdif, method = "dif1s")  # result is also scaled
+aggregate_gr(xdif, method = "difsum")
+aggregate_gr(xdif, method = "difmean")  # result is also scaled
 ```
 
 The `rel` and `pct` methods assume that the input timeseries is a one-period 
@@ -133,7 +133,7 @@ X_t = \sum_{i=1}^{n} x_{t,i}/n
 
 However there are transformations which are not so straightforward. A case in point is when $x$ is a high frequency first difference and must be converted to a low frequency first difference. A simple averaging of $n$ high frequency observations will not give the correct answer. For example, for a quarterly growth series the yearly aggregates also depend on the quarterly observations of the previous year. Therefore we cannot use function `aggregate`, function `aggregate_gr` must be applied. In the next subsections a more detailed description of the available frequency conversion methods for this function is given.
 
-## `dif1` method 
+## `difsum` method 
 Define $x$ to be the first difference  of $z$. Thus
 \begin{displaymath}
  x_{t,i} = z_{t,i} - z_{t,i-1}
@@ -186,15 +186,15 @@ X_t =  \left(  \sum_{j=2}^n  (j-1) x_{t-1,j} +  \sum_{j=1}^n  (n - j + 1) x_{t,j
 \end{displaymath}
 
 
-## `dif1s` method 
-The `dif1s` method is similar to the `dif1` method described in the previous 
+## `difmean` method 
+The `difmean` method is similar to the `difsum` method described in the previous 
 subsection. The only difference is that  the aggregate $Z_t$ is calculated with
 an average instead of a sum:
 \begin{eqnarray*}
 Z_t &=& \sum_{i=1}^{n} z_{t,i}/n\\
 \end{eqnarray*}
 Further derivations are analogous.
-The result for `dif1s` is the result for `dif1` divided by $n$:
+The result for `difmean` is the result for `difsum` divided by $n$:
 \begin{displaymath}
 X_t =  \left(  \sum_{j=2}^n  (j-1) x_{t-1,j} +  \sum_{j=1}^n  (n - j + 1) x_{t,j} \right) / n
 \end{displaymath}
