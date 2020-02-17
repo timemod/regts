@@ -14,8 +14,8 @@
 #' They calculate the exact percentage or relative change for the output timeseries.
 #' The \code{difmean} and \code{difsum} methods assume that the input timeseries
 #' contain a first difference. The result is a first difference in the output frequency.
-#' Method name \code{"dif1s"} has been replaced by \code{"difmean"}, method name
-#' \code{"dif1"} has been replaced by \code{"difsum"}.
+#' Method names \code{"dif1s"} and \code{"dif1"} are obsolete and have been
+#' replaced by \code{"difmean"} and \code{"difsum"}.
 #' More details for the various methods are provided in vignette
 #' \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
 #' (Growth) Timeseries"}}.
