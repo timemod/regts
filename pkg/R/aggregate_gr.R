@@ -15,7 +15,7 @@
 #' The \code{difmean} and \code{difsum} methods assume that the input timeseries
 #' contain a first difference. The result is a first difference in the output frequency.
 #' Method names \code{"dif1s"} and \code{"dif1"} are obsolete and have been
-#' replaced by \code{"difmean"} and \code{"difsum"}.
+#' replaced by \code{"difmean"} and \code{"difsum"}, respectively.
 #' More details for the various methods are provided in vignette
 #' \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
 #' (Growth) Timeseries"}}.

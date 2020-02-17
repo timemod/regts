@@ -11,8 +11,7 @@ aggregate_gr(x, method = c("pct", "rel", "difmean", "difsum", "dif1s",
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object}
 
-\item{method}{aggregation methods: \code{"pct"}, \code{"rel"}, \code{"difmean"},
-\code{"difsum"}. See Details.}
+\item{method}{aggregation methods. See Details.}
 
 \item{nfrequency}{the frequency of the result. This should be higher than
 the frequency of timeseries \code{x}}
@@ -35,6 +34,8 @@ percentage or relative changes of a timeseries with only positive values.
 They calculate the exact percentage or relative change for the output timeseries.
 The \code{difmean} and \code{difsum} methods assume that the input timeseries
 contain a first difference. The result is a first difference in the output frequency.
+Method names \code{"dif1s"} and \code{"dif1"} are obsolete and have been
+replaced by \code{"difmean"} and \code{"difsum"}, respectively.
 More details for the various methods are provided in vignette
 \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
 (Growth) Timeseries"}}.

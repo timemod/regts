@@ -98,28 +98,27 @@ results for timeseries with absolute, relative or percentage changes.
 For growth timeseries the function `aggregate_gr` can be used. It accepts both 
 `regts` and `ts` timeseries. The function implements several methods 
 (`rel`, `pct`, `difmean` and `difsum`) for different types of input timeseries.
+The methods are described in detail in the next section.
 
 The `rel` and `pct` methods assume that the input timeseries is a one-period 
 relative or percentage change and calculate the exact low frequency relative or 
-percentage change. Methods `difmean` and `difsum` assume that the input timeseries 
-is a first difference. 
-Some examples for change timeseries, the results are (by default) annual timeseries:
-An example for a percentage change series:
+percentage change. An example for a percentage change series:
 ```{r eval = FALSE}
 xgrowth <- growth(regts(1:8, start = "2019q1"))
 aggregate_gr(xgrowth, method = "rel")
 ```
+By default the result is an annual timeseries.
 
-Examples for difference series:
+Methods `difmean` and `difsum` assume that the input timeseries 
+is a first difference. An example:
 ```{r}
 xdif <- diff(regts(1:8, start = "2019q1"))
 xdif
 aggregate_gr(xdif, method = "difmean")
 aggregate_gr(xdif, method = "difsum")  
 ```
-Note that the results differ factor 4.
+Note that the results differ factor 4. 
 
-The methods are described in detail in the next section.
 
 # Aggregation methods for growth timeseries
 This section describes the methods implemented in function `aggregate_gr`, 
