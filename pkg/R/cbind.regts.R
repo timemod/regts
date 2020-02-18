@@ -81,7 +81,7 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
 # This function is based on stats:::cbind.ts.
 # sers: objects to be joined
 # nmsers: names of the objects in the function call
-# suffixes: suffices added to the timeseries in case of duplicate columns
+# suffixes: suffixes added to the timeseries in case of duplicate columns
 .cbind.regts <- function(sers, nmsers, suffixes, union = TRUE,
                          check_dupl = TRUE) {
 
