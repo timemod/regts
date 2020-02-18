@@ -50,10 +50,10 @@ start and the end period must be present.
 Otherwise the timeseries are filled with \code{NA} for the missing periods.}
 
 \item{union}{A logical (default \code{TRUE}). Only used in \code{as.regts.list}.
-If the list contains multiple timeseries and \code{union} is\code{TRUE},
+If the list contains multiple timeseries and \code{union} is \code{TRUE},
 then the period range of the result is the union of the period ranges of
 the individual timeseries objecct in the list. Otherwise the period range is
-the intersection.}
+the intersection of the period ranges of the individual timeseries.}
 }
 \value{
 a \code{regts} object
@@ -73,7 +73,8 @@ of the matrix
 \item \code{matrix}: Convert a \code{\link{matrix}} to a \code{regts}
 
 \item \code{list}: Convert a \code{\link{list}} to a \code{regts}. At least
-one of the elements of the list should contain a timeseries.
+one of the elements of the list should contain a timeseries. The result is a
+multivariate timeseries with the combined timeseries
 
 \item \code{numeric}: Convert a numeric vector to a \code{regts}
 

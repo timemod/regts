@@ -34,9 +34,6 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   # construct names for the input arguments
   ts_names <- .get_ts_names(...)
 
-  # Do not use do.call(ts.union, args) or do.call(ts.intersect, args).
-  # This is very slow for for large timersies objects, for unknown reasons.
-  # Instead use function .cbind.regts
   return(.cbind.regts(list(...), ts_names, suffixes, union = union))
 }
 
@@ -84,8 +81,7 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
 # This function is based on stats:::cbind.ts.
 # sers: objects to be joined
 # nmsers: names of the objects in the function call
-# suffices: suffices added to the timeseries in case of duplicate columns
-#' @importFrom stats tsp
+# suffixes: suffices added to the timeseries in case of duplicate columns
 .cbind.regts <- function(sers, nmsers, suffixes, union = TRUE,
                          check_dupl = TRUE) {
 
@@ -102,9 +98,7 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   if (nser == 0L) return(NULL)
 
   # check if there is any timeseries in sers
-  tsser <- vapply(sers, function(x) length(tsp(x)) > 0L, NA)
-  # TODO: alternative?
-  #tsser <- vapply(sers, function(x) inheris(x, "ts"), NA)
+  tsser <- vapply(sers, function(x) inherits(x, "ts"), NA)
   if (!any(tsser)) stop("no time series supplied")
 
   # convert all timeseries to a a regts
@@ -149,7 +143,7 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
     return(regts(matrix(NA_real_, ncol = 0, nrow = nperiods), period = range))
   }
 
-  # convert non-timeseries objects to timeseries with the specified period
+  # convert non-timeseries objects to timeseries witht the correct range.
   if (any(!tsser)) {
     ln <- vapply(sers[!tsser], NROW, 1)
     if (any(ln != 1 & ln != nperiods)) {

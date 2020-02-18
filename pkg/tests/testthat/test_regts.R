@@ -250,7 +250,7 @@ test_that("colnames are preserved in miscellaneous timeseries functions", {
   x_lag <- lag(x)
   x_diff <- diff(x)
   x_agg <- aggregate(x)
-  x_agg_gr <- aggregate_gr(x, method = "dif1s")
+  x_agg_gr <- aggregate_gr(x, method = "difmean")
   x_windows <- window(x, start = c(2011, 4))
   expect_identical(colnames(x), colnames(x_lag))
   expect_identical(colnames(x), colnames(x_sin))

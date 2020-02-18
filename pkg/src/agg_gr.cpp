@@ -34,11 +34,11 @@ List agg_gr(NumericMatrix ts_old, const int freq_new,
     NumericMatrix data(nper_new, ts_old.ncol());
 
     int shift = per_new.first * rep - rep - per_old.first;
-    if (method == "dif1s" || method == "dif1") {
+    if (method == "difmean" || method == "difsum") {
         for (int col = 0; col < ts_old.ncol(); col++) {
             agg_gr_abs(ts_old(_, col), data(_, col), rep, shift);
         }
-        if (method == "dif1s") {
+        if (method == "difmean") {
             data = data / rep;
         }
     } else if (method == "rel" || method == "pct") {

@@ -9,18 +9,18 @@
 #' results for these type of timeseries.
 #'
 #' There are methods for different types of input timeseries.
-#' The \code{dif1s} and \code{dif1} methods assume that the input timeseries
-#' contain a first difference (for \code{dif1s} the input is also
-#' scaled). The result is a first difference in the output frequency.
-#' The \code{pct} and \code{rel} methods assume timeseries that contain
+#' The \code{"pct"} and \code{"rel"} methods assume timeseries that contain
 #' percentage or relative changes of a timeseries with only positive values.
-#' They calculate
-#' the exact percentage or relative change for the output timeseries.
+#' They calculate the exact percentage or relative change for the output timeseries.
+#' The \code{"difmean"} and \code{"difsum"} methods assume that the input timeseries
+#' contain a first difference. The result is a first difference in the output frequency.
+#' Method names \code{"dif1s"} and \code{"dif1"} are obsolete and have been
+#' replaced by \code{"difmean"} and \code{"difsum"}, respectively.
 #' More details for the various methods are provided in vignette
-#'  \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
+#' \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
 #' (Growth) Timeseries"}}.
 #'
-#' As explained before, the \code{pct} and \code{rel} methods assume that `x` is
+#' As explained before, the \code{"pct"} and \code{"rel"} methods assume that `x` is
 #' is a percentage or relative change of a series with only
 #' positive values.  This imposes a restriction on  `x`: for the `pct` method,
 #' `x >= -100%`, and for `rel`, `x >= -1`. Function `aggregate_gr` gives an
@@ -29,22 +29,29 @@
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} object
 #' @param nfrequency the frequency of the result. This should be higher than
 #' the frequency of timeseries \code{x}
-#' @param method Aggregation method: \code{"dif1s"}, \code{"dif1"}, \code{"pct"}
-#' or \code{"rel"}. See Details.
+#' @param method aggregation methods. See Details.
 #' @return a \code{regts} with frequency \code{nfrequency}
 #' @examples
 #' ts_q <- regts(abs(rnorm(10)), start = "2016Q1")
-#' aggregate_gr(ts_q, method = "dif1s")
+#' aggregate_gr(ts_q, method = "difmean")
 #'
 #' ts_m <- regts(matrix(abs(rnorm(20)), ncol = 2), start = "2017M1", names = c("a", "b"))
 #' aggregate_gr(ts_m, method = "rel", nfrequency = 4)
 #' @export
 #' @useDynLib regts, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
-aggregate_gr <- function(x, method = c("dif1s", "dif1", "pct", "rel"),
+aggregate_gr <- function(x, method = c("pct", "rel", "difmean", "difsum", "dif1s", "dif1" ),
                          nfrequency = 1) {
 
   method <- match.arg(method)
+  if (method == "dif1s"){
+    warning("Method name 'dif1s' is obsolete, use 'difmean' instead")
+    method <- "difmean"
+  }
+  if (method == "dif1"){
+    warning("Method name 'dif1' is obsolete, use 'difsum' instead")
+    method <- "difsum"
+  }
   if (!is.ts(x)) {
     stop("Argument x is not a timeseries")
   }

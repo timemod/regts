@@ -142,6 +142,5 @@ test_that("simpel annual timeseries", {
 
 test_that("errors", {
   x <- regts("hello", period =  p)
-  msg <- "Not compatible with requested type: \\[type=character; target=double\\]."
-  expect_error(movavb(x, order = 2))
+  expect_error(movavb(x, order = 2), class = "Rcpp::not_compatible")
 })
