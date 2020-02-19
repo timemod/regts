@@ -63,9 +63,11 @@ disagg_natural <- function(x, nfrequency,
 
   l_input <- as.list(x)
   l_splined <- lapply(l_input, FUN = disagg_uni)
-  result <- do.call(cbind, l_splined)
+  result <- as.regts(l_splined)
 
-  if (input_is_matrix && !is.matrix(result)) {
+  if (!input_is_matrix) {
+    result <- result[, 1]
+  } else if (input_is_matrix && !is.matrix(result)) {
     dim(result) <- c(length(result), 1)
     colnames(result) <- col_names
   }

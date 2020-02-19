@@ -5,6 +5,7 @@
 \alias{as.regts.ts}
 \alias{as.regts.data.frame}
 \alias{as.regts.matrix}
+\alias{as.regts.list}
 \alias{as.regts.numeric}
 \alias{as.regts.default}
 \title{Coerce an object to a \code{\link{regts}} timeseries object}
@@ -16,6 +17,8 @@ as.regts(x, ...)
 \method{as.regts}{data.frame}(x, time_column = 0, numeric = TRUE, fun = period, strict = TRUE, ...)
 
 \method{as.regts}{matrix}(x, numeric = TRUE, fun = period, strict = TRUE, ...)
+
+\method{as.regts}{list}(x, union = TRUE, ...)
 
 \method{as.regts}{numeric}(x, fun = period, strict = TRUE, ...)
 
@@ -45,6 +48,12 @@ function \code{period}). See argument \code{time_column} for exceptions.}
 \item{strict}{A logical. If \code{TRUE} (the default) all periods between the
 start and the end period must be present.
 Otherwise the timeseries are filled with \code{NA} for the missing periods.}
+
+\item{union}{A logical (default \code{TRUE}). Only used in \code{as.regts.list}.
+If the list contains multiple timeseries and \code{union} is \code{TRUE},
+then the period range of the result is the union of the period ranges of
+the individual timeseries objecct in the list. Otherwise the period range is
+the intersection of the period ranges of the individual timeseries.}
 }
 \value{
 a \code{regts} object
@@ -61,8 +70,11 @@ Coerce an object to a \code{\link{regts}} timeseries object
 \code{regts}. The time should be stored in the row numbers
 of the matrix
 
-\item \code{matrix}: Convert a \code{\link{matrix}} to a
-\code{regts}
+\item \code{matrix}: Convert a \code{\link{matrix}} to a \code{regts}
+
+\item \code{list}: Convert a \code{\link{list}} to a \code{regts}. At least
+one of the elements of the list should contain a timeseries. The result is a
+multivariate timeseries with the combined timeseries
 
 \item \code{numeric}: Convert a numeric vector to a \code{regts}
 

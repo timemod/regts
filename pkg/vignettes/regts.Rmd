@@ -773,14 +773,15 @@ list2 <- within(list, {
 })
 ```
 
-The result is a list. The timeseries in this list can be joined by combining functions `cbind` and `do.call`. 
+The result is a list. The timeseries in this list can be joined by using function `as.regts`. 
 
 ```{r}
-do.call(cbind, list2)
+as.regts(list2)
 ```
-Note the reverse ordering of the columns.
+The result is a multivariate timeseries. Note that the columns corresponding to
+the timeseries created in the `within` function appear in reverse order
+(the last created timeseries, `d`, comes first).
 
-The elements in resulting `list2` all have type `regts`, so the result is a `multivariate regts`. 
 
 Not all elements in the list have to be timeseries. For example we may create a numeric and a logical vector:
 
@@ -794,7 +795,7 @@ list3$f
 Function `cbind` also converts these elements to a `regts`:
 
 ```{r}
-do.call(cbind, list3)
+as.regts(list3)
 ```
 The elements `e` and `f` are repeated for the whole period and the value `TRUE` is coerced to `numeric`.^[You could also add a character variable, i.e. g <- "a". 
 Now the result will remain a `regts`, but all elements of the timeseries will be coerced to character data, which is probably not what you want.]

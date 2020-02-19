@@ -1,9 +1,14 @@
 library(regts)
+library(testthat)
+
+rm(list = ls())
 context("list")
+
+source("utils/univec2unimat.R")
 
 set.seed(12345)
 
-test_that("as.list for univariate timeseries without colnames", {
+test_that("as.list and as.regts.list for univariate timeseries without colnames", {
     labels <- "Var a"
     a <- regts(1:10, start = "2010Q2", labels = labels)
     l1 <- as.list(a)
@@ -11,9 +16,10 @@ test_that("as.list for univariate timeseries without colnames", {
     expect_identical(names(l1), "a")
     expect_identical(lapply(l1, FUN = ts_labels), list(a = labels[1]))
 
-    ref <- a
+    ref <- univec2unimat(a, "a")
     ts_labels(ref) <- ts_labels(ref)  # add names
     expect_identical(do.call(cbind, l1), ref)
+    expect_identical(as.regts(l1), ref)
 
     # for a list with one element, ts.intersect gives the same result as
     # cbind
@@ -38,7 +44,9 @@ test_that("as.list for univariate timeseries with colnames", {
     dim(ref) <- NULL
     names(ts_labels(ref)) <- NULL
 
-    expect_identical(do.call(cbind, l1), ref)
+    expected_result <- univec2unimat(ref, "a")
+    expect_identical(do.call(cbind, l1), expected_result)
+    expect_identical(as.regts(l1), expected_result)
 
     # for a list with one element, ts.intersect gives the same result as
     # cbind
@@ -60,6 +68,7 @@ test_that("as.list for multivariate timeseries", {
     label_b <- labels[2]
     expect_identical(lapply(l1, FUN = ts_labels), list(a = label_a, b = label_b))
     expect_identical(do.call(cbind, c(l1, union = FALSE)), regts1)
+    expect_identical(as.regts(l1, union = FALSE), regts1)
 })
 
 test_that("as.list for multivariate timeseries without colnames and labels", {
@@ -72,6 +81,7 @@ test_that("as.list for multivariate timeseries without colnames and labels", {
     colnames(ref) <- c("regts1.1", "regts1.2")
     expect_identical(names(l1), colnames(ref))
     expect_equal(do.call(cbind, l1), ref)
+    expect_equal(as.regts(l1), ref)
 })
 
 test_that("usage of within", {
@@ -84,6 +94,7 @@ test_that("usage of within", {
         d <- lag(c)
     })
     regts2 <- do.call(cbind, l)
+    expect_identical(as.regts(l), regts2)
     regts2 <- regts2[, c("a", "b", "c", "d")]
 
     ref <- regts1
@@ -103,6 +114,7 @@ test_that("usage of within with labels", {
         d <- lag(c)
     })
     regts2 <- do.call(cbind, l)
+    expect_identical(as.regts(l), regts2)
     regts2 <- regts2[, c("a", "b", "c", "d")]
 
     ref <- regts1
@@ -111,4 +123,33 @@ test_that("usage of within with labels", {
     ref['2015q2/2015q4', 'd'] <- lag(ref[, 'c'])
     ts_labels(ref) <- c("Var a", "Var b", "Var a", "Var a")
     expect_identical(regts2, ref)
+})
+
+test_that("as.regts.list differrent periods", {
+
+    a <- regts(rnorm(3), start = "2010Q2", labels = "Var a")
+    b <- regts(matrix(rnorm(3), ncol = 1), start = "2010Q3", names = "b",
+               labels = "Var b")
+
+    expect_identical(as.regts(list(a)),
+                     univec2unimat(a, "list(a).1"))
+    expect_identical(as.regts(list(a, NULL)),
+                     univec2unimat(a, "list(a, NULL).1"))
+
+    expected_result_union <- cbind(a, b, 2)
+    colnames(expected_result_union) <- c("l.1", "b", "l.3")
+    l <- list(a, b, 2)
+    result <- as.regts(l)
+    expect_identical(result, expected_result_union)
+    expected_labels <- c("Var a", "Var b", "")
+    names(expected_labels) <- c("l.1", "b", "l.3")
+    expect_identical(ts_labels(result), expected_labels)
+
+    names(l) <- c("a", "b", "c")
+    expected_result_intersect <- expected_result_union["2010q3/2010q4"]
+    colnames(expected_result_intersect) <- names(l)
+    result <- as.regts(l, union = FALSE)
+    expect_identical(result, expected_result_intersect)
+    names(expected_labels) <- names(l)
+    expect_identical(ts_labels(result), expected_labels)
 })
