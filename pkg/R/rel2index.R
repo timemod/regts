@@ -77,16 +77,7 @@ rel2index <- function(x, base = NULL, scale = 100,
   if (is.null(base)) {
     first_base_row <- 0
   } else {
-    base <- as.period_range(base)
-    freq_base <- frequency(base)
-    freq_x <- frequency(x)
-    if (freq_base != freq_x) {
-      if (freq_base > freq_x) {
-        stop(paste0("Base period (", base, ") should not have a higher",
-                    " frequency than the input timeseries (", freq_x, ")"))
-      }
-      base <- change_frequency(base, new_frequency = freq_x)
-    }
+    base <- check_base(base, x)
     first_base_row <- start_period(base) - start_period(x) + 1
   }
 
