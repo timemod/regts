@@ -38,16 +38,7 @@ index_ts <- function(x, base = NULL, scale = 100) {
   x <- as.regts(x)
 
   if (!is.null(base)) {
-    base <- as.period_range(base)
-    freq_base <- frequency(base)
-    freq_x <- frequency(x)
-    if (freq_base != freq_x) {
-      if (freq_base > freq_x) {
-        stop(paste0("Base period (", base, ") should not have a higher",
-                    " frequency than the input timeseries (", freq_x, ")"))
-      }
-      base <- change_frequency(base, new_frequency = freq_x)
-    }
+    base <- check_base(base, x)
   } else {
     base <- as.period_range(start_period(x))
   }

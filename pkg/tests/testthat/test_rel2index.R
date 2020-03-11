@@ -28,6 +28,38 @@ test_that("rel2index univariate timeseries", {
   ts1_index3 <- rel2index(ts1_rel, "2010q3")
   expected <- (100 * ts1 / as.numeric(ts1["2010Q3"]))[get_period_range(ts1_rel)]
   expect_equal(ts1_index3, expected)
+
+  # NA values at beginning
+  ts2_rel <- ts1_rel
+  ts2_rel["2009q4"] <- NA
+  expect_equal(rel2index(ts2_rel), ts2_rel * NA)
+
+  expect_warning(
+    expect_equal(rel2index(ts2_rel, base = "2009q4"), ts2_rel * NA),
+    "NA values in base period 2009Q4"
+  )
+
+  expect_warning(ts2_index2 <- rel2index(ts2_rel, base = "2010Q4"),
+                 "Negative \\(average\\) value at base period 2010Q4.")
+  expected <- (100 * ts1 / abs(as.numeric(ts1["2010Q4"])))[get_period_range(ts2_rel)]
+  expect_equal(ts2_index2, expected)
+
+  expect_silent(ts2_index3 <- rel2index(ts2_rel, "2010q3"))
+  expected <- (100 * ts1 / as.numeric(ts1["2010Q3"]))[get_period_range(ts2_rel)]
+  expect_equal(ts2_index3, expected)
+
+  ts3_rel <- ts1_rel
+  ts3_rel <- ts3_rel * NA
+  ts3_rel[1] <- 2
+  expect_equal(rel2index(ts3_rel), ts3_rel * (300/ 2))
+
+  expect_equal(rel2index(ts3_rel, base = "2010q3"), ts3_rel * (100/ 2))
+
+  ts4_rel <- ts1_rel
+  ts4_rel["2009q3"] <- NA
+  ts4_rel["2009q4"] <- 2
+  expected <- (100 * ts1 / as.numeric(ts1["2010Q3"]))[get_period_range(ts4_rel)]
+  expect_equal(rel2index(ts4_rel, "2010q3"), expected)
 })
 
 test_that("rel2index multivariate timeseries", {
@@ -45,13 +77,15 @@ test_that("rel2index multivariate timeseries", {
     expect_warning(ts1_index_3 <- rel2index(ts1_rel, base = "2011Q3", scale = 1),
                  "Negative \\(average\\) value at base period 2011Q3 for columns: a.")
     prd <- get_period_range(ts1_rel)
-    expected_result <- ts1 * rep(1 / abs(as.numeric(ts1["2011q3"])), each = nrow(ts1))
+    expected_result <- ts1 * rep(1 / abs(as.numeric(ts1["2011q3"])),
+                                 each = nrow(ts1))
     expected_result <- expected_result[prd]
     expect_equal(ts1_index_3,  expected_result)
 
     expect_warning(ts1_index_4 <- rel2index(ts1_rel, base = "2011Q2", scale = 1),
                  "Negative \\(average\\) value at base period 2011Q2 for columns: a, b.")
-    expected_result <- ts1 * rep(1 / abs(as.numeric(ts1["2011q2"])), each = nrow(ts1))
+    expected_result <- ts1 * rep(1 / abs(as.numeric(ts1["2011q2"])),
+                                 each = nrow(ts1))
     expected_result <- expected_result[prd]
     expect_equal(ts1_index_4,  expected_result)
 
@@ -68,6 +102,20 @@ test_that("rel2index multivariate timeseries", {
   expect_equal(rel2index(ts1_rel_empty, keep_range = FALSE), ts1_empty)
   expect_equal(rel2index(ts1_rel_empty, keep_range = TRUE), ts1_empty[p],
                check.attributes = FALSE)
+
+  ts2_rel <- ts1_rel
+  ts2_rel["2010q3", "a"] <- NA
+
+  expected <- ts1[get_period_range(ts2_rel)]
+  expected$a <- NA
+  expected$b <- 100 * expected$b
+  expect_equal(rel2index(ts2_rel), expected)
+
+  expected <- index_ts(ts1, base = "2012q2")
+  expected["2010q2", "a"] <- NA
+
+  expect_equal(rel2index(ts2_rel, base = "2012q2", keep_range = FALSE),
+               expected)
 })
 
 test_that("pct2index", {

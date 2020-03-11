@@ -72,9 +72,18 @@ rel2index <- function(x, base = NULL, scale = 100,
     dim(x) <- c(length(x), 1)
   }
 
+  # calculate the index of the start period of the base period in
+  # timeseries x
+  if (is.null(base)) {
+    first_base_row <- 0
+  } else {
+    base <- check_base(base, x)
+    first_base_row <- start_period(base) - start_period(x) + 1
+  }
+
   # call C++ function rel2index_cpp (in file src/rel2index_cpp.cpp)
-  # to perform the cumulation.
-  data <- rel2index_cpp(x)
+  # to perform the cumulation. Subtract 1 because C++ has index base 0.
+  data <- rel2index_cpp(x, as.integer(first_base_row - 1))
 
   if (is.null(base)) {
 
