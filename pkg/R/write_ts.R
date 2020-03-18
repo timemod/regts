@@ -205,9 +205,16 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   minWidth_old <- options("openxlsx.minWidth")[[1]]
   options("openxlsx.minWidth" = 8.43)
 
-  saveWorkbook(wb, file, overwrite = TRUE)
-
-  options("openxlsx.minWidth" = minWidth_old)
+  # save the workbook with openxlsx::saveWorkbook. Because saveWorkbook
+  # only gives an error when something goes wrong, for example if the file
+  # is not writable, we use tryCatch to turn a warning to a message.
+  tryCatch({
+    saveWorkbook(wb, file, overwrite = TRUE)
+  }, warning = function(w) {
+    stop(w$message, call. = FALSE)
+  }, finally = {
+    options("openxlsx.minWidth" = minWidth_old)
+  })
 
   return(invisible(NULL))
 }
