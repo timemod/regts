@@ -1,7 +1,7 @@
 Package: regts
 Type: Package
 Title: Regular Timeseries
-Version: 1.1.0
+Version: 1.2.0
 Authors@R: c(
  person("Rob", "van Harrevelt", email = "rvanharrevelt@gmail.com", role = c("aut", "cre")),
  person("Anita", "van der Roest", email = "J.C.van.der.Roest@cpb.nl",role = "aut")
@@ -19,7 +19,7 @@ Description: An extension of the ts class with enhanced possibilities for
              methods for growth series, and several other functions.
 License: GPL-3
 LazyData: TRUE
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE, old_usage = TRUE)
 Imports:
     Rcpp,
