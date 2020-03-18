@@ -116,7 +116,7 @@ tryCatch({
  saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE)
 }, warning = function(w) {
  stop(w$message, call. = FALSE)
-}
+})
 
 
 # write a timeseries with comments
