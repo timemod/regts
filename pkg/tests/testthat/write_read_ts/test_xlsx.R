@@ -261,4 +261,11 @@ test_that("period_as_date", {
   expect_identical(ts1_lbls, ts1_date_t_read)
 })
 
+test_that("errors", {
+  file <- "xxlsx/ts1_date.xlsx"
+  expect_error(
+    write_ts_xlsx(ts1_lbls, file, labels = "after", period_as_date = TRUE),
+    "cannot create file 'xxlsx/ts1_date.xlsx', reason 'No such file or directory'")
+})
+
 

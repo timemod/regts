@@ -109,7 +109,15 @@ write_ts_sheet(ts1 * 100, wb, "ts1_times_100", labels = "after")
 # narrow.
 options("openxlsx.minWidth" = 8.43)
 
-saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE)
+# save the workbook with openxlsx::saveWorkbook. Because saveWorkbook
+# only gives an error when something goes wrong, for example if the file
+# is not writable, we use tryCatch to turn a warning to a message.
+tryCatch({
+ saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE)
+}, warning = function(w) {
+ stop(w$message, call. = FALSE)
+})
+
 
 # write a timeseries with comments
 comments <- c("Timeseries ts1 is created on the Central Bureau of Policy Analysis",
