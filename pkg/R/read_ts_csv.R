@@ -290,7 +290,10 @@ df_to_numeric_matrix <- function(x, dec) {
     x_converted <- x
   }
 
-  num_mat <- suppressWarnings(data.matrix(x_converted))
+  suppressWarnings({
+    num_mat <- matrix(sapply(x_converted, as.numeric), nrow = nrow(x))
+    colnames(num_mat) <- colnames(x)
+  })
 
   error_sel <- is.na(num_mat) & !is.na(x_converted)
 
