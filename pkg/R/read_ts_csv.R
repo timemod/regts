@@ -268,8 +268,8 @@ read_ts_columnwise <- function(tbl, frequency, dec, period_fun, layout, strict,
 
 # Convert a character data frame to a numeric matrix.
 # This function is similar to function numeric_matrix (see file regts.R), but
-# more efficient because we already know that x only contains texts and that NA values
-# are treated correctly.
+# more efficient because we already know that x only contains texts and that 
+# NA values are treated correctly.
 df_to_numeric_matrix <- function(x, dec) {
 
   if (nrow(x) == 0 || ncol(x) == 0) {
@@ -277,22 +277,23 @@ df_to_numeric_matrix <- function(x, dec) {
     return(matrix(0.0, nrow = nrow(x), ncol = ncol(x)))
   }
 
-  data_text <- unlist(x)
+  text_mat <- as.matrix(x)
 
   if (dec != ".") {
     # convert decimal separator
-    data_text_conv <- sub(dec, ".", data_text, fixed = TRUE)
+    text_mat_conv <- sub(dec, ".", text_mat, fixed = TRUE)
   } else {
-    data_text_conv <- data_text
+    text_mat_conv <- text_mat
   }
 
   suppressWarnings({
-    data_num <- as.numeric(data_text_conv)
+    num_mat <- as.numeric(text_mat_conv)
+    dim(num_mat) <- dim(text_mat)
   })
 
-  error_sel <- is.na(data_num) & !is.na(data_text)
+  error_sel <- is.na(num_mat) & !is.na(text_mat)
   if (any(error_sel)) {
-    weird_texts <- unique(data_text[error_sel])
+    weird_texts <- unique(text_mat[error_sel])
     nweird <- length(weird_texts)
     NWEIRD_MAX <- 10
     nmax <- min(NWEIRD_MAX, nweird)
@@ -305,12 +306,11 @@ df_to_numeric_matrix <- function(x, dec) {
     } else {
       warning(paste0("NAs introduced by coercion.\n",
                      nweird, " texts could not be converted to numeric.\n",
-                     "The first ", NWEIRD_MAX, " texts that gave problems are:\n",
+                     "The first ", NWEIRD_MAX, 
+                     " texts that gave problems are:\n",
                      paste0(weird_texts, collapse = "\n")))
     }
   }
 
-  num_mat <- data_num
-  dim(num_mat) <- dim(x)
   return(num_mat)
 }
