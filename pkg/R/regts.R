@@ -455,7 +455,7 @@ numeric_matrix <- function(x) {
   }
 
   x_converted <- as.data.frame(lapply(x, FUN = convert_col),
-                               stringsAsFactors = FALSE, optional = TRUE)
+                               stringsAsFactors = FALSE)
 
   suppressWarnings({
     num_mat <- matrix(sapply(x_converted, as.numeric), nrow = nrow(x))
