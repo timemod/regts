@@ -429,7 +429,7 @@ as.regts.list <- function(x, union = TRUE, ...) {
 # INPUT
 #   x    a data frame
 #   dec  decimal separator
-numeric_matrix <- function(x, dec = ".") {
+numeric_matrix <- function(x) {
 
   if (nrow(x) == 0 || ncol(x) == 0) {
     # no data available
@@ -438,26 +438,29 @@ numeric_matrix <- function(x, dec = ".") {
 
   x <- as.data.frame(x)
 
-  # Convert factors, Dates etc. to characters. Also replace
-  # decimals separator with ".".
+  if (all(sapply(x, FUN = is.numeric, USE.NAMES = FALSE))) {
+    return(as.matrix(x))
+  }
+
+  # Convert factors, Dates etc. to characters. Convert empty character
+  # strings to NA_character_
   convert_col <- function(x) {
     if (is.numeric(x) || is.logical(x)) {
       return(x)
     } else {
       x <- as.character(x)
       x[trimws(x) == ""] <- NA_character_
-      if (dec != ".") {
-        return(sub(dec, ".", x, fixed = TRUE))
-      } else {
-        return(x)
-      }
+      return(x)
     }
   }
 
   x_converted <- as.data.frame(lapply(x, FUN = convert_col),
-                               stringsAsFactors = FALSE, optional = TRUE)
+                               stringsAsFactors = FALSE)
 
-  num_mat <- suppressWarnings(data.matrix(x_converted))
+  suppressWarnings({
+    num_mat <- matrix(sapply(x_converted, as.numeric), nrow = nrow(x))
+    colnames(num_mat) <- colnames(x)
+  })
 
   error_sel <- is.na(num_mat) & !is.na(x_converted)
 

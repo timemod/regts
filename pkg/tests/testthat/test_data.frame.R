@@ -102,7 +102,8 @@ test_that("as.regts.data.frame with invalid period texts", {
                    stringsAsFactors = FALSE)
   rownames(df) <- 2015:2017
 
-  mat <- suppressWarnings(data.matrix(df))
+  mat <- suppressWarnings(matrix(as.numeric(unlist(df)), nrow = 3))
+  colnames(mat) <- colnames(df)
   msg <- "NAs introduced by coercion.\nThe following texts could not be converted to numeric:\n\"x\""
   expect_warning(ts1 <- as.regts(df), regexp = msg)
   # use as.numeric to create non integer values, ts1 has also non integer values
@@ -114,12 +115,13 @@ test_that("as.regts.data.frame with invalid period texts and with factors", {
 
   df <- data.frame(a = c("1", "x", "3"), b = c("2", " ", ""), c = 11:13,
                    stringsAsFactors = FALSE)
-  mat <- suppressWarnings(data.matrix(df))
+
+  mat <- suppressWarnings(matrix(as.numeric(unlist(df)), nrow = 3))
+  colnames(mat) <- colnames(df)
 
   df_fac <- data.frame(a = c("1", "x", "3"), b = c("2", " ", ""), c = 11:13,
                        stringsAsFactors = TRUE)
   rownames(df_fac) <- 2015:2017
-
 
   msg <- "NAs introduced by coercion.\nThe following texts could not be converted to numeric:\n\"x\""
   expect_warning(ts1 <- as.regts(df_fac), regexp = msg)

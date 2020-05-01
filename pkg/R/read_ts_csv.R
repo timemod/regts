@@ -266,10 +266,10 @@ read_ts_columnwise <- function(tbl, frequency, dec, period_fun, layout, strict,
   return(ret)
 }
 
-# convert a character data frame to a numeric matrix.
-# this function is similar to function numeric_matrix, but more efficient
-# because we already know that x only contains texts and that NA values
-# are treated correctly.
+# Convert a character data frame to a numeric matrix.
+# This function is similar to function numeric_matrix (see file regts.R), but
+# more efficient because we already know that x only contains texts and that 
+# NA values are treated correctly.
 df_to_numeric_matrix <- function(x, dec) {
 
   if (nrow(x) == 0 || ncol(x) == 0) {
@@ -277,25 +277,23 @@ df_to_numeric_matrix <- function(x, dec) {
     return(matrix(0.0, nrow = nrow(x), ncol = ncol(x)))
   }
 
-  x <- as.data.frame(x)
+  text_mat <- as.matrix(x)
 
   if (dec != ".") {
     # convert decimal separator
-    convert_col <- function(x) {
-      return(sub(dec, ".", x, fixed = TRUE))
-    }
-    x_converted <- as.data.frame(lapply(x, FUN = convert_col),
-                                 stringsAsFactors = FALSE, optional = TRUE)
+    text_mat_conv <- sub(dec, ".", text_mat, fixed = TRUE)
   } else {
-    x_converted <- x
+    text_mat_conv <- text_mat
   }
 
-  num_mat <- suppressWarnings(data.matrix(x_converted))
+  suppressWarnings({
+    num_mat <- as.numeric(text_mat_conv)
+    dim(num_mat) <- dim(text_mat)
+  })
 
-  error_sel <- is.na(num_mat) & !is.na(x_converted)
-
+  error_sel <- is.na(num_mat) & !is.na(text_mat)
   if (any(error_sel)) {
-    weird_texts <- unique(x[error_sel])
+    weird_texts <- unique(text_mat[error_sel])
     nweird <- length(weird_texts)
     NWEIRD_MAX <- 10
     nmax <- min(NWEIRD_MAX, nweird)
@@ -308,7 +306,8 @@ df_to_numeric_matrix <- function(x, dec) {
     } else {
       warning(paste0("NAs introduced by coercion.\n",
                      nweird, " texts could not be converted to numeric.\n",
-                     "The first ", NWEIRD_MAX, " texts that gave problems are:\n",
+                     "The first ", NWEIRD_MAX, 
+                     " texts that gave problems are:\n",
                      paste0(weird_texts, collapse = "\n")))
     }
   }
