@@ -1,7 +1,7 @@
 Package: regts
 Type: Package
 Title: Regular Timeseries
-Version: 1.2.0
+Version: 1.3.0
 Authors@R: c(
  person("Rob", "van Harrevelt", email = "rvanharrevelt@gmail.com", role = c("aut", "cre")),
  person("Anita", "van der Roest", email = "J.C.van.der.Roest@cpb.nl",role = "aut")

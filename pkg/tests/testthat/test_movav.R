@@ -136,11 +136,3 @@ test_that("simpel annual timeseries", {
                    expected_result_centre)
 })
 
-
-
-
-
-test_that("errors", {
-  x <- regts("hello", period =  p)
-  expect_error(movavb(x, order = 2), class = "Rcpp::not_compatible")
-})
