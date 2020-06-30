@@ -37,14 +37,14 @@ test_that("univariate example", {
   expect_equal(tsres, tsjoin)
 })
 
-mts_new <- regts(matrix((data), nc = 1), start = "2017", names = "a")
-mts_old <- regts(matrix((data), nc = 1), start = "2010", names = "a")
-mts3    <- regts(matrix((data), nc = 1), start = "2019", names = "m")
-mtsjoin <- regts(matrix(data2, nc = 1), start = "2010", names = "a")
+mts_new  <- regts(matrix(data, nc = 1), start = "2017", names = "a")
+mts_old  <- regts(matrix(data, nc = 1), start = "2010", names = "a")
+mts3     <- regts(matrix(data, nc = 1), start = "2019", names = "m")
+mts_join <- regts(matrix(data2, nc = 1), start = "2010", names = "a")
 
 test_that("multivariate 1 column example", {
   mtsres <- join_ts(mts_old, mts_new)
-  expect_equal(mtsres, mtsjoin)
+  expect_equal(mtsres, mts_join)
 })
 
 
@@ -54,21 +54,20 @@ xts_old <- regts(matrix(data = rep(data, 3), nc = 3), start = "2010",
                  names = c("a", "b", "c"))
 xts3    <- regts(matrix(data = rep(data, 3), nc = 3), start = "2000",
                  names = c("a", "b", "c"))
-xtsjoin <- regts(matrix(rep(data2, 3), nc = 3), start = "2010",
+xts_join <- regts(matrix(rep(data2, 3), nc = 3), start = "2010",
                  names = c("a", "b", "c"))
 
 test_that("multivariate 3 column example", {
   xtsres <- join_ts(xts_old, xts_new)
-  expect_equal(xtsres, xtsjoin)
+  expect_equal(xtsres, xts_join)
 })
 
-test_that("join & add non common columns", {
+test_that("join & add only add new remaining columns", {
   xtsres <- join_ts(xts_old, mts_new)
-  mxts <- cbind(mtsjoin, xts_old[, c("b", "c")])
-  expect_equal(xtsres, mxts)
+  expect_equal(xtsres, mts_join)
 
   xtsres <- join_ts(mts_old, xts_new)
-  mxts <- cbind(mtsjoin, xts_new[, c("b", "c")])
+  mxts <- cbind(mts_join, xts_new[, c("b", "c")])
   expect_equal(xtsres, mxts)
 })
 
@@ -86,43 +85,48 @@ xts_new["2017", "b"] <- NA
 xts_old["2019", "b"] <- NA
 xts_old["2018/2019", "c"] <- NA
 
-xtsjoin_NA <- xtsjoin
-xtsjoin_NA["2010/2016", "a"] <- xtsjoin["2010/2016", "a"]*2
-xtsjoin_NA["2017/2018", "a"] <- c(4.0, 2.0)
-xtsjoin_NA["2017", "b"] <- 2.0
-xtsjoin_NA["2010/2016", "c"] <- xtsjoin["2010/2016", "c"]/2
+xts_join_NA <- xts_join
+xts_join_NA["2010/2016", "a"] <- xts_join["2010/2016", "a"]*2
+xts_join_NA["2017/2018", "a"] <- c(4.0, 2.0)
+xts_join_NA["2017", "b"] <- 2.0
+xts_join_NA["2010/2016", "c"] <- xts_join["2010/2016", "c"]/2
 
 test_that("NA's in common period", {
   xtsres <- join_ts(xts_old, xts_new)
-  expect_equal(xtsres, xtsjoin_NA)
+  expect_equal(xtsres, xts_join_NA)
 
   # and elsewhere ..
   xts_new["2023/2026", "c"] <- NA
-  xtsjoin_NA["2023/2026", "c"] <- NA
+  xts_join_NA["2023/2026", "c"] <- NA
   xtsres <- join_ts(xts_old, xts_new)
-  expect_equal(xtsres, xtsjoin_NA)
+  expect_equal(xtsres, xts_join_NA)
 
 })
 
 test_that("labels", {
+  # labels only in old
   ts_labels(xts_old) <- c("a_old", "b_old", "c_old")
+  xtsres <- join_ts(xts_old, xts_new)
+  expect_equal(ts_labels(xtsres), ts_labels(xts_old))
+
+  # labels also in new
   ts_labels(xts_new) <- c("a_new", "b_new", "c_new")
   xtsres <- join_ts(xts_old, xts_new)
   expect_equal(ts_labels(xtsres), ts_labels(xts_new))
 
-  # and with non common columnns
-  xts4 <- regts(matrix(data = rep(data, 3), nc = 3), start = "2017",
+  # and with non common columnns, use also labels in old
+  xts_new5 <- regts(matrix(data = rep(data, 3), nc = 3), start = "2017",
                    names = c("d", "b", "e"), labels = c("d_new", "", "e_new"))
-  xtsres <- join_ts(xts_old, xts4)
+  xtsres <- join_ts(xts_old, xts_new5)
   expect_equal(ts_labels(xtsres),
-               c(a = "a_old", b = "b_old", c = "c_old", d = "d_new", e = "e_new"))
+               c(b = "b_old", d = "d_new", e = "e_new"))
 
-  # no labels in old
+  # no more labels in old
   xts_old <- regts(matrix(data = rep(data, 3), nc = 3), start = "2010",
                    names = c("a", "b", "c"))
-  xtsres <- join_ts(xts_old, xts4)
-  expect_equal(ts_labels(xtsres),
-               c(a = "", b = "", c = "", d = "d_new", e = "e_new"))
+  xtsres2 <- join_ts(xts_old, xts_new5)
+  expect_equal(ts_labels(xtsres2),
+               c(b = "", d = "d_new", e = "e_new"))
 
 })
 

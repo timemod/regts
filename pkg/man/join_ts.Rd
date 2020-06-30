@@ -19,25 +19,30 @@ join_ts(old, new, method = c("mult", "add"))
 a \code{\link{regts}} object.
 }
 \description{
-This function creates a new timeseries from two (partially) overlapping
-timeseries with the same frequency.
+This function creates a new timeseries from two timeseries with the same
+frequency, which share observations for a certain period.
 All observations from the first timeseries are scaled in such a way that
-the overlapping observations from the two timeseries have the same value
+the common observations from the two timeseries have the same value
 (on average). The second timeseries must contain the most recent data.
 }
 \details{
 The period range of the result is the union of the period ranges of the
 first and second timeseries.
 
-When the overlap period is determined, the trailing NA values of the old
+When the common period is determined, the trailing NA values of the old
 timeseries and the leading NA values of the new timeseries are ignored.
 
-In case of multivariate regts only the common columns are joined. For each
-common timeseries a check is done whether an overlapping period exists
+In case of two multivariate regts only the common columns are joined. For each
+common timeseries a check is done whether a common period exists
 (ignoring the NA values as described above).
-The non overlapping columns in both timeseries are added to the result.
-If both input timeseries are vectors (i.e. no column names), the result is
-also a vector.
+The remaining columns in the new timeseries are added to the result.
+Remaining columns in the old timeseries are ignored.
+Thus the result series and the new series have the same columns but the
+column ordering can be different.
+The joined timeseries can be found in the common columns.
+
+If both input timeseries are vectors (i.e. there are no column names), the
+result is also a vector.
 }
 \examples{
 x1 <- regts((1:15)/10, start = "2016q1")

@@ -1,23 +1,28 @@
 #' Join timeseries object with different but overlapping period ranges
 #'
-#' This function creates a new timeseries from two (partially) overlapping
-#' timeseries with the same frequency.
+#' This function creates a new timeseries from two timeseries with the same
+#' frequency, which share observations for a certain period.
 #' All observations from the first timeseries are scaled in such a way that
-#' the overlapping observations from the two timeseries have the same value
+#' the common observations from the two timeseries have the same value
 #' (on average). The second timeseries must contain the most recent data.
 #'
 #' The period range of the result is the union of the period ranges of the
 #' first and second timeseries.
 #'
-#' When the overlap period is determined, the trailing NA values of the old
+#' When the common period is determined, the trailing NA values of the old
 #' timeseries and the leading NA values of the new timeseries are ignored.
 #'
-#' In case of multivariate regts only the common columns are joined. For each
-#' common timeseries a check is done whether an overlapping period exists
+#' In case of two multivariate regts only the common columns are joined. For each
+#' common timeseries a check is done whether a common period exists
 #' (ignoring the NA values as described above).
-#' The non overlapping columns in both timeseries are added to the result.
-#' If both input timeseries are vectors (i.e. no column names), the result is
-#' also a vector.
+#' The remaining columns in the new timeseries are added to the result.
+#' Remaining columns in the old timeseries are ignored.
+#' Thus the result series and the new series have the same columns but the
+#' column ordering can be different.
+#' The joined timeseries can be found in the common columns.
+#'
+#' If both input timeseries are vectors (i.e. there are no column names), the
+#' result is also a vector.
 #'
 #' @param old the first timeseries (a \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
@@ -111,8 +116,7 @@ join_ts <- function(old, new, method = c("mult", "add")) {
   }
 
   common_names <- intersect(names_new, names_old)
-  missing_names_new <- setdiff(names_old, names_new)
-  missing_names_old <- setdiff(names_new, names_old)
+  extra_names_new <- setdiff(names_new, names_old)
 
   if (length(common_names) == 0) {
     warning("No common names in two timeseries, new timeseries is returned!")
@@ -143,44 +147,41 @@ join_ts <- function(old, new, method = c("mult", "add")) {
 
   # update for multivariate timeseries
   if (!vector_new){
-    # update result with non common names
-    if (length(missing_names_new) > 0) {
-      join[p_old, missing_names_new] <- x_old[p_old, missing_names_new]
+    # update result with non common names in x_new
+    if (length(extra_names_new) > 0) {
+      join[p_new, extra_names_new] <- x_new[p_new, extra_names_new]
+    }
 
-      # add labels of missing_names_new in x_old to the result
-      lbls <- ts_labels(x_old)
-      if (!is.null(lbls)) {
-        lbls <- lbls[missing_names_new]
-        join <- update_ts_labels(join, lbls)
+    # add labels of x_new and possibly x_old to the result
+    lbls_new <- ts_labels(x_new)
+    lbls_old <- ts_labels(x_old)
+
+    if (is.null(lbls_new)) {
+      # no new labels, add old labels if available
+      if (!is.null(lbls_old)) {
+        join <- update_ts_labels(join, ts_labels(x_old[, common_names]))
       }
-    }
-    if (length(missing_names_old) > 0) {
-      join[p_new, missing_names_old] <- x_new[p_new, missing_names_old]
-    }
 
-    # add labels of x_new to the result
-    lbls <- ts_labels(x_new)
-    if (!is.null(lbls)) {
-      join <- update_ts_labels(join, lbls)
-    }
+    } else {
+      # add new labels
+      join <- update_ts_labels(join, lbls_new)
 
-    # check for empty labels, fill them with old labels if available
-    lbls <- ts_labels(x_old)
-    if (!is.null(lbls)) {
-      sel <- ts_labels(join) == ""
-      if (any(sel)){
-        cnames <- intersect(names(lbls), names(sel[sel]))
-        if (length(cnames) > 0){
-         join <- update_ts_labels(join, ts_labels(x_old[, cnames, drop = FALSE]))
+      # check for empty labels, fill them with old labels if available
+      if (!is.null(lbls_old)) {
+        sel <- ts_labels(join) == ""
+        if (any(sel)){
+          cnames <- intersect(names(lbls_old), names(sel[sel]))
+          if (length(cnames) > 0){
+            join <- update_ts_labels(join, ts_labels(x_old[, cnames, drop = FALSE]))
+          }
         }
       }
     }
 
-    # sort columns of join
-    join <- join[, order(colnames(join)), drop = FALSE]
+    # sort columns of join in same order as columns in new
+    #join <- join[, names_new ]
 
   }
-
   return (join)
 }
 
@@ -285,3 +286,9 @@ calculate_join <- function(x_old, x_new, common_names, p_old, p_new, method,
 # Result series contain
 #   original values of new timeseries for overlap period till end of new ts
 #   calculated values for period starting in first period old ts till overlap
+
+
+
+
+
+
