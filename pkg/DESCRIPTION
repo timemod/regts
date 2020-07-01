@@ -29,6 +29,8 @@ Imports:
     tibble,
     openxlsx,
     stringr,
+    tidyselect,
+    rlang,
     testthat
 Suggests:
     knitr,
