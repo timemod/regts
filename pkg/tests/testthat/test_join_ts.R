@@ -71,6 +71,7 @@ test_that("join & add only add new remaining columns", {
   expect_equal(xtsres, mxts)
 })
 
+
 test_that("no common columns, warnings ignored", {
 res <- suppressWarnings(join_ts(mts3, xts_new))
 expect_equal(res, xts_new)
@@ -119,16 +120,39 @@ test_that("labels", {
                    names = c("d", "b", "e"), labels = c("d_new", "", "e_new"))
   xtsres <- join_ts(xts_old, xts_new5)
   expect_equal(ts_labels(xtsres),
-               c(b = "b_old", d = "d_new", e = "e_new"))
+               c(d = "d_new", b = "b_old", e = "e_new"))
 
   # no more labels in old
   xts_old <- regts(matrix(data = rep(data, 3), nc = 3), start = "2010",
                    names = c("a", "b", "c"))
   xtsres2 <- join_ts(xts_old, xts_new5)
   expect_equal(ts_labels(xtsres2),
-               c(b = "", d = "d_new", e = "e_new"))
+               c(d = "d_new", b = "", e = "e_new"))
 
 })
+
+test_that("result must have same columns as new", {
+
+  xts_new <- regts(matrix(data = rep(data, 3), nc = 3), start = "2017",
+                   names = c("c", "b", "a"), labels = c("c_new", "b_new", "a_new"))
+  xts_new2 <- regts(matrix(data = rep(data, 3), nc = 3), start = "2017",
+                    names = c("d", "b", "e"), labels = c("d_new", "", "e_new"))
+  xts_old <- regts(matrix(data = rep(data, 3), nc = 3), start = "2010",
+                   names = c("a", "b", "c"))
+
+  xts_join <- regts(matrix(rep(data2, 3), nc = 3), start = "2010",
+                    names = c("c", "b", "a"), labels = c("c_new", "b_new", "a_new"))
+  xts_join2 <- regts(matrix(rep(data2, 3), nc = 3), start = "2010",
+                    names = c("d", "b", "e"), labels = c("d_new", "", "e_new"))
+  xts_join2["2010/2016",c("d","e")] <- NA
+
+  xtsres <- join_ts(xts_old, xts_new)
+  expect_equal(xtsres, xts_join)
+
+  xtsres2 <- join_ts(xts_old, xts_new2)
+  expect_equal(xtsres2, xts_join2)
+})
+
 
 test_that("errors", {
 
