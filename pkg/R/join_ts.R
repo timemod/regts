@@ -1,20 +1,22 @@
-#' Join timeseries object with different but overlapping period ranges
+#' Join timeseries objects with overlapping period ranges
 #'
-#' This function creates a new timeseries from two timeseries with the same
-#' frequency, which share observations for a certain period.
-#' All observations from the first timeseries are scaled in such a way that
-#' the common observations from the two timeseries have the same value
-#' (on average). The second timeseries must contain the most recent data.
+#' This function joins two timeseries with the same frequency and different but
+#' overlapping period ranges.
+#' All observations from the old timeseries, the first timeseries, are scaled
+#' in such a way that the common observations from the two timeseries have the
+#' same value (on average). The new timeseries, the second timeseries, must
+#' contain the most recent data.
 #'
 #' The period range of the result is the union of the period ranges of the
-#' first and second timeseries.
+#' old and new timeseries.
 #'
 #' When the overlapping period is determined, the trailing NA values of the old
-#' timeseries and the leading NA values of the new timeseries are ignored.
+#' timeseries and the leading NA values of the new timeseries are
+#' ignored.
 #'
-#' In case of two multivariate regts only the common columns are joined. For each
-#' common timeseries a check is done whether an overlapping period exists
-#' (ignoring the NA values as described above).
+#' If both the old and new timeseries are multivariate regts objects, only
+#' the common columns are joined. For each common timeseries the overlapping
+#' period is determined, ignoring the NA values as described above.
 #' The remaining columns in the new timeseries are added to the result.
 #' Remaining columns in the old timeseries are ignored.
 #' The result series and the new series have the same columns, in the same order.
@@ -33,7 +35,7 @@
 #' @examples
 #' x1 <- regts((1:15)/10, start = "2016q1")
 #' x2 <- regts(1:10, start = "2018q4")
-#' res <- join_ts(x1, x2)
+#' join_ts(x1, x2)
 #'
 #' data <- (1:10)/10
 #' x_old <- regts(cbind(data, 2 * data), period = "2001/2010",
