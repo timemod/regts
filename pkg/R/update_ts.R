@@ -26,7 +26,7 @@
 #' Outside this period the values in the first timeseries will become
 #' \code{NA}.
 #'
-#' The non overlapping columns in both timeseries are added to the result.
+#' The non common columns in both timeseries are added to the result.
 #'
 #' The period range of the result is the union of the period ranges of the
 #' first and second timeseries, except for the \code{updval} method.
@@ -50,7 +50,7 @@
 #' update_ts(x1, x2, method = "upd")
 #'
 #' @seealso
-#'\code{\link{regts}}
+#'\code{\link{regts}} and \code{\link{join_ts}}
 #'
 #' @export
 update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
