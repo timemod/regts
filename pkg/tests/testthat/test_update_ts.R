@@ -13,16 +13,20 @@ test_that("equal periods", {
   u1 <- update_ts(x1, x2, "upd")
   n1 <- update_ts(x1, x2, "updna")
   v1 <- update_ts(x1, x2, "updval")
+  r1 <- update_ts(x1, x2, "replace")
   u2 <- update_ts(x2, x1, "upd")
   n2 <- update_ts(x2, x1, "updna")
   v2 <- update_ts(x2, x1, "updval")
-  r1 <- update_ts(x2, x1, "replace")
+  r2 <- update_ts(x2, x1, "replace")
 
-  expect_identical(u1, n2)
-  expect_identical(u2, n1)
   expect_identical(u1, v1)
+  expect_identical(u1, r1)
+
   expect_identical(u2, v2)
-  expect_identical(r1, u2)
+  expect_identical(u2, r2)
+
+  expect_identical(n1, u2[, sort(colnames(u2))])
+  expect_identical(u1, n2[, sort(colnames(n2))])
 
 })
 
@@ -43,14 +47,14 @@ test_that("equal periods, NA values in x1", {
   n2 <- update_ts(x2, x1, "updna")
   v2 <- update_ts(x2, x1, "updval")
 
-  expect_identical(u1, n2)
+  expect_identical(u1, n2[, sort(colnames(n2))])
   # compare u2 ( = x1 + d)
   expect_identical(u2[, colnames(x1)], x1)
   # extend x1 and compare again
   x1_d <- cbind(x1,  x2[, "d"])
-  colnames(x1_d) <- colnames(u2)
-  expect_identical(u2, x1_d)
-  expect_identical(n1, v2)
+  colnames(x1_d) <- sort(colnames(u2))
+  expect_identical(x1_d, u2[, sort(colnames(u2))])
+  expect_identical(n1, v2[, sort(colnames(v2))])
   expect_identical(v1, u1)
 
 })
@@ -81,9 +85,9 @@ test_that("equal periods, NA values in x2", {
   x2_b <- x2_b[, sort(colnames(x2_b)), drop = FALSE]
   expect_identical(u1, x2_b)
 
-  expect_identical(u2, n1)
-  expect_identical(n1, v2)
-  expect_identical(v1, n2)
+  expect_identical(n1, u2[, sort(colnames(u2))])
+  expect_identical(n1, v2[, sort(colnames(v2))])
+  expect_identical(v1, n2[, sort(colnames(n2))])
 
 })
 
@@ -113,9 +117,9 @@ test_that("equal periods, NA values in x1 and x2", {
   colnames(x2_b)[4] <- "b"
   x2_b <- x2_b[, sort(colnames(x2_b)), drop = FALSE]
   expect_identical(u1, x2_b)
-  expect_identical(u2, x1)
-  expect_identical(n1, v2)
-  expect_identical(n2, v1)
+  expect_identical(x1, u2[, sort(colnames(u2))])
+  expect_identical(n1, v2[, sort(colnames(v2))])
+  expect_identical(v1, n2[, sort(colnames(n2))])
 
 })
 
@@ -135,14 +139,14 @@ test_that("overlapping periods, no NA values", {
   r1 <- update_ts(x1, x2, "replace")
   r2 <- update_ts(x2, x1, "replace")
 
-  expect_identical(u1, n2)
-  expect_identical(u2, n1)
-  expect_identical(v1, n2)
-  expect_identical(v2, n1)
+  expect_identical(u1, n2[, sort(colnames(n2))])
+  expect_identical(n1, u2[, sort(colnames(u2))])
+  expect_identical(v1, n2[, sort(colnames(n2))])
+  expect_identical(n1, v2[, sort(colnames(v2))])
   n2["2000/2001",c("a","c")] <- NA
-  expect_identical(r1, n2)
+  expect_identical(r1, n2[, sort(colnames(n2))])
   n1["2004/2006",c("a","c")] <- NA
-  expect_identical(r2, n1)
+  expect_identical(n1, r2[, sort(colnames(r2))])
 
 })
 
@@ -167,10 +171,10 @@ test_that("overlapping periods, NA values", {
   # only element ["2003", "c"] is different between u1 and n2
   expect_identical(u1[, c("a","b","d")], n2[, c("a","b","d")])
   u1["2003", "c"] <- n2["2003", "c"]
-  expect_identical(u1, n2)
-  expect_identical(u2, n1)
-  expect_identical(v1, n2)
-  expect_identical(v2, n1["2001/2006", ])
+  expect_identical(u1, n2[, sort(colnames(n2))])
+  expect_identical(n1, u2[, sort(colnames(u2))])
+  expect_identical(v1, n2[, sort(colnames(n2))])
+  expect_identical(n1["2001/2006", ], v2[, sort(colnames(v2))])
 
 })
 
@@ -188,10 +192,10 @@ test_that("period x1 encloses period x2, no NA values", {
   n2 <- update_ts(x2, x1, "updna")
   v2 <- update_ts(x2, x1, "updval")
 
-  expect_identical(u1, n2)
-  expect_identical(u2, n1)
-  expect_identical(v1, n2)
-  expect_identical(v2, n1)
+  expect_identical(u1, n2[, sort(colnames(n2))])
+  expect_identical(n1, u2[, sort(colnames(u2))])
+  expect_identical(v1, n2[, sort(colnames(n2))])
+  expect_identical(n1, v2[, sort(colnames(v2))])
 
 })
 
@@ -215,10 +219,10 @@ test_that("period x1 encloses period x2, NA values", {
 
   prd_v2 <- get_period_range(v2)
 
-  expect_identical(u1, n2)
-  expect_identical(u2, n1)
-  expect_identical(v1, n2)
-  expect_identical(v2, n1[prd_v2, ])
+  expect_identical(u1, n2[, sort(colnames(n2))])
+  expect_identical(n1, u2[, sort(colnames(u2))])
+  expect_identical(v1, n2[, sort(colnames(n2))])
+  expect_identical(n1[prd_v2, ], v2[, sort(colnames(v2))])
 
 })
 
@@ -240,14 +244,14 @@ test_that("no overlapping periods, NA values", {
   n2 <- update_ts(x2, x1, "updna")
   v2 <- update_ts(x2, x1, "updval")
 
-  expect_identical(u1, u2)
-  expect_identical(n1, n2)
+  expect_identical(u1, u2[, sort(colnames(n2))])
+  expect_identical(n1, n2[, sort(colnames(n2))])
   # updval removes leading/trailing rows and columns with only NA values
   prd_v2 <- get_period_range(v2)
-  expect_identical(v1[prd_v2, colnames(v2)], v2 )
+  expect_identical(v1[prd_v2, colnames(v2)], v2[, sort(colnames(v2))] )
   v1 <- na_trim(v1)
   v1 <- remove_na_columns(v1)
-  expect_identical(v1, v2)
+  expect_identical(v1, v2[, sort(colnames(v2))])
 
 })
 
@@ -269,10 +273,10 @@ test_that("no overlapping columns, NA values", {
   n2 <- update_ts(x2, x1, "updna")
   v2 <- update_ts(x2, x1, "updval")
 
-  expect_identical(u1, u2)
-  expect_identical(n1, n2)
+  expect_identical(u1, u2[, sort(colnames(u2))])
+  expect_identical(n1, n2[, sort(colnames(n2))])
   prd_v2 <- get_period_range(v2)
-  expect_identical(v2, v1[prd_v2, ])
+  expect_identical(v1[prd_v2, ], v2[, sort(colnames(v2))])
 
 })
 
@@ -293,6 +297,43 @@ test_that("no column names", {
   expect_identical(u2, n1)
   expect_identical(n1, v2)
   expect_identical(n2, v1)
+
+})
+
+test_that("join_second parameter", {
+
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
+              names = c("a", "b", "c"))
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2002/2006",
+              names = c("a", "c", "d"))
+
+  u1 <- update_ts(x1, x2, "upd", join_second = TRUE)
+  u2 <- update_ts(x1, x2, "upd", join_second = FALSE)
+
+  expect_identical(u2, u1[, colnames(u2)])
+  u2$d <- u1$d
+  expect_identical(u2, u1)
+
+
+})
+
+
+test_that("join_second parameter, NA values", {
+
+  x1 <- regts(matrix(data = 1, nc = 3), period = "2000/2003",
+              names = c("a", "b", "c"))
+  x2 <- regts(matrix(data = 2, nc = 3), period = "2002/2006",
+              names = c("a", "c", "d"))
+
+  x1["2000", c("a","b","c")] <- NA
+  x1[, "b"] <- NA
+
+  u1 <- update_ts(x1, x2, "updna", join_second = TRUE)
+  u2 <- update_ts(x1, x2, "updna", join_second = FALSE)
+
+  expect_identical(u2, u1[, colnames(u2)])
+  u2$d <- u1$d
+  expect_identical(u2, u1)
 
 })
 

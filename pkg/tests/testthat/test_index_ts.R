@@ -55,11 +55,11 @@ test_that("NA values", {
 
   a_NA <- a
   a_NA["2019Q3"] <- NA
-  warning <- "NA values in base period 2019Q3/2019Q4"
+  warning <- "NA values in base period 2019Q3/2019Q4 for variable a_NA"
   expect_warning(a_NA_i <- index_ts(a_NA,  base = "2019Q3/2019Q4"), warning)
   expect_equal(a_NA_i, NA * a)
 
-  warning <- "NA values in base period 2019Q3"
+  warning <- "NA values in base period 2019Q3 for variable a_NA"
   expect_warning(a_NA_i <- index_ts(a_NA,  base = "2019Q3"), warning)
   expect_equal(a_NA_i, NA * a)
 
@@ -74,7 +74,7 @@ test_that("NA values", {
 
   ab_NA <- ab
   ab_NA["2019Q3", "a"] <- NA
-  warning <- "NA values in base period 2019Q3"
+  warning <- "NA values in base period 2019Q3 for columns: a."
   expect_warning(ab_NA_i <- index_ts(ab_NA,  base = "2019Q3"), warning)
 
   expected_result  <-100 * ab_NA / 14
