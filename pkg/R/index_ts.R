@@ -69,7 +69,7 @@ index_ts <- function(x, base = NULL, scale = 100) {
 
   psel <- (startp_base : endp_base) - startp_x + 1
 
-  if (is.mts(x)) {
+  if (is.matrix(x) && (ncol(x) > 1) || !is.null(colnames(x))) {
     # multivariate timeseries
 
     xdat <- x[psel, , drop = FALSE]
