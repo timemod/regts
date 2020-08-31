@@ -127,7 +127,13 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace"),
     }
   }
 
-  if (ncol(x1) == 0) return(x2)
+  if (ncol(x1) == 0){
+    if (join_second){
+      return(x2)
+    }else{
+      return(x1)
+    }
+  }
   if (ncol(x2) == 0) return(x1)
 
   common_names  <- intersect(names1, names2)
