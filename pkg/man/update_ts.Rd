@@ -4,7 +4,8 @@
 \alias{update_ts}
 \title{Update a timeseries with another timeseries object}
 \usage{
-update_ts(x1, x2, method = c("upd", "updna", "updval", "replace"))
+update_ts(x1, x2, method = c("upd", "updna", "updval", "replace"),
+  join_second = TRUE)
 }
 \arguments{
 \item{x1}{the first timeseries (a \code{\link{regts}} or
@@ -15,6 +16,10 @@ update_ts(x1, x2, method = c("upd", "updna", "updval", "replace"))
 \item{method}{four different ways to update the timeseries.
 By default the timeseries are updated. This behaviour can be changed by
 using one of the other methods. See details.}
+
+\item{join_second}{A logical (default \code{TRUE}) indicating whether columns
+present in the second timeseries but missing in the first timeseries should
+be added to the result.}
 }
 \value{
 an updated \code{\link{regts}} object.
@@ -46,7 +51,13 @@ period range of these second timeseries.
 Outside this period the values in the first timeseries will become
 \code{NA}.
 
-The non common columns in both timeseries are added to the result.
+By default, columns only present in one of the two timeseries objects
+are added to the result.
+The result columns are the columns of the first series, supplemented
+with the columns of the second series.
+If parameter \code{join_second} is \code{FALSE} then the remaining columns
+of the second timeseries are \emph{not} added to the result. Thus the result
+series has the same columns as the first series.
 
 The period range of the result is the union of the period ranges of the
 first and second timeseries, except for the \code{updval} method.

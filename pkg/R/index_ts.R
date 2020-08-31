@@ -35,6 +35,8 @@
 #' @export
 index_ts <- function(x, base = NULL, scale = 100) {
 
+  series_name <- deparse(substitute(x))
+
   x <- as.regts(x)
 
   if (!is.null(base)) {
@@ -67,7 +69,7 @@ index_ts <- function(x, base = NULL, scale = 100) {
 
   psel <- (startp_base : endp_base) - startp_x + 1
 
-  if (is.mts(x)) {
+  if (is.matrix(x) && (ncol(x) > 1) || !is.null(colnames(x))) {
     # multivariate timeseries
 
     xdat <- x[psel, , drop = FALSE]
@@ -104,13 +106,14 @@ index_ts <- function(x, base = NULL, scale = 100) {
     # univariate timeseries
     m  <- mean(x[psel])
     if (is.na(m)) {
-      warning(sprintf("NA values in base period %s", as.character(base)))
+      warning(sprintf(paste("NA values in base period %s for variable %s."),
+                      as.character(base), series_name))
     } else if (m == 0) {
-      warning(sprintf(paste("Zero (average) value at base period %s."),
-                      as.character(base)))
+      warning(sprintf(paste("Zero (average) value at base period %s for variable %s."),
+                      as.character(base), series_name))
     } else if (m < 0) {
-      warning(sprintf(paste("Negative (average) value at base period %s."),
-                   as.character(base)))
+      warning(sprintf(paste("Negative (average) value at base period %s for variable %s."),
+                      as.character(base), series_name))
       m <- -m
     }
     return(scale * x / m)

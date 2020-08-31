@@ -26,7 +26,13 @@
 #' Outside this period the values in the first timeseries will become
 #' \code{NA}.
 #'
-#' The non common columns in both timeseries are added to the result.
+#' By default, columns only present in one of the two timeseries objects
+#' are added to the result.
+#' The result columns are the columns of the first series, supplemented
+#' with the columns of the second series.
+#' If parameter \code{join_second} is \code{FALSE} then the remaining columns
+#' of the second timeseries are *not* added to the result. Thus the result
+#' series has the same columns as the first series.
 #'
 #' The period range of the result is the union of the period ranges of the
 #' first and second timeseries, except for the \code{updval} method.
@@ -40,6 +46,9 @@
 #' @param method four different ways to update the timeseries.
 #' By default the timeseries are updated. This behaviour can be changed by
 #' using one of the other methods. See details.
+#' @param join_second A logical (default \code{TRUE}) indicating whether columns
+#' present in the second timeseries but missing in the first timeseries should
+#' be added to the result.
 #' @return an updated \code{\link{regts}} object.
 #'
 #' @examples
@@ -53,7 +62,8 @@
 #'\code{\link{regts}} and \code{\link{join_ts}}
 #'
 #' @export
-update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
+update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace"),
+                      join_second = TRUE) {
 
   series_name1 <- deparse(substitute(x1))
   series_name2 <- deparse(substitute(x2))
@@ -117,46 +127,33 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace")) {
     }
   }
 
-  if (ncol(x1) == 0) return(x2)
+  if (ncol(x1) == 0){
+    if (join_second){
+      return(x2)
+    }else{
+      return(x1)
+    }
+  }
   if (ncol(x2) == 0) return(x1)
 
-  common_names   <- intersect(names1, names2)
-  missing_names1 <- setdiff(names2, names1)
-  missing_names2 <- setdiff(names1, names2)
+  common_names  <- intersect(names1, names2)
+  extra_names2  <- setdiff(names2, names1)
 
   p1 <- get_period_range(x1)
   p2 <- get_period_range(x2)
 
   update <- calculate_update(x1, x2, common_names, p1, p2, method)
 
-  # update result with non common names
-  if (length(missing_names1) > 0) {
-    update[p2, missing_names1] <- x2[p2, missing_names1]
-  }
-  if (length(missing_names2) > 0) {
-    update[p1, missing_names2] <- x1[p1, missing_names2]
-  }
+  # if join_second = TRUE update result with extra names in second series
+  if (join_second && length(extra_names2) > 0) {
+    update[p2, extra_names2] <- x2[p2, extra_names2]
 
-  if (length(missing_names1) > 0) {
     # add labels of missing_names1 in x2 to the result
     lbls <- ts_labels(x2)
     if (!is.null(lbls)) {
-      lbls <- lbls[missing_names1]
+      lbls <- lbls[extra_names2]
       update <- update_ts_labels(update, lbls)
     }
-  }
-  if (length(missing_names2) > 0) {
-    # add labels of missing_names2 in x1 to the result
-    lbls <- ts_labels(x1)
-    if (!is.null(lbls)) {
-      lbls <- lbls[missing_names2]
-      update <- update_ts_labels(update, lbls)
-    }
-  }
-
-  # sort columns of update
-  if (!is.null(update)) {
-    update <- update[, sort(colnames(update)), drop = FALSE]
   }
 
   return (update)
@@ -190,7 +187,9 @@ calculate_update <- function(x1, x2, common_names, p1, p2, method) {
     xx1[not_na_xx2] <- xx2[not_na_xx2]
   }
 
-  return(xx1)
+  x1[p_union, common_names] <- xx1[p_union, common_names]
+
+  return(x1)
 }
 
 
