@@ -15,13 +15,14 @@ univec2unimat <- function(x, name) {
 }
 
 # check argument frequency of functions such as as.period and as.period_range
-check_frequency_arg <- function(frequency) {
+check_frequency_arg <- function(frequency, arg_name = "frequency") {
   if (missing(frequency)) return(invisible())
   f <- frequency
   if ( length(f) > 1 ||
        !(is.numeric(f) || identical(f, NA)) ||
        (!is.na(f) && f != as.integer(f))) {
-    stop("Argument 'frequency' should be a scalar integer value.")
+    stop(sprintf("Argument '%s' should be a scalar integer value.",
+                 arg_name))
   }
   return(invisible())
 }
