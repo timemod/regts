@@ -17,7 +17,7 @@ get_periods(x, ...)
 }
 \arguments{
 \item{x}{a \code{\link{period_range}}, a character that can be coerced to a
-\code{period_range} with function \code{as.period_range}, or a times series
+\code{period_range} with function \code{\link{as.period_range}}, or a times series
 (\code{\link[stats]{ts}} or \code{\link{regts}}).}
 
 \item{...}{arguments passed to methods (currently not used).}
@@ -27,7 +27,7 @@ A \code{\link{period}} vector.
 }
 \description{
 The periods in a \code{\link{period_range}} or timeseries are returned
-as a \code{period} vector
+as a \code{\link{period}} vector
 }
 \examples{
 # example for period range

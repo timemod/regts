@@ -1,10 +1,10 @@
 #' Return all periods in a  \code{period_range} or timeseries.
 #'
 #' The periods in a \code{\link{period_range}} or timeseries are returned
-#' as a \code{period} vector
+#' as a \code{\link{period}} vector
 #'
 #' @param x a \code{\link{period_range}}, a character that can be coerced to a
-#' `period_range` with function `as.period_range`, or a times series
+#' `period_range` with function \code{\link{as.period_range}}, or a times series
 #' (\code{\link[stats]{ts}} or \code{\link{regts}}).
 #' @param ... arguments passed to methods (currently not used).
 #' @return A \code{\link{period}} vector.
