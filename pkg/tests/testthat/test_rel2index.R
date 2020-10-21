@@ -3,6 +3,8 @@ library(testthat)
 
 context("conversion functions for timeseries")
 
+rm(list = ls())
+
 set.seed(123)
 
 data <- c(-0.56047565, -0.23017749,  1.55870831,  0.07050839,  0.12928774,
@@ -163,6 +165,10 @@ test_that("errors", {
                paste("Base period \\(2010Q1/2010Q4\\) not within timeseries",
                       "period \\(2010Q2/2011Q1\\)"))
 
+  msg <- "Argument 'scale' should be a numeric vector of length 1"
+  expect_error(rel2index(ts1, scale = "xxx"), msg)
+  expect_error(rel2index(ts1, scale = 1:2), msg)
+
 })
 
 test_that("Base period is period range, univariate series", {
@@ -255,4 +261,16 @@ test_that("negative timeseries (2)", {
   ts_labels(t3) <- c(x = "var x ", y = "var y")
   t4 <- pct2index(100 * growth(t3, keep_range = FALSE), keep_range = FALSE, scale = 1)
   expect_equal(t3, t4)
+})
+
+test_that("example extrapolation of timeseries with growth series", {
+  z_r <- regts(abs(rnorm(10, mean = 1)) + 1e-3, start = "2018m1")
+  per <- get_period_range(z_r)
+  z <- regts(10, start = "2017m12")
+  per0 <- period("2017m12")
+  z[per] <- pct2index(z_r, scale = z[per0])
+
+  z_ref <- z[per0]
+  z_ref[per]  <- c(z[per0]) * cumprod(1 + z_r / 100)
+  expect_equal(z, z_ref)
 })

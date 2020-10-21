@@ -62,8 +62,13 @@ NULL
 #' @describeIn rel2index-slash-pct2index Calculates an index timeseries from a
 #' timeseries with relative changes
 #' @export
-rel2index <- function(x, base = NULL, scale = 100,
-                          keep_range = TRUE) {
+rel2index <- function(x, base = NULL, scale = 100, keep_range = TRUE) {
+
+  if (!is.numeric(scale) || length(scale) != 1) {
+    stop("Argument 'scale' should be a numeric vector of length 1")
+  }
+  # remove attributes (for example time series attributes):
+  scale <- as.numeric(scale)
 
   x <- as.regts(x)
 
