@@ -1,6 +1,10 @@
 #' Generates a sequence of periods
 #'
 #' Generates a regular sequence of \code{\link[regts]{period}} objects.
+#'
+#' If both `from` and `to` are specified, then the two periods must have
+#' the same frequency.
+#'
 #' @param from a \code{period} object or a character specifying the first period
 #' of the sequence. If `from` is a character, it is coerced to a period object
 #' with function \code{\link{as.period}}.
@@ -22,11 +26,11 @@
 #' seq(p1, "2019q4", by = 2)
 #' seq("2018q1", "2020q1", by = 4)
 #'
-#' # example: print the value of a timeseries for every first quarter of ayear
+#' # example: print the value of a timeseries for every first quarter of a year
 #' x <- regts(1:10, start = "2018q1")
-#' seqp <- seq(period("2018q1"), "2020q1", by = 4)
+#' seqp <- seq("2018q1", "2020q1", by = 4)
 #' for (prd in as.list(seqp)) {
-#'   cat(sprintf("x[%s] =", prd, x[prd]))
+#'   cat(sprintf("x[%s] = %g\n", prd, x[prd]))
 #' }
 #' # Note that we do not loop directly over the period vector, but first convert
 #' # the vector to a list. Otherwise the period class is lost.
