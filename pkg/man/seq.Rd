@@ -3,16 +3,20 @@
 \name{seq}
 \alias{seq}
 \alias{seq.period}
+\alias{seq.character}
 \title{Generates a sequence of periods}
 \usage{
 \method{seq}{period}(from, to, by, length.out, ...)
+
+\method{seq}{character}(from, to, by, length.out = NULL, ...)
 }
 \arguments{
-\item{from}{a \code{period} object specifying the first period of the
-sequence.}
+\item{from}{a \code{period} object or a character specifying the first period
+of the sequence. If \code{from} is a character, it is coerced to a period object
+with function \code{\link{as.period}}.}
 
-\item{to}{a \code{period} object (or an object that can be coerced to a
-\code{period} object) specifying the last period of the sequence}
+\item{to}{a \code{period} object or a character
+specifying the last period of the sequence.}
 
 \item{by}{an integer number, the increment of the sequence (the number of
 periods between each period in the sequence).}
@@ -35,18 +39,16 @@ p1 <- period("2018q2")
 seq(p1, length.out = 4)
 seq(p1, "2019q4")
 seq(p1, "2019q4", by = 2)
+seq("2018q1", "2020q1", by = 4)
 
-# use seq in a for loop
-ts <- regts(1:10, start = "2018q1")
+# example: print the value of a timeseries for every first quarter of ayear
+x <- regts(1:10, start = "2018q1")
 seqp <- seq(period("2018q1"), "2020q1", by = 4)
-
-# print first quarters ts
-for (prd in as.list(seqp))
-  {print(ts[prd])
+for (prd in as.list(seqp)) {
+  cat(sprintf("x[\%s] =", prd, x[prd]))
 }
-
 # Note that we do not loop directly over the period vector, but first convert
-# the vector to a list. Otherwise the \code{period} class is lost.
+# the vector to a list. Otherwise the period class is lost.
 
 }
 \seealso{

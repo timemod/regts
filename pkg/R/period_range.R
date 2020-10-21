@@ -127,6 +127,9 @@ as.period_range <- function(x, frequency = NA, ...) {
 
 #' @export
 as.period_range.character <- function(x, frequency = NA, ...) {
+  if (!missing(frequency) && !identical(frequency, NA)) {
+    check_frequency_arg(frequency)
+  }
   if (length(x) != 1) {
     stop("x should be a single character string")
   }

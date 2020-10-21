@@ -50,6 +50,17 @@ test_that("constructor period_range", {
   expect_error(period_range(period("2018m1"), period(c("2019m2", "2019m3")),
                             frequency = 4),
                "Argument 'end' must be of length 1")
+
+  msg <-  "Argument 'frequency' should be a scalar integer value."
+  expect_error(period_range("2018q1/2018q2", frequency = "xxx"), msg)
+  expect_error(period_range("2018q1/2018q2", frequency = 2:4), msg)
+  expect_error(period_range("2018q1/2918q2", frequency = 2.5), msg)
+  expect_error(period_range(2018, 2022, frequency = "xxx"), msg)
+  expect_error(period_range(2018, 2022, frequency = 2:4), msg)
+  expect_error(period_range(2018, 2022, frequency = 2.5), msg)
+  expect_error(period_range("2018q1", "2018q2", frequency = "xxx"), msg)
+  expect_error(period_range("2018q1", "2018q2", frequency = 2:4), msg)
+  expect_error(period_range("2018q1", "2918q2", frequency = 2.5), msg)
 })
 
 test_that("as.period_range.character", {

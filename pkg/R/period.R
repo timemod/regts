@@ -113,7 +113,10 @@ as.period.period <- function(x, ...) {
 
 #' @export
 as.period.character <- function(x, frequency = NA, ...) {
-  # Call C++ function parse_period
+  if (!missing(frequency) && !identical(frequency, NA)) {
+    check_frequency_arg(frequency)
+  }
+  # Call C++ function parse_period:
   return(parse_period(x, frequency))
 }
 
@@ -124,7 +127,9 @@ as.period.factor <- function(x, frequency = NA, ...) {
 
 #' @export
 as.period.numeric <- function(x, frequency = NA, ...) {
-
+  if (!missing(frequency) && !identical(frequency, NA)) {
+    check_frequency_arg(frequency)
+  }
   # convert possible integer vector to numeric vector
   x <- as.numeric(x)
 
@@ -413,10 +418,11 @@ Summary.period <- function(..., na.rm = FALSE){
 #' Generates a sequence of periods
 #'
 #' Generates a regular sequence of \code{\link[regts]{period}} objects.
-#' @param from a \code{period} object specifying the first period of the
-#'   sequence.
-#' @param to a \code{period} object (or an object that can be coerced to a
-#'   \code{period} object) specifying the last period of the sequence
+#' @param from a \code{period} object or a character specifying the first period
+#' of the sequence. If `from` is a character, it is coerced to a period object
+#' with function \code{\link{as.period}}.
+#' @param to a \code{period} object or a character
+#'  specifying the last period of the sequence.
 #' @param by an integer number, the increment of the sequence (the number of
 #' periods between each period in the sequence).
 #' @param length.out the desired length of the sequence. A non-negative number.
@@ -431,18 +437,16 @@ Summary.period <- function(..., na.rm = FALSE){
 #' seq(p1, length.out = 4)
 #' seq(p1, "2019q4")
 #' seq(p1, "2019q4", by = 2)
+#' seq("2018q1", "2020q1", by = 4)
 #'
-#' # use seq in a for loop
-#' ts <- regts(1:10, start = "2018q1")
+#' # example: print the value of a timeseries for every first quarter of ayear
+#' x <- regts(1:10, start = "2018q1")
 #' seqp <- seq(period("2018q1"), "2020q1", by = 4)
-#'
-#' # print first quarters ts
-#' for (prd in as.list(seqp))
-#'   {print(ts[prd])
+#' for (prd in as.list(seqp)) {
+#'   cat(sprintf("x[%s] =", prd, x[prd]))
 #' }
-#'
 #' # Note that we do not loop directly over the period vector, but first convert
-#' # the vector to a list. Otherwise the \code{period} class is lost.
+#' # the vector to a list. Otherwise the period class is lost.
 #'
 #' @seealso \code{\link[regts]{period}}, \code{\link[regts]{period_range}} and
 #' \code{\link[regts]{get_periods}}
@@ -453,7 +457,7 @@ seq.period <- function(from, to, by, length.out, ...) {
   to_missing <- missing(to)
 
   if (from_missing && to_missing) {
-    stop("For seq.period, either from or to must be specified")
+    stop("For seq.period, either 'from' or 'to' must be specified")
   }
 
   if (!from_missing) {
@@ -471,21 +475,78 @@ seq.period <- function(from, to, by, length.out, ...) {
   freq <- if (to_missing) f_from else f_to
 
   if (!from_missing && !to_missing && f_from != f_to) {
-    stop(sprintf(paste("Argument to has a different frequency (%d) than",
-                       "argument from (%d)"), f_to, f_from))
+    stop(sprintf(paste("Argument 'to' has a different frequency (%d) than",
+                       "argument 'from' (%d)"), f_to, f_from))
   }
 
   if (!missing(by)) {
-     if (by %% 1 != 0) {
-       stop("Argument by is not an integer")
-     }
+    if (by %% 1 != 0) {
+      stop("Argument 'by' is not an integer")
+    }
   } else if (!missing(length.out) && length.out > 1 && !from_missing
              && !to_missing) {
     if ((to - from) %% (length.out - 1) != 0) {
       stop(sprintf(paste("The number of periods (%d) between %s and %s",
-                  "is not divisible by\nlength.out - 1 = %d."),
-                 to - from, as.character(per_from), as.character(per_to),
-                 length.out - 1))
+                         "is not divisible by\nlength.out - 1 = %d."),
+                   to - from, as.character(per_from), as.character(per_to),
+                   length.out - 1))
+    }
+    by <- (to - from) / (length.out - 1)
+  }
+
+
+  # subperiod_count is the number of subperiods since Christ
+  subperiod_count <- NextMethod(.Generic)
+  return(create_period(as.numeric(subperiod_count), frequency = freq))
+
+}
+
+#' @export
+#' @rdname seq
+seq.character <- function(from, to, by, length.out = NULL, ...) {
+
+  #
+  # TODO: this code contains a lot of the same code of seq.period.
+  # However, I have not found a simple way to combine the code
+  #
+  from_missing <- missing(from)
+  to_missing <- missing(to)
+
+  if (from_missing && to_missing) {
+    stop("For seq.period, either 'from' or 'to' must be specified")
+  }
+
+  if (!from_missing) {
+    from <- as.period(from)
+    f_from <- frequency(from)
+    per_from <- from
+    from <- as.numeric(from)
+  }
+  if (!to_missing) {
+    to <- as.period(to)
+    f_to <- frequency(to)
+    per_to <- to
+    to <- as.numeric(to)
+  }
+
+  freq <- if (to_missing) f_from else f_to
+
+  if (!from_missing && !to_missing && f_from != f_to) {
+    stop(sprintf(paste("Argument 'to' has a different frequency (%d) than",
+                       "argument 'from' (%d)"), f_to, f_from))
+  }
+
+  if (!missing(by)) {
+    if (by %% 1 != 0) {
+      stop("Argument 'by' is not an integer")
+    }
+  } else if (!missing(length.out) && length.out > 1 && !from_missing
+             && !to_missing) {
+    if ((to - from) %% (length.out - 1) != 0) {
+      stop(sprintf(paste("The number of periods (%d) between %s and %s",
+                         "is not divisible by\nlength.out - 1 = %d."),
+                   to - from, as.character(per_from), as.character(per_to),
+                   length.out - 1))
     }
     by <- (to - from) / (length.out - 1)
   }

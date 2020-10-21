@@ -113,6 +113,14 @@ test_that("errors", {
   expect_error(period("2018 1234", frequency = 4),
                paste("Subperiod of period 2018 1234 is larger than the",
                      "specified frequency 4"))
+
+  msg <-  "Argument 'frequency' should be a scalar integer value."
+  expect_error(period("2018q1", "xxx"), msg)
+  expect_error(period("2018q1", 2:4), msg)
+  expect_error(period("2018q1", 2.5), msg)
+  expect_error(period(2018, "xxx"), msg)
+  expect_error(period(2018, 2:4), msg)
+  expect_error(period(2018, 2.5), msg)
 })
 
 test_that("frequency", {
@@ -233,13 +241,15 @@ test_that("regts:::is_period_text", {
                                                    frequency = 1))
 })
 
-
-test_that("c and seq", {
+test_that("c", {
 
   pq <- period("2018q2")
   py <- period(2016)
   expect_identical(c(pq, py), list(pq, py))
   expect_identical(c(pq, py, 3, "xxx"), list(pq, py, 3, "xxx"))
+})
+
+test_that("seq.period", {
 
   p <- period("2018q2")
   expect_identical(seq(p, p + 2), p + 0:2)
@@ -254,15 +264,49 @@ test_that("c and seq", {
                "is not divisible by\nlength.out - 1 = 3.")
   expect_error(seq(p, p + 8, length.out = 4), msg)
 
-  expect_error(seq(p, 8), paste("Argument to has a different frequency",
-        "\\(1\\) than argument from \\(4\\)"))
+  expect_error(seq(p, 8), paste("Argument 'to' has a different frequency",
+        "\\(1\\) than argument 'from' \\(4\\)"))
 
-  expect_error(seq(p, p + 2, by = 0.5), "Argument by is not an integer")
+  expect_error(seq(p, p + 2, by = 0.5), "Argument 'by' is not an integer")
 
-  expect_error(seq(p, p + 8, by = 3, length.out = 3))
+  expect_error(seq(p, p + 8, by = 3, length.out = 3), "too many arguments")
 
-  expect_error(seq(p, "2012m2"), paste("Argument to has a different frequency",
-               "\\(12\\) than argument from \\(4\\)"))
+  expect_error(seq(p, "2012m2"), paste("Argument 'to' has a different frequency",
+               "\\(12\\) than argument 'from' \\(4\\)"))
+})
+
+
+test_that("seq.character", {
+
+  ptxt <- "2018q2"
+  p <- period(ptxt)
+  expect_identical(seq(ptxt, p + 2), p + 0:2)
+  expect_identical(seq(ptxt, as.character(p + 8), by = 3), p + c(0, 3, 6))
+  expect_identical(seq(ptxt, "2020q2", length.out = 3), p + c(0, 4, 8))
+
+  expect_identical(seq(to = as.character(p + 8), by = 3, length.out = 3),
+                   p + c(2, 5, 8))
+  expect_identical(seq(to = as.character(p + 8), length.out = 3),
+                   p + c(6, 7, 8))
+
+  # errors
+  msg <- paste("The number of periods \\(8\\) between 2018Q2 and 2020Q2",
+               "is not divisible by\nlength.out - 1 = 3.")
+  expect_error(seq(ptxt, p + 8, length.out = 4), msg)
+
+  expect_error(seq(ptxt, 8), paste("Argument 'to' has a different frequency",
+                                "\\(1\\) than argument 'from' \\(4\\)"))
+
+  expect_error(seq(ptxt, as.character(p + 2), by = 0.5), "Argument 'by' is not an integer")
+
+  expect_error(seq(ptxt, p + 8, by = 3, length.out = 3), "too many arguments")
+
+  expect_error(seq(ptxt, "2012m2"), paste("Argument 'to' has a different frequency",
+                                       "\\(12\\) than argument 'from' \\(4\\)"))
+
+  expect_identical(seq("2010", 2011), period(c("2010", "2011")))
+  expect_identical(seq(2010, "2011"), 2010:2011)
+  expect_identical(seq(to =" 2010", length.out = 2), period(c("2009", "2010")))
 })
 
 test_that("as.character and print", {
@@ -316,7 +360,7 @@ test_that("multiple periods", {
               "If frequency == 1, then x should be an integer.")
 
   expect_error(period(c(2010, NA, 2011)),
-                      "Argument frequency should be specified.")
+               "Argument frequency should be specified.")
 
   expect_identical(
     period(c(as.Date("2010-04-01"), as.Date("2010-07-01")), frequency = 4),
