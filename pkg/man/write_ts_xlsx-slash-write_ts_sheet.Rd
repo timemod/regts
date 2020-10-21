@@ -109,15 +109,15 @@ write_ts_sheet(ts1 * 100, wb, "ts1_times_100", labels = "after")
 # narrow.
 options("openxlsx.minWidth" = 8.43)
 
-# save the workbook with openxlsx::saveWorkbook. Because saveWorkbook
-# only gives an error when something goes wrong, for example if the file
-# is not writable, we use tryCatch to turn a warning to a message.
-tryCatch({
- saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE)
-}, warning = function(w) {
- stop(w$message, call. = FALSE)
-})
-
+# Save the workbook with openxlsx::saveWorkbook. Function saveWorkbook does
+# not give an error or warning when something goes wrong, for example if the
+# file is not writable. However, if argument returnValue = TRUE, then
+# saveWorkbook returns a warning or error object if a problem occurred, or
+# TRUE if everything is OK. Therefore use the following code to save the
+# workbook:
+result <- saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE,
+                       returnValue = TRUE)
+if (!isTRUE(result)) stop(result$message, call. = FALSE)
 
 # write a timeseries with comments
 comments <- c("Timeseries ts1 is created on the Central Bureau of Policy Analysis",
