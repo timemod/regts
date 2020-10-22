@@ -36,6 +36,8 @@ change_frequency <- function(x, new_frequency, ...) UseMethod("change_frequency"
 #' @export
 change_frequency.period <- function(x, new_frequency, ...) {
 
+  check_frequency_arg(new_frequency, "new_frequency")
+
   old_frequency <- frequency(x)
 
   if (new_frequency == old_frequency) {
@@ -64,6 +66,8 @@ change_frequency.period <- function(x, new_frequency, ...) {
 #' higher or lower frequency
 #' @export
 change_frequency.period_range <- function(x, new_frequency, ...) {
+
+  check_frequency_arg(new_frequency, "new_frequency")
 
   old_frequency <- frequency(x)
 

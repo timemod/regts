@@ -29,6 +29,9 @@ test_that("change_frequency.period", {
   msg <- "Old frequency \\(12\\) not divisible by new frequency \\(5\\)."
   expect_error(change_frequency(p, 5), msg)
 
+  msg <- "Argument 'new_frequency' should be a scalar integer value."
+  expect_error(change_frequency(p, "aap"), msg)
+  expect_error(change_frequency(p, 1:2), msg)
 })
 
 test_that("change_frequency.period_range", {
@@ -64,6 +67,10 @@ test_that("change_frequency.period_range", {
 
   msg <- "New frequency \\(5\\) not divisible by old frequency \\(4\\)."
   expect_error(change_frequency(r, 5), msg)
+
+  msg <- "Argument 'new_frequency' should be a scalar integer value."
+  expect_error(change_frequency(r, "aap"), msg)
+  expect_error(change_frequency(r, 1:2), msg)
 
 })
 
