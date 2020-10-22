@@ -2,19 +2,32 @@
 % Please edit documentation in R/get_periods.R
 \name{get_periods}
 \alias{get_periods}
+\alias{get_periods.period_range}
+\alias{get_periods.ts}
+\alias{get_periods.character}
 \title{Return all periods in a  \code{period_range} or timeseries.}
 \usage{
 get_periods(x, ...)
+
+\method{get_periods}{period_range}(x, ...)
+
+\method{get_periods}{ts}(x, ...)
+
+\method{get_periods}{character}(x, ...)
 }
 \arguments{
-\item{x}{a \code{\link{period_range}} or times series
+\item{x}{a \code{\link{period_range}}, a character that can be coerced to a
+\code{period_range} with function \code{\link{as.period_range}}, or a times series
 (\code{\link[stats]{ts}} or \code{\link{regts}}).}
 
 \item{...}{arguments passed to methods (currently not used).}
 }
+\value{
+A \code{\link{period}} vector.
+}
 \description{
 The periods in a \code{\link{period_range}} or timeseries are returned
-as a \code{period} vector
+as a \code{\link{period}} vector
 }
 \examples{
 # example for period range
@@ -24,7 +37,16 @@ get_periods(range)
 # example for timeseries
 x <- regts(1:3, start = "2010Q4")
 get_periods(x)
+
+# example: print the value of a timeseries for every quarter
+x <- regts(1:4, start = "2018q1")
+for (prd in as.list(get_periods(x))) {
+  cat(sprintf("x[\%s] = \%g\n", prd, x[prd]))
+}
+# Note that we do not loop directly over the period vector, but first convert
+# the vector to a list. Otherwise the period class is lost.
 }
 \seealso{
-\code{\link{get_period_range}}
+\code{\link{period}}, \code{\link{get_period_range} and
+\code{\link{seq}}}
 }

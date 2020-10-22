@@ -74,6 +74,7 @@ test_that("get_period_range / get_periods", {
   expected_result <- start_period(range1) + (0:7)
   expect_identical(get_periods(regts1), expected_result)
   expect_identical(get_periods(range1), expected_result)
+  expect_identical(get_periods("2010q1/2011q4"), expected_result)
 
   regts2 <- regts(c("aap", "noot", "mies"), start = "2010M1", end = "2011M4")
   expect_identical(get_period_range(regts2),
