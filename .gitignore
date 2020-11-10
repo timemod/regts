@@ -2,8 +2,7 @@
 .Rhistory
 .RData
 pkg/inst/doc
-pkg.pdf
-pkg.log
+refman.log
 regts.Rcheck
 regts*zip
 regts*tar.gz

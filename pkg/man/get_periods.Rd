@@ -47,6 +47,6 @@ for (prd in as.list(get_periods(x))) {
 # the vector to a list. Otherwise the period class is lost.
 }
 \seealso{
-\code{\link{period}}, \code{\link{get_period_range} and
-\code{\link{seq}}}
+\code{\link{period}}, \code{\link{get_period_range}} and
+\code{\link{seq}}
 }

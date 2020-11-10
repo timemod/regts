@@ -41,6 +41,8 @@ Suggests:
     tseries,
     tempdisagg,
     Hmisc,
-    lubridate
+    lubridate,
+    R.rsp
 LinkingTo: Rcpp
-VignetteBuilder: knitr
+VignetteBuilder: knitr,
+                 R.rsp

@@ -24,8 +24,8 @@
 #' }
 #' # Note that we do not loop directly over the period vector, but first convert
 #' # the vector to a list. Otherwise the period class is lost.
-#' @seealso \code{\link{period}}, \code{\link{get_period_range} and
-#' \code{\link{seq}}}
+#' @seealso \code{\link{period}}, \code{\link{get_period_range}} and
+#' \code{\link{seq}}
 #' @export
 get_periods <- function(x, ...) {
   UseMethod("get_periods")
