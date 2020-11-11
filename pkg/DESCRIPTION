@@ -27,7 +27,7 @@ Imports:
     readxl (>= 1.2.0),
     cellranger,
     tibble,
-    openxlsx,
+    openxlsx (>= 4.2.2),
     stringr,
     tidyselect,
     rlang,
