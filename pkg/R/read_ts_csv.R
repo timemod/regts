@@ -128,7 +128,8 @@
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
 #' start and the end period must be present.
 #' Otherwise the timeseries are filled with \code{NA} for the missing periods.
-#'
+#' @param warn_dupl A logical. If \code{TRUE} (the default), a warning is issued
+#' if there are duplicate column names in the returned timeseries object.
 #' @return a \code{regts} object
 #'
 #' @examples
@@ -146,7 +147,8 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
                         labels = c("after", "before", "no"),
                         sep = "auto", fill = FALSE,
                         dec = if (sep != ".") "." else ",",
-                        na_string = "", name_fun, period_fun, strict = TRUE) {
+                        na_string = "", name_fun, period_fun, strict = TRUE,
+                        warn_dupl = TRUE) {
 
   na_string <- union(na_string, "")
 
@@ -191,7 +193,7 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
   }
 
   # check for duplicate names
-  test_duplicates(ret, filename)
+  if (warn_dupl) test_duplicates(ret, filename)
 
   return(ret)
 }
@@ -268,7 +270,7 @@ read_ts_columnwise <- function(tbl, frequency, dec, period_fun, layout, strict,
 
 # Convert a character data frame to a numeric matrix.
 # This function is similar to function numeric_matrix (see file regts.R), but
-# more efficient because we already know that x only contains texts and that 
+# more efficient because we already know that x only contains texts and that
 # NA values are treated correctly.
 df_to_numeric_matrix <- function(x, dec) {
 
@@ -306,7 +308,7 @@ df_to_numeric_matrix <- function(x, dec) {
     } else {
       warning(paste0("NAs introduced by coercion.\n",
                      nweird, " texts could not be converted to numeric.\n",
-                     "The first ", NWEIRD_MAX, 
+                     "The first ", NWEIRD_MAX,
                      " texts that gave problems are:\n",
                      paste0(weird_texts, collapse = "\n")))
     }

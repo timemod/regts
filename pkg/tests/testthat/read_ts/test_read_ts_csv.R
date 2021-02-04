@@ -267,10 +267,16 @@ test_that("example6.csv read correctly", {
 
 test_that("double_row.csv is read correctly and gives warning",  {
   csv_file <- "csv/double_row.csv"
-  warnings <- capture_warnings(result <- read_ts_csv(csv_file, strict = FALSE))
-
-  expect_identical(warnings, c("Duplicate names in file csv/double_row.csv: a"))
-
+  msg <- "Duplicate names in file csv/double_row.csv: a"
+  expect_warning(result1 <- read_ts_csv(csv_file, strict = FALSE), msg)
+  expect_warning(result2 <- read_ts_csv(csv_file, strict = FALSE,
+                                         warn_dupl = FALSE), NA)
+  prd <- period_range("2010Q2/2011Q2")
+  a_1 <- regts(c(1, NA, NA, 5, 6), period =  prd)
+  correct_result <- cbind(a_1, b = 10 * a_1, a_2 = a_1)
+  colnames(correct_result) <-  sub("_\\d$", "", colnames(correct_result))
+  expect_identical(result1, correct_result)
+  expect_identical(result2, correct_result)
 })
 
 test_that("example 9 and 10", {
