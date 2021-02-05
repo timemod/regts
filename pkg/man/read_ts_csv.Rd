@@ -7,7 +7,7 @@
 read_ts_csv(filename, skiprow = 0, skipcol = 0, rowwise, frequency = NA,
   labels = c("after", "before", "no"), sep = "auto", fill = FALSE,
   dec = if (sep != ".") "." else ",", na_string = "", name_fun, period_fun,
-  strict = TRUE)
+  strict = TRUE, warn_dupl = TRUE)
 }
 \arguments{
 \item{filename}{a string with the filename.}
@@ -55,6 +55,9 @@ standard format (see Description).}
 \item{strict}{A logical. If \code{TRUE} (the default) all periods between the
 start and the end period must be present.
 Otherwise the timeseries are filled with \code{NA} for the missing periods.}
+
+\item{warn_dupl}{A logical. If \code{TRUE} (the default), a warning is issued
+if there are duplicate column names in the returned timeseries object.}
 }
 \value{
 a \code{regts} object

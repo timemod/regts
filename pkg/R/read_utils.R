@@ -750,17 +750,16 @@ get_labels_from_tbl <- function(label_tbl, rowwise) {
   return(lbls)
 }
 
-test_duplicates <- function(rts, filename, sheetname = NULL){
-  # test duplicate names in xlsx or csv
-  dupl <- duplicated(colnames(rts))
-  if (any(dupl)){
-
+test_duplicates <- function(rts, filename, sheetname = NULL) {
+  # test duplicate names in timeseries rts (used in read_ts_xslx and read_ts_csv)
+  if (anyDuplicated(cnames <- colnames(rts))) {
+    dupl_names <- cnames[duplicated(cnames)]
     if (is.null(sheetname)){
       warning(sprintf("Duplicate names in file %s: %s", filename,
-                      paste(colnames(rts)[dupl], collapse = ", ")))
+                      paste(dupl_names, collapse = ", ")))
     } else{
       warning(sprintf("Duplicate names on sheet %s of file %s: %s", sheetname,
-                      filename, paste(colnames(rts)[dupl], collapse = ", ")))
+                      filename, paste(dupl_names, collapse = ", ")))
     }
   }
   return(invisible(NULL))

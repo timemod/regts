@@ -133,10 +133,11 @@
 #' start and the end period must be present.
 #' Otherwise the timeseries are filled with \code{NA} for the missing periods.
 #' @param warn_num_text A logical. If \code{TRUE} (the default) a warning is issued
-#' when a cell contains a number as text (e.g. \code{"2012.2"}) when
+#' if a cell contains a number as text (e.g. \code{"2012.2"}) when
 #' a numeric value is expected. The text is always converted to a numeric value
 #' assuming the decimal separator \code{"."}.
-
+#' @param warn_dupl A logical. If \code{TRUE} (the default), a warning is issued
+#' if there are duplicate column names in the returned timeseries object.
 #' @return a \code{regts} object
 #'
 #' @examples
@@ -158,7 +159,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          skiprow = 0, skipcol = 0, rowwise, frequency = NA,
                          labels = c("after", "before", "no"),
                          na_string = "", name_fun, period_fun, strict = TRUE,
-                         warn_num_text = TRUE) {
+                         warn_num_text = TRUE, warn_dupl = TRUE) {
 
   # n_inspect if the number of rows to read to determine the layout of the
   # sheet.
@@ -232,7 +233,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   }
 
   # check for duplicate names
-  test_duplicates(ret, filename, sheetname)
+  if (warn_dupl) test_duplicates(ret, filename, sheetname)
 
   return(ret)
 }
