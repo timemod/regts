@@ -6,7 +6,6 @@ PKGDIR=pkg
 INSTALL_FLAGS=--no-multiarch --with-keep.source
 
 OSTYPE=$(shell Rscript -e "cat(.Platform[['OS.type']])")
-PKG_CXXFLAGS = $(shell Rscript -e "Rcpp:::CxxFlags()")
 
 ifeq ($(OSTYPE), windows)
 # for unknown reason R CMD check --as-cran does not work on Windows
@@ -16,10 +15,14 @@ RCHECKARG=--no-multiarch --as-cran
 endif
 
 # Package name, Version and date from DESCIPTION
-PKG=$(shell grep 'Package:' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2)
-PKGTAR=$(PKG)_$(shell grep 'Version' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2).tar.gz
-PKGDATE=$(shell grep 'Date' $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2)
-TODAY=$(shell date "+%Y-%m-%d")
+PKG=$(shell grep Package: $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2)
+PKGTAR=$(PKG)_$(shell grep Version $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2).tar.gz
+
+ifneq ($(OSTYPE), windows)
+CPP=$(shell R CMD config CXX)
+CPP_FLAGS=$(shell R CMD config --cppflags)
+PKG_CXXFLAGS = $(shell Rscript -e "Rcpp:::CxxFlags()")
+endif
 
 help:
 	@echo
@@ -38,26 +41,18 @@ help:
 	@echo "   clean     - cleans up everything"
 	@echo "   flags     - display R config flags and some macros"
 
-# make sure that R's variables are used
-# if you don't do this you'll get make's initial values
-# gives error doing syntax target
-#R_CPPFLAGS=$(shell R CMD config --cppflags)
-CC=$(shell R CMD config CC)
-CXX=$(shell R CMD config CXX)
-CPP_FLAGS=$(shell R CMD config --cppflags)
-
 flags:
-	@echo "OSTYPE=$(OSTYPE)"
-	@echo "CPP_FLAGS=$(CPP_FLAGS)"
-	@echo "PKG_CXXFLAGS=$(PKG_CXXFLAGS)"
-	@echo "PKGDIR=$(PKGDIR)"
-	@echo "PKG=$(PKG)"
-	@echo "PKGTAR=$(PKGTAR)"
-	@echo "PKGDATE=$(PKGDATE)"
-	@echo "CPP=$(CPP)"
-	@echo "CPP_FLAGS=$(CPP_FLAGS)"
-	@echo "RCHECKARG=$(RCHECKARG)"
-	@echo "libPaths:"
+	@echo OSTYPE=$(OSTYPE)
+	@echo PKGDIR=$(PKGDIR)
+	@echo PKG=$(PKG)
+	@echo PKGTAR=$(PKGTAR)
+	@echo RCHECKARG=$(RCHECKARG)
+ifneq ($(OSTYPE), windows)
+	@echo CPP=$(CPP)
+	@echo CPP_FLAGS=$(CPP_FLAGS)
+	@echo PKG_CXXFLAGS=$(PKG_CXXFLAGS)
+endif
+	@echo libPaths:
 	@R --no-save --quiet --slave -e '.libPaths()'
 
 test:
@@ -71,19 +66,21 @@ check: cleanx syntax
 	R CMD build $(PKGDIR)
 	R CMD check $(RCHECKARG) $(PKGTAR)
 	@rm -f  $(PKGTAR)
-	@echo "Today                           : $(TODAY)"
-	@echo "Checked package description date: $(PKGDATE)"
-	@echo ""
 
 syntax:
-	$(CXX) $(CPP_FLAGS) $(PKG_CXXFLAGS) -c -fsyntax-only -Wall -pedantic $(PKGDIR)/src/*.c*
+ifneq ($(OSTYPE), windows)
+	$(CPP) $(CPP_FLAGS) $(PKG_CXXFLAGS) -c -fsyntax-only -Wall \
+		         -pedantic $(PKGDIR)/src/*.c*
+else
+	@echo Syntax checking not possible on Windows
+endif
 
 cleanx:
-ifneq ($(OSTYPE), windows)
-# Apple Finder rubbish
-	@find . -name '.DS_Store' -delete
 	@rm -f $(PKGTAR)
 	@rm -fr $(PKG).Rcheck
+ifneq ($(OSTYPE), windows)
+        # Apple Finder rubbish
+	@find . -name '.DS_Store' -delete
 endif
 
 # build date of package must be at least today
@@ -96,10 +93,6 @@ else
 	R CMD build $(PKGDIR)
 	R CMD check --as-cran $(RCHECKARG) $(PKGTAR)
 	@cp -nv $(PKGTAR) archive
-	@echo "Today                           : $(TODAY)"
-	@echo "Checked package description date: $(PKGDATE)"
-# 	@Rscript -e 'cat("Installed version date          :",packageDescription("nleqslv", fields="Date"))'
-	@echo ""
 	./drat.sh --pkg=$(PKGTAR)
 endif
 
@@ -131,9 +124,9 @@ uninstall:
 clean:
 	-rm -fr $(PKGDIR).Rcheck
 	-rm -fr tmp
-	-rm -f $(PKGTAR)
-	-rm -f $(PKGDIR).pdf
-	-rm -f $(PKGDIR).log
 	-rm -f $(PKGDIR)/src/*.o
 	-rm -f $(PKGDIR)/src/*.so
 	-rm -f $(PKGDIR)/src/*.dll
+	-rm -rf .Rd2*
+	-rm -f $(PKG)_*.zip
+	-rm -f $(PKG)_*.tar.gz
