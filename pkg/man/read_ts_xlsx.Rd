@@ -7,7 +7,7 @@
 read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = 0,
   skipcol = 0, rowwise, frequency = NA, labels = c("after", "before",
   "no"), na_string = "", name_fun, period_fun, strict = TRUE,
-  warn_num_text = TRUE)
+  warn_num_text = TRUE, warn_dupl = TRUE)
 }
 \arguments{
 \item{filename}{a string with the filename.}
@@ -57,9 +57,12 @@ start and the end period must be present.
 Otherwise the timeseries are filled with \code{NA} for the missing periods.}
 
 \item{warn_num_text}{A logical. If \code{TRUE} (the default) a warning is issued
-when a cell contains a number as text (e.g. \code{"2012.2"}) when
+if a cell contains a number as text (e.g. \code{"2012.2"}) when
 a numeric value is expected. The text is always converted to a numeric value
 assuming the decimal separator \code{"."}.}
+
+\item{warn_dupl}{A logical. If \code{TRUE} (the default), a warning is issued
+if there are duplicate column names in the returned timeseries object.}
 }
 \value{
 a \code{regts} object
