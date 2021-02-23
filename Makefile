@@ -61,7 +61,7 @@ test:
 test_covr:
 	Rscript test_covr.R
 
-check: cleanx syntax
+check: cleanx install_deps syntax
 	@echo " *** Running R CMD check ***"
 	R CMD build $(PKGDIR)
 	R CMD check $(RCHECKARG) $(PKGTAR)
