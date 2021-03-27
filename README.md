@@ -6,7 +6,7 @@ Package `regts` makes it easier to work with regular timeseries, particularly fo
 
 ## Documentation
 
-[Reference manual](pkg/vignettes/regts.pdf)
+[Reference manual](pkg/vignettes/regts_refman.pdf)
 
 [Vignette *Introduction to `regts`*](pkg/vignettes/regts.pdf)
 
