@@ -1,7 +1,7 @@
 
 tsdif timeseries comparison result
 
-Compared timeseries: ts1 and ts2 
+Compared timeseries: ts1 and ts2
 
 Names of timeseries with differences (alphabetical):
  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j"

@@ -290,12 +290,12 @@ print.tsdif <- function(x, ...) {
       cat("The two timeseries objects", ts_names[1], "and", ts_names[2],
                 "are equal!\n")
     } else {
-      cat("Compared timeseries:", ts_names[1], "and", ts_names[2], "\n")
+      cat("Compared timeseries:", ts_names[1], "and", paste0(ts_names[2], "\n"))
       if (!is.null(fun)) {
-        cat("Difference function:", fun, "\n")
+        cat("Difference function:", paste0(fun, "\n"))
       }
       if (tol != 0) {
-        cat("Difference tolerance:", tol, "\n")
+        cat("Difference tolerance:", paste0(tol, "\n"))
       }
       cat("\n")
       if (!is.null(dif)) {
