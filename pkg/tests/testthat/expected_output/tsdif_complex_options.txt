@@ -4,7 +4,8 @@ tsdif timeseries comparison result
 Compared timeseries: ts1 and ts2 
 
 Names of timeseries with differences (alphabetical):
- [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l"
+ [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j"
+[ reached getOption("regts_max_difnames") -- omitted  2 names ]
 
 Maximum differences timeseries in decreasing order:
 
@@ -19,7 +20,8 @@ h 2018Q4    -193
 g 2018Q4    -169
 e 2018Q4    -121
 d 2018Q4     -97
-[ reached getOption("regts_max_maxdif") -- omitted  2 differences ]
+b 2018Q4     -49
+a 2018Q4     -25
 
 Timeseries with largest difference (c):
 

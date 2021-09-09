@@ -348,6 +348,21 @@ test_that("check more complex output with combinations of NA and proper values",
   ts2["2017q4", "f"] <- NA
   expect_known_output(tsdif(ts1, ts2), "expected_output/tsdif_complex.txt",
                       print = TRUE)
+
+
+  max_difnames_old <- getOption("regts_max_difnames")
+  max_maxdif_old <- getOption("regts_max_maxdif")
+  expect_equal(max_difnames_old, 500)
+  expect_equal(max_maxdif_old, 10)
+  options(list(regts_max_difnames = 10, regts_max_maxdif = 12))
+  expect_equal(getOption("regts_max_difnames"), 10)
+  expect_equal(getOption("regts_max_maxdif"), 12)
+
+  expect_known_output(tsdif(ts1, ts2),
+                      "expected_output/tsdif_complex_options.txt",
+                      print = TRUE)
+  options(list(regts_max_difnames = max_difnames_old,
+               regts_max_maxdif = max_maxdif_old))
 })
 
 test_that("function cvgdif", {

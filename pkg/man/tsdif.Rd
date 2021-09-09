@@ -68,7 +68,27 @@ The two timeseries must have the same frequency, but may have a different
 period range. The difference is computed for the intersection of the two
 period ranges. Two \code{NA} or two \code{NaN} values are considered to be
 equal. A \code{NA} value is not equal to a \code{NaN} value.
-The function also returns missing column names in one of the two objects,
+The function also returns missing column names in one of the two objects.
+
+The return value of the function is an object of class \code{tsdif}. When this
+object is printed, a short summary of the result of the
+comparison is printed: the names of timeseries with differences,
+the names of timeseries present
+in one object but missing in the other object, and a table of the
+largest differences.
+The print result is controlled by two options: \code{regts_max_difnames} and
+\code{regts_max_maxdif}.  The first option, \code{regts_max_difnames} (default 500)
+determines the maximum number of timeseries names printed (both the names
+of timeseries with differences and the names of timeseries missing in the
+first or second object). Option \code{regts_max_maxdif} (default 10) determines
+the maximum number of maximum differences printed. If \code{regts_max_maxdif} is 10,
+then the maximum differences for the 10 timeseries with the largest
+maximum differences are printed, sorted in decreasing order
+(however timeseries with an \code{NA} difference come first).
+The options can be modified with function
+\code{\link{options}} (e.g. \code{options(regts_max_maxdif = 20)} and
+\code{options(regts_max_difnames = 1000)}. Function \code{getOptions} can be used
+to check the current values of these options (e.g. \code{getOption("regts_max_maxdif")}).
 }
 \examples{
 # create two timeseries x1 and x2
