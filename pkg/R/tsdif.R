@@ -164,9 +164,39 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
   dif <- calculate_difference(common_names, common_range, x1, x2, tol, fun)
 
   if (!is.null(dif)) {
+
     difnames <- colnames(dif)
+
+    # absolute values to get largest values per timeseries with function max
+    absdif <- abs(dif)
+    maxdif <- apply(absdif, FUN = max, MARGIN = 2)
+
+    # Determine the ordering of maxdif, with NAs first
+    # maxdif can contain NA values, we want to print them first, followed
+    # by names with highest differences
+    max_index <- order(maxdif, decreasing = TRUE, na.last = FALSE)
+
+    # find period index of maxdif values, if NA search for position NA
+    period_index_func <- function(i) {
+      mdif <- maxdif[i]
+      pos <- Position(f = function(x)
+      {if (is.na(mdif)) is.na(x) else x == mdif},
+      absdif[, i])
+      return(pos)
+    }
+    per_index <- sapply(max_index, FUN = period_index_func)
+
+    startp <- start_period(dif)
+    period_texts <- as.character(startp + per_index - 1)
+    max_values <- dif[cbind(per_index, max_index)]
+
+    # periods and max_values are already in index order
+    maxdif <- data.frame(period = period_texts, max_dif = max_values)
+    rownames(maxdif) <- difnames[max_index]
+
   } else {
     difnames <- character(0)
+    maxdif <- NULL
   }
 
   # check if results are equal
@@ -176,6 +206,7 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
   ret <- list(equal          = equal,
               difnames       = difnames,
               dif            = dif,
+              maxdif         = maxdif,
               common_names   = common_names,
               missing_names1 = missing_names1,
               missing_names2 = missing_names2,
@@ -235,15 +266,12 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
     pstart <- start_period(common_range) + row_sel[1] - 1
     period <- period_range(pstart, pstart + length(row_sel) - 1)
     dif <- dif[period, , drop = FALSE]
-
+    # sort columns of dif
+    dif <- dif[, sort(colnames(dif)), drop = FALSE]
   } else {
     dif <- NULL
   }
-
-  if (!is.null(dif)) {
-    # sort columns of dif
-    dif <- dif[, sort(colnames(dif)), drop = FALSE]
-  }
+  return(dif)
 }
 
 #' Calculate the 'convergence difference'
@@ -310,49 +338,17 @@ print.tsdif <- function(x, ...) {
         }
 
         max_maxdif <- min(ncol(dif), max_maxdif)
-
-        # absolute values to get largest values per timeseries with function max
-        absdif <- abs(dif)
-        maxdif <- apply(absdif, FUN = max, MARGIN = 2)
-
-        # Determine the ordering of maxdif, with NAs first
-        # maxdif can contain NA values, we want to print them first, followed
-        # by names with highest differences
-        max_index <- order(maxdif, decreasing = TRUE, na.last = FALSE)
-
-        # print only max_maxdif values
-        max_index <- max_index[1:max_maxdif]
-
-        # find period index of maxdif values, if NA search for position NA
-        period_index_func <- function(i) {
-          mdif <- maxdif[i]
-          pos <- Position(f = function(x)
-                                 {if (is.na(mdif)) is.na(x) else x == mdif},
-                          absdif[, i])
-          return(pos)
-        }
-        per_index <- sapply(max_index, FUN = period_index_func)
-
-        startp <- start_period(dif)
-        period_texts <- as.character(startp + per_index - 1)
-        max_values <- dif[cbind(per_index, max_index)]
-
-        # periods and max_values are already in index order
-        maxdif <- data.frame(period = period_texts, max_dif = max_values)
-        rownames(maxdif) <- difnames[max_index]
-
         cat("\nMaximum differences timeseries in decreasing order:\n\n")
-        print(maxdif)
+        print(maxdif[1:max_maxdif, ])
         if (ncol(dif) > max_maxdif) {
           cat("[ reached getOption(\"regts_max_maxdif\") -- omitted ",
               ncol(dif) - max_maxdif, "differences ]\n")
         }
 
         # print timeseries with largest difference
-        cat(sprintf("\nTimeseries with largest difference (%s):\n\n",
-                    difnames[max_index[1]]))
-        print(dif[, difnames[max_index[1]]])
-
+        name <- rownames(maxdif)[1]
+        cat(sprintf("\nTimeseries with largest difference (%s):\n\n", name))
+        print(dif[, name])
       } else {
         if (is.null(common_range)) {
           cat(paste0("No differences computed because the two timeseries\n",
