@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // agg_gr
 List agg_gr(NumericMatrix ts_old, const int freq_new, const std::string& method);
 RcppExport SEXP _regts_agg_gr(SEXP ts_oldSEXP, SEXP freq_newSEXP, SEXP methodSEXP) {
