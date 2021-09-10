@@ -11,7 +11,7 @@
 #'
 #' @details
 #' This function calculates the difference between common columns
-#' of two multivariate timeseries objects \code{x1} and \code{x2}.
+#' of two timeseries objects \code{x1} and \code{x2}.
 #' The two timeseries must have the same frequency, but may have a different
 #' period range. The difference is computed for the intersection of the two
 #' period ranges. Two \code{NA} or two \code{NaN} values are considered to be
@@ -41,9 +41,9 @@
 #'  can be used to check the current values of these options
 #'  (e.g. `getOption("regts_max_maxdif")`).
 #' @export
-#' @param x1 the first timeseries (a multivariate \code{\link{regts}} or
+#' @param x1 the first timeseries (a  \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
-#' @param x2 the second timeseries (a multivariate \code{regts} or \code{ts} object).
+#' @param x2 the second timeseries (a \code{regts} or \code{ts} object).
 #' @param tol difference tolerance (by default zero). Differences with absolute
 #' values smaller than or equal to \code{tol} are ignored.
 #' @param fun function to compute differences. This function should accept

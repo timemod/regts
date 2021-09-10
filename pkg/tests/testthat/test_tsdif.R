@@ -80,7 +80,10 @@ test_that("univariate timeseries", {
   res_correct2$missing_names2 <- character(0)
   dif <- res_correct$dif[ , "a", drop = FALSE]
   colnames(dif) <- "ts_without_name"
+  maxdif <- res_correct$maxdif[1, , drop = FALSE]
+  rownames(maxdif) <- "ts_without_name"
   res_correct2$dif <- dif
+  res_correct2$maxdif <- maxdif
   res_correct2$ts_names <-  c("ts1[, \"a\"]", "ts2[, \"a\"]")
   expect_equal(res2, res_correct2)
 
@@ -92,7 +95,9 @@ test_that("univariate timeseries", {
   res_correct3$missing_names1 <- character(0)
   res_correct3$missing_names2 <- character(0)
   dif <- res_correct$dif[ , "a", drop = FALSE]
+  maxdif <- res_correct$maxdif[1, , drop = FALSE]
   res_correct3$dif <- dif
+  res_correct3$maxdif <- maxdif
   res_correct3$ts_names <-  c("ts1[, \"a\", drop = FALSE]",
                               "ts2[, \"a\", drop = FALSE]")
   expect_equal(res3, res_correct3)
@@ -109,6 +114,7 @@ test_that("univariate timeseries", {
   res_correct4$missing_names1 <- "b"
   res_correct4$missing_names2 <- "a"
   res_correct4["dif"] <- list(NULL)
+  res_correct4["maxdif"] <- list(NULL)
   res_correct4$ts_names <-  c("ts1[, \"a\", drop = FALSE]",
                               "ts2[, \"b\", drop = FALSE]")
   expect_equal(res4, res_correct4)

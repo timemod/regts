@@ -8,10 +8,10 @@ objects}
 tsdif(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2))
 }
 \arguments{
-\item{x1}{the first timeseries (a multivariate \code{\link{regts}} or
+\item{x1}{the first timeseries (a  \code{\link{regts}} or
 \code{\link[stats]{ts}} object).}
 
-\item{x2}{the second timeseries (a multivariate \code{regts} or \code{ts} object).}
+\item{x2}{the second timeseries (a \code{regts} or \code{ts} object).}
 
 \item{tol}{difference tolerance (by default zero). Differences with absolute
 values smaller than or equal to \code{tol} are ignored.}
@@ -69,7 +69,7 @@ includes differences in the period ranges.
 }
 \details{
 This function calculates the difference between common columns
-of two multivariate timeseries objects \code{x1} and \code{x2}.
+of two timeseries objects \code{x1} and \code{x2}.
 The two timeseries must have the same frequency, but may have a different
 period range. The difference is computed for the intersection of the two
 period ranges. Two \code{NA} or two \code{NaN} values are considered to be
