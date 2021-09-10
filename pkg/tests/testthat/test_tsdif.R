@@ -69,16 +69,60 @@ test_that("no difference", {
                       print = TRUE)
 })
 
+test_that("univariate timeseries", {
+
+  # univariate timeseries without column name
+  res2 <- tsdif(ts1[, "a"], ts2[, "a"])
+
+  res_correct2 <- res_correct
+  res_correct2[c("difnames", "common_names")] <- "ts_without_name"
+  res_correct2$missing_names1 <- character(0)
+  res_correct2$missing_names2 <- character(0)
+  dif <- res_correct$dif[ , "a", drop = FALSE]
+  colnames(dif) <- "ts_without_name"
+  res_correct2$dif <- dif
+  res_correct2$ts_names <-  c("ts1[, \"a\"]", "ts2[, \"a\"]")
+  expect_equal(res2, res_correct2)
+
+  # univariate timeseries with column name
+  res3 <- tsdif(ts1[, "a", drop = FALSE], ts2[, "a", drop = FALSE])
+
+  res_correct3 <- res_correct
+  res_correct3[c("difnames", "common_names")] <- "a"
+  res_correct3$missing_names1 <- character(0)
+  res_correct3$missing_names2 <- character(0)
+  dif <- res_correct$dif[ , "a", drop = FALSE]
+  res_correct3$dif <- dif
+  res_correct3$ts_names <-  c("ts1[, \"a\", drop = FALSE]",
+                              "ts2[, \"a\", drop = FALSE]")
+  expect_equal(res3, res_correct3)
+
+  expect_warning(
+    res4 <- tsdif(ts1[, "a", drop = FALSE], ts2[, "b", drop = FALSE]),
+    "Timeseries ts1[, \"a\", drop = FALSE] and ts2[, \"b\", drop = FALSE] have no common columns",
+    fixed = TRUE
+  )
+
+  res_correct4 <- res_correct
+  res_correct4$difnames <- character(0)
+  res_correct4$common_names <- character(0)
+  res_correct4$missing_names1 <- "b"
+  res_correct4$missing_names2 <- "a"
+  res_correct4["dif"] <- list(NULL)
+  res_correct4$ts_names <-  c("ts1[, \"a\", drop = FALSE]",
+                              "ts2[, \"b\", drop = FALSE]")
+  expect_equal(res4, res_correct4)
+})
+
 test_that("errors", {
+
+  expect_error(tsdif(ts1[, "a"], 2),
+               "Argument x2 (2) is not a timeseries", fixed = TRUE)
+  expect_error(tsdif(res_correct, ts1[, "a"]),
+               "Argument x1 (res_correct) is not a timeseries", fixed = TRUE)
 
   msg <- "Argument tol should be >= 0"
   expect_error(tsdif(ts1, ts1, tol = -1),  msg)
-
-  # univariate timeseries
-  expect_error(tsdif(ts1[, "a"], ts2[, "a"]),
-               "Argument x1 \\(ts1\\[, \"a\"\\]\\) is not a multivariate timeseries")
-  expect_error(tsdif(ts1, ts2[, "a", drop = FALSE]),
-               "Argument x2 \\(ts2\\[, \"a\", drop = FALSE\\]\\) is not a multivariate timeseries")
 
   # different frequencies
   tsy <- regts(matrix(data = rep(1:9), nc = 3), start = "2008",
