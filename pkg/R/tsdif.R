@@ -30,7 +30,7 @@
 #' timeseries.
 #'
 #' The print result is controlled by two options: `regts_max_difnames` and
-#' `regts_max_maxdif`.  The first option, `regts_max_difnames` (default 500)
+#' `regts_max_maxdif`.  The first option, `regts_max_difnames` (default 50)
 #' determines the maximum number of timeseries names printed (the names
 #' of timeseries with differences and the names of timeseries missing in the
 #' first or second timeseries object). Option `regts_max_maxdif` (default 10) determines

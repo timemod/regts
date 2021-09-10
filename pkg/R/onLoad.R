@@ -1,5 +1,5 @@
 regts_default_options <- list(
-  regts_max_difnames = 500,
+  regts_max_difnames = 50,
   regts_max_maxdif = 10
 )
 

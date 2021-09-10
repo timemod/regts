@@ -88,7 +88,7 @@ the periods for which the maximum difference occurs for the specific
 timeseries.
 
 The print result is controlled by two options: \code{regts_max_difnames} and
-\code{regts_max_maxdif}.  The first option, \code{regts_max_difnames} (default 500)
+\code{regts_max_maxdif}.  The first option, \code{regts_max_difnames} (default 50)
 determines the maximum number of timeseries names printed (the names
 of timeseries with differences and the names of timeseries missing in the
 first or second timeseries object). Option \code{regts_max_maxdif} (default 10) determines

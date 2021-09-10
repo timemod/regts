@@ -433,7 +433,7 @@ test_that("check more complex output with combinations of NA and proper values",
 
   max_difnames_old <- getOption("regts_max_difnames")
   max_maxdif_old <- getOption("regts_max_maxdif")
-  expect_equal(max_difnames_old, 500)
+  expect_equal(max_difnames_old, 50)
   expect_equal(max_maxdif_old, 10)
   options(list(regts_max_difnames = 10, regts_max_maxdif = 12))
   expect_equal(getOption("regts_max_difnames"), 10)
