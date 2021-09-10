@@ -84,26 +84,21 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
   series_name1 <- deparse(substitute(x1))
   series_name2 <- deparse(substitute(x2))
 
-  if (!is.mts(x1)) {
-    stop(paste0("Argument x1 (", series_name1,
-                ") is not a multivariate timeseries"))
-  }
-  if (!is.mts(x2)) {
-    stop(paste0("Argument x2 (", series_name2,
-                ") is not a multivariate timeseries"))
-  }
-
-  if (tol < 0) {
-    stop("Argument tol should be >= 0")
-  }
+  if (!is.ts(x1)) stop("Argument x1 (", series_name1,") is not a timeseries")
+  if (!is.ts(x2)) stop("Argument x2 (", series_name2,") is not a timeseries")
 
   if (frequency(x1) != frequency(x2)) {
-    stop(paste0("Timeseries x1 and x2 (", series_name1, " and ", series_name2,
-                ") have different frequencies"))
+    stop("Timeseries x1 and x2 (", series_name1, " and ", series_name2,
+                ") have different frequencies")
   }
+
+  if (!is.matrix(x1)) x1 <- univec2unimat(x1, "ts_without_name")
+  if (!is.matrix(x2)) x2 <- univec2unimat(x2, "ts_without_name")
 
   x1 <- as.regts(x1)
   x2 <- as.regts(x2)
+
+  if (tol < 0) stop("Argument tol should be >= 0")
 
   names1 <- colnames(x1)
   names2 <- colnames(x2)
