@@ -167,36 +167,31 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
 
     difnames <- colnames(dif)
 
-    # absolute values to get largest values per timeseries with function max
-    absdif <- abs(dif)
-    maxdif <- apply(absdif, FUN = max, MARGIN = 2)
-
-    # Determine the ordering of maxdif, with NAs first
-    # maxdif can contain NA values, we want to print them first, followed
-    # by names with highest differences
-    max_index <- order(maxdif, decreasing = TRUE, na.last = FALSE)
-
-    # find period index of maxdif values, if NA search for position NA
-    period_index_func <- function(i) {
-      mdif <- maxdif[i]
-      pos <- Position(f = function(x)
-      {if (is.na(mdif)) is.na(x) else x == mdif},
-      absdif[, i])
-      return(pos)
+    #
+    # Find the maximum differences
+    #
+    get_max_index <- function(x) {
+      # Returns the index of the first maximum of vector x,
+      # or the index of the first NA if x contains NA values.
+      idx <- Position(is.na, x)
+      if (is.na(idx)) idx <- which.max(x)
+      return(idx)
     }
-    per_index <- sapply(max_index, FUN = period_index_func)
+    period_idx <- apply(abs(dif), FUN = get_max_index, MARGIN = 2)
+    maxdif_values <- dif[cbind(period_idx, 1:ncol(dif))]
+    periods <- as.character(get_periods(dif)[period_idx])
+    maxdif <- data.frame(period = periods, maxdif = maxdif_values,
+                         row.names = difnames)
 
-    startp <- start_period(dif)
-    period_texts <- as.character(startp + per_index - 1)
-    max_values <- dif[cbind(per_index, max_index)]
-
-    # periods and max_values are already in index order
-    maxdif <- data.frame(period = period_texts, max_dif = max_values)
-    rownames(maxdif) <- difnames[max_index]
+    # now order maxdif with decreasing order (but NA values come first)
+    ordr <- order(abs(maxdif_values), decreasing = TRUE, na.last = FALSE)
+    maxdif <- maxdif[ordr, , drop = FALSE]
 
   } else {
+
     difnames <- character(0)
     maxdif <- NULL
+
   }
 
   # check if results are equal
