@@ -20,23 +20,26 @@
 #'
 #' The return value of the function is an object of class `tsdif`. When this
 #' object is printed, a short summary of the result of the
-#' comparison is printed: the names of timeseries with differences,
+#' comparison is presented: the names of timeseries with differences,
 #' the names of timeseries present
-#' in one object but missing in the other object, and a table of the
-#' largest differences.
+#' in one timeseries object but missing in the other object, and a table of the
+#' maximum differences. For the table of maximum differences, the maximum
+#' difference is determined for each timeseries separately,
+#' and the maximum differences are printed in decreasing order, together with
+#' the periods for which the maximum difference occurs for the specific
+#' timeseries.
+#'
 #' The print result is controlled by two options: `regts_max_difnames` and
 #' `regts_max_maxdif`.  The first option, `regts_max_difnames` (default 500)
-#' determines the maximum number of timeseries names printed (both the names
+#' determines the maximum number of timeseries names printed (the names
 #' of timeseries with differences and the names of timeseries missing in the
-#' first or second object). Option `regts_max_maxdif` (default 10) determines
-#' the maximum number of maximum differences printed. If `regts_max_maxdif` is 10,
-#' then the maximum differences for the 10 timeseries with the largest
-#' maximum differences are printed, sorted in decreasing order
-#' (however timeseries with an `NA` difference come first).
-#' The options can be modified with function
-#'  \code{\link{options}} (e.g. `options(regts_max_maxdif = 20)` and
-#'  `options(regts_max_difnames = 1000)`. Function `getOptions` can be used
-#'  to check the current values of these options (e.g. `getOption("regts_max_maxdif")`).
+#' first or second timeseries object). Option `regts_max_maxdif` (default 10) determines
+#' the maximum number of
+#' maximum differences printed. The options can be modified with function
+#'  \code{\link[base]{options}} (e.g. `options(regts_max_maxdif = 20)` and
+#'  `options(regts_max_difnames = 1000)`. Function \code{\link[base]{getOption}}
+#'  can be used to check the current values of these options
+#'  (e.g. `getOption("regts_max_maxdif")`).
 #' @export
 #' @param x1 the first timeseries (a multivariate \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
@@ -59,6 +62,12 @@
 #'  Only timeseries with differences larger than \code{tol} are included.
 #'  Leading and trailing rows with differences less than \code{tol} have also been
 #'  removed.}
+#'   \item{maxdif}{A \code{data.frame} with the maximum differences. For each
+#'   timeseries the maximum difference is determined. Column `maxdif`
+#'   contains the maximum differences and
+#'   column `period` the periods at which these maximum difference occur.
+#'   The rows of the data frame are ordered with decreasing order of `maxdif`,
+#'   so the timeseries with the largest maximum differences come first.}
 #'  \item{common_names}{the names of the common columns}
 #'  \item{missing_names1}{The names of columns present in \code{x2} but missing
 #'                        in \code{x1}}
@@ -95,6 +104,23 @@
 #'dif3 <- tsdif(x1, x2, tol = 1e-4, fun = cvgdif)
 #'print(dif3$difnames)
 #'
+#' #
+#' # example for timeseries objects with many columns
+#' #
+#'
+#' # create two timeseries objects with 100 timeseries
+#' x1 <- regts(matrix(rnorm(10 * 100), ncol = 100), start =  "2018Q1",
+#'             names = paste0("x", 1:100))
+#' x2 <- x1
+#'
+#' # Make x2 different from x1 at 20 random locations:
+#' smpl <- sample.int(length(x1), 20)
+#' x2[smpl] <- x2[smpl] + 1:length(smpl)
+#'
+#' # set option regts_max_maxdif to ensure that all 20 differences are printed:
+#' options(regts_max_maxdif = 20)
+#' print(tsdif(x1, x2))
+
 #' @seealso
 #'\code{\link{regts}}
 #'
