@@ -15,13 +15,16 @@ ts1["2009Q3", ] <- 2
 
 difference <- regts(matrix(data = rep(-0.01, 6), nc = 2), start = "2008Q4",
                     names = c("a", "b"))
+maxdif <- data.frame(period = "2008Q4", maxdif = rep(-0.01, 2),
+                     row.names = colnames(difference))
 
 create_tsdif <- function(...) {
   return(structure(list(...), class = "tsdif"))
 }
 
 res_correct <- create_tsdif(equal = FALSE, difnames = c("a", "b"),
-                            dif = difference, common_names = c("a", "b"),
+                            dif = difference, maxdif = maxdif,
+                            common_names = c("a", "b"),
                             missing_names1 = "d",  missing_names2 = "c",
                             common_range = period_range("2008Q4/2009Q2"),
                             period_range1 = get_period_range(ts1),
@@ -39,6 +42,7 @@ test_that("argument fun", {
   res2_correct <- res_correct
   res2_correct$fun <- "function(x1, x2) (sin(x2 - x1))"
   res2_correct$dif <- sin(-res2_correct$dif)
+  res2_correct$maxdif$maxdif <- sin(-res2_correct$maxdif$maxdif)
   expect_equal(res2, res2_correct)
 })
 
@@ -50,7 +54,7 @@ test_that("check simple output", {
 test_that("no difference", {
   res <- tsdif(ts1, ts1)
   res_no_dif <- create_tsdif(equal = TRUE, difnames = character(0),
-                             dif = NULL,
+                             dif = NULL, maxdif = NULL,
                              common_names = c("a", "b", "c"),
                              missing_names1 = character(0),
                              missing_names2 = character(0),
@@ -76,7 +80,10 @@ test_that("univariate timeseries", {
   res_correct2$missing_names2 <- character(0)
   dif <- res_correct$dif[ , "a", drop = FALSE]
   colnames(dif) <- "ts_without_name"
+  maxdif <- res_correct$maxdif[1, , drop = FALSE]
+  rownames(maxdif) <- "ts_without_name"
   res_correct2$dif <- dif
+  res_correct2$maxdif <- maxdif
   res_correct2$ts_names <-  c("ts1[, \"a\"]", "ts2[, \"a\"]")
   expect_equal(res2, res_correct2)
 
@@ -88,7 +95,9 @@ test_that("univariate timeseries", {
   res_correct3$missing_names1 <- character(0)
   res_correct3$missing_names2 <- character(0)
   dif <- res_correct$dif[ , "a", drop = FALSE]
+  maxdif <- res_correct$maxdif[1, , drop = FALSE]
   res_correct3$dif <- dif
+  res_correct3$maxdif <- maxdif
   res_correct3$ts_names <-  c("ts1[, \"a\", drop = FALSE]",
                               "ts2[, \"a\", drop = FALSE]")
   expect_equal(res3, res_correct3)
@@ -105,6 +114,7 @@ test_that("univariate timeseries", {
   res_correct4$missing_names1 <- "b"
   res_correct4$missing_names2 <- "a"
   res_correct4["dif"] <- list(NULL)
+  res_correct4["maxdif"] <- list(NULL)
   res_correct4$ts_names <-  c("ts1[, \"a\", drop = FALSE]",
                               "ts2[, \"b\", drop = FALSE]")
   expect_equal(res4, res_correct4)
@@ -131,8 +141,14 @@ test_that("only one NA difference", {
   ts1_NA <- ts1
   ts1_NA[2, 2] <- NA
   res <- tsdif(ts1, ts1_NA, tol = 0)
+
+  dif <- zero_trim((ts1 - ts1_NA)[, "b", drop = FALSE])
+  maxdif <- as.data.frame(dif, row_names = FALSE)
+  rownames(maxdif) <- colnames(dif)
+  colnames(maxdif)[2] <- "maxdif"
+
   res_no_dif <- create_tsdif(equal = FALSE, difnames = "b",
-                             dif = zero_trim((ts1 - ts1_NA)[, "b", drop = FALSE]),
+                             dif = dif, maxdif = maxdif,
                              common_names = c("a", "b", "c"),
                              missing_names1 = character(0),
                              missing_names2 = character(0),
@@ -150,8 +166,13 @@ test_that("two NA differences", {
   ts1_NA[2, 2] <- NA
   ts1_NA[4,3] <- NA
   res <- tsdif(ts1, ts1_NA, tol = 0)
+
+  dif <- zero_trim((ts1 - ts1_NA)[, -1])
+  maxdif <- data.frame(period = as.character(get_periods(dif))[c(1, 3)],
+                       maxdif = NA_real_, row.names = colnames(dif))
+
   res_no_dif <- create_tsdif(equal = FALSE, difnames = c("b", "c"),
-                             dif = zero_trim((ts1 - ts1_NA)[, -1]),
+                             dif = dif, maxdif = maxdif,
                              common_names = c("a", "b", "c"),
                              missing_names1 = character(0),
                              missing_names2 = character(0),
@@ -171,6 +192,7 @@ test_that("differences smaller than tol", {
   res_tol <- res_correct
   res_tol$tol <- 0.1
   res_tol["dif"] <- list(NULL)
+  res_tol["maxdif"] <- list(NULL)
   res_tol$difnames <- character()
   expect_equal(res, res_tol)
 
@@ -206,7 +228,7 @@ test_that("no common columns", {
   msg <- "Timeseries ts1 and x2 have no common columns"
   expect_warning(res <- tsdif(ts1, x2), msg)
   res_correct2 <- create_tsdif(equal = FALSE, difnames = character(0),
-                               dif = NULL,
+                               dif = NULL, maxdif = NULL,
                                common_names = character(0),
                                missing_names1 = c("A", "B", "D"),
                                missing_names2 = c("a", "b", "c"),
@@ -239,6 +261,10 @@ test_that("single ts as result", {
   res_correct2$difnames <- 'b'
   res_correct2$dif <- regts(matrix(data = rep(-0.11, 3), nc = 1), start = "2008Q4",
                             names = c("b"))
+
+  res_correct2$maxdif <- data.frame(period = "2008Q4", maxdif = -0.11,
+                                    row.names = "b")
+
   res_correct2$ts_names <- c("ts1[sample, ]", "x2")
   res_correct2$period_range1 <- sample
   res_correct2$period_range2 <- sample
@@ -249,9 +275,12 @@ test_that("single ts as result", {
 
 test_that("single common column", {
   res <- tsdif(ts1[, c("a", "c")], ts2[, c("d", "a")])
+
+  dif <-  regts(matrix(data = rep(-0.01, 3), nc = 1),
+                start = "2008Q4", names = c("a"))
+  maxdif <- data.frame(period = "2008Q4", maxdif = -0.01, row.names = "a")
   res_correct2 <- create_tsdif(equal = FALSE, difnames = c("a"),
-                               dif = regts(matrix(data = rep(-0.01, 3), nc = 1),
-                                           start = "2008Q4", names = c("a")),
+                               dif = dif, maxdif = maxdif,
                                common_names = "a",
                                missing_names1 = "d",  missing_names2 = "c",
                                common_range = period_range("2008Q4/2009Q2"),
@@ -273,9 +302,13 @@ test_that("no column names simple", {
 
   difference3 <- difference[, 1:2]
   colnames(difference3) <- c("column 1", "column 2")
+
+  maxdif3 <- data.frame(period = "2008Q4", maxdif = rep(-0.01, 2),
+                       row.names = colnames(difference3))
+
   res_correct3 <- create_tsdif(equal = FALSE,
                                difnames = paste("column", 1:2),
-                               dif = difference3,
+                               dif = difference3, maxdif = maxdif3,
                                common_names = paste("column", 1:2),
                                missing_names1 = character(0),
                                missing_names2 = "column 3",
@@ -295,6 +328,7 @@ test_that("no overlapping periods", {
   expect_warning(res <- tsdif(ts1['2008Q4/2009Q1', ], ts2['2009Q2', ]), msg)
   res_correct2 <- res_correct
   res_correct2["dif"] <- list(NULL)
+  res_correct2["maxdif"] <- list(NULL)
   res_correct2$difnames <- character(0)
   res_correct2["common_range"] <- list(NULL)
   res_correct2$period_range1 <- period_range("2008Q4", "2009Q1")
@@ -361,8 +395,12 @@ test_that("test combinations of NA, NaN, Inf and proper values", {
   ts2 <- regts(matrix(data = c(NaN, NaN, rep(1:4)), nc = 3), start = "2016",
                names = c("a", "b", "c"))
 
+  dif <- ts1
+  maxdif <- data.frame(period = as.character(get_periods(dif)[1]),
+                       maxdif = dif[1, ], row.names = colnames(dif))
+
   res__dif <- create_tsdif(equal = FALSE, difnames = c("a", "b", "c"),
-                           dif = ts1,
+                           dif = dif, maxdif = maxdif,
                            common_names = c("a", "b", "c"),
                            missing_names1 = character(0),
                            missing_names2 = character(0),
@@ -392,6 +430,20 @@ test_that("check more complex output with combinations of NA and proper values",
   ts2["2017q4", "f"] <- NA
   expect_known_output(tsdif(ts1, ts2), "expected_output/tsdif_complex.txt",
                       print = TRUE)
+
+  max_difnames_old <- getOption("regts_max_difnames")
+  max_maxdif_old <- getOption("regts_max_maxdif")
+  expect_equal(max_difnames_old, 50)
+  expect_equal(max_maxdif_old, 10)
+  options(list(regts_max_difnames = 10, regts_max_maxdif = 12))
+  expect_equal(getOption("regts_max_difnames"), 10)
+  expect_equal(getOption("regts_max_maxdif"), 12)
+
+  expect_known_output(tsdif(ts1, ts2),
+                      "expected_output/tsdif_complex_options.txt",
+                      print = TRUE)
+  options(list(regts_max_difnames = max_difnames_old,
+               regts_max_maxdif = max_maxdif_old))
 })
 
 test_that("function cvgdif", {
