@@ -212,12 +212,20 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 
   minWidth_old <- options("openxlsx.minWidth")[[1]]
   options("openxlsx.minWidth" = 8.43)
+
   tryCatch({
     result <- saveWorkbook(wb, file, overwrite = TRUE, returnValue = TRUE)
-    if (!isTRUE(result)) stop(result$message, call. = FALSE)
+    if (!isTRUE(result)) {
+      if (packageVersion("openxlsx") > "4.2.4") {
+        stop("Failed to save workbook to file '", file, "'. Check warnings.")
+      } else {
+        stop(result$message, call. = FALSE)
+      }
+    }
   }, finally = {
     options("openxlsx.minWidth" = minWidth_old)
   })
+
   return(invisible(NULL))
 }
 

@@ -263,9 +263,28 @@ test_that("period_as_date", {
 
 test_that("errors", {
   file <- "xxlsx/ts1_date.xlsx"
-  expect_error(
-    write_ts_xlsx(ts1_lbls, file, labels = "after", period_as_date = TRUE),
-    "cannot create file 'xxlsx/ts1_date.xlsx', reason 'No such file or directory'")
+
+  msg1 <- "cannot create file 'xxlsx/ts1_date.xlsx', reason 'No such file or directory'"
+  msg2 <-  "Failed to save workbook to file 'xxlsx/ts1_date.xlsx'\\. Check warnings\\."
+
+  minWidth_old <- options("openxlsx.minWidth")[[1]]
+  options("openxlsx.minWidth" = 111)
+
+  if (packageVersion("openxlsx") > "4.2.4") {
+    # different error handling since openxslx 4.2.5
+    expect_error(
+      expect_warning(
+        write_ts_xlsx(ts1_lbls, file, labels = "after", period_as_date = TRUE),
+        msg1),
+      msg2
+     )
+  } else {
+    expect_error(
+      write_ts_xlsx(ts1_lbls, file, labels = "after", period_as_date = TRUE),
+      msg1)
+  }
+
+  expect_equal(options("openxlsx.minWidth")[[1]], 111)
+
+  options("openxlsx.minWidth" = minWidth_old)
 })
-
-
