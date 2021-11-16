@@ -113,15 +113,15 @@ rel2index <- function(x, base = NULL, scale = 100, keep_range = TRUE) {
                  labels = ts_labels(x)))
 
   } else {
-
+    #
     # base period specified
+    #
     if (!x_is_matrix) {
       # convert the vector to data
       dim(data) <- NULL
     }
 
     # prepare a timeseries that can be passed to function index_ts.
-
     result <- regts(data, start = start_period(x) - 1, names = colnames(x),
                     labels = ts_labels(x))
 

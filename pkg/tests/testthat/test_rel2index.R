@@ -243,9 +243,6 @@ test_that("negative timeseries (1)", {
   expect_warning(i11 <- index_ts(i5, base = "2011q3"))
   expected_result <- i11
   expected_result$x <- - expected_result$x
-  # TODO: ik snap deze test niet helemaal: waarom moeten we hier niet doen:
-  # expected_result$y <- - expected_result$y.
-  # UITZOEKEN!!
   expect_equal(i10, expected_result)
 
   expect_warning(
