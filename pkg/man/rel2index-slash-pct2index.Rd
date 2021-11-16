@@ -33,13 +33,12 @@ If \code{FALSE} then the result timeseries starts 1 period earlier.}
 }
 \description{
 Function \code{rel2index} is the inverse of function \code{\link{growth}}.
-The growth \code{x[t]} (also called the relative change) of a timeseries \code{z[t]}
-is defined as\preformatted{x[t] = (z[t] - z[t - 1]) / z[t - 1].
+The growth rate \code{x[t]} (also called the relative change) of a timeseries \code{z[t]}
+is defined as\preformatted{x[t] = (z[t] - z[t-1]) / z[t-1].
 }
 
 The function constructs an index series for \code{z[t]} given the values of
-\code{x[t]}, assuming that the value of timeseries \code{z} at the
-period before the start period of timeseries \code{x} is positive. See Details.
+\code{x[t]}. See Details.
 \cr\cr
 Function \code{pct2index} computes the index series
 from a timeseries of percentage changes.
@@ -47,16 +46,18 @@ Thus expression \code{pct2index(x)} gives the same result as \code{100 * rel2ind
 }
 \details{
 If \code{x[t]} is given but \code{z[t]} is unknown, \code{z[t]} can be calculated from
-\code{z[t-1]} using\preformatted{z[t] = z[t - 1] * (1 + x[t]).
+\code{z[t-1]} using\preformatted{z[t] = z[t-1] * (1 + x[t]).
 }
 
 Given an initial value for \code{z} at some period (say \code{z[0]}), the equation
 above can be used repeatedly to calculate the values of \code{z[t]} for \code{t > 0}.
-\code{z[0]} is not known,  but this value is not needed if we calculate
-the index series defined as\preformatted{i[t] =  scale * z[t] / mean(z[base]),
+Finally the index series is computed using\preformatted{i[t] =  scale * z[t] / mean(z[base]),
 }
 
 where \code{base} is the base period.
+
+\code{z[0]} is not known, but the result \code{i[t]} does not depend on \code{z[0]} and
+therefore it can be arbitrarily set to 1.
 }
 \section{Functions}{
 \itemize{

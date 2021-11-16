@@ -9,7 +9,7 @@
 #' where `scale` is usually 100 and `base` the base period, which can be
 #' a single `period` or a `period_range` (by default the base period is the
 #' first period of `x`).
-#' If  `mean(x[base])` is negative a warning is given and the (mean) value
+#' If  `mean(x[base])` is negative, a warning is given and the (mean) value
 #' of the resulting index series at the  base period will be `-scale`.
 #'
 #' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object

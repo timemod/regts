@@ -2,14 +2,13 @@
 #' percentage changes.
 #'
 #' Function `rel2index` is the inverse of function \code{\link{growth}}.
-#' The growth `x[t]` (also called the relative change) of a timeseries `z[t]`
+#' The growth rate `x[t]` (also called the relative change) of a timeseries `z[t]`
 #' is defined as
 #' ```
-#' x[t] = (z[t] - z[t - 1]) / z[t - 1].
+#' x[t] = (z[t] - z[t-1]) / z[t-1].
 #' ```
 #' The function constructs an index series for `z[t]` given the values of
-#' `x[t]`, assuming that the value of timeseries `z` at the
-#' period before the start period of timeseries `x` is positive. See Details.
+#' `x[t]`. See Details.
 #' \cr\cr
 #' Function `pct2index` computes the index series
 #' from a timeseries of percentage changes.
@@ -18,16 +17,18 @@
 #' If `x[t]` is given but `z[t]` is unknown, `z[t]` can be calculated from
 #' `z[t-1]` using
 #' ```
-#' z[t] = z[t - 1] * (1 + x[t]).
+#' z[t] = z[t-1] * (1 + x[t]).
 #' ```
 #' Given an initial value for `z` at some period (say `z[0]`), the equation
 #' above can be used repeatedly to calculate the values of `z[t]` for `t > 0`.
-#' `z[0]` is not known,  but this value is not needed if we calculate
-#' the index series defined as
+#' Finally the index series is computed using
 #' ```
 #' i[t] =  scale * z[t] / mean(z[base]),
 #' ```
 #' where `base` is the base period.
+#'
+#' `z[0]` is not known, but the result `i[t]` does not depend on `z[0]` and
+#' therefore it can be arbitrarily set to 1.
 #'
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a
 #' multivariate timeseries) with the relative of percentage changes.
