@@ -22,31 +22,25 @@
 #' ```
 #' Given an initial value for `z` at some period (say `z[0]`), the equation
 #' above can be used repeatedly to calculate the values of `z[t]` for `t > 0`.
-#' `z[0]` is not known, but if we assume that it is
-#' positive, then this value is not needed if we calculate the index series
-#' defined as
+#' `z[0]` is not known,  but this value is not needed if we calculate
+#' the index series defined as
 #' ```
 #' i[t] =  scale * z[t] / mean(z[base]),
 #' ```
 #' where `base` is the base period.
-#' The index series `i` is independent of the absolute value of `z[0]`, but
-#' does depend on the sign of `z[0]`. If `z[0]` is actually negative
-#' then the result should be multiplied with `-1`.
-#'
-#' If  `mean(x[base])` is negative then a warning is given and the (mean) value
-#' of the resulting index series in the  base period  will be `-scale`.
 #'
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a
 #' multivariate timeseries) with the relative of percentage changes.
 #' @param base a \code{\link{period}} or a
 #' \code{\link{period_range}} specifying the base period, or an object that can
-#' be coerced to a \code{period} or \code{period_range}.
+#' be coerced to a \code{period} or \code{period_range}. The (average) value
+#' of the timeseries at the base period is set to `scale` (by default 100).
 #' By default the base period is the period before the first period of the
 #' input timeseries `x`. For example,  if `x` starts at `2018q1`, then the
 #' default base period is `2017q4`. If the base period is a `period_range`,
 #' then the average value of the index series will be equal to `scale`.
 #' @param scale the (average) value of the index series at the base period
-#' (by default 100)
+#' (by default 100). This may be a negative number.
 #' @param keep_range if \code{TRUE} (the default), then the output
 #' timeseries has the same period range as the input timeseries.
 #' If \code{FALSE} then the result timeseries starts 1 period earlier.
@@ -64,11 +58,14 @@ NULL
 #' @export
 rel2index <- function(x, base = NULL, scale = 100, keep_range = TRUE) {
 
+  series_name <- deparse(substitute(x))
+
   if (!is.numeric(scale) || length(scale) != 1) {
     stop("Argument 'scale' should be a numeric vector of length 1")
   }
   # remove attributes (for example time series attributes):
   scale <- as.numeric(scale)
+  if (is.na(scale)) stop("The scale is NA")
 
   x <- as.regts(x)
 
@@ -118,7 +115,6 @@ rel2index <- function(x, base = NULL, scale = 100, keep_range = TRUE) {
   } else {
 
     # base period specified
-
     if (!x_is_matrix) {
       # convert the vector to data
       dim(data) <- NULL
@@ -129,9 +125,11 @@ rel2index <- function(x, base = NULL, scale = 100, keep_range = TRUE) {
     result <- regts(data, start = start_period(x) - 1, names = colnames(x),
                     labels = ts_labels(x))
 
-    result <- index_ts(result, base, scale = scale)
+    result <- index_ts_internal(result, base, scale, series_name,
+                                check_negative = FALSE)
 
     if (keep_range) result <- result[get_period_range(x)]
+
     return(result)
   }
 }

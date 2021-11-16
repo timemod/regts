@@ -17,14 +17,15 @@ multivariate timeseries) with the relative of percentage changes.}
 
 \item{base}{a \code{\link{period}} or a
 \code{\link{period_range}} specifying the base period, or an object that can
-be coerced to a \code{period} or \code{period_range}.
+be coerced to a \code{period} or \code{period_range}. The (average) value
+of the timeseries at the base period is set to \code{scale} (by default 100).
 By default the base period is the period before the first period of the
 input timeseries \code{x}. For example,  if \code{x} starts at \verb{2018q1}, then the
 default base period is \verb{2017q4}. If the base period is a \code{period_range},
 then the average value of the index series will be equal to \code{scale}.}
 
 \item{scale}{the (average) value of the index series at the base period
-(by default 100)}
+(by default 100). This may be a negative number.}
 
 \item{keep_range}{if \code{TRUE} (the default), then the output
 timeseries has the same period range as the input timeseries.
@@ -51,18 +52,11 @@ If \code{x[t]} is given but \code{z[t]} is unknown, \code{z[t]} can be calculate
 
 Given an initial value for \code{z} at some period (say \code{z[0]}), the equation
 above can be used repeatedly to calculate the values of \code{z[t]} for \code{t > 0}.
-\code{z[0]} is not known, but if we assume that it is
-positive, then this value is not needed if we calculate the index series
-defined as\preformatted{i[t] =  scale * z[t] / mean(z[base]),
+\code{z[0]} is not known,  but this value is not needed if we calculate
+the index series defined as\preformatted{i[t] =  scale * z[t] / mean(z[base]),
 }
 
 where \code{base} is the base period.
-The index series \code{i} is independent of the absolute value of \code{z[0]}, but
-does depend on the sign of \code{z[0]}. If \code{z[0]} is actually negative
-then the result should be multiplied with \code{-1}.
-
-If  \code{mean(x[base])} is negative then a warning is given and the (mean) value
-of the resulting index series in the  base period  will be \code{-scale}.
 }
 \section{Functions}{
 \itemize{
