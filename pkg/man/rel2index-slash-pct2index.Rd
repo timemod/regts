@@ -33,7 +33,7 @@ If \code{FALSE} then the result timeseries starts 1 period earlier.}
 \description{
 Function \code{rel2index} is the inverse of function \code{\link{growth}}.
 The growth \code{x[t]} (also called the relative change) of a timeseries \code{z[t]}
-is defined as\preformatted{x[t] = (z[t] - z[t - 1]) / |z[t - 1]|.
+is defined as\preformatted{x[t] = (z[t] - z[t - 1]) / z[t - 1].
 }
 
 The function constructs an index series for \code{z[t]} given the values of
@@ -41,17 +41,17 @@ The function constructs an index series for \code{z[t]} given the values of
 period before the start period of timeseries \code{x} is positive. See Details.
 \cr\cr
 Function \code{pct2index} computes the index series
-from a timeseries of percentage changes, defined as \code{100 * g[t]}.
-Thus expression \code{pct2index(x)} gives the same result as \code{rel2index(x / 100)}.
+from a timeseries of percentage changes.
+Thus expression \code{pct2index(x)} gives the same result as \code{100 * rel2index(x / 100)}.
 }
 \details{
-If \code{x[t]} is given but \code{z[t]} is unknown, we can compute
-\code{z[t]} as\preformatted{z[t] = z[t - 1] * (1 + sign(z[t - 1]) x[t]).
+If \code{x[t]} is given but \code{z[t]} is unknown, \code{z[t]} can be calculated from
+\code{z[t-1]} using\preformatted{z[t] = z[t - 1] * (1 + x[t]).
 }
 
 Given an initial value for \code{z} at some period (say \code{z[0]}), the equation
 above can be used repeatedly to calculate the values of \code{z[t]} for \code{t > 0}.
-In function \code{rel2index} \code{z[0]} is not known, but if we assume that it is
+\code{z[0]} is not known, but if we assume that it is
 positive, then this value is not needed if we calculate the index series
 defined as\preformatted{i[t] =  scale * z[t] / mean(z[base]),
 }
@@ -59,7 +59,7 @@ defined as\preformatted{i[t] =  scale * z[t] / mean(z[base]),
 where \code{base} is the base period.
 The index series \code{i} is independent of the absolute value of \code{z[0]}, but
 does depend on the sign of \code{z[0]}. If \code{z[0]} is actually negative
-then the results of \code{rel2index} and \code{pct2index} are not correct.
+then the result should be multiplied with \code{-1}.
 
 If  \code{mean(x[base])} is negative then a warning is given and the (mean) value
 of the resulting index series in the  base period  will be \code{-scale}.

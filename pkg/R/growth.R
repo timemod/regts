@@ -1,16 +1,16 @@
-#' Return the relative change of a timeseries
+#' Return the relative growth rate of a timeseries
 #'
 #' @description
-#' Function \code{growth} computes the relative change of a timeseries.
-#' The one period relative change of a timeseries is defined as:
-#' \code{growth(x) = (x[t] - x[t-1]) / |x[t-1]|}
+#' Function \code{growth} computes the relative growth rate of a (multivariate)
+#' timeseries. The one period relative growth rate  of a timeseries is defined as
+#' \code{growth(x) = (x[t] - x[t-1]) / x[t-1]}.
+#' The \code{n} period relative change of a timeseries is defined as
+#' \code{growth(x,n) = (x[t] - x[t-n]) / x[t-n]}.
 #'
-#' The \code{n} period relative change of a timeseries is defined as:
-#' \code{growth(x,n) = (x[t] - x[t-n]) / |x[t-n]|}
-#'
-#' The formula implies that when the timeseries decreases, the result will be
-#' negative regardless of the sign of \code{x}. The function also works for
-#' multivariate timeseries.
+#' Note that `growth` divides the change by ` x[t-n]` and not by the
+#' absolute value of `x[t-1]`.
+#' This implies that the growth rate is positive when a negative timeseries
+#' becomes more negative.
 #'
 #' @param x a \code{\link[stats]{ts}} or \code{\link{regts}} object
 #' @param n an integer indicating the period of relative change
@@ -37,11 +37,11 @@ growth <- function(x, n = 1, keep_range = TRUE) {
   }
 
   if (n >= NROW(x)){
-    stop(paste("Timeseries must have at least", n+1, "observations"))
+    stop(paste("Timeseries must have at least", n + 1, "observations"))
   }
 
-  ret <- diff_ts(x, n, keep_range = keep_range) / abs(lag_ts(x, n,
-                                                  keep_range = keep_range))
+  ret <- diff_ts(x, n, keep_range = keep_range) /
+         lag_ts(x, n, keep_range = keep_range)
 
   return(ret)
 }

@@ -15,7 +15,7 @@ data <- c(-0.56047565, -0.23017749,  1.55870831,  0.07050839,  0.12928774,
 test_that("rel2index univariate timeseries", {
   ts1 <- regts(data[1:10], start = "2010Q2")
   ts1 <- 100 * ts1 / ts1[1]
-  ts1_rel <- diff(ts1) / abs(lag(ts1, -1))
+  ts1_rel <- diff(ts1) / lag(ts1, -1)
   ts1_index <- rel2index(ts1_rel, keep_range = FALSE)
   expect_equal(ts1, ts1_index)
 
@@ -68,7 +68,7 @@ test_that("rel2index multivariate timeseries", {
     ts1 <- regts(matrix(data, ncol = 2), start = "2010Q2",
                  names = c("a", "b"), labels = paste("Timeseries", c("a", "b")))
     ts1[] <- apply(ts1, MARGIN = 2, FUN = function(x) {x /x[1]})
-    ts1_rel <- diff(ts1) / abs(lag(ts1, -1))
+    ts1_rel <- diff(ts1) / lag(ts1, -1)
     ts1_index <- rel2index(ts1_rel, scale = 1, keep_range = TRUE)
     p <- get_period_range(ts1_rel)
     expect_equal(ts1[p], ts1_index[p])
@@ -124,7 +124,7 @@ test_that("pct2index", {
   ts1 <- regts(matrix(data, ncol = 2), start = "2010Q2",
                names = c("a", "b"), labels = paste("Timeseries", c("a", "b")))
   ts1[] <- apply(ts1, MARGIN = 2, FUN = function(x) {x /x[1]})
-  ts1_rel <- 100 * diff(ts1) / abs(lag(ts1, -1))
+  ts1_rel <- 100 * diff(ts1) / lag(ts1, -1)
   ts1_index <- pct2index(ts1_rel, scale = 1)
   p <- get_period_range(ts1_rel)
   expect_equal(ts1[p], ts1_index[p])
@@ -135,7 +135,7 @@ test_that("pct2index", {
 
 test_that("NA values", {
   ts1 <- regts(c(1L, 2L, 3L, NA, 5L, 6L), start = "2010Q2")
-  ts1_rel <- diff(ts1) / abs(lag(ts1, -1))
+  ts1_rel <- diff(ts1) / lag(ts1, -1)
   ts1_index <- rel2index(ts1_rel, scale = 1, keep_range = FALSE)
   expected_result <- ts1
   expected_result["2011Q2/"] <- NA
@@ -144,7 +144,7 @@ test_that("NA values", {
 
 test_that("Inf values", {
   ts1 <- regts(c(1L, 2L, 3L, Inf, 5L, 6L), start = "2010M2")
-  ts1_rel <- diff(ts1) / abs(lag(ts1, -1))
+  ts1_rel <- diff(ts1) / lag(ts1, -1)
   ts1_index <- rel2index(ts1_rel, scale = 1)
   expected_result <- ts1[get_period_range(ts1_rel)]
   expected_result["2010m6/"] <- NaN
@@ -254,12 +254,14 @@ test_that("negative timeseries (2)", {
 
   # create a timeseries that starts with a positive value
   t1 <- regts(c(1, rnorm(10)), start = "2019q1")
-  t2 <- pct2index(100 * growth(t1, keep_range = FALSE), keep_range = FALSE, scale = 1)
+  t2 <- pct2index(100 * growth(t1, keep_range = FALSE), keep_range = FALSE,
+                  scale = 1)
   expect_equal(t1, t2)
 
   t3 <- cbind(x = t1, y = 1 / t1)
   ts_labels(t3) <- c(x = "var x ", y = "var y")
-  t4 <- pct2index(100 * growth(t3, keep_range = FALSE), keep_range = FALSE, scale = 1)
+  t4 <- pct2index(100 * growth(t3, keep_range = FALSE), keep_range = FALSE,
+                  scale = 1)
   expect_equal(t3, t4)
 })
 

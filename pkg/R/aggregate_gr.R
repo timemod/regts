@@ -10,8 +10,8 @@
 #'
 #' There are methods for different types of input timeseries.
 #' The \code{"pct"} and \code{"rel"} methods assume timeseries that contain
-#' percentage or relative changes of a timeseries with only positive values.
-#' They calculate the exact percentage or relative change for the output timeseries.
+#' percentage or relative changes and calculate the exact percentage or relative
+#' change in the output frequency.
 #' The \code{"difmean"} and \code{"difsum"} methods assume that the input timeseries
 #' contain a first difference. The result is a first difference in the output frequency.
 #' Method names \code{"dif1s"} and \code{"dif1"} are obsolete and have been
@@ -20,11 +20,10 @@
 #' \href{../doc/aggregation.pdf}{\emph{"Temporal Aggregation of
 #' (Growth) Timeseries"}}.
 #'
-#' As explained before, the \code{"pct"} and \code{"rel"} methods assume that `x` is
-#' is a percentage or relative change of a series with only
-#' positive values.  This imposes a restriction on  `x`: for the `pct` method,
-#' `x >= -100%`, and for `rel`, `x >= -1`. Function `aggregate_gr` gives an
-#' error if this condition is not satisfied.
+#' Methods `"pct"` and `"rel"` use the same definition of the relative change
+#' as in function \code{\link{growth}}:
+#' \code{growth(x) = (x[t] - x[t-1]) / x[t-1]} (note that the numerator is not
+#' the absolute value of \code{x[t-1]}).
 #'
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} object
 #' @param nfrequency the frequency of the result. This should be higher than
@@ -65,8 +64,6 @@ aggregate_gr <- function(x, method = c("pct", "rel", "difmean", "difsum", "dif1s
     is_mat <- TRUE
   }
 
-  if (method %in% c("pct", "rel")) check_growth_factors(x, is_mat, method)
-
   # call C++ function agg_gr (see src/agg_gr.cpp)
   res <- agg_gr(x, nfrequency, method)
   data  <- res[[1]]
@@ -80,30 +77,4 @@ aggregate_gr <- function(x, method = c("pct", "rel", "difmean", "difsum", "dif1s
 
   return(create_regts(data, range_new[1], range_new[2], range_new[3],
                       ts_labels(x)))
-}
-
-
-check_growth_factors <- function(x, is_mat, method) {
-  # Check for negative growth factors (1 + x). The pct and rel aggregation
-  # methods assume that the timeseries are always positive. This is only
-  # poossible if the growth factors are larger than or equal to zero.
-
-  if (method == "pct") x <- x / 100
-
-  problem_cols <- apply(x, FUN = function(x) {any(!is.na(x) & x < -1)},
-                        MARGIN = 2)
-
-  if (any(problem_cols)) {
-    if (is_mat) {
-      cnames <- colnames(x)
-      if (is.null(cnames)) cnames <- seq_len(ncol(x))
-      problem_col_names <- cnames[problem_cols]
-      stop(paste0("Relative growth smaller than -1 for one or more periods",
-                  " for columns: ", paste(problem_col_names, collapse = ", "),
-                  "."))
-    } else {
-      stop("Relative growth smaller than -1 for one or more periods.")
-    }
-  }
-  return(invisible(NULL))
 }

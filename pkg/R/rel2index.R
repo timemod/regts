@@ -5,24 +5,24 @@
 #' The growth `x[t]` (also called the relative change) of a timeseries `z[t]`
 #' is defined as
 #' ```
-#' x[t] = (z[t] - z[t - 1]) / |z[t - 1]|.
+#' x[t] = (z[t] - z[t - 1]) / z[t - 1].
 #' ```
 #' The function constructs an index series for `z[t]` given the values of
 #' `x[t]`, assuming that the value of timeseries `z` at the
 #' period before the start period of timeseries `x` is positive. See Details.
 #' \cr\cr
 #' Function `pct2index` computes the index series
-#' from a timeseries of percentage changes, defined as `100 * g[t]`.
-#' Thus expression `pct2index(x)` gives the same result as `rel2index(x / 100)`.
+#' from a timeseries of percentage changes.
+#' Thus expression `pct2index(x)` gives the same result as `100 * rel2index(x / 100)`.
 #'
-#' If `x[t]` is given but `z[t]` is unknown, we can compute
-#' `z[t]` as
+#' If `x[t]` is given but `z[t]` is unknown, `z[t]` can be calculated from
+#' `z[t-1]` using
 #' ```
-#' z[t] = z[t - 1] * (1 + sign(z[t - 1]) x[t]).
+#' z[t] = z[t - 1] * (1 + x[t]).
 #' ```
 #' Given an initial value for `z` at some period (say `z[0]`), the equation
 #' above can be used repeatedly to calculate the values of `z[t]` for `t > 0`.
-#' In function `rel2index` `z[0]` is not known, but if we assume that it is
+#' `z[0]` is not known, but if we assume that it is
 #' positive, then this value is not needed if we calculate the index series
 #' defined as
 #' ```
@@ -31,7 +31,7 @@
 #' where `base` is the base period.
 #' The index series `i` is independent of the absolute value of `z[0]`, but
 #' does depend on the sign of `z[0]`. If `z[0]` is actually negative
-#' then the results of `rel2index` and `pct2index` are not correct.
+#' then the result should be multiplied with `-1`.
 #'
 #' If  `mean(x[base])` is negative then a warning is given and the (mean) value
 #' of the resulting index series in the  base period  will be `-scale`.
@@ -131,9 +131,7 @@ rel2index <- function(x, base = NULL, scale = 100, keep_range = TRUE) {
 
     result <- index_ts(result, base, scale = scale)
 
-    if (keep_range) {
-      result <- result[get_period_range(x)]
-    }
+    if (keep_range) result <- result[get_period_range(x)]
     return(result)
   }
 }
