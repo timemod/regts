@@ -168,7 +168,7 @@ NULL
 #' @importFrom openxlsx addStyle
 #' @importFrom openxlsx setColWidths
 #' @importFrom openxlsx freezePane
-#' @importFrom utils packageVersions
+#' @importFrom utils packageVersion
 #' @export
 write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           rowwise = TRUE, append = FALSE,
