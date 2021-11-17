@@ -201,9 +201,9 @@ test_that("negative timeseries (1)", {
   expected_result["2012q1"] <- NaN
   expect_equal(i2,  expected_result)
 
-  msg <- "Zero \\(average\\) value at base period 2010Q4/2011Q2."
+  msg <- "Zero (average) value at base period 2010Q4/2011Q2 for variable r1."
   expect_warning(i3 <- rel2index(r1, base = "2010q4/2011q2", keep_range = FALSE),
-                 msg)
+                 msg, fixed = TRUE)
 
   msg <- "Zero (average) value at base period 2010Q4/2011Q2 for variable i2."
   expect_warning(i4 <- index_ts(i2, base = "2010q4/2011q2"), msg,
@@ -226,11 +226,11 @@ test_that("negative timeseries (1)", {
   expected_result["2011q4/2012q1"] <- NaN
   expect_equal(i5_y_gr, expected_result)
 
-  msg <-"Zero \\(average\\) value at base period 2011Q4 for columns: x, y."
+  msg <-"Zero (average) value at base period 2011Q4 for columns: x, y."
   expect_warning(
    i6 <- rel2index(r3, scale = 1, keep_range = FALSE, base = "2011q4"),
-   "Zero \\(average\\) value at base period 2011Q4 for columns: x, y.")
-  expect_warning(i7 <- index_ts(i5, base = "2011q4"), msg)
+   msg, fixed = TRUE)
+  expect_warning(i7 <- index_ts(i5, base = "2011q4"), msg, fixed = TRUE)
   expect_equal(i6, i7)
 
   expect_silent(i8 <- rel2index(r3, scale = -100, keep_range = FALSE, base = "2011q1"))
@@ -247,8 +247,16 @@ test_that("negative timeseries (1)", {
 
   expect_warning(
     i12 <- rel2index(r3[ , "y"], scale = 100, base = "2012q1"),
-    "NA values in base period 2012Q1")
+    "NA values in base period 2012Q1 for variable r3[, \"y\"]", fixed = TRUE)
   expect_equal(i12, regts(NaN, period = "2010q3/2012q1"))
+
+  expect_warning(
+    i12 <- rel2index(r3[ , "y", drop = FALSE], scale = 100, base = "2012q1"),
+    "NA values in base period 2012Q1 for columns: y.", fixed = TRUE)
+
+  expect_silent(i13 <-  pct2index(r3$y, scale = 100, base = "2012q1"))
+  expect_equal(i13,
+               regts(c(rep(0, 6), NaN), start = "2010Q3"))
 })
 
 test_that("negative timeseries (2)", {
