@@ -42,7 +42,7 @@ index_ts <- function(x, base = NULL, scale = 100) {
     if (!is.numeric(scale) || is.na(scale[1]) || scale[1] < 0) {
       stop("Argument scale must be a positive number.")
     }
-     # remove any attrbitues (timeseries attributes etc.)
+     # remove any attributes (timeseries attributes etc.)
     scale <- as.numeric(scale)
     if (length(scale) > 1) stop("Argument scale should be a single number.")
   }
