@@ -46,6 +46,18 @@ agg_reldiff_2 <- function(x, method, nfrequency = 1) {
   return(aggregate_gr(x_gr, method, nfrequency))
 }
 
+#
+# alternative implementations of the pct and rel methods
+#
+aggregate_rel <- function(x, nfrequency = 1) {
+  x_i <- rel2index(na_trim(x), keep_range = FALSE)[get_period_range(x)]
+  x_i_agg <- aggregate(x_i)
+  return(growth(x_i_agg, keep_range = FALSE))
+}
+aggregate_pct <- function(x, nfrequency = 1) {
+  return(100 * aggregate_rel(x / 100, nfrequency = nfrequency))
+}
+
 test_that("difmean and difsum, quarterly to year, single timeseries", {
   p         <- period_range("2008Q2", "2013Q3")
   ts_q      <- regts(rnorm(nperiod(p)), start = start_period(p))
@@ -118,19 +130,49 @@ test_that("errors", {
 })
 
 test_that("rel and pct for negative timeseries", {
+
   t1 <- regts(c(1, -3, 4, -2, -2, -1, 0.1, 1, 2, 3, -2, -3), start = "2010q1")
   r1 <- growth(t1)
-  expect_error(aggregate_gr(r1, method = "rel"),
-               "Relative growth smaller than -1 for one or more periods.")
+  agg1 <- aggregate_gr(r1, method = "rel")
+  expect_equal(agg1, aggregate_rel(r1))
 
   r2 <- 100 * cbind(x = r1, y = 2 * r1)
-  expect_error(aggregate_gr(r2, method = "pct"),
-               "Relative growth smaller than -1 for one or more periods for columns: x, y.")
+  agg2 <- aggregate_gr(r2, method = "pct")
+  expect_equal(agg2$x, aggregate_pct(r2$x))
+  expect_equal(agg2$y, aggregate_pct(r2$y))
 
   r3 <- r2
   r3$x <- ifelse(r3$x < -100, -100, r3$x)
-
-  expect_error(aggregate_gr(r3, method = "pct"),
-               "Relative growth smaller than -1 for one or more periods for columns: y.")
-
+  agg3 <- aggregate_gr(r3, method = "pct")
+  expect_equal(agg3$x, aggregate_pct(r3$x))
+  expect_equal(agg3$y, aggregate_pct(r3$y))
 })
+
+
+test_that("rel and pct and NA values", {
+
+  r0 <- regts(c(1:32), start = "2010q1")
+
+  r1 <- r0
+  r1["2012q3"] <- NA
+
+  agg1 <- aggregate_gr(r1, method = "rel")
+  expect_equal(agg1["2011"], aggregate_rel(r1)["2011"])
+  expect_equal(agg1["2012/2013"], regts(NA_real_, period = "2012/2013"))
+  expect_equal(agg1["2014/"], aggregate_rel(r1["2013/"]))
+
+  r2 <- 100 * cbind(x = r0, y = 2 * r0)
+  r2$x["2012q1"] <- NA
+  r2$y["2014q4"] <- NA
+  r2$x["2013Q3"] <- -200
+  agg2 <- aggregate_gr(r2, method = "pct")
+
+  expect_equal(agg2$x["2011"], aggregate_pct(r2$x)["2011"])
+  expect_equal(agg2$x["2012"], regts(NA_real_, period = "2012"))
+  expect_equal(agg2$x["2013/"], aggregate_pct(r2$x["2012/"]))
+
+  expect_equal(agg2$y["2011/2013"], na_trim(aggregate_pct(r2$y)))
+  expect_equal(agg2$y["2014/2015"], regts(NA_real_, period = "2014/2015"))
+  expect_equal(agg2$y["2016/"], aggregate_pct(r2$y["2015/"]))
+})
+

@@ -26,7 +26,7 @@ The index series \code{i} is calculated from the input series \code{x} as\prefor
 where \code{scale} is usually 100 and \code{base} the base period, which can be
 a single \code{period} or a \code{period_range} (by default the base period is the
 first period of \code{x}).
-If  \code{mean(x[base])} is negative then a warning is given and the (mean) value
+If  \code{mean(x[base])} is negative, a warning is given and the (mean) value
 of the resulting index series at the  base period will be \code{-scale}.
 }
 \examples{

@@ -50,7 +50,6 @@ NumericMatrix rel2index_cpp(NumericMatrix &grts, int first_base_row) {
         for (int row = start_row; row < nrow; row++) {
             gr = col_gr[row];
             if (ISNA(gr)) break;
-            if (col_result[row] < 0) gr = -gr;
             col_result[row + 1] = col_result[row] * (1 + gr);
         }
     }

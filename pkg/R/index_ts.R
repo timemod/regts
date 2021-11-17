@@ -9,7 +9,7 @@
 #' where `scale` is usually 100 and `base` the base period, which can be
 #' a single `period` or a `period_range` (by default the base period is the
 #' first period of `x`).
-#' If  `mean(x[base])` is negative then a warning is given and the (mean) value
+#' If  `mean(x[base])` is negative, a warning is given and the (mean) value
 #' of the resulting index series at the  base period will be `-scale`.
 #'
 #' @param x  a \code{\link[stats]{ts}} of \code{\link{regts}} object
@@ -34,10 +34,28 @@
 #'
 #' @export
 index_ts <- function(x, base = NULL, scale = 100) {
-
   series_name <- deparse(substitute(x))
-
   x <- as.regts(x)
+
+  # check scale argument. Remove attributes (for example time series attributes):
+   if (!missing(scale)) {
+    if (!is.numeric(scale) || is.na(scale[1]) || scale[1] < 0) {
+      stop("Argument scale must be a positive number.")
+    }
+     # remove any attributes (timeseries attributes etc.)
+    scale <- as.numeric(scale)
+    if (length(scale) > 1) stop("Argument scale should be a single number.")
+  }
+
+
+  return(index_ts_internal(x, base, scale, series_name, check_negative = TRUE))
+}
+
+# Internal function to compute an index timeseries.
+# If check_negative == TRUE, a warning is given if the (average) value of x
+# in the base period is negative, and the result is set such that the
+# result at the base period is -100.
+index_ts_internal <- function(x, base, scale, series_name, check_negative) {
 
   if (!is.null(base)) {
     base <- check_base(base, x)
@@ -45,12 +63,6 @@ index_ts <- function(x, base = NULL, scale = 100) {
     base <- as.period_range(start_period(x))
   }
 
-  if (!missing(scale)) {
-    if (!is.numeric(scale) || is.na(scale[1]) || scale[1] < 0) {
-      stop("Argument scale must be a positive number.")
-    }
-    if (length(scale) > 1) stop("Argument scale should be a single number.")
-  }
 
   p_x <- get_period_range(x)
   startp_x <- p_x[1]
@@ -76,16 +88,17 @@ index_ts <- function(x, base = NULL, scale = 100) {
     means <- as.numeric(colMeans(xdat))
     cnames <- colnames(x)
     if (is.null(cnames)) cnames <- seq_len(ncol(x))
-    if (any(neg_sel <- !is.na(means) & means < 0)) {
-      # error: if the value in the base period is negative, it is not
-      # possible to construct a meaningful index series
+
+    if (check_negative && any(neg_sel <- !is.na(means) & means < 0)) {
+      # Give a warning if the value at the base period is negative,
+      # and multiply the result with -1.
       means[neg_sel] <- -means[neg_sel]
       neg_cols <- cnames[neg_sel]
       warning(paste0("Negative (average) value at base",
-                  " period ", base, " for columns: ",
-                  paste(neg_cols, collapse = ", "), "."))
-
+                     " period ", base, " for columns: ",
+                     paste(neg_cols, collapse = ", "), "."))
     }
+
     if (any(na_sel <- is.na(means))) {
       # result series will be NA or NaN
       na_cols <- cnames[na_sel]
@@ -93,6 +106,7 @@ index_ts <- function(x, base = NULL, scale = 100) {
                      base, " for columns: ", paste(na_cols, collapse = ", "),
                      "."))
     }
+
     if (any(zero_sel <- !is.na(means) & means == 0)) {
       # result series will be Inf or -Inf
       zero_cols <- cnames[zero_sel]
@@ -111,7 +125,7 @@ index_ts <- function(x, base = NULL, scale = 100) {
     } else if (m == 0) {
       warning(sprintf(paste("Zero (average) value at base period %s for variable %s."),
                       as.character(base), series_name))
-    } else if (m < 0) {
+    } else if (check_negative && m < 0) {
       warning(sprintf(paste("Negative (average) value at base period %s for variable %s."),
                       as.character(base), series_name))
       m <- -m

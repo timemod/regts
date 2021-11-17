@@ -13,12 +13,12 @@ ts_labels(mts) <- c("Timeseries a", "Timeseries b", "Timeseries c")
 test_that("univariate timeseries", {
 
   p <- get_period_range(a)
-  result <- (a - lag(a, -1))/ abs(lag(a, -1))
+  result <- (a - lag(a, -1))/ lag(a, -1)
   resultp <- result[p]
   expect_identical(growth(a, keep_range = FALSE) , result)
   expect_identical(growth(a), resultp)
 
-  result <- (a - lag(a, -4))/ abs(lag(a, -4))
+  result <- (a - lag(a, -4))/ lag(a, -4)
   resultp <- result[p]
   expect_identical(growth(a, n = 4, keep_range = FALSE) , result)
   expect_identical(growth(a, n = 4), resultp)
@@ -30,12 +30,12 @@ test_that("univariate timeseries", {
 test_that("multivariate timeseries", {
 
   p <- get_period_range(mts)
-  result <- (mts - lag(mts, -1))/ abs(lag(mts, -1))
+  result <- (mts - lag(mts, -1))/ lag(mts, -1)
   resultp <- result[p]
   expect_identical(growth(mts, keep_range = FALSE) , result)
   expect_identical(growth(mts), resultp)
 
-  result <- (mts - lag(mts, -4))/ abs(lag(mts, -4))
+  result <- (mts - lag(mts, -4))/ lag(mts, -4)
   resultp <- result[p]
   expect_identical(growth(mts, n = 4, keep_range = FALSE) , result)
   expect_identical(growth(mts, n = 4), resultp)

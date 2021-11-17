@@ -2,7 +2,7 @@
 % Please edit documentation in R/growth.R
 \name{growth}
 \alias{growth}
-\title{Return the relative change of a timeseries}
+\title{Return the relative growth rate of a timeseries}
 \usage{
 growth(x, n = 1, keep_range = TRUE)
 }
@@ -21,16 +21,16 @@ shorter than the input timeseries.}
 a \code{regts} object with relative changes
 }
 \description{
-Function \code{growth} computes the relative change of a timeseries.
-The one period relative change of a timeseries is defined as:
-\code{growth(x) = (x[t] - x[t-1]) / |x[t-1]|}
+Function \code{growth} computes the relative growth rate of a (multivariate)
+timeseries. The one period relative growth rate  of a timeseries is defined as
+\code{growth(x) = (x[t] - x[t-1]) / x[t-1]}.
+The \code{n} period relative change of a timeseries is defined as
+\code{growth(x,n) = (x[t] - x[t-n]) / x[t-n]}.
 
-The \code{n} period relative change of a timeseries is defined as:
-\code{growth(x,n) = (x[t] - x[t-n]) / |x[t-n]|}
-
-The formula implies that when the timeseries decreases, the result will be
-negative regardless of the sign of \code{x}. The function also works for
-multivariate timeseries.
+Note that \code{growth} divides the change by \code{ x[t-n]} and not by the
+absolute value of \code{x[t-1]}.
+This implies that the growth rate is positive when a negative timeseries
+becomes more negative.
 }
 \examples{
 x <- regts(rnorm(10), start = "2018Q1")
