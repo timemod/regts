@@ -7,7 +7,7 @@
 #' ```
 #' x[t] = (z[t] - z[t-1]) / z[t-1].
 #' ```
-#' Note that according to this definition the numerator is not the absolute
+#' Note that according to this definition the denominator is not the absolute
 #' value of \code{z[t-1]}).
 #' The function constructs an index series for `z[t]` given the values of
 #' `x[t]`. See Details.

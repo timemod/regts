@@ -37,7 +37,7 @@ The growth rate \code{x[t]} (also called the relative change) of a timeseries \c
 is defined as\preformatted{x[t] = (z[t] - z[t-1]) / z[t-1].
 }
 
-Note that according to this definition the numerator is not the absolute
+Note that according to this definition the denominator is not the absolute
 value of \code{z[t-1]}).
 The function constructs an index series for \code{z[t]} given the values of
 \code{x[t]}. See Details.

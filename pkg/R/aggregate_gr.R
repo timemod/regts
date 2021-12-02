@@ -22,7 +22,7 @@
 #'
 #' Methods `"pct"` and `"rel"` use the same definition of the relative change
 #' as in function \code{\link{growth}}:
-#' \code{growth(x) = (x[t] - x[t-1]) / x[t-1]} (note that the numerator is not
+#' \code{growth(x) = (x[t] - x[t-1]) / x[t-1]} (note that the denominator is not
 #' the absolute value of \code{x[t-1]}).
 #'
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} object
