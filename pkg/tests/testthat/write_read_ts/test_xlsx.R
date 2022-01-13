@@ -116,6 +116,15 @@ test_that("ts with labels written correctly (2)",  {
   write_ts_xlsx(ts1_lbls, file, sheet_name = "ts1", append = TRUE,
                 number_format = "00.00")
 
+  expect_warning(
+    expect_error(
+      write_ts_xlsx(ts1_lbls, file = "x/y/dummy.xlsx",
+                    sheet_name = "ts1",
+                    number_format = "00.00"),
+      regexp = "Failed to save workbook to file 'x/y/dummy.xlsx'. Check warnings.",
+      fixed = TRUE
+    )
+  )
 
   ts1_read <- read_ts_xlsx(file, sheet = "ts1", labels = "after")
 
