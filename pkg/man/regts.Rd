@@ -8,11 +8,11 @@ regts(data, start, end, period, frequency = NA, names = colnames(data),
   labels = NULL)
 }
 \arguments{
-\item{data}{a vector or matrix of the observed timeseries values.
-A \code{\link[base]{data.frame}}
-will be coerced to a numeric matrix via \code{\link{data.matrix}}.
-(See also the description of the
-function \code{\link[stats]{ts}} of the \code{\link{stats}} package).}
+\item{data}{a vector, matrix or \code{\link[base]{data.frame}}
+with  the observed timeseries values. A \code{data.frame} will
+be coerced to a numeric matrix. Character columns of the data frame
+are converted to numeric columns using function \code{\link{as.character}}.
+See Details.}
 
 \item{start}{the starting period as a  \code{\link{period}} object or a
 character string that can be converted to a \code{period} object.
@@ -45,6 +45,19 @@ a \code{regts} object
 The \code{regts} class is an extension of the \code{\link[stats]{ts}}
 class of the \link{stats} package. Working with \code{regts} makes it
 easier to select periods.
+}
+\details{
+Function \code{regts} creates a \code{regts} object from a vector, matrix
+of \code{data.frame}. The function is similar to the \code{ts} function of the
+\code{stats} package. Argument \code{data} can be  vector or matrix of any type
+(\code{numeric}, \code{character} or \code{logical}). The resulting timseriss has the
+same type However, if \code{data} is a \code{data.frame},
+it is converted to a numeric matrix. In contrast to function \code{\link[stats]{ts}},
+\code{regts} does not use function \code{\link{data.matrix}} to convert the data frame.
+\code{data.matrix} converts character columns first to factors and then to
+integers. In contrast, in function \code{regts} character columns are converted directly to
+numerical values using function \code{\link{as.character}}. For each text
+that cannot be converted to a numerical value a warning is issued.
 }
 \examples{
 # univariate timeseries

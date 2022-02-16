@@ -1,5 +1,6 @@
 library(testthat)
 library(regts)
+library(tibble)
 
 context("regts")
 
@@ -472,3 +473,22 @@ test_that("as.regts.ts for non-integer frequencies", {
   expect_error(as.regts(cbind(x, x)), msg)
 }
 )
+
+test_that("tibble with numeric columns", {
+  data <- tibble(a = c("1", "text", "1.123"), b = 2:4)
+  start <- "2018q1"
+  wmsg <- paste0("NAs introduced by ",
+                 "coercion.\nThe following texts could not be converted to ",
+                 "numeric:\n\"text\"")
+  expect_warning(data_ts <- regts(data, start = start), wmsg)
+
+  expect_equal(data_ts,
+               regts(matrix(c(1, NA, 1.123, 2:4), ncol = 2),
+                     names = c("a", "b"), start = start))
+
+  matrix <- as.matrix(data)
+  expect_silent(data_ts2 <- regts(matrix, start = start))
+  expect_equal(data_ts2,
+               regts(matrix(unlist(data, use.names = FALSE), ncol = 2),
+                     names = c("a", "b"), start = start))
+})
