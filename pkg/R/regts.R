@@ -4,11 +4,23 @@
 #' class of the \link{stats} package. Working with \code{regts} makes it
 #' easier to select periods.
 #'
-#' @param data a vector or matrix of the observed timeseries values.
-#' A \code{\link[base]{data.frame}}
-#' will be coerced to a numeric matrix via \code{\link{data.matrix}}.
-#' (See also the description of the
-#' function \code{\link[stats]{ts}} of the \code{\link{stats}} package).
+#' Function `regts` creates a `regts` object from a vector, matrix
+#' or `data.frame`. The function is similar to the `ts` function of the
+#' `stats` package. Argument `data` can be a vector or matrix of any type
+#' (`numeric`, `character` or `logical`). The resulting timeseries has the
+#' same type However, if `data` is a `data.frame`,
+#' it is converted to a numeric matrix. In contrast to function \code{\link[stats]{ts}},
+#' `regts` does not use function \code{\link{data.matrix}} to convert the data frame.
+#' `data.matrix` converts character columns first to factors and then to
+#' integers. In contrast, in function `regts` character columns are converted directly to
+#' numerical values using function \code{\link{as.character}}. For each text
+#' that cannot be converted to a numerical value a warning is issued.
+#'
+#' @param data a vector, matrix or \code{\link[base]{data.frame}}
+#' with  the observed timeseries values. A `data.frame` will
+#' be coerced to a numeric matrix. Character columns of the data frame
+#' are converted to numeric columns using function \code{\link{as.character}}.
+#' See Details.
 #' @param start the starting period as a  \code{\link{period}} object or a
 #' character string that can be converted to a \code{period} object.
 #' If not specified, then the start period is calculated
@@ -93,7 +105,7 @@
 regts <- function(data, start, end, period, frequency = NA,
                   names = colnames(data), labels = NULL) {
 
-  # Check the periodrange
+  # Check the period range
   if (!missing(period) && !missing(start)) {
     stop("Arguments 'start' and 'period' exclude each other!")
   }
@@ -154,7 +166,7 @@ regts <- function(data, start, end, period, frequency = NA,
 
   # CONVERT DATA
   if (is.data.frame(data)) {
-    data <- data.matrix(data)
+    data <- numeric_matrix(as.data.frame(data))
   }
   if (is.matrix(data)) {
     ndata <- nrow(data)
@@ -428,7 +440,6 @@ as.regts.list <- function(x, union = TRUE, ...) {
 #
 # INPUT
 #   x    a data frame
-#   dec  decimal separator
 numeric_matrix <- function(x) {
 
   if (nrow(x) == 0 || ncol(x) == 0) {
