@@ -48,9 +48,9 @@ easier to select periods.
 }
 \details{
 Function \code{regts} creates a \code{regts} object from a vector, matrix
-of \code{data.frame}. The function is similar to the \code{ts} function of the
-\code{stats} package. Argument \code{data} can be  vector or matrix of any type
-(\code{numeric}, \code{character} or \code{logical}). The resulting timseriss has the
+or \code{data.frame}. The function is similar to the \code{ts} function of the
+\code{stats} package. Argument \code{data} can be a vector or matrix of any type
+(\code{numeric}, \code{character} or \code{logical}). The resulting timeseries has the
 same type However, if \code{data} is a \code{data.frame},
 it is converted to a numeric matrix. In contrast to function \code{\link[stats]{ts}},
 \code{regts} does not use function \code{\link{data.matrix}} to convert the data frame.

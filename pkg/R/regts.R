@@ -5,9 +5,9 @@
 #' easier to select periods.
 #'
 #' Function `regts` creates a `regts` object from a vector, matrix
-#' of `data.frame`. The function is similar to the `ts` function of the
-#' `stats` package. Argument `data` can be  vector or matrix of any type
-#' (`numeric`, `character` or `logical`). The resulting timseriss has the
+#' or `data.frame`. The function is similar to the `ts` function of the
+#' `stats` package. Argument `data` can be a vector or matrix of any type
+#' (`numeric`, `character` or `logical`). The resulting timeseries has the
 #' same type However, if `data` is a `data.frame`,
 #' it is converted to a numeric matrix. In contrast to function \code{\link[stats]{ts}},
 #' `regts` does not use function \code{\link{data.matrix}} to convert the data frame.
@@ -105,7 +105,7 @@
 regts <- function(data, start, end, period, frequency = NA,
                   names = colnames(data), labels = NULL) {
 
-  # Check the periodrange
+  # Check the period range
   if (!missing(period) && !missing(start)) {
     stop("Arguments 'start' and 'period' exclude each other!")
   }
