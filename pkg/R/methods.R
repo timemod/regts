@@ -28,8 +28,12 @@ aggregate.regts <- function(x, nfrequency = 1, ...) {
   p1 <- start_period(x)
   extra <- as.integer(p1) %% rep
   if (extra != 0) {
-    # shift initial period
-    p1 <- p1 + rep - extra
+    # shift start period
+    shift <- rep - extra
+    if (shift >= NROW(x)) {
+      stop("Not enough observations to perform aggregation")
+    }
+    p1 <- p1 + shift
     x <- window_regts(x, period_range(p1, NULL))
   }
 
