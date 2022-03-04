@@ -24,12 +24,18 @@ diff.regts <- function(x, ...) {
 #' @importFrom stats aggregate.ts
 #' @export
 aggregate.regts <- function(x, nfrequency = 1, ...) {
+
   rep <- frequency(x) / nfrequency
   p1 <- start_period(x)
-  extra <- as.integer(p1) %% rep
-  if (extra != 0) {
+
+  # The start period of the high frequency series should start at
+  # beginning of a low frequency period. For example, if a quarterly series
+  # is converted to an annual series, the quarterly series should start
+  # at Q1. If  a monthly series is converted to a quarterly series,
+  # then the monthly series should start at M01, M04, M07 or M10,
+  shift <- (rep - as.integer(p1) %% rep) %% rep
+  if (shift != 0) {
     # shift start period
-    shift <- rep - extra
     if (shift >= NROW(x)) {
       stop("Not enough observations to perform aggregation")
     }
