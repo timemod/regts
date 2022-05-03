@@ -5,6 +5,8 @@ context("read_ts_csv")
 
 rm(list = ls())
 
+update_expected <- FALSE
+
 # construct correct results
 prd <- period_range("2010Q2/2011Q2")
 a <- regts(c(1, NA, NA, 5, 6), period =  prd)
@@ -255,7 +257,7 @@ test_that("example6.csv read correctly", {
   warnings <- capture_warnings(result1 <- read_ts_csv(csv_file))
 
   expect_known_output(warnings, "expected_output/read_ts_csv_ex61_warn.txt",
-                      print = TRUE)
+                      print = TRUE, update = update_expected)
 
   expect_identical(result1, regts(matrix(c(NA, 1, 2), ncol = 1),
                                   names = c("a"), start = "2011"))

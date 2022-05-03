@@ -5,6 +5,8 @@ rm(list = ls())
 
 context("tsdif")
 
+update_expected <- FALSE
+
 # prepare input data
 ts1 <- regts(matrix(data = rep(1:9), nc = 3), start = "2008Q4",
              names = c("a", "b", "c"))
@@ -48,7 +50,7 @@ test_that("argument fun", {
 
 test_that("check simple output", {
   expect_known_output(tsdif(ts1, ts2), "expected_output/tsdif.txt",
-                      print = TRUE)
+                      print = TRUE, update = update_expected)
 })
 
 test_that("no difference", {
@@ -66,7 +68,7 @@ test_that("no difference", {
                              tol = 0, fun = NULL)
   expect_equal(res, res_no_dif)
   expect_known_output(res, "expected_output/tsdif_no_dif.txt",
-                      print = TRUE)
+                      print = TRUE,  update = update_expected)
 })
 
 test_that("univariate timeseries", {
@@ -429,7 +431,7 @@ test_that("check more complex output with combinations of NA and proper values",
   ts1["2016q3", "c"] <- NA
   ts2["2017q4", "f"] <- NA
   expect_known_output(tsdif(ts1, ts2), "expected_output/tsdif_complex.txt",
-                      print = TRUE)
+                      print = TRUE,  update = update_expected)
 
   max_difnames_old <- getOption("regts_max_difnames")
   max_maxdif_old <- getOption("regts_max_maxdif")
@@ -441,7 +443,7 @@ test_that("check more complex output with combinations of NA and proper values",
 
   expect_known_output(tsdif(ts1, ts2),
                       "expected_output/tsdif_complex_options.txt",
-                      print = TRUE)
+                      print = TRUE,  update = update_expected)
   options(list(regts_max_difnames = max_difnames_old,
                regts_max_maxdif = max_maxdif_old))
 })

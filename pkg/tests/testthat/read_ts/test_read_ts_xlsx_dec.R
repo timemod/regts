@@ -5,6 +5,8 @@ rm(list = ls())
 
 context("read_ts_xlsx for xlsx files with many decimals")
 
+update_expected <- FALSE
+
 prd <- period_range("2010Q2/2010Q3")
 num_dec <- 1.123456789
 correct_result <- regts(matrix(c(num_dec, 1, NA, num_dec), ncol = 2),
@@ -55,7 +57,7 @@ test_that("example10.xlsx is read correctly",  {
                            period =  "2010q2/2011q2")
   expect_equal(result1, expected_result)
   expect_known_output(warnings1, "expected_output/example10_warn1.txt",
-                      print = TRUE)
+                      print = TRUE, update = update_expected)
 
   warnings2 <- capture_warnings(
     result2 <- read_ts_xlsx(xlsx_file, labels = "after", skipcol = 1,
@@ -63,5 +65,5 @@ test_that("example10.xlsx is read correctly",  {
   )
   expect_equal(result2, expected_result)
   expect_known_output(warnings2, "expected_output/example10_warn2.txt",
-                      print = TRUE)
+                      print = TRUE, update = update_expected)
 })
