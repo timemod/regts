@@ -131,15 +131,17 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' # narrow.
 #' options("openxlsx.minWidth" = 8.43)
 #'
-#' # Save the workbook with openxlsx::saveWorkbook. Function saveWorkbook does
-#' # not give an error or warning when something goes wrong, for example if the
-#' # file is not writable. However, if argument returnValue = TRUE, then
-#' # saveWorkbook returns a warning or error object if a problem occurred, or
-#' # TRUE if everything is OK. Therefore use the following code to save the
-#' # workbook:
-#' result <- saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE,
-#'                        returnValue = TRUE)
-#' if (!isTRUE(result)) stop(result$message, call. = FALSE)
+#' # Save the workbook with openxlsx::saveWorkbook. Function saveWorkbook
+#' # sometimes only gives a warning, and not an error, when something goes
+#' # wrong, for example if the file is not writable.
+#' # However, if argument returnValue = TRUE, saveWorkbook returns TRUE in case of
+#' # success and else FALSE. The recommended way to save the workbook is
+#' # therefore something like the following code:
+#' output_file <- "timeseries.xlsx"
+#' ok <- saveWorkbook(wb, output_file, overwrite = TRUE, returnValue = TRUE)
+#' if (!ok) {
+#'   stop("Failed to save workbook to file '", output_file, "'. Check warnings.")
+#' }
 #'
 #' # write a timeseries with comments
 #' comments <- c("Timeseries ts1 is created on the Central Bureau of Policy Analysis",

@@ -595,7 +595,7 @@ After some processing (e.g. selecting and/or deleting (parts of) rows and column
 
 ## Operators and functions for `regts`
 Since the `regts` class is a subclass of the `ts` class it inherits all functionality from this class.
-All arithmetic (`+`, `-`, `*`, `/`, `^`, `%%`, `%/%`), logical (`&&`, `||`, `!`), 
+All arithmetic (`+`, `-`, `*`, `/`, `^`, `%%`, `%/%`), logical (`&`, `|`, `!`), 
 relational (`==`, `!=`, `<`, `<=`, `>`, `>=`) and subsetting (`[]`) operators 
 applicable for a `ts` variable, can be used for a `regts` timeseries. 
 Some examples:
@@ -607,7 +607,7 @@ tx <- regts(1:10, start = "2017q1")
 ty    <- 2 * tx + 1
 tpyth <- tx^2 + ty^2   
 modulo <- tx %% 2
-tlog  <- tx < ty && ty > 1
+tlog  <- tx < ty & ty > 1
 number <- tx["2017q2"]
 
 ```

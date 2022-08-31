@@ -34,8 +34,10 @@ If \code{FALSE} then the result timeseries starts 1 period earlier.}
 \description{
 Function \code{rel2index} is the inverse of function \code{\link{growth}}.
 The growth rate \code{x[t]} (also called the relative change) of a timeseries \code{z[t]}
-is defined as\preformatted{x[t] = (z[t] - z[t-1]) / z[t-1].
-}
+is defined as
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{x[t] = (z[t] - z[t-1]) / z[t-1].
+}\if{html}{\out{</div>}}
 
 Note that according to this definition the denominator is not the absolute
 value of \code{z[t-1]}).
@@ -48,13 +50,17 @@ Thus expression \code{pct2index(x)} gives the same result as \code{100 * rel2ind
 }
 \details{
 If \code{x[t]} is given but \code{z[t]} is unknown, \code{z[t]} can be calculated from
-\code{z[t-1]} using\preformatted{z[t] = z[t-1] * (1 + x[t]).
-}
+\code{z[t-1]} using
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{z[t] = z[t-1] * (1 + x[t]).
+}\if{html}{\out{</div>}}
 
 Given an initial value for \code{z} at some period (say \code{z[0]}), the equation
 above can be used repeatedly to calculate the values of \code{z[t]} for \code{t > 0}.
-Finally the index series is computed using\preformatted{i[t] =  scale * z[t] / mean(z[base]),
-}
+Finally the index series is computed using
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{i[t] =  scale * z[t] / mean(z[base]),
+}\if{html}{\out{</div>}}
 
 where \code{base} is the base period.
 
