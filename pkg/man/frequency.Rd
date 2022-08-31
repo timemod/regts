@@ -19,9 +19,10 @@
 the frequency of the \code{period} or the \code{period_range}
 }
 \description{
-This is an extension to S3 generic function \code{\link[stats:time]{frequency}}.
-Function now also returns the frequency of a \code{period} or a
-\code{period_range}
+This is an extension to S3 generic function
+\code{\link[stats:time]{frequency}}.
+The function also returns the frequency of a \code{period} or a
+\code{period_range} object.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -35,5 +36,5 @@ p <- period("2016Q1")
 freq <- frequency(p)
 
 p <- period_range("2016Q1", "2018Q2")
-freq <- frequency(p)#'
+freq <- frequency(p)
 }

@@ -39,8 +39,8 @@ the common columns are joined. For each common timeseries the overlapping
 period is determined, ignoring the NA values as described above.
 The remaining columns in the new timeseries are added to the result.
 Remaining columns in the old timeseries are ignored.
-The result series and the new series have the same columns, in the same order.
-The joined timeseries can be found in the common columns.
+The result series and the new series have the same columns, in the same
+order. The joined timeseries can be found in the common columns.
 
 If both input timeseries are vectors (i.e. there are no column names), the
 result is also a vector.

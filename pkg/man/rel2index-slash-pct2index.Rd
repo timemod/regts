@@ -33,8 +33,8 @@ If \code{FALSE} then the result timeseries starts 1 period earlier.}
 }
 \description{
 Function \code{rel2index} is the inverse of function \code{\link{growth}}.
-The growth rate \code{x[t]} (also called the relative change) of a timeseries \code{z[t]}
-is defined as
+The growth rate \code{x[t]} (also called the relative change) of a timeseries
+\code{z[t]} is defined as
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{x[t] = (z[t] - z[t-1]) / z[t-1].
 }\if{html}{\out{</div>}}
@@ -46,7 +46,8 @@ The function constructs an index series for \code{z[t]} given the values of
 \cr\cr
 Function \code{pct2index} computes the index series
 from a timeseries of percentage changes.
-Thus expression \code{pct2index(x)} gives the same result as \code{100 * rel2index(x / 100)}.
+Thus expression \code{pct2index(x)} gives the same result as
+\code{100 * rel2index(x / 100)}.
 }
 \details{
 If \code{x[t]} is given but \code{z[t]} is unknown, \code{z[t]} can be calculated from

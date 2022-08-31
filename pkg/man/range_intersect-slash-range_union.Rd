@@ -4,7 +4,8 @@
 \alias{range_intersect/range_union}
 \alias{range_intersect}
 \alias{range_union}
-\title{Calculate the intersection or union of two \code{\link{period_range}} objects.}
+\title{Calculate the intersection or union of two \code{\link{period_range}}
+objects.}
 \usage{
 range_intersect(range1, range2)
 
@@ -21,9 +22,9 @@ the intersection or union of \code{range1} and \code{range2}.
 If there are no common periods \code{range_intersection} returns \code{NULL}
 }
 \description{
-These functions calculate the intersection or union of two \code{\link{period_range}}
-objects. The start and end periods of the period_range objects may
-not be \code{NULL}.
+These functions calculate the intersection or union of two
+\code{\link{period_range}} objects. The start and end periods of the
+\code{period_range} objects may not be \code{NULL}.
 }
 \examples{
 range1 <- period_range("2016Q1", "2017Q4")

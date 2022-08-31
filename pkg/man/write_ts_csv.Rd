@@ -40,7 +40,8 @@ ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
 write_ts_csv(ts1, file = "ts1.csv", labels = "after")
 
 # write timeseries columnwise to csv, using a specified period_format
-write_ts_csv(ts1, file = "ts1_2.csv", rowwise = FALSE, period_format = "\%Y-\%m-\%d")
+write_ts_csv(ts1, file = "ts1_2.csv", rowwise = FALSE,
+             period_format = "\%Y-\%m-\%d")
 \dontshow{
    unlink("ts1.csv")
    unlink("ts1_2.csv")

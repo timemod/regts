@@ -4,7 +4,8 @@
 #' \code{regts} objects.
 #
 #' @param x a \code{\link{regts} object}
-#' @param ... arguments passed to methods (not used in the default implementation)
+#' @param ... arguments passed to methods (not used in the default
+#' implementation)
 #' @return a list of univariate \code{regts} objects
 #' @examples
 #' regts1 <- regts(matrix(1:6, ncol = 2), start = "2015Q3", names = c("a", "b"))
@@ -33,7 +34,7 @@ as.list.regts <- function(x, ...) {
     if (!is.matrix(x)) {
         retval <- list(x)
         names(retval) <- deparse(substitute(x))
-        return (retval)
+        return(retval)
     }
 
     retval <- lapply(seq_len(ncol(x)), function(i) x[, i])
@@ -54,5 +55,5 @@ as.list.regts <- function(x, ...) {
             names(retval) <- paste(xname, 1:nc, sep = ".")
         }
     }
-    return (retval)
+    return(retval)
 }

@@ -19,17 +19,18 @@
 #' has no lower or upper bound. The string format is case insensitive.
 #'
 #' @param start the first period (a \code{period}, an object that can be coerced
-#' to a \code{period}, or by default \code{NULL}). If \code{start} is \code{NULL}
-#' the lower bound of the period range is undetermined. \code{start} can also
-#' be a character string specifying a period range, for example
+#' to a \code{period}, or by default \code{NULL}). If \code{start} is
+#' \code{NULL} the lower bound of the period range is undetermined. \code{start}
+#' can also be a character string specifying a period range, for example
 #' \code{"2010Q2/2011Q3"}).
 #' @param end the last period (a \code{period}, an object that can be coerced
 #' to a \code{period}, or by default \code{NULL}).
-#' If \code{end} is \code{NULL}, the upper bound of the period range is undetermined.
+#' If \code{end} is \code{NULL}, the upper bound of the period range is
+#' undetermined.
 #' @param x an R object
 #' @param frequency frequency of the period objects. This argument is mandatory
-#' if argument \code{start} or \code{end} is a character with general period format
-#' without frequency indicator (e.g. \code{"2011-1"})
+#' if argument \code{start} or \code{end} is a character with general period
+#' format without frequency indicator (e.g. \code{"2011-1"})
 #' @param ... additional arguments to be passed to or from methods (currently
 #' not used in package \code{regts})
 #' @return a \code{period_range} object
@@ -70,20 +71,21 @@ period_range <- function(start = NULL, end = NULL, frequency = NA) {
     if (length(start) > 1) stop("Argument 'start' must be of length 1")
     if (is.character(start) && grepl("/", start[1])) {
       # direct conversion, inputs "2016q1" and "2016q1/2017q1" are possible
-      if (is.null(end)){
+      if (is.null(end)) {
         return(as.period_range(start, frequency))
       } else {
-        stop("Argument end should not be specified if start is a period range string")
+        stop("Argument end should not be specified if start is a period range ",
+             "string")
       }
     } else {
       start <- as.period(start, frequency)
-      freq1 <- attr(start, 'frequency')
+      freq1 <- attr(start, "frequency")
     }
   }
   if (!is.null(end)) {
     if (length(end) > 1) stop("Argument 'end' must be of length 1")
     end <- as.period(end, frequency)
-    freq2 <- attr(end, 'frequency')
+    freq2 <- attr(end, "frequency")
   }
   if ((!(is.null(start) || is.null(end)))) {
     if (freq1 != freq2) {
@@ -258,7 +260,7 @@ as.character.period_range <- function(x, ...) {
   if (!is.na(x[2])) {
     retval <- paste0(retval, as.character.period(end_period(x)))
   }
-  return (retval)
+  return(retval)
 }
 
 
@@ -274,7 +276,7 @@ as.character.period_range <- function(x, ...) {
 #' @export
 nperiod  <- function(x) {
   x <- as.period_range(x)
-  if (is.na(x[1]) | is.na(x[2])) {
+  if (is.na(x[1]) || is.na(x[2])) {
     return (Inf)
   }
   return(nperiod__(x))
@@ -282,7 +284,7 @@ nperiod  <- function(x) {
 
 nperiod__  <- function(x) {
   # Internal nperiod function, no check for NA's or variabletype
-  return (x[2] - x[1] + 1)
+  return(x[2] - x[1] + 1)
 }
 
 #' @export

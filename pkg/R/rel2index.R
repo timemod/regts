@@ -2,8 +2,8 @@
 #' percentage changes.
 #'
 #' Function `rel2index` is the inverse of function \code{\link{growth}}.
-#' The growth rate `x[t]` (also called the relative change) of a timeseries `z[t]`
-#' is defined as
+#' The growth rate `x[t]` (also called the relative change) of a timeseries
+#'  `z[t]` is defined as
 #' ```
 #' x[t] = (z[t] - z[t-1]) / z[t-1].
 #' ```
@@ -14,7 +14,8 @@
 #' \cr\cr
 #' Function `pct2index` computes the index series
 #' from a timeseries of percentage changes.
-#' Thus expression `pct2index(x)` gives the same result as `100 * rel2index(x / 100)`.
+#' Thus expression `pct2index(x)` gives the same result as
+#' `100 * rel2index(x / 100)`.
 #'
 #' If `x[t]` is given but `z[t]` is unknown, `z[t]` can be calculated from
 #' `z[t-1]` using

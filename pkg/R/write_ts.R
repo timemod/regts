@@ -24,7 +24,8 @@
 #' write_ts_csv(ts1, file = "ts1.csv", labels = "after")
 #'
 #' # write timeseries columnwise to csv, using a specified period_format
-#' write_ts_csv(ts1, file = "ts1_2.csv", rowwise = FALSE, period_format = "%Y-%m-%d")
+#' write_ts_csv(ts1, file = "ts1_2.csv", rowwise = FALSE,
+#'              period_format = "%Y-%m-%d")
 #
 #' \dontshow{
 #'    unlink("ts1.csv")
@@ -44,10 +45,8 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
                         period_format, FALSE)
   data <- dataframes$data
   column_headers <- dataframes$column_headers
-  has_labels <- dataframes$has_labels
 
-  fwrite(column_headers, file, sep = sep, dec  = dec,
-         col.names = FALSE)
+  fwrite(column_headers, file, sep = sep, dec  = dec, col.names = FALSE)
   fwrite(data, file, sep = sep, dec  = dec, append = TRUE, col.names = FALSE)
 
   return(invisible(NULL))
@@ -134,17 +133,18 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' # Save the workbook with openxlsx::saveWorkbook. Function saveWorkbook
 #' # sometimes only gives a warning, and not an error, when something goes
 #' # wrong, for example if the file is not writable.
-#' # However, if argument returnValue = TRUE, saveWorkbook returns TRUE in case of
-#' # success and else FALSE. The recommended way to save the workbook is
+#' # However, if argument returnValue = TRUE, saveWorkbook returns TRUE in case
+#' # of success and else FALSE. The recommended way to save the workbook is
 #' # therefore something like the following code:
 #' output_file <- "timeseries.xlsx"
 #' ok <- saveWorkbook(wb, output_file, overwrite = TRUE, returnValue = TRUE)
 #' if (!ok) {
-#'   stop("Failed to save workbook to file '", output_file, "'. Check warnings.")
+#'   stop("Failed to save workbook to file '", output_file,
+#'        "'. Check warnings.")
 #' }
 #'
 #' # write a timeseries with comments
-#' comments <- c("Timeseries ts1 is created on the Central Bureau of Policy Analysis",
+#' comments <- c("Timeseries ts1 is created at the CPB",
 #'               "using a random number generator")
 #' write_ts_xlsx(ts1, file = "ts_comments.xlsx", sheet_name = "ts1",
 #'               comments = comments)
@@ -213,7 +213,7 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
     worksheetOrder(wb) <- order
   }
 
-  minWidth_old <- options("openxlsx.minWidth")[[1]]
+  min_width_old <- options("openxlsx.minWidth")[[1]]
   options("openxlsx.minWidth" = 8.43)
 
   tryCatch({
@@ -226,7 +226,7 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
       }
     }
   }, finally = {
-    options("openxlsx.minWidth" = minWidth_old)
+    options("openxlsx.minWidth" = min_width_old)
   })
 
   return(invisible(NULL))
@@ -334,7 +334,7 @@ write_ts_sheet_ <- function(x, wb, sheet, rowwise, labels, labels_missing,
              gridExpand = TRUE)
   }
 
-  setColWidths(wb, sheet, 1:ncol(data), widths = "auto")
+  setColWidths(wb, sheet, seq_len(ncol(data)), widths = "auto")
 
   row_split <- n_text_rows + n_comment_rows + 1
   col_split <- n_text_cols + 1
@@ -369,7 +369,7 @@ ts2df_ <- function(x, rowwise, labels = c("after", "before", "no"),
   labels <- match.arg(labels)
 
   if (is.null(colnames(x))) {
-    colnames(x) <- paste0("series", 1:ncol(x))
+    colnames(x) <- paste0("series", seq_len(ncol(x)))
   }
 
   # collect labels
@@ -401,13 +401,10 @@ ts2df_ <- function(x, rowwise, labels = c("after", "before", "no"),
     names <- rownames(data)
     if (labels == "no") {
       data <- cbind(name = names, data, stringsAsFactors = FALSE)
-      col_headers <- c("name")
     } else if (labels == "after") {
       data <- cbind(name = names, label = lbls, data, stringsAsFactors = FALSE)
-      col_headers <- c("name", "label")
     } else if (labels == "before") {
       data <- cbind(label = lbls, name = names, data, stringsAsFactors = FALSE)
-      col_headers <- c("label", "name")
     }
     n_rowheaders <- ncol(data) - length(periods)
     column_headers <- as.data.frame(c(as.list(colnames(data)[1:n_rowheaders]),

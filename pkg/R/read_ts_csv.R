@@ -17,7 +17,8 @@
 #' \code{period_fun}, \code{skipcol} or \code{skiprow}.
 #' Specify option  \code{rowwise} if you know
 #' that the timeseries are stored rowwise or columnwise. Specify
-#' argument \code{frequency} if you already know the frequency of the timeseries.
+#' argument \code{frequency} if you already know the frequency of the
+#' timeseries.
 #' Arguments \code{skipcol} and \code{skiprow} can be used to read only a
 #' part of the file.
 #' If that does not help, then you can read the data into a data frame
@@ -128,8 +129,8 @@
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
 #' start and the end period must be present.
 #' Otherwise the timeseries are filled with \code{NA} for the missing periods.
-#' @param warn_dupl A logical. If \code{TRUE} (the default), a warning is issued
-#' if there are duplicate column names in the returned timeseries object.
+#' @param warn_dupl A logical. If \code{TRUE} (the default), a warning is
+#' issued if there are duplicate column names in the returned timeseries object.
 #' @return a \code{regts} object
 #'
 #' @examples
@@ -166,7 +167,7 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
               na.strings = na_string)
 
   if (!missing(skipcol) && skipcol > 0) {
-    df <- df[ , -(1:skipcol), drop = FALSE]
+    df <- df[, -(1:skipcol), drop = FALSE]
   }
 
   if (nrow(df) == 0 && ncol(df) == 0) {
@@ -254,7 +255,8 @@ read_ts_columnwise <- function(tbl, frequency, dec, period_fun, layout, strict,
                        "of file %s."), col, filename))
   }
 
-  # convert data columns to a numeric matrix, employing function df_to_numeric_matrix
+  # convert data columns to a numeric matrix, employing function
+  # df_to_numeric_matrix
   mat <- df_to_numeric_matrix(tbl[layout$is_data_col], dec = dec)
   colnames(mat) <- layout$names
 
@@ -297,18 +299,18 @@ df_to_numeric_matrix <- function(x, dec) {
   if (any(error_sel)) {
     weird_texts <- unique(text_mat[error_sel])
     nweird <- length(weird_texts)
-    NWEIRD_MAX <- 10
-    nmax <- min(NWEIRD_MAX, nweird)
+    nweird_max <- 10
+    nmax <- min(nweird_max, nweird)
     weird_texts <- paste0("\"", weird_texts[1:nmax], "\"")
 
-    if (nweird <= NWEIRD_MAX) {
+    if (nweird <= nweird_max) {
       warning(paste0("NAs introduced by coercion.\n",
                      "The following texts could not be converted to numeric:\n",
                      paste0(weird_texts, collapse = "\n")))
     } else {
       warning(paste0("NAs introduced by coercion.\n",
                      nweird, " texts could not be converted to numeric.\n",
-                     "The first ", NWEIRD_MAX,
+                     "The first ", nweird_max,
                      " texts that gave problems are:\n",
                      paste0(weird_texts, collapse = "\n")))
     }

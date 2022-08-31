@@ -1,8 +1,9 @@
-#' Calculate the intersection or union of two \code{\link{period_range}} objects.
+#' Calculate the intersection or union of two \code{\link{period_range}}
+#' objects.
 #'
-#' These functions calculate the intersection or union of two \code{\link{period_range}}
-#' objects. The start and end periods of the period_range objects may
-#' not be \code{NULL}.
+#' These functions calculate the intersection or union of two
+#' \code{\link{period_range}} objects. The start and end periods of the
+#' `period_range` objects may not be \code{NULL}.
 #' @param range1 a \code{period_range} object or object that can be coerced to
 #' a period_range
 #' @param range2 another such (\code{period_range}) object
@@ -61,8 +62,8 @@ range_check <- function(range1, range2) {
   p2_start <- start_period(range2)
   p2_end   <- end_period(range2)
 
-  if (is.null(p1_start) | is.null(p1_end) |
-      is.null(p2_start) | is.null(p2_end)) {
+  if (is.null(p1_start) || is.null(p1_end) ||
+      is.null(p2_start) || is.null(p2_end)) {
     stop("Start and end periods of both ranges should not be NULL")
   }
 

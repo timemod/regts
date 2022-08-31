@@ -7,13 +7,12 @@
 #'
 #' @details
 #' The function behaves differently than base method
-#' \code{\link[base]{as.matrix}}. If the input timeseries is a matrix with timeseries
-#' attributes, then \code{as.matrix} just returns the input value. If the input
-#' timeseries is not a matrix (a univariate timeseries with vector data),
-#' then \code{as.matrix} returns a matrix without row and column names and
-#' without timeseries attributes. In contrast, \code{as_matrix} always returns
-#' a matrix without timeseries attributes.
-#'
+#' \code{\link[base]{as.matrix}}. If the input timeseries is a matrix with
+#' timeseries attributes, then \code{as.matrix} just returns the input value.
+#' If the input timeseries is not a matrix (a univariate timeseries with vector
+#' data), then \code{as.matrix} returns a matrix without row and column names
+#' and without timeseries attributes. In contrast, \code{as_matrix} always
+#' returns a matrix without timeseries attributes.
 #' @param x a \code{\link[stats]{ts}} or \code{\link{regts}}
 #' @param rowwise a logical value: should the timeseries be stored rowwise
 #' or columnwise in the matrix? Defaults to \code{FALSE}

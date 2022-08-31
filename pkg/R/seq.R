@@ -143,5 +143,3 @@ seq.character <- function(from, to, by, length.out = NULL, ...) {
   return(create_period(as.numeric(subperiod_count), frequency = freq))
 
 }
-
-

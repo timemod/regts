@@ -35,9 +35,9 @@ the row names of the data frame.
 If \code{time_column} has length > 1, then argument \code{fun} should be
 a function which converts a data frame to \code{period} vector.}
 
-\item{numeric}{logical: should non numeric values be converted to numeric data.
-By default they are converted to numeric. This can be changed by setting
-\code{numeric = FALSE}.}
+\item{numeric}{logical: should non numeric values be converted to numeric
+data. By default they are converted to numeric. This can be changed by
+setting \code{numeric = FALSE}.}
 
 \item{fun}{a function for converting values in the row names,
 time column(s), or names of a numeric vector to \code{\link{period}} objects.
@@ -49,7 +49,8 @@ function \code{period}). See argument \code{time_column} for exceptions.}
 start and the end period must be present.
 Otherwise the timeseries are filled with \code{NA} for the missing periods.}
 
-\item{union}{A logical (default \code{TRUE}). Only used in \code{as.regts.list}.
+\item{union}{A logical (default \code{TRUE}). Only used in
+\code{as.regts.list}.
 If the list contains multiple timeseries and \code{union} is \code{TRUE},
 then the period range of the result is the union of the period ranges of
 the individual timeseries objecct in the list. Otherwise the period range is

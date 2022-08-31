@@ -29,7 +29,7 @@
 #' # remove leading zeros if all elements in the row are zero
 #' zero_trim(rts, method = "first")
 #' @export
-zero_trim <- function (x, method = c("both", "first","last")) {
+zero_trim <- function(x, method = c("both", "first", "last")) {
 
 
   # Use function inherits instead of is.ts to check if x1 is a timeseries.

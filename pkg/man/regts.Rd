@@ -28,13 +28,14 @@ the dimension of \code{data}.}
 character string that can be converted to a \code{period_range} object.
 This argument replaces arguments \code{start} and \code{end}.}
 
-\item{frequency}{the frequency of the timeseries. This argument should only be
-specified if the \code{start}, \code{end} or \code{period} argument is
+\item{frequency}{the frequency of the timeseries. This argument should only
+be specified if the \code{start}, \code{end} or \code{period} argument is
 specified with a general period format without period indicator,
 e.g. \code{"2011-3"}.}
 
 \item{names}{a character vector with the column names for the series
-if \code{data} is a matrix or data frame. Defaults to the column names of data.}
+if \code{data} is a matrix or data frame. Defaults to the column names of
+data.}
 
 \item{labels}{a character vector of labels (descriptions of the timeseries)}
 }
@@ -52,12 +53,15 @@ or \code{data.frame}. The function is similar to the \code{ts} function of the
 \code{stats} package. Argument \code{data} can be a vector or matrix of any type
 (\code{numeric}, \code{character} or \code{logical}). The resulting timeseries has the
 same type However, if \code{data} is a \code{data.frame},
-it is converted to a numeric matrix. In contrast to function \code{\link[stats]{ts}},
-\code{regts} does not use function \code{\link{data.matrix}} to convert the data frame.
+it is converted to a numeric matrix. In contrast to function
+\code{\link[stats]{ts}},
+\code{regts} does not use function \code{\link{data.matrix}} to convert the data
+frame.
 \code{data.matrix} converts character columns first to factors and then to
-integers. In contrast, in function \code{regts} character columns are converted directly to
-numerical values using function \code{\link{as.character}}. For each text
-that cannot be converted to a numerical value a warning is issued.
+integers. In contrast, in function \code{regts} character columns are converted
+directly to numerical values using function \code{\link{as.character}}.
+For each text that cannot be converted to a numerical value a warning is
+issued.
 }
 \examples{
 # univariate timeseries
@@ -67,7 +71,8 @@ ts1 <- regts(1:10, start = "2010Q4")
 print(ts1["2011Q2/2011Q3"])
 
 # multivariate timeseries
-ts2 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"))
+ts2 <- regts(matrix(1:9, ncol = 3), start = "2010Q4",
+             names = c("a", "b", "c"))
 
 # two equivalent ways to select a column in a multivariate ts
 print(ts2$a)
@@ -84,7 +89,8 @@ ts2$d <- 2
 ts2[ , "e"] <- 2
 
 # multivariate timeseries with labels
-ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"),
+ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4",
+             names = c("a", "b", "c"),
              labels = paste("Timeseries", c("a", "b", "c")))
 
 # multivariate timeseries created with a period_range object

@@ -37,7 +37,8 @@ index_ts <- function(x, base = NULL, scale = 100) {
   series_name <- deparse(substitute(x))
   x <- as.regts(x)
 
-  # check scale argument. Remove attributes (for example time series attributes):
+  # check scale argument. Remove attributes (for example time series
+  # attributes):
    if (!missing(scale)) {
     if (!is.numeric(scale) || is.na(scale[1]) || scale[1] < 0) {
       stop("Argument scale must be a positive number.")
@@ -123,10 +124,12 @@ index_ts_internal <- function(x, base, scale, series_name, check_negative) {
       warning(sprintf(paste("NA values in base period %s for variable %s."),
                       as.character(base), series_name))
     } else if (m == 0) {
-      warning(sprintf(paste("Zero (average) value at base period %s for variable %s."),
+      warning(sprintf(paste("Zero (average) value at base period %s for",
+                            "variable %s."),
                       as.character(base), series_name))
     } else if (check_negative && m < 0) {
-      warning(sprintf(paste("Negative (average) value at base period %s for variable %s."),
+      warning(sprintf(paste("Negative (average) value at base period %s for",
+                            "variable %s."),
                       as.character(base), series_name))
       m <- -m
     }

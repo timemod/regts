@@ -2,9 +2,9 @@
 #'
 #' This function removes leading or trailing NAs or both from a (multivariate)
 #' regts object.
-#' For multivariate regts a row will by default be regarded as NA if all elements
-#' in the row are NA. Use argument \code{is.na = "any"} to change this behaviour.
-#' The function returns \code{NULL} if all values are \code{NA}.
+#' For multivariate regts a row will by default be regarded as NA if all
+#' elements in the row are NA. Use argument \code{is.na = "any"} to change this
+#' behaviour. The function returns \code{NULL} if all values are \code{NA}.
 #'
 #' @param x a \code{\link{regts}} object
 #' @param method character string with values \code{"both",} \code{"first"} or
@@ -15,8 +15,8 @@
 #' all elements in the row are \code{NA}. If \code{"any"} then a row will be
 #' regarded as \code{NA} if it has any \code{NA}s. For one dimensional regts
 #' objects this argument has no effect.
-#' @return A \code{\link{regts}} object in which leading and/or trailing NAs have
-#' been removed, or \code{NULL} if all values are \code{NA}.
+#' @return A \code{\link{regts}} object in which leading and/or trailing NAs
+#' have been removed, or \code{NULL} if all values are \code{NA}.
 #'
 #' @seealso \code{\link{zero_trim}}
 #'
@@ -38,8 +38,8 @@
 #' na_trim(rts, is_na = "any")
 
 #' @export
-na_trim <- function (x, method = c("both", "first","last"),
-                     is_na = c("all", "any")) {
+na_trim <- function(x, method = c("both", "first", "last"),
+                    is_na = c("all", "any")) {
 
   # Use function inherits instead of is.ts to check if x1 is a timeseries.
   # is.ts returns FALSE if x1 is a timeseries with 0 columns
@@ -54,25 +54,25 @@ na_trim <- function (x, method = c("both", "first","last"),
     side <- match.arg(method)
     isna <- match.arg(is_na)
 
-    fst_not_NA <- function(x){
-      ret <- Position(function(x){x}, !is.na(x))
-      if (is.na(ret)){ ret <- length(x) + 1}
+    fst_not_na <- function(x) {
+      ret <- Position(function(x) x, !is.na(x))
+      if (is.na(ret)) ret <- length(x) + 1
       return(ret)
     }
-    lst_not_NA <- function(x){
-      ret <-Position(function(x){x}, !is.na(x), right = TRUE)
-      if (is.na(ret)){ ret <- 0}
+    lst_not_na <- function(x) {
+      ret <- Position(function(x) x, !is.na(x), right = TRUE)
+      if (is.na(ret)) ret <- 0
       return(ret)
     }
 
     if (!is.matrix(x)) {
-      first <- fst_not_NA(x)
-      last <- lst_not_NA(x)
+      first <- fst_not_na(x)
+      last <- lst_not_na(x)
       len <- length(x)
 
     } else {
-      first <- apply(x, 2, fst_not_NA)
-      last  <- apply(x, 2, lst_not_NA)
+      first <- apply(x, 2, fst_not_na)
+      last  <- apply(x, 2, lst_not_na)
 
       if (isna == "any") {
         first <- max(first)

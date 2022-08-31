@@ -2,7 +2,8 @@
 % Please edit documentation in R/ts_labels.R
 \name{update_ts_labels}
 \alias{update_ts_labels}
-\title{Update one or more timeseries labels in a multivariate \code{\link{regts}} object}
+\title{Update one or more timeseries labels in a multivariate
+\code{\link{regts}} object}
 \usage{
 update_ts_labels(x, labels)
 }
@@ -14,7 +15,8 @@ of the timeseries (columns) whose label will be updated.
 Specify \code{NULL} to remove all labels.}
 }
 \description{
-Update one or more timeseries labels in a multivariate \code{\link{regts}} object
+Update one or more timeseries labels in a multivariate
+\code{\link{regts}} object
 }
 \examples{
 ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"),

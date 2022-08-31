@@ -2,8 +2,8 @@
 #'
 #' @description
 #' Function \code{growth} computes the relative growth rate of a (multivariate)
-#' timeseries. The one period relative growth rate  of a timeseries is defined as
-#' \code{growth(x) = (x[t] - x[t-1]) / x[t-1]}.
+#' timeseries. The one period relative growth rate  of a timeseries is defined
+#' as \code{growth(x) = (x[t] - x[t-1]) / x[t-1]}.
 #' The \code{n} period relative change of a timeseries is defined as
 #' \code{growth(x,n) = (x[t] - x[t-n]) / x[t-n]}.
 #'
@@ -36,8 +36,8 @@ growth <- function(x, n = 1, keep_range = TRUE) {
      stop("Argument x is not a timeseries")
   }
 
-  if (n >= NROW(x)){
-    stop(paste("Timeseries must have at least", n + 1, "observations"))
+  if (n >= NROW(x)) {
+    stop("Timeseries must have at least ", n + 1, " observations")
   }
 
   ret <- diff_ts(x, n, keep_range = keep_range) /

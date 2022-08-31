@@ -56,8 +56,8 @@ standard format (see Description).}
 start and the end period must be present.
 Otherwise the timeseries are filled with \code{NA} for the missing periods.}
 
-\item{warn_dupl}{A logical. If \code{TRUE} (the default), a warning is issued
-if there are duplicate column names in the returned timeseries object.}
+\item{warn_dupl}{A logical. If \code{TRUE} (the default), a warning is
+issued if there are duplicate column names in the returned timeseries object.}
 }
 \value{
 a \code{regts} object
@@ -81,7 +81,8 @@ it might help to specify arguments \code{rowwise}, \code{frequency},
 \code{period_fun}, \code{skipcol} or \code{skiprow}.
 Specify option  \code{rowwise} if you know
 that the timeseries are stored rowwise or columnwise. Specify
-argument \code{frequency} if you already know the frequency of the timeseries.
+argument \code{frequency} if you already know the frequency of the
+timeseries.
 Arguments \code{skipcol} and \code{skiprow} can be used to read only a
 part of the file.
 If that does not help, then you can read the data into a data frame

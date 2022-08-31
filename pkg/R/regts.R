@@ -9,12 +9,15 @@
 #' `stats` package. Argument `data` can be a vector or matrix of any type
 #' (`numeric`, `character` or `logical`). The resulting timeseries has the
 #' same type However, if `data` is a `data.frame`,
-#' it is converted to a numeric matrix. In contrast to function \code{\link[stats]{ts}},
-#' `regts` does not use function \code{\link{data.matrix}} to convert the data frame.
+#' it is converted to a numeric matrix. In contrast to function
+#'  \code{\link[stats]{ts}},
+#' `regts` does not use function \code{\link{data.matrix}} to convert the data
+#' frame.
 #' `data.matrix` converts character columns first to factors and then to
-#' integers. In contrast, in function `regts` character columns are converted directly to
-#' numerical values using function \code{\link{as.character}}. For each text
-#' that cannot be converted to a numerical value a warning is issued.
+#' integers. In contrast, in function `regts` character columns are converted
+#' directly to numerical values using function \code{\link{as.character}}.
+#' For each text that cannot be converted to a numerical value a warning is
+#' issued.
 #'
 #' @param data a vector, matrix or \code{\link[base]{data.frame}}
 #' with  the observed timeseries values. A `data.frame` will
@@ -32,13 +35,14 @@
 #' @param period the period range as a \code{\link{period_range}} object or a
 #' character string that can be converted to a \code{period_range} object.
 #' This argument replaces arguments \code{start} and \code{end}.
-#' @param frequency the frequency of the timeseries. This argument should only be
-#' specified if the \code{start}, \code{end} or \code{period} argument is
+#' @param frequency the frequency of the timeseries. This argument should only
+#' be specified if the \code{start}, \code{end} or \code{period} argument is
 #' specified with a general period format without period indicator,
 #' e.g. \code{"2011-3"}.
 
 #' @param names a character vector with the column names for the series
-#' if \code{data} is a matrix or data frame. Defaults to the column names of data.
+#' if \code{data} is a matrix or data frame. Defaults to the column names of
+#' data.
 #' @param labels a character vector of labels (descriptions of the timeseries)
 #' @return a \code{regts} object
 #' @examples
@@ -49,7 +53,8 @@
 #' print(ts1["2011Q2/2011Q3"])
 #'
 #' # multivariate timeseries
-#' ts2 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"))
+#' ts2 <- regts(matrix(1:9, ncol = 3), start = "2010Q4",
+#'              names = c("a", "b", "c"))
 #'
 #' # two equivalent ways to select a column in a multivariate ts
 #' print(ts2$a)
@@ -66,7 +71,8 @@
 #' ts2[ , "e"] <- 2
 #'
 #' # multivariate timeseries with labels
-#' ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4", names = c("a", "b", "c"),
+#' ts3 <- regts(matrix(1:9, ncol = 3), start = "2010Q4",
+#'              names = c("a", "b", "c"),
 #'              labels = paste("Timeseries", c("a", "b", "c")))
 #'
 #'# multivariate timeseries created with a period_range object
@@ -120,9 +126,9 @@ regts <- function(data, start, end, period, frequency = NA,
     start <- start_period(period)
     end <- end_period(period)
     # start and end cannot both be NULL
-    if(!is.null(start)){
+    if (!is.null(start)) {
       freq <- frequency(start)
-      if(is.null(end)){
+      if (is.null(end)) {
         end <- start + NROW(data) - 1
       }
     } else {
@@ -146,7 +152,7 @@ regts <- function(data, start, end, period, frequency = NA,
     }
     if (missing(end)) {
       end <- start + NROW(data) - 1
-    } else if (missing(start)){
+    } else if (missing(start)) {
       start <- end - NROW(data) + 1
     }
   }
@@ -201,7 +207,7 @@ regts <- function(data, start, end, period, frequency = NA,
     }
   }
 
-  return (create_regts(data, start, end, freq, labels))
+  return(create_regts(data, start, end, freq, labels))
 }
 
 # Internal function to create a regts. No checking of input data.
@@ -217,7 +223,7 @@ create_regts <- function(data, startp, endp, freq, labels) {
   if (!is.null(labels)) {
     ts_labels(data) <- labels
   }
-  return (data)
+  return(data)
 }
 
 #' Test whether an object is a \code{\link{regts}} timeseries object
@@ -230,7 +236,7 @@ create_regts <- function(data, startp, endp, freq, labels) {
 #' is.regts(a)
 #' @export
 is.regts <- function(x) {
-  return (inherits(x, "regts"))
+  return(inherits(x, "regts"))
 }
 
 #' Coerce an object to a \code{\link{regts}} timeseries object
@@ -241,9 +247,9 @@ is.regts <- function(x) {
 #' the row names of the data frame.
 #' If \code{time_column} has length > 1, then argument \code{fun} should be
 #' a function which converts a data frame to \code{period} vector.
-#' @param numeric logical: should non numeric values be converted to numeric data.
-#' By default they are converted to numeric. This can be changed by setting
-#' \code{numeric = FALSE}.
+#' @param numeric logical: should non numeric values be converted to numeric
+#' data. By default they are converted to numeric. This can be changed by
+#' setting \code{numeric = FALSE}.
 #' @param fun a function for converting values in the row names,
 #' time column(s), or names of a numeric vector to \code{\link{period}} objects.
 #' Normally this is a function
@@ -252,7 +258,8 @@ is.regts <- function(x) {
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
 #' start and the end period must be present.
 #' Otherwise the timeseries are filled with \code{NA} for the missing periods.
-#' @param union A logical (default \code{TRUE}). Only used in \code{as.regts.list}.
+#' @param union A logical (default \code{TRUE}). Only used in
+#' \code{as.regts.list}.
 #' If the list contains multiple timeseries and \code{union} is \code{TRUE},
 #' then the period range of the result is the union of the period ranges of
 #' the individual timeseries objecct in the list. Otherwise the period range is
@@ -309,7 +316,8 @@ as.regts.regts <- function(x, ...) {
 as.regts.ts <- function(x, ...) {
   f <- frequency(x)
   if (floor(f) != f) {
-    stop(sprintf("Non-integer frequency (%.15g) not allowed for regts objects.", f))
+    stop(sprintf("Non-integer frequency (%.15g) not allowed for regts objects.",
+                 f))
   }
   class(x) <- c("regts", class(x))
   return(x)
@@ -349,7 +357,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     if (is.character(time_column)) {
       time_column <- which(colnames(x) %in% time_column)
     }
-    periods <- x[ , time_column]
+    periods <- x[, time_column]
     data <- x[-time_column]
   }
 
@@ -376,7 +384,7 @@ as.regts.data.frame <- function(x, time_column = 0, numeric = TRUE,
     }
   }
 
-  return (ret)
+  return(ret)
 }
 
 #' @describeIn as.regts Convert a \code{\link{matrix}} to a \code{regts}
@@ -478,19 +486,19 @@ numeric_matrix <- function(x) {
   if (any(error_sel)) {
     weird_texts <- unique(x[error_sel])
     nweird <- length(weird_texts)
-    NWEIRD_MAX <- 10
-    nmax <- min(NWEIRD_MAX, nweird)
+    nweird_max <- 10
+    nmax <- min(nweird_max, nweird)
     weird_texts <- paste0("\"", weird_texts[1:nmax], "\"")
 
-    if (nweird <= NWEIRD_MAX) {
-      warning(paste0("NAs introduced by coercion.\n",
-                     "The following texts could not be converted to numeric:\n",
-                     paste0(weird_texts, collapse = "\n")))
+    if (nweird <= nweird_max) {
+      warning("NAs introduced by coercion.\n",
+              "The following texts could not be converted to numeric:\n",
+               paste0(weird_texts, collapse = "\n"))
     } else {
-      warning(paste0("NAs introduced by coercion.\n",
-                     nweird, " texts could not be converted to numeric.\n",
-                     "The first ", NWEIRD_MAX, " texts that gave problems are:\n",
-                     paste0(weird_texts, collapse = "\n")))
+      warning("NAs introduced by coercion.\n",
+              nweird, " texts could not be converted to numeric.\n",
+              "The first ", nweird_max, " texts that gave problems are:\n",
+              paste0(weird_texts, collapse = "\n"))
     }
   }
 
@@ -551,15 +559,16 @@ matrix2regts_ <- function(x, periods, numeric, strict) {
     # are ordered synchronically
     ret <- regts(x, start = periods[1], freq)
   } else {
-    # irregular timeseries in data frame (missing periods or unordered time index.
-    # stop if strict and missing periods
-    if (strict){
+    # irregular timeseries in data frame (missing periods or unordered time
+    # index. stop if strict and missing periods
+    if (strict) {
       dif <- setdiff(sorted_periods, periods)
       if (length(dif) > 0) {
         dif_periods <- create_period(dif, freq)
         missing_periods <- as.character(dif_periods)
         mp <- paste(missing_periods, collapse = ", ")
-        stop(paste0("Missing periods found (", mp, "). Set parameter strict to FALSE!"))
+        stop("Missing periods found (", mp,
+             "). Set parameter strict to FALSE!")
       }
     }
 
@@ -572,7 +581,7 @@ matrix2regts_ <- function(x, periods, numeric, strict) {
     rows <- periods - p_min + 1
     ret[rows, ] <- x
   }
-  return (ret)
+  return(ret)
 }
 
 #' @describeIn as.regts Convert a numeric vector to a \code{regts}
@@ -638,14 +647,14 @@ add_columns <- function(x, new_colnames) {
   if (!is.null(lbls)) {
     ts_labels(ret) <- c(lbls, rep("", ncols))
   }
-  return (ret)
+  return(ret)
 }
 
 # Selection on the left-hand side: replace a part of a regts
 # (e.g. x["2010Q2", ] <- 2).
 #' @importFrom stats is.mts
 #' @export
-"[<-.regts" <- function (x, i, j, value) {
+"[<-.regts" <- function(x, i, j, value) {
 
   if (is.null(value) && is.matrix(x)) {
     # remove columns
@@ -707,10 +716,10 @@ add_columns <- function(x, new_colnames) {
     # column selection. x[i] does not return the same as x[i, ].
     if (missing(j) && is.mts(x)) {
       x[i, ] <- value
-      return (x)
+      return(x)
     }
   }
-  return (NextMethod("[<-"))
+  return(NextMethod("[<-"))
 }
 
 # Selection on the right-hand-side (e.g. x["2010Q2", ]).
@@ -747,7 +756,7 @@ add_columns <- function(x, new_colnames) {
           inherits(i, "period_range")) {
         # first select columns
         if (!missing(j)) {
-          x <- x[ , j, drop = drop]
+          x <- x[, j, drop = drop]
         }
         # the row selector is a period_range. Use window_regts
         return(window_regts(x, as.period_range(i)))
@@ -760,7 +769,8 @@ add_columns <- function(x, new_colnames) {
   }, warning = function(w) {
     warning(w)
   }, error = function(err) {
-    if (!j_missing && is.character(j) && err$message == "subscript out of bounds") {
+    if (!j_missing && is.character(j) &&
+        err$message == "subscript out of bounds") {
       missing_cols <- setdiff(j, colnames(x))
       message <- paste0("Undefined columns: ",
                        paste(missing_cols, collapse = ", "), ".")
@@ -806,7 +816,7 @@ convert_selection_range <- function(sel_range, ts_range) {
     stop(paste0("The start period (", pstart, ") is after the end period (",
                pend, ")."))
   }
-  return (new_sel_range)
+  return(new_sel_range)
 }
 
 window_regts <- function(x, sel_range) {
@@ -835,14 +845,14 @@ window_regts <- function(x, sel_range) {
   if (is.matrix(x)) {
     data <- matrix(na_val, nrow = nper_new, ncol = ncol(x))
     if (rmax >= rmin) {
-      data[rmin:rmax, ] <- x[(rmin+shift):(rmax+shift), ]
+      data[rmin:rmax, ] <- x[(rmin + shift):(rmax + shift), ]
     }
     colnames(data) <- colnames(x)
   } else {
     data <- logical(nper_new)
     data[] <- na_val
     if (rmax >= rmin) {
-      data[rmin:rmax] <- x[(rmin+shift):(rmax+shift)]
+      data[rmin:rmax] <- x[(rmin + shift):(rmax + shift)]
     }
   }
   return(create_regts(data, sel_range[1], sel_range[2], sel_range[3],
@@ -881,4 +891,3 @@ window_regts <- function(x, sel_range) {
 
   return(object)
 }
-

@@ -11,18 +11,19 @@ as.period_range(x, frequency = NA, ...)
 }
 \arguments{
 \item{start}{the first period (a \code{period}, an object that can be coerced
-to a \code{period}, or by default \code{NULL}). If \code{start} is \code{NULL}
-the lower bound of the period range is undetermined. \code{start} can also
-be a character string specifying a period range, for example
+to a \code{period}, or by default \code{NULL}). If \code{start} is
+\code{NULL} the lower bound of the period range is undetermined. \code{start}
+can also be a character string specifying a period range, for example
 \code{"2010Q2/2011Q3"}).}
 
 \item{end}{the last period (a \code{period}, an object that can be coerced
 to a \code{period}, or by default \code{NULL}).
-If \code{end} is \code{NULL}, the upper bound of the period range is undetermined.}
+If \code{end} is \code{NULL}, the upper bound of the period range is
+undetermined.}
 
 \item{frequency}{frequency of the period objects. This argument is mandatory
-if argument \code{start} or \code{end} is a character with general period format
-without frequency indicator (e.g. \code{"2011-1"})}
+if argument \code{start} or \code{end} is a character with general period
+format without frequency indicator (e.g. \code{"2011-1"})}
 
 \item{x}{an R object}
 

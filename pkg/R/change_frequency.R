@@ -28,8 +28,9 @@
 #' change_frequency(range, 12)
 #' change_frequency(range, 1)
 #' @export
-change_frequency <- function(x, new_frequency, ...) UseMethod("change_frequency")
-
+change_frequency <- function(x, new_frequency, ...) {
+  UseMethod("change_frequency")
+}
 
 #' @describeIn change_frequency Change the frequency of a \code{period} to
 #' lower frequency

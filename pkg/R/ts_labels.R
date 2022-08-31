@@ -35,9 +35,9 @@ ts_labels <- function(x) {
 `ts_labels<-` <- function(x, value) {
   if (!is.null(value)) {
     if (!is.character(value)) {
-      if (is.factor(value)){
+      if (is.factor(value)) {
         value <- as.character(value)
-      } else{
+      } else {
         stop("value should be a character vector")
       }
     }
@@ -50,10 +50,11 @@ ts_labels <- function(x) {
   # since the column names may be modified with `colnames<-` function.
   # Use as.vector to remove name attributes if present.
   attr(x, "ts_labels") <- as.vector(value)
-  return (x)
+  return(x)
 }
 
-#' Update one or more timeseries labels in a multivariate \code{\link{regts}} object
+#' Update one or more timeseries labels in a multivariate
+#' \code{\link{regts}} object
 #'
 #' @param x a multivariate \code{regts} object
 #' @param labels a named character vector. The names are the names
@@ -74,9 +75,9 @@ update_ts_labels <- function(x, labels) {
   }
   if (is.null(labels)) {
     ts_labels(x) <- NULL
-    return (x)
+    return(x)
   }
-  if (is.factor(labels)){
+  if (is.factor(labels)) {
     # convert to character, first save the names
     names <- names(labels)
     labels <- as.character(labels)
@@ -92,5 +93,5 @@ update_ts_labels <- function(x, labels) {
   sel <- which(colnames(x) %in% names(labels))
   lbls[sel] <- labels[colnames(x)[sel]]
   ts_labels(x) <- lbls
-  return (x)
+  return(x)
 }

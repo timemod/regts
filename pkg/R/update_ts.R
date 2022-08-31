@@ -9,9 +9,9 @@
 #' period range.
 #' The common columns in the timeseries can be updated in four different ways:
 #'
-#' \code{upd} the first timeseries are updated with the second timeseries for the
-#' total period range of the second timeseries. Outside this period the values
-#' in the first timeseries do not change.
+#' \code{upd} the first timeseries are updated with the second timeseries for
+#' the total period range of the second timeseries. Outside this period the
+#' values in the first timeseries do not change.
 #'
 #' \code{updna} if method \code{updna} is selected instead of \code{upd},
 #' only NA values in the first timeseries will be updated
@@ -95,7 +95,7 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace"),
   # create colnames if x1 or x2 does not have colnames
   if (is.null(names1) && NCOL(x1) > 0) {
     if (is.matrix(x1)) {
-      names1 <- paste("column", 1 : ncol(x1))
+      names1 <- paste("column", seq_len(ncol(x1)))
     } else {
       # adapt (vector) timeseries: use timeseries name and give matrix dimension
       names1 <- series_name1
@@ -106,7 +106,7 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace"),
 
   if (is.null(names2) && NCOL(x2) > 0) {
     if (is.matrix(x2)) {
-      names2 <- paste("column", 1 : ncol(x2))
+      names2 <- paste("column", seq_len(ncol(x2)))
     } else {
       # adapt (vector) timeseries: use timeseries name and give matrix dimension
       names2 <- series_name2
@@ -127,10 +127,10 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace"),
     }
   }
 
-  if (ncol(x1) == 0){
-    if (join_second){
+  if (ncol(x1) == 0) {
+    if (join_second) {
       return(x2)
-    }else{
+    } else {
       return(x1)
     }
   }
@@ -156,7 +156,7 @@ update_ts <- function(x1, x2, method = c("upd", "updna", "updval", "replace"),
     }
   }
 
-  return (update)
+  return(update)
 }
 
 
@@ -169,7 +169,8 @@ calculate_update <- function(x1, x2, common_names, p1, p2, method) {
     return(x1)
   }
 
-  # extend common regts to union of periods, fill non overlapping periods with NA
+  # extend common regts to union of periods, fill non overlapping periods with
+  # NA
   p_union <- range_union(p1, p2)
   xx1 <- x1[p_union, common_names, drop = FALSE]
   xx2 <- x2[p_union, common_names, drop = FALSE]
@@ -191,9 +192,3 @@ calculate_update <- function(x1, x2, common_names, p1, p2, method) {
 
   return(x1)
 }
-
-
-
-
-
-

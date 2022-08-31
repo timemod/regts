@@ -4,7 +4,7 @@
 window.regts <- function(x, ...) {
   ret <- as.regts(NextMethod(.Generic))
   ts_labels(ret) <- ts_labels(x)
-  return (ret)
+  return(ret)
 }
 
 # The S3 method diff.ts removes the regts class, therefore use as.regts.
@@ -12,7 +12,7 @@ window.regts <- function(x, ...) {
 diff.regts <- function(x, ...) {
   ret <- as.regts(NextMethod(.Generic))
   ts_labels(ret) <- ts_labels(x)
-  return (ret)
+  return(ret)
 }
 
 # The S3 method aggregate.ts removes the regts class, therefore call  as.regts.
@@ -56,7 +56,7 @@ aggregate.regts <- function(x, nfrequency = 1, ...) {
   }
 
   ts_labels(ret) <- ts_labels(x)
-  return (ret)
+  return(ret)
 }
 
 #' @export

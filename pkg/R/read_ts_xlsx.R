@@ -3,9 +3,9 @@
 #' This function reads timeseries from a sheet of an xls(x) file,
 #' employing function \code{\link[readxl]{read_excel}} of
 #' package \code{readxl}. \code{read_ts_xlsx} searches for period cells and
-#' automatically determines how the timeseries are stored (rowwise or columnwise)
-#' and which columns contain the numerical values of the timeseries.
-#' Period cells are cells containing
+#' automatically determines how the timeseries are stored
+#' (rowwise or columnwise) and which columns contain the numerical values of
+#' the timeseries. Period cells are cells containing
 #' \itemize{
 #' \item a text with the format recognized by function \code{\link{period}},
 #' for example \code{"2010Q2"}, \code{"2010.2Q"},
@@ -17,8 +17,8 @@
 #' Use argument \code{period_fun} if the period cells contain a text with a
 #' format not recognized by function \code{period}.
 #'
-#' \code{read_ts_xlsx} reads the timeseries data in two steps. In the first step,
-#' the first 25 rows are read to inspect the
+#' \code{read_ts_xlsx} reads the timeseries data in two steps. In the first
+#' step, the first 25 rows are read to inspect the
 #' structure of the data on the sheet: are the timeseries stored rowwise or
 #' columnwise, which row or column contains the period cells and which columns
 #' contain the numerical data of the timeseries.
@@ -31,7 +31,8 @@
 #' \code{period_fun}, \code{range}, \code{skipcol} or \code{skiprow}.
 #' Specify option  \code{rowwise} if you know
 #' that the timeseries are stored rowwise or columnwise. Specify
-#' argument \code{frequency} if you already know the frequency of the timeseries.
+#' argument \code{frequency} if you already know the frequency of the
+#' timeseries.
 #' Arguments \code{range}, \code{skipcol} and \code{skiprow} can be used to read
 #' only a part of the file.
 #'
@@ -124,7 +125,7 @@
 #' @param na_string Character vector of strings to use for missing values.
 #' By default, \code{read_ts_xlsx} treats blank cells as missing data.
 #' @param name_fun function to apply to the names of the timeseries.
-##' @param period_fun function applied to period texts. This should be a function
+#' @param period_fun function applied to period texts. This should be a function
 #' that converts a character vector to another character vector or a
 #' \code{period} vector with the same length. Use this argument if the period
 #' texts do not have a
@@ -132,14 +133,13 @@
 #' @param strict A logical. If \code{TRUE} (the default) all periods between the
 #' start and the end period must be present.
 #' Otherwise the timeseries are filled with \code{NA} for the missing periods.
-#' @param warn_num_text A logical. If \code{TRUE} (the default) a warning is issued
-#' if a cell contains a number as text (e.g. \code{"2012.2"}) when
+#' @param warn_num_text A logical. If \code{TRUE} (the default) a warning is
+#' issued if a cell contains a number as text (e.g. \code{"2012.2"}) when
 #' a numeric value is expected. The text is always converted to a numeric value
 #' assuming the decimal separator \code{"."}.
-#' @param warn_dupl A logical. If \code{TRUE} (the default), a warning is issued
-#' if there are duplicate column names in the returned timeseries object.
+#' @param warn_dupl A logical. If \code{TRUE} (the default), a warning is
+#' issued if there are duplicate column names in the returned timeseries object.
 #' @return a \code{regts} object
-#'
 #' @examples
 #' \dontrun{
 #' read_ts_xlsx("series.xlsx", skipcol = 2, na_string = c("", "NA"))
@@ -399,7 +399,7 @@ select_read_excel_warnings <- function(warnings, row_sel, first_row_nr,
   row_nrs <- which(row_sel) + first_row_nr - 1
 
   pattern <- "^((Expecting numeric)|(Coercing text to numeric)) in [A-Z]+(\\d+)"
-  warning_row_nrs <- as.numeric(str_match(warnings, pattern)[ , 5])
+  warning_row_nrs <- as.numeric(str_match(warnings, pattern)[, 5])
   sel <- is.na(warning_row_nrs) | warning_row_nrs %in% row_nrs
   if (!warn_num_text) {
     # remove warnings  about "Coercing text to numeric")

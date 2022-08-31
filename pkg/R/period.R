@@ -134,7 +134,7 @@ as.period.numeric <- function(x, frequency = NA, ...) {
   x <- as.numeric(x)
 
   if (is.na(frequency)) {
-    if (any(is.na(x) | x %%1 != 0)) {
+    if (any(is.na(x) | x %% 1 != 0)) {
       stop("Argument frequency should be specified.")
     } else {
       frequency <- 1
@@ -213,7 +213,7 @@ Ops.period <- function(e1, e2) {
   if (.Generic %in% c("==", "!=", "<", ">", "<=", ">=")) {
     # logical operator
     if (is.period(e1) && is.period(e2) &&
-        (attr(e1, 'frequency') != attr(e2, 'frequency'))) {
+        (attr(e1, "frequency") != attr(e2, "frequency"))) {
       # if e1 and e2 are both periods with a different frequency,
       # the operators == and != are meaningful, but comparison
       # operators such as > do not make sense.
@@ -234,7 +234,7 @@ Ops.period <- function(e1, e2) {
     e2_is_per <- is.period(e2)
 
     if (e1_is_per && e2_is_per) {
-      if (attr(e1, 'frequency') != attr(e2, 'frequency')) {
+      if (attr(e1, "frequency") != attr(e2, "frequency")) {
         stop(paste("Arithmetic operations on periods with different",
                    "frequencies are not allowed."))
       }
@@ -245,7 +245,8 @@ Ops.period <- function(e1, e2) {
       # check if supplied numeric arguments are integers
       if (!e1_is_per && is.numeric(e1) &&  !all(is.na(e1) | e1 %% 1 == 0)) {
         stop("First operand contains non-integer values.")
-      } else if (!e2_is_per && is.numeric(e2) && !all(is.na(e2) | e2 %% 1 == 0)) {
+      } else if (!e2_is_per && is.numeric(e2) &&
+                 !all(is.na(e2) | e2 %% 1 == 0)) {
         stop("Second operand contains non-integer values.")
       }
     }

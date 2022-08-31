@@ -31,9 +31,9 @@ Compute the lag of a timeseries, shifting the observations
 forwards by a given number of periods.
 }
 \details{
-Vector, matrix and data frame arguments are first converted to a \code{regts}
-with function \code{\link{regts}}. This conversion results in a timeseries
-with frequency 1 and starting at year 1.
+Vector, matrix and data frame arguments are first converted to a
+\code{regts} with function \code{\link{regts}}. This conversion results in a
+timeseries with frequency 1 and starting at year 1.
 
 \code{lag_ts} differs from \code{\link[stats]{lag}}
 in the \code{stats} package in that the specified number of lags
@@ -48,5 +48,6 @@ lag_ts(x)
 lag_ts(x, k = 2, keep_range = FALSE)
 }
 \seealso{
-\code{\link{lead_ts}}, \code{\link{diff_ts}} and \code{\link[stats]{lag}}
+\code{\link{lead_ts}}, \code{\link{diff_ts}} and
+\code{\link[stats]{lag}}.
 }

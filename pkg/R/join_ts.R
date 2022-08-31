@@ -19,8 +19,8 @@
 #' period is determined, ignoring the NA values as described above.
 #' The remaining columns in the new timeseries are added to the result.
 #' Remaining columns in the old timeseries are ignored.
-#' The result series and the new series have the same columns, in the same order.
-#' The joined timeseries can be found in the common columns.
+#' The result series and the new series have the same columns, in the same
+#' order. The joined timeseries can be found in the common columns.
 #'
 #' If both input timeseries are vectors (i.e. there are no column names), the
 #' result is also a vector.
@@ -90,9 +90,10 @@ join_ts <- function(old, new, method = c("mult", "add")) {
   # create colnames if x_new or x_old are vectors and do not have column names
   if (is.null(names_new)) {
     if (is.matrix(x_new)) {
-      names_new <- paste("column", 1 : ncol(x_new))
+      names_new <- paste("column", seq_len(ncol(x_new)))
     } else {
-      # adapt (vector) timeseries: use timeseries names and give matrix dimension
+      # adapt (vector) timeseries: use timeseries names and give matrix
+      # dimension
       names_new <- paste(series_name_old, series_name_new, sep = "_")
       dim(x_new) <- c(length(x_new), 1)
       vector_new <- TRUE
@@ -102,9 +103,10 @@ join_ts <- function(old, new, method = c("mult", "add")) {
   }
   if (is.null(names_old)) {
     if (is.matrix(x_old)) {
-      names_old <- paste("column", 1 : ncol(x_old))
+      names_old <- paste("column", seq_len(ncol(x_old)))
     } else {
-      # adapt (vector) timeseries: use timeseries names and give matrix dimension
+      # adapt (vector) timeseries: use timeseries names and give matrix
+      # dimension
       names_old <- paste(series_name_old, series_name_new, sep = "_")
       dim(x_old) <- c(length(x_old), 1)
       vector_old <- TRUE
@@ -112,7 +114,7 @@ join_ts <- function(old, new, method = c("mult", "add")) {
     colnames(x_old) <- names_old
   }
 
-  if (vector_new != vector_old){
+  if (vector_new != vector_old) {
     stop("Combinations of timeseries with and without column names are not possible")
   }
 
@@ -133,11 +135,13 @@ join_ts <- function(old, new, method = c("mult", "add")) {
   ep_new <- end_period(p_new)
   ep_old <- end_period(p_old)
 
-  if (sp_new < sp_old){
-    stop("Timeseries are in wrong order, old series should start before new series!")
-  } else if (ep_new < ep_old){
-    stop("Timeseries are in wrong order, old series should end before new series!")
-  } else if (sp_new > ep_old){
+  if (sp_new < sp_old) {
+    stop("Timeseries are in wrong order, old series should start before new ",
+          "series!")
+  } else if (ep_new < ep_old) {
+    stop("Timeseries are in wrong order, old series should end before new ",
+         "series!")
+  } else if (sp_new > ep_old) {
     stop("Timeseries have no overlap!")
   }
 
@@ -147,7 +151,7 @@ join_ts <- function(old, new, method = c("mult", "add")) {
                          distance, vector_new)
 
   # update for multivariate timeseries
-  if (!vector_new){
+  if (!vector_new) {
     # update result with non common names in x_new
     if (length(extra_names_new) > 0) {
       join[p_new, extra_names_new] <- x_new[p_new, extra_names_new]
@@ -170,9 +174,9 @@ join_ts <- function(old, new, method = c("mult", "add")) {
       # check for empty labels, fill them with old labels if available
       if (!is.null(lbls_old)) {
         sel <- ts_labels(join) == ""
-        if (any(sel)){
+        if (any(sel)) {
           cnames <- intersect(names(lbls_old), names(sel[sel]))
-          if (length(cnames) > 0){
+          if (length(cnames) > 0) {
             join <- update_ts_labels(join, ts_labels(x_old[, cnames, drop = FALSE]))
           }
         }
@@ -180,10 +184,10 @@ join_ts <- function(old, new, method = c("mult", "add")) {
     }
 
     # sort columns of join in same order as columns in new
-    join <- join[, names_new, drop = FALSE ]
+    join <- join[, names_new, drop = FALSE]
 
   }
-  return (join)
+  return(join)
 }
 
 
@@ -213,17 +217,17 @@ calculate_join <- function(x_old, x_new, common_names, p_old, p_new, method,
 
     # trim individual series to see if there is still an overlapping period
     # f_new is first not NA in new series, l_old is last not NA in old series
-    f_new <- Position(function(x){x}, !is.na(m_new[, ix]))
-    if (is.na(f_new)){ f_new <- nperiod(p_new) + 1}
+    f_new <- Position(function(x) x, !is.na(m_new[, ix]))
+    if (is.na(f_new)) f_new <- nperiod(p_new) + 1
     f_old <- f_new + distance
-    l_old  <- Position(function(x){x}, !is.na(m_old[, ix]), right = TRUE)
-    if (is.na(l_old)){ l_old <- 0}
+    l_old  <- Position(function(x) x, !is.na(m_old[, ix]), right = TRUE)
+    if (is.na(l_old)) l_old <- 0
     l_new  <- l_old - distance
 
-    if (f_new > l_new){
-      if (vector){
+    if (f_new > l_new) {
+      if (vector) {
         stop("No overlapping period (when NA values are taken into account)")
-      } else{
+      } else {
         name <- common_names[ix]
         stop(paste("No overlapping period in combination of timeseries", name,
              "(when NA values are taken into account)"))
@@ -239,11 +243,11 @@ calculate_join <- function(x_old, x_new, common_names, p_old, p_new, method,
     fill_prd_1 <- 1 : (f_old - 1)
     fill_prd_2 <- f_old : nper
 
-    if (method == "mult"){
+    if (method == "mult") {
       factor <- mn_new/mn_old
       ret_matrix[fill_prd_1, ix] <- m_old[fill_prd_1, ix] * factor
 
-    } else{
+    } else {
       factor <- mn_new - mn_old
       ret_matrix[fill_prd_1, ix] <- m_old[fill_prd_1, ix] + factor
     }
@@ -251,7 +255,7 @@ calculate_join <- function(x_old, x_new, common_names, p_old, p_new, method,
     ret_matrix[fill_prd_2, ix] <- m_new[(fill_prd_2 - distance), ix]
   }
 
-  if (vector){
+  if (vector) {
     ret <- regts(as.vector(ret_matrix), period = p)
   } else {
     ret <- regts(ret_matrix, period = p, names = common_names)
@@ -288,9 +292,3 @@ calculate_join <- function(x_old, x_new, common_names, p_old, p_new, method,
 # Result series contain
 #   original values of new timeseries for overlap period till end of new ts
 #   calculated values for period starting in first period old ts till overlap
-
-
-
-
-
-

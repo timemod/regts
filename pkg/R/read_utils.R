@@ -44,7 +44,7 @@ is_period_data <- function(data, frequency, xlsx, period_fun) {
     if (is.na(frequency) || 12 %% frequency == 0) {
       # When read from an xlsx file the tbl may contain  POSIXt values.
       # POSIXt values are possible periods if the frequency is a divisor of 12.
-      is_posixt <- sapply(data, FUN =  function(x) {inherits(x[[1]], "POSIXt")})
+      is_posixt <- sapply(data, FUN =  function(x) inherits(x[[1]], "POSIXt"))
       if (any(is_posixt)) {
         is_period[is_posixt] <- TRUE
       }
@@ -86,7 +86,7 @@ get_periods_data <- function(data, frequency, xlsx, period_fun) {
     }
     if (is.na(frequency) || 12 %% frequency == 0) {
       # POSIXt values are possible periods if the frequency is a divisor of 12.
-      is_posixt <- sapply(data, FUN = function(x) {inherits(x[[1]], "POSIXt")})
+      is_posixt <- sapply(data, FUN = function(x) inherits(x[[1]], "POSIXt"))
       posixt_present <- any(is_posixt)
     } else {
       posixt_present <- FALSE
@@ -196,9 +196,9 @@ apply_period_fun <- function(texts, period_fun) {
 }
 
 # Internal function inspect_tibble: finds the first row or column of the periods
-# of the tibble read by read_ts_xlsx or read_ts_csv. The function also determines
-# which column of the tibble contains timeseries data. Returns NULL if no
-# period has been found.
+# of the tibble read by read_ts_xlsx or read_ts_csv. The function also
+# determines which column of the tibble contains timeseries data. Returns NULL
+# if no period has been found.
 #
 # The function does not assume that all rows of the csv file or Excel sheet
 # have been read. read_ts_xlsx first reads the first 25 rows, then calls
@@ -208,10 +208,10 @@ apply_period_fun <- function(texts, period_fun) {
 # but inspect_tibble does not use that information.
 #
 # For rowwise timeseries, the function returns the periods and for columnwise
-# timeseries the names and labels.  The function does not return names and labels
-# for rowwise timeseries, because the input tibble may not contain all rows
-# (see the discussion above). For the same reason, the function does not return
-# the periods for columnwise timeseries.
+# timeseries the names and labels.  The function does not return names and
+# labels for rowwise timeseries, because the input tibble may not contain all
+# rows (see the discussion above). For the same reason, the function does not
+# return the periods for columnwise timeseries.
 inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
                            name_fun) {
 
@@ -225,7 +225,7 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
   if (rowwise_specified && !rowwise) {
     # columnwise
 
-    for (col_nr in 1:ncol(tbl)) {
+    for (col_nr in seq_len(ncol(tbl))) {
       is_period_col <- is_period_data(tbl[[col_nr]], frequency, xlsx,
                                       period_fun)
       if (!any(is_period_col)) next
@@ -336,7 +336,7 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
   if (rowwise_guessed) {
     text <- if (rowwise) "rowwise" else  "columnwise"
     warning(paste("Could not determine if timeseries are stored rowwise",
-                  "or columnwise.\nAssuming" , text, "based on the",
+                  "or columnwise.\nAssuming", text, "based on the",
                   "number of periods found.\nUse argument rowwise if",
                   "necessary."))
   }
@@ -353,7 +353,7 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
     periods <- get_periods_data(period_data, frequency, xlsx, period_fun)
 
     is_data_col <- is_period_row
-    is_data_col[1:(first_data_col -1)] <- FALSE
+    is_data_col[1:(first_data_col - 1)] <- FALSE
 
     return(list(rowwise = TRUE, period_row = row_nr,
                 first_data_col = first_data_col, last_data_col = last_data_col,
@@ -431,7 +431,7 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
   }
 
   #
-  # FREQUENCY > 1
+  # FREQUENCY LARGER THAN 1
   #
 
   if (!is.na(frequency) && frequency > 1 &&
@@ -556,7 +556,7 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
 
 
 get_first_non_empty_row <- function(tbl) {
-  for (row_nr in 1:nrow(tbl)) {
+  for (row_nr in seq_len(nrow(tbl))) {
     if (any(!is.na(tbl[row_nr, ]))) {
       return(row_nr)
     }
@@ -565,7 +565,7 @@ get_first_non_empty_row <- function(tbl) {
 }
 
 get_last_non_empty_row <- function(tbl) {
-  for (row_nr in nrow(tbl):1) {
+  for (row_nr in rev(seq_len(nrow(tbl)))) {
     if (any(!is.na(tbl[row_nr, ]))) {
       return(row_nr)
     }
@@ -574,7 +574,7 @@ get_last_non_empty_row <- function(tbl) {
 }
 
 get_last_non_empty_column <- function(tbl) {
-  for (col_nr in ncol(tbl):1) {
+  for (col_nr in rev(seq_len(ncol(tbl)))) {
     if (any(!is.na(tbl[[col_nr]]))) {
       return(col_nr)
     }
@@ -607,7 +607,7 @@ get_name_info_rowwise <- function(layout, data_tbl, labels, name_fun) {
   # get the names and labels for a rowwise tibble containing timeseries data.
   if (layout$first_data_col > 1) {
     pre_data_cols <- 1 : (layout$first_data_col - 1)
-    pre_data_tbl <- data_tbl[ , pre_data_cols]
+    pre_data_tbl <- data_tbl[, pre_data_cols]
     empty_cols <- apply(is.na(pre_data_tbl), MARGIN = 2, FUN = all)
     name_label_cols <- which(!empty_cols)
   } else {
@@ -622,7 +622,7 @@ get_name_info_rowwise <- function(layout, data_tbl, labels, name_fun) {
   n_label_cols <- length(name_label_cols) - 1
 
   # no labels if there is only one non-empty column
-  if (n_label_cols == 0) labels = "no"
+  if (n_label_cols == 0) labels <- "no"
 
   name_col <- if (labels == "before") {
     name_label_cols[n_label_cols + 1]
@@ -689,7 +689,7 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
   n_label_rows <- length(name_label_rows) - 1
 
   # no labels if there is only one non-empty column
-  if (n_label_rows == 0) labels = "no"
+  if (n_label_rows == 0) labels <- "no"
 
   name_row <- if (labels == "before") {
     name_label_rows[n_label_rows + 1]
@@ -732,8 +732,11 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
 }
 
 get_labels_from_tbl <- function(label_tbl, rowwise) {
-  label_tbl[] <- lapply(label_tbl, FUN = function(x)
-               {ifelse(is.na(x),  "", as.character(x))})
+  label_tbl[] <- lapply(label_tbl,
+                        FUN = function(x) {
+                                ifelse(is.na(x),  "", as.character(x))
+                              }
+                        )
   if (!rowwise) {
     label_tbl <- as_tibble(t(label_tbl), .name_repair = "minimal")
   }
@@ -751,13 +754,14 @@ get_labels_from_tbl <- function(label_tbl, rowwise) {
 }
 
 test_duplicates <- function(rts, filename, sheetname = NULL) {
-  # test duplicate names in timeseries rts (used in read_ts_xslx and read_ts_csv)
+  # test duplicate names in timeseries rts (used in read_ts_xslx and
+  # read_ts_csv)
   if (anyDuplicated(cnames <- colnames(rts))) {
     dupl_names <- cnames[duplicated(cnames)]
-    if (is.null(sheetname)){
+    if (is.null(sheetname)) {
       warning(sprintf("Duplicate names in file %s: %s", filename,
                       paste(dupl_names, collapse = ", ")))
-    } else{
+    } else {
       warning(sprintf("Duplicate names on sheet %s of file %s: %s", sheetname,
                       filename, paste(dupl_names, collapse = ", ")))
     }

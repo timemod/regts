@@ -26,7 +26,7 @@
 
 
 #' @export
-remove_na_columns <- function (x, is_na = c("all", "any")) {
+remove_na_columns <- function(x, is_na = c("all", "any")) {
 
   # Use function inherits instead of is.ts to check if x1 is a timeseries.
   # is.ts returns FALSE if x1 is a timeseries with 0 columns
@@ -59,6 +59,6 @@ remove_na_columns <- function (x, is_na = c("all", "any")) {
     return(NULL)
   }
 
-  return(x[ ,elem, drop = FALSE])
+  return(x[, elem, drop = FALSE])
 
 }

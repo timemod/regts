@@ -18,22 +18,22 @@ values smaller than or equal to \code{tol} are ignored.}
 
 \item{fun}{function to compute differences. This function should accept
 two arguments (two numbers) for which the difference is computed.
-By default the normal difference (\eqn{x_1 - x_2}) is computed. A useful function for
-computing differences is \code{\link{cvgdif}}, which computes relative differences
-if the absolute value of \code{x2} is larger than 1.}
+By default the normal difference (\eqn{x_1 - x_2}) is computed. A useful
+function for computing differences is \code{\link{cvgdif}}, which computes
+relative differences if the absolute value of \code{x2} is larger than 1.}
 }
 \value{
 a list with class "tsdif", with the following components
-\item{equal}{\code{TRUE} if \code{x1} and \code{x2} have the same column names
-and period ranges,
+\item{equal}{\code{TRUE} if \code{x1} and \code{x2} have the same column
+names and period ranges,
 and if all differences are smaller than or equal to \code{tol}}
 \item{difnames}{The names of the timeseries with differences
 larger than \code{tol}}
 \item{dif}{A \code{regts} with the computed differences,
 or \code{NULL} if there are no differences larger than \code{tol}.
 Only timeseries with differences larger than \code{tol} are included.
-Leading and trailing rows with differences less than \code{tol} have also been
-removed.}
+Leading and trailing rows with differences less than \code{tol} have also
+been removed.}
 \item{maxdif}{A \code{data.frame} with the maximum differences. For each
 timeseries the maximum difference is determined. Column \code{maxdif}
 contains the maximum differences and
@@ -91,8 +91,8 @@ The print result is controlled by two options: \code{regts_max_difnames} and
 \code{regts_max_maxdif}.  The first option, \code{regts_max_difnames} (default 50)
 determines the maximum number of timeseries names printed (the names
 of timeseries with differences and the names of timeseries missing in the
-first or second timeseries object). Option \code{regts_max_maxdif} (default 10) determines
-the maximum number of
+first or second timeseries object). Option \code{regts_max_maxdif} (default 10)
+determines the maximum number of
 maximum differences printed. The options can be modified with function
 \code{\link[base]{options}} (e.g. \code{options(regts_max_maxdif = 20)} and
 \code{options(regts_max_difnames = 1000)}. Function \code{\link[base]{getOption}}

@@ -25,7 +25,8 @@ shorter than the input timeseries.}
 
 \item{method}{method used to handle the centered moving average for
 even orders. Possible values are \code{"centre"} (the default),
-\code{"left"} and \code{"right"}. See Details. This argument is ignored for odd orders.}
+\code{"left"} and \code{"right"}. See Details. This argument is ignored for
+odd orders.}
 }
 \value{
 a \code{regts} object with the moving average values

@@ -12,8 +12,9 @@
 #' The \code{"pct"} and \code{"rel"} methods assume timeseries that contain
 #' percentage or relative changes and calculate the exact percentage or relative
 #' change in the output frequency.
-#' The \code{"difmean"} and \code{"difsum"} methods assume that the input timeseries
-#' contain a first difference. The result is a first difference in the output frequency.
+#' The \code{"difmean"} and \code{"difsum"} methods assume that the input
+#' timeseries contain a first difference. The result is a first difference in
+#' the output frequency.
 #' Method names \code{"dif1s"} and \code{"dif1"} are obsolete and have been
 #' replaced by \code{"difmean"} and \code{"difsum"}, respectively.
 #' More details for the various methods are provided in vignette
@@ -34,20 +35,22 @@
 #' ts_q <- regts(abs(rnorm(10)), start = "2016Q1")
 #' aggregate_gr(ts_q, method = "difmean")
 #'
-#' ts_m <- regts(matrix(abs(rnorm(20)), ncol = 2), start = "2017M1", names = c("a", "b"))
+#' ts_m <- regts(matrix(abs(rnorm(20)), ncol = 2), start = "2017M1",
+#'               names = c("a", "b"))
 #' aggregate_gr(ts_m, method = "rel", nfrequency = 4)
 #' @export
 #' @useDynLib regts, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
-aggregate_gr <- function(x, method = c("pct", "rel", "difmean", "difsum", "dif1s", "dif1" ),
+aggregate_gr <- function(x, method = c("pct", "rel", "difmean", "difsum",
+                                       "dif1s", "dif1"),
                          nfrequency = 1) {
 
   method <- match.arg(method)
-  if (method == "dif1s"){
+  if (method == "dif1s") {
     warning("Method name 'dif1s' is obsolete, use 'difmean' instead")
     method <- "difmean"
   }
-  if (method == "dif1"){
+  if (method == "dif1") {
     warning("Method name 'dif1' is obsolete, use 'difsum' instead")
     method <- "difsum"
   }

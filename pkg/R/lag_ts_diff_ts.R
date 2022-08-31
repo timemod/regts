@@ -3,9 +3,9 @@
 #' Compute the lag of a timeseries, shifting the observations
 #' forwards by a given number of periods.
 #'
-#' Vector, matrix and data frame arguments are first converted to a \code{regts}
-#' with function \code{\link{regts}}. This conversion results in a timeseries
-#' with frequency 1 and starting at year 1.
+#' Vector, matrix and data frame arguments are first converted to a
+#' \code{regts} with function \code{\link{regts}}. This conversion results in a
+#' timeseries with frequency 1 and starting at year 1.
 #'
 #' \code{lag_ts} differs from \code{\link[stats]{lag}}
 #' in the \code{stats} package in that the specified number of lags
@@ -26,7 +26,8 @@
 #' starts and ends \code{n} periods later.
 #' @param ... further arguments to be passed to or from methods
 #'            (currently not used in package \code{regts})
-#' @seealso \code{\link{lead_ts}}, \code{\link{diff_ts}} and \code{\link[stats]{lag}}
+#' @seealso \code{\link{lead_ts}}, \code{\link{diff_ts}} and
+#' \code{\link[stats]{lag}}.
 #' @examples
 #' x <- regts(1:10, start = "2018q3")
 #' lag_ts(x)
@@ -60,9 +61,9 @@ lag_ts.default <- function(x, n = 1, keep_range = TRUE, ...) {
 #' with function \code{\link{regts}}. This conversion results in a timeseries
 #' with frequency 1 and starting at year 1.
 #'
-#' Function \code{lead_ts} is an alternative for function \code{\link[stats]{lag}}
-#' in the \code{stats} package which computes both lags and leads.
-#' By default in \code{lead_ts} the resulting timeseries has the same
+#' Function \code{lead_ts} is an alternative for function
+#' \code{\link[stats]{lag}} in the \code{stats} package which computes both lags
+#' and leads. By default in \code{lead_ts} the resulting timeseries has the same
 #' period range as the input timeseries. In function \code{lag} the time base
 #' is always shifted. \code{lead_ts(x, 1, keep_range = FALSE)} is the same as
 #' \code{lag(x, 1)}
@@ -121,7 +122,7 @@ shift_ts <- function(x, k, keep_range) {
       return(data.table::shift(ts, n = abs(k), type = type))
     }
     if (is.matrix(x)) {
-      x[] <- apply(x, MARGIN = 2 , FUN = shift_fun)
+      x[] <- apply(x, MARGIN = 2, FUN = shift_fun)
       return(x)
     } else {
       return(shift_fun(x))
@@ -152,7 +153,7 @@ shift_ts <- function(x, k, keep_range) {
 #' timeseries has the same period range as the input timeseries.
 #' Then the result timeseries will have \code{lag + differences - 1}
 #' \code{NA} values at the beginning.
-#' If \code{FALSE} then the result timeseries starts \code{lag + differences - 1}
+#' If \code{FALSE} then the result timeseries starts `lag + differences - 1`
 #' periods later than the input timeseries.
 #' @param ... further arguments to be passed to or from methods
 #'            (currently not used in package \code{regts})
@@ -197,7 +198,8 @@ diff_ts.ts <- function(x, lag = 1, differences = 1, keep_range = TRUE, ...) {
 
 #' @rdname diff_ts
 #' @export
-diff_ts.default <- function(x, lag = 1, differences = 1, keep_range = TRUE, ...) {
+diff_ts.default <- function(x, lag = 1, differences = 1, keep_range = TRUE,
+                            ...) {
   return(diff_ts(regts(x), lag = lag, differences = differences,
                  keep_range = keep_range, ...))
 }

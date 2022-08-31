@@ -36,7 +36,7 @@ print.regts <- function(x, ...) {
   f <- frequency(x)
 
   if (is.matrix(x)) {
-    print_mat <- x[1:nrow(x), , drop = FALSE]
+    print_mat <- x[seq_len(nrow(x)), , drop = FALSE]
     first_period <- start_period.ts(x)
     periods <- sapply(0 : (NROW(x) - 1),
                       FUN = function(i) as.character(first_period + i))
@@ -69,8 +69,8 @@ print_vec_year <- function(x, ...) {
 
   # Determine the columns width. All strings of the vector
   # returned by function format have the same length, except if argument trim
-  # has been specified. For safety we determine the maximum length of the formatted
-  # data, and use this to calculate the number of columns.
+  # has been specified. For safety we determine the maximum length of the
+  # formatted data, and use this to calculate the number of columns.
   col_width <- max(nchar(formatted_data))
   # the columns width should be at least 4, because of the columns names.
   # we columns names for column 2 and further will be " + 2", "+ 3", etc.
@@ -96,7 +96,7 @@ print_vec_year <- function(x, ...) {
     # fore decades and half-decades we want to start at the beginning
     # of a decade/half decade
     start_y_mat <- floor(start_y / ncol) * ncol
-    end_y_mat   <- ceiling((end_y + 1)/ ncol) * ncol - 1
+    end_y_mat   <- ceiling((end_y + 1) / ncol) * ncol - 1
   } else {
     start_y_mat <- start_y
     ny_mat <- ceiling(ny / ncol) * ncol
@@ -129,5 +129,3 @@ print_vec_regts <- function(x, ...) {
   print(values)
   return(invisible(x))
 }
-
-

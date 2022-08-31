@@ -56,13 +56,13 @@ standard format (see Description).}
 start and the end period must be present.
 Otherwise the timeseries are filled with \code{NA} for the missing periods.}
 
-\item{warn_num_text}{A logical. If \code{TRUE} (the default) a warning is issued
-if a cell contains a number as text (e.g. \code{"2012.2"}) when
+\item{warn_num_text}{A logical. If \code{TRUE} (the default) a warning is
+issued if a cell contains a number as text (e.g. \code{"2012.2"}) when
 a numeric value is expected. The text is always converted to a numeric value
 assuming the decimal separator \code{"."}.}
 
-\item{warn_dupl}{A logical. If \code{TRUE} (the default), a warning is issued
-if there are duplicate column names in the returned timeseries object.}
+\item{warn_dupl}{A logical. If \code{TRUE} (the default), a warning is
+issued if there are duplicate column names in the returned timeseries object.}
 }
 \value{
 a \code{regts} object
@@ -71,9 +71,9 @@ a \code{regts} object
 This function reads timeseries from a sheet of an xls(x) file,
 employing function \code{\link[readxl]{read_excel}} of
 package \code{readxl}. \code{read_ts_xlsx} searches for period cells and
-automatically determines how the timeseries are stored (rowwise or columnwise)
-and which columns contain the numerical values of the timeseries.
-Period cells are cells containing
+automatically determines how the timeseries are stored
+(rowwise or columnwise) and which columns contain the numerical values of
+the timeseries. Period cells are cells containing
 \itemize{
 \item a text with the format recognized by function \code{\link{period}},
 for example \code{"2010Q2"}, \code{"2010.2Q"},
@@ -86,8 +86,8 @@ Use argument \code{period_fun} if the period cells contain a text with a
 format not recognized by function \code{period}.
 }
 \details{
-\code{read_ts_xlsx} reads the timeseries data in two steps. In the first step,
-the first 25 rows are read to inspect the
+\code{read_ts_xlsx} reads the timeseries data in two steps. In the first
+step, the first 25 rows are read to inspect the
 structure of the data on the sheet: are the timeseries stored rowwise or
 columnwise, which row or column contains the period cells and which columns
 contain the numerical data of the timeseries.
@@ -100,7 +100,8 @@ it might help to specify arguments \code{rowwise}, \code{frequency},
 \code{period_fun}, \code{range}, \code{skipcol} or \code{skiprow}.
 Specify option  \code{rowwise} if you know
 that the timeseries are stored rowwise or columnwise. Specify
-argument \code{frequency} if you already know the frequency of the timeseries.
+argument \code{frequency} if you already know the frequency of the
+timeseries.
 Arguments \code{range}, \code{skipcol} and \code{skiprow} can be used to read
 only a part of the file.
 

@@ -34,9 +34,9 @@ The two timeseries must have the same frequency, but may have a different
 period range.
 The common columns in the timeseries can be updated in four different ways:
 
-\code{upd} the first timeseries are updated with the second timeseries for the
-total period range of the second timeseries. Outside this period the values
-in the first timeseries do not change.
+\code{upd} the first timeseries are updated with the second timeseries for
+the total period range of the second timeseries. Outside this period the
+values in the first timeseries do not change.
 
 \code{updna} if method \code{updna} is selected instead of \code{upd},
 only NA values in the first timeseries will be updated

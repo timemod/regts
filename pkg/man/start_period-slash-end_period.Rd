@@ -43,7 +43,8 @@ start_period(range)
 end_period(range)
 
 # start and end period of a regts
-data <- regts(matrix(1:20, ncol = 2), start = "2010Q2", names = c("nl", "uk"))
+data <- regts(matrix(1:20, ncol = 2), start = "2010Q2",
+              names = c("nl", "uk"))
 start_period(data)
 end_period(data)
 

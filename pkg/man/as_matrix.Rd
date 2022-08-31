@@ -28,12 +28,12 @@ column names of the returned matrix, depending on argument \code{rowwise}.
 }
 \details{
 The function behaves differently than base method
-\code{\link[base]{as.matrix}}. If the input timeseries is a matrix with timeseries
-attributes, then \code{as.matrix} just returns the input value. If the input
-timeseries is not a matrix (a univariate timeseries with vector data),
-then \code{as.matrix} returns a matrix without row and column names and
-without timeseries attributes. In contrast, \code{as_matrix} always returns
-a matrix without timeseries attributes.
+\code{\link[base]{as.matrix}}. If the input timeseries is a matrix with
+timeseries attributes, then \code{as.matrix} just returns the input value.
+If the input timeseries is not a matrix (a univariate timeseries with vector
+data), then \code{as.matrix} returns a matrix without row and column names
+and without timeseries attributes. In contrast, \code{as_matrix} always
+returns a matrix without timeseries attributes.
 }
 \section{Methods (by class)}{
 \itemize{

@@ -40,7 +40,8 @@
 #' @param order the order of the moving average
 #' @param method method used to handle the centered moving average for
 #' even orders. Possible values are \code{"centre"} (the default),
-#' \code{"left"} and \code{"right"}. See Details. This argument is ignored for odd orders.
+#' \code{"left"} and \code{"right"}. See Details. This argument is ignored for
+#' odd orders.
 #' @param keep_range If \code{TRUE} (the default), then  the output
 #' timeseries has the same period range as the input timeseries.
 #' Then the result timeseries will have \code{order} NA values. For
@@ -74,7 +75,7 @@ movavc <- function(x, order, keep_range = TRUE,
 
   method <- match.arg(method)
 
-  is_odd_order <- as.logical(order%%2)
+  is_odd_order <- as.logical(order %% 2)
   if (is_odd_order || method == "centre") {
     to <- floor(order / 2)
     from <- -to

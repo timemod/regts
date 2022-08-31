@@ -75,7 +75,7 @@ transpose_df  <- function(x, colname_column, label_column) {
   # the numerical columns to character columns with function as.character.
   # as.character does not loose precision.
   is_num <- sapply(x, FUN = is.numeric)
-  is_text <- sapply(x, FUN = function(x) {is.character(x) | is.factor(x)})
+  is_text <- sapply(x, FUN = function(x) (is.character(x) | is.factor(x)))
   if (any(is_text) && any(is_num)) {
     x[is_num] <- lapply(x[is_num], FUN = as.character)
   }
@@ -101,5 +101,5 @@ transpose_df  <- function(x, colname_column, label_column) {
     ret <- as.data.table(ret)
   }
 
-  return (ret)
+  return(ret)
 }

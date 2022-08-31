@@ -15,8 +15,8 @@
 #' of the joined objects.
 #' @param suffixes Suffixes appended to the column names for all overlapping
 #' columns. This argument is obligatory if the timeseries have overlapping
-#' column names. Length suffixes must be equal to the number of joined timeseries
-#' or objects.
+#' column names. Length suffixes must be equal to the number of joined
+#' timeseries or objects.
 #' @seealso \code{\link{as.list}}
 #' @importFrom stats ts.union ts.intersect
 #' @examples
@@ -119,7 +119,7 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
     } else {
       range <- Reduce(range_intersect, ranges)
     }
-    sers[tsser] <- lapply(sers[tsser], FUN = function(x) {x[range]})
+    sers[tsser] <- lapply(sers[tsser], FUN = function(x) x[range])
   } else {
     range <- ranges[[1]]
   }
@@ -149,8 +149,7 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
     if (any(ln != 1 & ln != nperiods)) {
       stop("non-time series not of the correct length")
     }
-    sers[!tsser] <- lapply(sers[!tsser],
-                           function(x) {regts(x, period = range)})
+    sers[!tsser] <- lapply(sers[!tsser], function(x) regts(x, period = range))
   }
 
   # get list of column names of the objects ot be joined
@@ -186,12 +185,12 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
     if (anyDuplicated(all_names)) {
       dupl_names <- unique(all_names[duplicated(all_names)])
       if (missing(suffixes)) {
-        stop(paste0("Duplicate column names (", paste(dupl_names, collapse = " "),
-                    "). Specify argument suffixes."))
+        stop("Duplicate column names (", paste(dupl_names, collapse = " "),
+             "). Specify argument suffixes.")
       } else if (length(suffixes) < nser_tot) {
-        stop(paste0("Length of argument 'suffixes' is smaller than the",
+        stop("Length of argument 'suffixes' is smaller than the",
                     " number of objects to be joined (", nser_tot,
-                    ")."))
+                    ").")
       }
       suffixes <- suffixes[!null_objects][!zero_cols]
       add_suffix <- lapply(cnames, function(x) x %in% dupl_names)
@@ -212,7 +211,7 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
   first_cols <- c(1, last_cols + 1)
   mat_data <- matrix(NA, nrow = nperiods, ncol = last_cols[nser])
   for (i in 1 : nser) {
-    mat_data[  , (first_cols[i] : last_cols[i])] <- sers[[i]]
+    mat_data[, (first_cols[i] : last_cols[i])] <- sers[[i]]
   }
 
   # create regts object
@@ -244,7 +243,7 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
     if (!is.null(lbls)) {
       return(lbls)
     } else {
-      return (rep("", NCOL(x)))
+      return(rep("", NCOL(x)))
     }
   }
 

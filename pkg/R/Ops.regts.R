@@ -6,7 +6,7 @@ Ops.regts <- function(e1, e2) {
 
     if (missing(e2)) {
         # unary operator
-        return (retval)
+        return(retval)
     }
 
     # Handling of labels: sometimes the result of NextMethod(.Generic)
@@ -17,7 +17,7 @@ Ops.regts <- function(e1, e2) {
     # labels.
     lbl1 <- ts_labels(e1)
     lbl2 <- ts_labels(e2)
-    check_lbls <- (!is.null(lbl1)|| !is.null(lbl2)) &&
+    check_lbls <- (!is.null(lbl1) || !is.null(lbl2)) &&
                   is.null(ts_labels(retval))
 
     if (is.ts(e1) && is.ts(e2)) {
@@ -36,5 +36,5 @@ Ops.regts <- function(e1, e2) {
             ts_labels(retval) <- lbl2
         }
     }
-    return (retval)
+    return(retval)
 }

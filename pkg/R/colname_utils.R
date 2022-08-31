@@ -30,9 +30,9 @@ select_columns <- function(x, regex, drop = TRUE, ...) {
   if (length(sel) == 0) {
     # the result with drop = TRUE is weird, therefore use drop = FALSE
     # if the selection was not succesfull
-    return(x[ , sel, drop = FALSE])
+    return(x[, sel, drop = FALSE])
   } else {
-    return(x[ , sel, drop = drop])
+    return(x[, sel, drop = drop])
   }
 }
 
@@ -114,9 +114,9 @@ rename_cols <- function(.data, ...) {
     cnames <- rep("", ncol(.data))
   }
 
-  # The following code is based on dplyr::rename. Because tidyselect::eval_rename
-  # uses the 'names' attribute of the data and not the colnames,
-  # we create an named vector with names equal to the column names,
+  # The following code is based on dplyr::rename. Because
+  # tidyselect::eval_rename uses the 'names' attribute of the data and not the
+  # colnames, we create an named vector with names equal to the column names,
   # eval_rename does not look at the contents of argument data, we simply
   # create a vector of NAs
   colname_data <- rep(NA, length(cnames))
@@ -129,4 +129,3 @@ rename_cols <- function(.data, ...) {
   colnames(.data) <- names
   return(.data)
 }
-

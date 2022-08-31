@@ -22,8 +22,8 @@ a \code{regts} object with relative changes
 }
 \description{
 Function \code{growth} computes the relative growth rate of a (multivariate)
-timeseries. The one period relative growth rate  of a timeseries is defined as
-\code{growth(x) = (x[t] - x[t-1]) / x[t-1]}.
+timeseries. The one period relative growth rate  of a timeseries is defined
+as \code{growth(x) = (x[t] - x[t-1]) / x[t-1]}.
 The \code{n} period relative change of a timeseries is defined as
 \code{growth(x,n) = (x[t] - x[t-n]) / x[t-n]}.
 

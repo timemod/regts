@@ -4,7 +4,7 @@ head.regts <- function(x, n = 6L, ...) {
 
   first <- start_period(get_period_range(x))
   last  <- end_period(get_period_range(x))
-  period <- period_range(first, min(first + n-1, last))
+  period <- period_range(first, min(first + n - 1, last))
 
   return(x[period, ])
 
@@ -16,7 +16,7 @@ tail.regts <- function(x, n = 6L, ...) {
 
   first <- start_period(get_period_range(x))
   last  <- end_period(get_period_range(x))
-  period <- period_range(max(first,last - n+1), last)
+  period <- period_range(max(first, last - n + 1), last)
 
   return(x[period, ])
 
@@ -53,9 +53,5 @@ topleft <- function(x, n = 6L, ncol = 10L) {
 
   ncol <- min(ncol, ncol(x))
 
-  return(x[period, 1:ncol, drop = FALSE ])
-
+  return(x[period, 1:ncol, drop = FALSE])
 }
-
-
-

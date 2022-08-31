@@ -10,7 +10,8 @@
 \arguments{
 \item{x}{a \code{\link{regts} object}}
 
-\item{...}{arguments passed to methods (not used in the default implementation)}
+\item{...}{arguments passed to methods (not used in the default
+implementation)}
 }
 \value{
 a list of univariate \code{regts} objects
