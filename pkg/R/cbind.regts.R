@@ -189,8 +189,7 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
              "). Specify argument suffixes.")
       } else if (length(suffixes) < nser_tot) {
         stop("Length of argument 'suffixes' is smaller than the",
-                    " number of objects to be joined (", nser_tot,
-                    ").")
+             " number of objects to be joined (", nser_tot, ").")
       }
       suffixes <- suffixes[!null_objects][!zero_cols]
       add_suffix <- lapply(cnames, function(x) x %in% dupl_names)

@@ -137,7 +137,7 @@ join_ts <- function(old, new, method = c("mult", "add")) {
 
   if (sp_new < sp_old) {
     stop("Timeseries are in wrong order, old series should start before new ",
-          "series!")
+         "series!")
   } else if (ep_new < ep_old) {
     stop("Timeseries are in wrong order, old series should end before new ",
          "series!")

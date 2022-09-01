@@ -149,11 +149,11 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
   names2 <- colnames(x2)
 
   # create colnames if x1 or x2 do not have colnames
-  if (is.null(names1)) {
+  if (is.null(names1) && ncol(x1) > 0) {
     names1 <- paste("column", seq_len(ncol(x1)))
     colnames(x1) <- names1
   }
-  if (is.null(names2)) {
+  if (is.null(names2) && ncol(x2) > 0) {
     names2 <- paste("column", seq_len(ncol(x2)))
     colnames(x2) <- names2
   }

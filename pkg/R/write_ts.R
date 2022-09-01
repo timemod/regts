@@ -368,7 +368,7 @@ ts2df_ <- function(x, rowwise, labels = c("after", "before", "no"),
 
   labels <- match.arg(labels)
 
-  if (is.null(colnames(x))) {
+  if (is.null(colnames(x)) && ncol(x) > 0) {
     colnames(x) <- paste0("series", seq_len(ncol(x)))
   }
 
