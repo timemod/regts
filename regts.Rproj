@@ -17,6 +17,7 @@ StripTrailingWhitespace: Yes
 
 BuildType: Package
 PackageUseDevtools: Yes
+PackageCleanBeforeInstall: No
 PackagePath: pkg
 PackageInstallArgs: --no-multiarch --with-keep.source
 PackageCheckArgs: --no-multiarch
