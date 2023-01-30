@@ -1,7 +1,7 @@
 build-job:
   stage: build
   script:
-    - export R_LIBS_USER=$HOME/R/cpb_r_packages/4.2
+    - echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
     - R -e "print(.libPaths())"
     - make install
 

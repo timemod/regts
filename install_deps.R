@@ -19,5 +19,4 @@ if (!require(testthat)) {
    install.packages("devtools", lib = user_lib_dir)
 }
 
-
-devtools::install_deps("pkg", dependencies = TRUE)
+devtools::install_dev_deps("pkg")
