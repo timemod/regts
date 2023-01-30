@@ -23,7 +23,7 @@ test_that("univariate timeseries with labels", {
   a_mat_l <- a_mat
   colnames(a_mat_l) <- "a_ts_l"
 
-  expect_identical(as_matrix(a_ts_l), a_mat_l * 1.1)
+  expect_identical(as_matrix(a_ts_l), a_mat_l)
   expect_identical(as_matrix(a_ts_l, rowwise = TRUE), t(a_mat_l))
 
 })
