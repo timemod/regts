@@ -2,7 +2,7 @@ build-job:
   stage: build
   script:
     - export R_LIBS_USER=$HOME/R/cpb_r_packages/4.2
-    - R -e "print('.libPaths()')"
+    - R -e "print(.libPaths())"
     - make install
 
 test-job1:
