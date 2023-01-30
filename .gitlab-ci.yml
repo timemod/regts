@@ -8,7 +8,7 @@ build-job:
 test-job1:
   stage: test
   script:
-    #- echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
+    - echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
     - echo "This job tests something"
     - R CMD check pkg
 
