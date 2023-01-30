@@ -9,6 +9,7 @@ local({
 
 
 user_lib_dir <- Sys.getenv("R_LIBS_USER")
+print(user_lib_dir)
 if (!dir.exists(user_lib_dir)) stopifnot(dir.create(user_lib_dir, recursive = TRUE))
 
 if (!require(devtools)) {
@@ -19,4 +20,4 @@ if (!require(testthat)) {
 }
 
 
-devtools::install_deps("pkg", dependencies = TRUE, lib = user_lib_dir)
+devtools::install_deps("pkg", dependencies = TRUE)
