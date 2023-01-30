@@ -2,11 +2,8 @@
 
 local({
   cran_repo <-  "https://cloud.r-project.org"
-  #cpb_repo <- "file:cpb_repo"
-  # cpb_repo is nodig als we voor bijv. isismdl regts moeten installeren -> uitzoeken
   r <- getOption("repos")
   r["CRAN"] <- cran_repo
-  #r["CPB"] <- cpb_repo
   options("repos" = r)
 })
 
