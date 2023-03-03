@@ -82,13 +82,13 @@ as shown in the example below.
 }
 \section{Functions}{
 \itemize{
-\item \code{write_ts_xlsx}: writes timeseries to an Excel
+\item \code{write_ts_xlsx()}: writes timeseries to an Excel
 workbook
 
-\item \code{write_ts_sheet}: writes a timeseries to a
+\item \code{write_ts_sheet()}: writes a timeseries to a
 \code{Workbook} object
-}}
 
+}}
 \examples{
 # create a timeseries object
 ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),

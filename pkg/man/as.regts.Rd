@@ -14,9 +14,11 @@ as.regts(x, ...)
 
 \method{as.regts}{ts}(x, ...)
 
-\method{as.regts}{data.frame}(x, time_column = 0, numeric = TRUE, fun = period, strict = TRUE, ...)
+\method{as.regts}{data.frame}(x, time_column = 0, numeric = TRUE,
+  fun = period, strict = TRUE, ...)
 
-\method{as.regts}{matrix}(x, numeric = TRUE, fun = period, strict = TRUE, ...)
+\method{as.regts}{matrix}(x, numeric = TRUE, fun = period, strict = TRUE,
+  ...)
 
 \method{as.regts}{list}(x, union = TRUE, ...)
 
@@ -64,26 +66,26 @@ Coerce an object to a \code{\link{regts}} timeseries object
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{ts}: Coerce a \code{\link[stats]{ts}} to a
+\item \code{as.regts(ts)}: Coerce a \code{\link[stats]{ts}} to a
 \code{regts}
 
-\item \code{data.frame}: Convert a \code{\link[base]{data.frame}} to a
+\item \code{as.regts(data.frame)}: Convert a \code{\link[base]{data.frame}} to a
 \code{regts}. The time should be stored in the row numbers
 of the matrix
 
-\item \code{matrix}: Convert a \code{\link{matrix}} to a \code{regts}
+\item \code{as.regts(matrix)}: Convert a \code{\link{matrix}} to a \code{regts}
 
-\item \code{list}: Convert a \code{\link{list}} to a \code{regts}. At least
+\item \code{as.regts(list)}: Convert a \code{\link{list}} to a \code{regts}. At least
 one of the elements of the list should contain a timeseries. The result is a
 multivariate timeseries with the combined timeseries
 
-\item \code{numeric}: Convert a numeric vector to a \code{regts}
+\item \code{as.regts(numeric)}: Convert a numeric vector to a \code{regts}
 
-\item \code{default}: Default method to convert an R object to a
+\item \code{as.regts(default)}: Default method to convert an R object to a
 \code{regts}. This method first employs \code{\link[stats]{as.ts}}
 and then \code{\link{as.regts.ts}}
-}}
 
+}}
 \examples{
 # convert a ts to regts
 x <- ts(1:3, start = c(2015,3), frequency = 4)

@@ -4,10 +4,3 @@
 
 Package `regts` makes it easier to work with regular timeseries, particularly for annual, quarterly and monthly timeseries.
 
-## Documentation
-
-[Reference manual](pkg/vignettes/regts_refman.pdf)
-
-[Vignette *Introduction to `regts`*](pkg/vignettes/regts.pdf)
-
-[Vignette *Temporal Aggregation of (Growth) Timeseries*](pkg/vignettes/aggregation.pdf)

@@ -37,10 +37,10 @@ returns a matrix without timeseries attributes.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{ts}: Coerce a \code{\link[stats]{ts}} to a matrix without
+\item \code{as_matrix(ts)}: Coerce a \code{\link[stats]{ts}} to a matrix without
 timeseries class and attributes
-}}
 
+}}
 \examples{
 ts <- regts(matrix(1:4, ncol = 2) , start = 2015, names = c("a", "b"))
 as_matrix(ts, rowwise = TRUE)

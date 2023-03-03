@@ -18,7 +18,7 @@ Description: An extension of the ts class with enhanced possibilities for
              growth series and the inverse transformation, special aggregation
              methods for growth series, and several other functions.
 License: GPL-3
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE, old_usage = TRUE)
 Imports:
     Rcpp,
@@ -41,7 +41,5 @@ Suggests:
     tempdisagg,
     Hmisc,
     lubridate,
-    R.rsp
 LinkingTo: Rcpp
-VignetteBuilder: knitr,
-                 R.rsp
+VignetteBuilder: knitr

@@ -70,13 +70,13 @@ therefore it can be arbitrarily set to 1.
 }
 \section{Functions}{
 \itemize{
-\item \code{rel2index}: Calculates an index timeseries from a
+\item \code{rel2index()}: Calculates an index timeseries from a
 timeseries with relative changes
 
-\item \code{pct2index}: Calculates an index timeseries from a
+\item \code{pct2index()}: Calculates an index timeseries from a
 timeseries with percentage changes
-}}
 
+}}
 \examples{
 ts1 <- regts(abs(rnorm(10)), start = "2010Q2")
 print(rel2index(ts1))

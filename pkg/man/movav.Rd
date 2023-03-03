@@ -69,11 +69,11 @@ e.g.  (\verb{0.5 x[t - 2] + x[t - 1] + x[t] + x[t + 1] + 0.5 x[t + 2]) / 4}}
 }
 \section{Functions}{
 \itemize{
-\item \code{movavb}: Backward moving average
+\item \code{movavb()}: Backward moving average
 
-\item \code{movavc}: Centered moving average
+\item \code{movavc()}: Centered moving average
+
 }}
-
 \examples{
 x <- regts(rnorm(10), start = "2018Q1")
 

@@ -26,11 +26,11 @@ The function also returns the frequency of a \code{period} or a
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{period}: frequency of a \link{period} object
+\item \code{frequency(period)}: frequency of a \link{period} object
 
-\item \code{period_range}: frequency of a \link{period_range} object
+\item \code{frequency(period_range)}: frequency of a \link{period_range} object
+
 }}
-
 \examples{
 p <- period("2016Q1")
 freq <- frequency(p)

@@ -4,6 +4,7 @@
 .Renviron`
 pkg/inst/doc
 refman.log
+refman.pdf
 regts.Rcheck
 regts*zip
 regts*tar.gz

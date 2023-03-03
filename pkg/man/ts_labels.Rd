@@ -28,11 +28,11 @@ can be used to give a description of the contents of the timeseries.
 }
 \section{Functions}{
 \itemize{
-\item \code{ts_labels}: Retrieve timeseries labels
+\item \code{ts_labels()}: Retrieve timeseries labels
 
-\item \code{ts_labels<-}: Sets the timeseries labels
+\item \code{ts_labels(x) <- value}: Sets the timeseries labels
+
 }}
-
 \examples{
 ts <- regts(matrix(1:6, ncol = 2), start = "2016Q2", names = c("a", "b"))
 ts_labels(ts) <- c("Timeseries a", "Timeseries b")

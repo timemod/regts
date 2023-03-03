@@ -40,13 +40,13 @@ the new frequency should be divisible by the old frequency.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{period}: Change the frequency of a \code{period} to
+\item \code{change_frequency(period)}: Change the frequency of a \code{period} to
 lower frequency
 
-\item \code{period_range}: Change the frequency of a \code{period_range} to
+\item \code{change_frequency(period_range)}: Change the frequency of a \code{period_range} to
 higher or lower frequency
-}}
 
+}}
 \examples{
 p <- period("2017M4")
 change_frequency(p, 4)
