@@ -1,7 +1,6 @@
 library(testthat)
 library(regts)
 
-context("regts")
 
 rm(list = ls())
 

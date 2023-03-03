@@ -1,7 +1,6 @@
 library(testthat)
 library(regts)
 
-context("update_ts regts with methods: upd, updna, updval and replace")
 
 test_that("equal periods", {
 

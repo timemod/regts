@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("read_ts_xlsx for weird xlsx files")
 
 
 test_that("weird_isis.xlsx is read correctly",  {

@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("read_ts_xlsx for xlsx files with many decimals")
 
 update_expected <- FALSE
 

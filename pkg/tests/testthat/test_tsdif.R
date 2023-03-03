@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("tsdif")
 
 update_expected <- FALSE
 

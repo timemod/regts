@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("aggregate_gr")
 
 # Test aggregation of growth timeseries
 

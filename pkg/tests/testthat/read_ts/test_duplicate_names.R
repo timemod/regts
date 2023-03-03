@@ -2,7 +2,6 @@ library(regts)
 library(testthat)
 
 rm(list = ls())
-context("test for duplicate names")
 
 test_that("example_duplicate_names.xlsx has duplicate names",  {
   xlsx_file <- "xlsx/example_duplicate_names.xlsx"

@@ -3,7 +3,6 @@ library(regts)
 
 rm(list = ls())
 
-context("internal function numeric_data_frame")
 
 test_that("normal data frames", {
 

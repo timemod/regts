@@ -1,7 +1,6 @@
 library(regts)
 library(testthat)
 
-context("write_read_ts_xlsx")
 
 if (!dir.exists("xlsx")) {
   # this could is needed if we run the test with Travis CI,

@@ -2,7 +2,6 @@ library(testthat)
 library(regts)
 library(data.table)
 
-context("tranpose_df")
 
 rm(list = ls())
 

@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("index_ts")
 
 a <- regts(1:18, start = "2018Q1")
 b <- 2 * a

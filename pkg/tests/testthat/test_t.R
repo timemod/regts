@@ -1,4 +1,3 @@
-context("t.regts")
 
 test_that("t.regts for univariate timeseries", {
   data <- 1:4

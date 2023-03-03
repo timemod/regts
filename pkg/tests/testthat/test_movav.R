@@ -1,6 +1,5 @@
 library(regts)
 library(testthat)
-context("movav")
 
 rm(list = ls())
 

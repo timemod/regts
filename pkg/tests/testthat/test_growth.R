@@ -1,6 +1,5 @@
 library(regts)
 library(testthat)
-context("growth_ts")
 
 
 # create some example timeseries

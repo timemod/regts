@@ -1,4 +1,3 @@
-context("min & max for period arguments")
 
 test_that("min & max for period arguments", {
 

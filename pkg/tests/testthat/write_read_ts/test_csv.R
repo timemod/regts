@@ -1,7 +1,6 @@
 library(regts)
 library(testthat)
 
-context("write_read_ts_csv")
 
 if (!dir.exists("csv")) {
   # this could is needed if we run the test with Travis CI,

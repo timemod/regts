@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("cbind")
 
 source("utils/univec2unimat.R")
 

@@ -1,4 +1,3 @@
-context("Ops.regts")
 
 test_that("Ops.regts for univariate timeseries", {
     regts1 <- regts(as.numeric(1:8), start = "2010Q2", labels = "Var a")

@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("read_ts_xlsx for WTM file with Date cells")
 
 update_expected <- FALSE
 

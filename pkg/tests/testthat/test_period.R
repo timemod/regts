@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("period")
 
 test_that("constructor period", {
   expect_identical(as.character(period("2010 q 2")), "2010Q2")

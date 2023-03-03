@@ -1,7 +1,6 @@
 library(regts)
 library(testthat)
 
-context("read_ts_csv for weird csv")
 
 test_that("weird_1.csv is read correctly",  {
 

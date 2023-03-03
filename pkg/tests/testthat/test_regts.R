@@ -2,7 +2,6 @@ library(testthat)
 library(regts)
 library(tibble)
 
-context("regts")
 
 rm(list = ls())
 

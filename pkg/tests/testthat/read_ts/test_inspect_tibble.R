@@ -4,7 +4,6 @@ library(tibble)
 
 rm(list = ls())
 
-context("test internal function inspect_tibble")
 
 get_csv_tbl <- function(tbl) {
   # convert a tbl for xlsx to a tibble for csv

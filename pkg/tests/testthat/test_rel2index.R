@@ -1,7 +1,6 @@
 library(regts)
 library(testthat)
 
-context("conversion functions for timeseries")
 
 rm(list = ls())
 

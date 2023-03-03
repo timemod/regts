@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("$ operator for regts")
 
 test_that("$.regts", {
 

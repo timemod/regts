@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("as.regts.numeric")
 
 
 test_that("no names or names with invalid periods", {

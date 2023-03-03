@@ -1,6 +1,5 @@
 library(testthat)
 library(regts)
-context("period_range")
 
 test_that("constructor period_range", {
   # "d1/d2" is an alternative way to ("d1","d2") to construct a period_range

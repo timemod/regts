@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("replacement NULL for regts")
 
 data <- matrix(1: 9, ncol = 3)
 names <- c("a", "b", "c")

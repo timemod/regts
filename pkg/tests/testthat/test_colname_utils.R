@@ -1,7 +1,6 @@
 library(regts)
 library(testthat)
 
-context("colname_utils")
 
 rm(list = ls())
 

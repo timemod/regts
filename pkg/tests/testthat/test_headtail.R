@@ -1,4 +1,3 @@
-context("head, tail & topleft")
 
 test_that("head, tail & topleft for regts", {
 

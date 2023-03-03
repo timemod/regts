@@ -1,7 +1,6 @@
 library(regts)
 library(testthat)
 
-context("read_ts_xlsx for some Taxus input files")
 
 test_that("taxus_fix1.xlsx is read correctly",  {
   xlsx_file <- "xlsx/taxus_fix1.xlsx"

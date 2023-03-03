@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("join_ts")
 
 # prepare input data
 data <- c(1, 1:5, 5:4, 2, 2)

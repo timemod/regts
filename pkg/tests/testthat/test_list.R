@@ -2,7 +2,6 @@ library(regts)
 library(testthat)
 
 rm(list = ls())
-context("list")
 
 source("utils/univec2unimat.R")
 

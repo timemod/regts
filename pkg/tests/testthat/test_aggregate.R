@@ -1,7 +1,6 @@
 library(regts)
 library(testthat)
 
-context("aggregate")
 
 rm(list = ls())
 

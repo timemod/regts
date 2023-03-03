@@ -1,4 +1,3 @@
-context("labels")
 
 test_that("constructor regts for univariate timeseries", {
 

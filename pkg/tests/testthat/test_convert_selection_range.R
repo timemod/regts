@@ -1,4 +1,3 @@
-context("convert_selection_range")
 
 test_that("monthly timeseries", {
     r <- period_range("2010Q4", "2011Q3")

@@ -1,4 +1,3 @@
-context("remove_na_columns")
 
 test_that("univariate timeseries", {
   ts1 <- regts(c(NA,1,3,NA,4,8), start = "2000")

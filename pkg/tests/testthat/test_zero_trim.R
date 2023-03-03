@@ -3,7 +3,6 @@ library(regts)
 
 rm(list = ls())
 
-context("zero_trim")
 
 test_that("univariate timeseries", {
   ts1 <- regts(c(0,1,3,0,4,8), start = "2000")

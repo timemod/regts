@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("as.regts.matrix")
 
 ref_ts <- regts(matrix(1:6, ncol = 2), start = "2018q1",
                     names = c("a", "b"))

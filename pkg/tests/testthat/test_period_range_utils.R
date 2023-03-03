@@ -1,7 +1,6 @@
 library(testthat)
 library(regts)
 
-context("period_range_utils")
 
 test_that(".range_intersect", {
   r1 <- as.period_range("2010Q4/2011Q3")

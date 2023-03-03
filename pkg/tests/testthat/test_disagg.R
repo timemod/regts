@@ -5,7 +5,6 @@ rm(list = ls())
 
 source("utils/disagg_natural.R")
 
-context("disagg")
 
 q_per <- period_range("2017Q2/2018Q3")
 l <- seq_len(nperiod(q_per))

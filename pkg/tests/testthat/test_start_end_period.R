@@ -1,4 +1,3 @@
-context("start_period, end_period")
 
 test_that("start_period and end_period for period_range", {
   r <- period_range("2010Q4", "2011Q3")

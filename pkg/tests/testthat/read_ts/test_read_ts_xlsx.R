@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("read_ts_xlsx")
 
 # construct correct result
 prd <- period_range("2010Q2/2011Q2")

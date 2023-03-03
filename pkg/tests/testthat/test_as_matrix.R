@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("as_matrix.regts")
 
 a_ts <- regts(1:3, start = "2018Q1")
 a_df <-data.frame(a_ts = 1:3, row.names = c("2018Q1", "2018Q2", "2018Q3"))

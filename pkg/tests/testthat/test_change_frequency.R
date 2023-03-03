@@ -1,6 +1,5 @@
 library(testthat)
 
-context("change_frequency")
 
 test_that("change_frequency.period", {
 

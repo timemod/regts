@@ -1,7 +1,6 @@
 library(regts)
 library(testthat)
 
-context("read_ts_csv")
 
 rm(list = ls())
 

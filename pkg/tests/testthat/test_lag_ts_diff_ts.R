@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("lag_ts, lead_ts and diff_ts")
 
 # prepare input data
 labels <- c("Var a", "Var b")

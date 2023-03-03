@@ -1,7 +1,6 @@
 library(regts)
 library(testthat)
 
-context("read_ts_csv for csv files with many decimals")
 
 prd <- period_range("2010Q2/2010Q3")
 num_dec <- 1.123456789

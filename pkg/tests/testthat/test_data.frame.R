@@ -3,7 +3,6 @@ library(testthat)
 
 rm(list = ls())
 
-context("data.frame")
 
 test_that("as.regts.data.frame for univariate quarterly timeseries", {
   df <- data.frame(period = c("2015Q3", "2015Q4", "2016Q1"), a = 1:3,
