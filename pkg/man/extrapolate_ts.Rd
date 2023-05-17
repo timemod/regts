@@ -2,22 +2,22 @@
 % Please edit documentation in R/extrapolate_ts.R
 \name{extrapolate_ts}
 \alias{extrapolate_ts}
-\title{Extrapolate timeseries}
+\title{Extrapolate timeseries.}
 \usage{
-extrapolate_ts(x, final_period, last_period_x = end_period(x),
-  method = c("level_constant", "diff_constant"))
+extrapolate_ts(x, to, from = end_period(x), method = c("level_constant",
+  "diff_constant"))
 }
 \arguments{
 \item{x}{a timeseries object (\code{\link{regts}} or \code{\link[stats]{ts}}
 object).}
 
-\item{final_period}{The final period to which the timeseries is
+\item{to}{The final period to which the timeseries is
 extrapolated. This should be a \code{\link{period}} object or an
 object that can be coerced to a \code{period} object.}
 
-\item{last_period_x}{The last period in timeseries \code{x} used
+\item{from}{The last period in timeseries \code{x} used
 to extrapolate the timeseries. Ths period should be smaller than
-\code{final_period}.}
+\code{to}. See Details.}
 
 \item{method}{the extrapolation method. See details.}
 }
@@ -29,20 +29,22 @@ Extrapolate a timeseries by assuming a constant level or first difference
 in the extrapolation period.
 }
 \details{
-The result is a timeseries with end period equal to \code{final_period}.
+The result is a timeseries with end period \code{to}.
 If \code{method == "level_constant"} (the default),
-the values in period \code{last_period_x + 1} and \code{final_period} are
-equal to the values of \code{x} in \code{last_period_x}.
-If \code{method == "diff_constant"} ,
-the first differences in period \code{last_period_x + 1} and \code{final_period} are
-equal to first difference of \code{x} in \code{last_period_x}.
+the values in periods between \code{from} and \code{to} (including period \code{to}) are
+equal to the values of \code{x} in period \code{from}.
+If \code{method == "diff_constant"},
+the first differences in period between \code{from} and \code{to} (including period \code{to})
+are equal to first difference of \code{x} at period \code{from}.
 }
 \examples{
+# univariate ts
 x <- regts(rnorm(3), start = "2019q1")
 extrapolate_ts(x, "2020q1")
 
+# multivariate ts
 x <- regts(matrix(rnorm(8), ncol = 2), names = c("a", "b"),
            start = "2019q1")
-plot(extrapolate_ts(x, final_period = "2020q4",
-               last_period_x = "2019q3", method = "diff_constant"))
+plot(extrapolate_ts(x, to = "2020q4",
+               from = "2019q3", method = "diff_constant"), type = "b")
 }
