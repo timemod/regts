@@ -16,7 +16,7 @@ extrapolated. This should be a \code{\link{period}} object or an
 object that can be coerced to a \code{period} object.}
 
 \item{from}{The last period in timeseries \code{x} used
-to extrapolate the timeseries. Ths period should be smaller than
+to extrapolate the timeseries. The period should be smaller than
 \code{to}. See Details.}
 
 \item{method}{the extrapolation method. See details.}
@@ -25,8 +25,8 @@ to extrapolate the timeseries. Ths period should be smaller than
 a code \code{regts} object
 }
 \description{
-Extrapolate a timeseries by assuming a constant level or first difference
-in the extrapolation period.
+Extrapolate a timeseries forwards by assuming a constant level or first
+difference in the extrapolation period.
 }
 \details{
 The result is a timeseries with end period \code{to}.
