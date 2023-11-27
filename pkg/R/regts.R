@@ -216,7 +216,7 @@ regts <- function(data, start, end, period, frequency = NA,
 create_regts <- function(data, startp, endp, freq, labels) {
   attr(data, "tsp") <- c(startp / freq, endp / freq, freq)
   class(data) <- if (NCOL(data) > 1) {
-    c("regts", "mts", "ts", "matrix")
+    c("regts", "mts", "ts", "matrix", "array")
   }  else {
     c("regts", "ts")
   }

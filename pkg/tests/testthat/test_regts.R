@@ -52,7 +52,7 @@ test_that("constructor regts for multivariate time series", {
   regts1 <- regts(data, start = "2010Q4")
   ts1 <- ts(data, start = c(2010,4), frequency = 4)
   expect_identical(regts1, as.regts(ts1))
-  expect_identical(class(regts1), c("regts", "mts", "ts", "matrix"))
+  expect_identical(class(regts1), c("regts", "mts", "ts", "matrix", "array"))
   expect_identical(is.regts(regts1), TRUE)
   expect_identical(is.regts(ts1), FALSE)
   expect_identical(is.ts(regts1), TRUE)
