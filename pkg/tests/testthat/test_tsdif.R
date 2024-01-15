@@ -377,16 +377,30 @@ test_that("NA, NaN, Inf and -Inf values", {
                names = c("a", "b"))
   ts2 <- ts1 + 0.01
   colnames(ts2) <- c("a", "b")
-
   dif1 <- tsdif(ts2, ts1)
-  expect_equal(dif1$dif, tsN1)
+  expect_equal(dif1$equal, TRUE)
+  dif1 <- tsdif(ts2, ts1, fun = cvgdif)
+  expect_equal(dif1$equal, TRUE)
 
   ts1 <- regts(matrix(data = -rep(1:4)/0, nc = 2), start = "2016",
                names = c("a", "b"))
   ts2 <- ts1 + 0.01
-
   dif1 <- tsdif(ts2, ts1)
-  expect_equal(dif1$dif, tsN1)
+  expect_equal(dif1$equal, TRUE)
+
+  dif1 <- tsdif(ts2, ts1, fun = cvgdif)
+  expect_equal(dif1$equal, TRUE)
+
+  # Compare Inf and -Inf: result is Inf
+  ts2$b <- -ts2$b
+  dif1 <- tsdif(ts2, ts1)
+  expect_equal(dif1$dif, regts(matrix(c(Inf, Inf), ncol = 1), names = "b",
+                               start = "2016"))
+
+  # Compare Inf and -Inf with function cvgdif: result is NaN
+  dif1 <- tsdif(ts2, ts1, fun = cvgdif)
+  expect_equal(dif1$dif, regts(matrix(c(NaN, NaN), ncol = 1), names = "b",
+                               start = "2016"))
 })
 
 test_that("test combinations of NA, NaN, Inf and proper values", {

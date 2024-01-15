@@ -264,6 +264,14 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
   xx1[both_na] <- 0
   xx2[both_na] <- 0
 
+  both_Inf <- !is.na(xx1) & xx1 == Inf & !is.na(xx2) & xx2 == Inf
+  xx1[both_Inf] <- 0
+  xx2[both_Inf] <- 0
+
+  both_min_Inf <- !is.na(xx1) & xx1 == -Inf & !is.na(xx2) & xx2 == -Inf
+  xx1[both_min_Inf] <- 0
+  xx2[both_min_Inf] <- 0
+
   dif <- fun(xx1, xx2)
   colnames(dif) <- common_names
 
