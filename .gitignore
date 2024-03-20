@@ -11,3 +11,4 @@ regts*tar.gz
 tmp/
 archive
 *.Rd2*
+pkg.Rcheck
