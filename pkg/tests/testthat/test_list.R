@@ -33,7 +33,6 @@ test_that("as.list for univariate timeseries with colnames", {
 
     expect_identical(names(l1), colnames(regts1))
     ref <- regts1[, 1]
-    ref[] <- as.numeric(ref)
     colnames(ref) <- NULL
     ts_labels(ref) <- ts_labels(ref)
     expect_identical(l1[[1]], ref)
@@ -43,7 +42,6 @@ test_that("as.list for univariate timeseries with colnames", {
     ref <- regts1
     dim(ref) <- NULL
     names(ts_labels(ref)) <- NULL
-    ref[] <- as.numeric(ref)
 
     expected_result <- univec2unimat(ref, "a")
     expect_identical(do.call(cbind, l1), expected_result)
@@ -53,7 +51,6 @@ test_that("as.list for univariate timeseries with colnames", {
     # cbind
     expect_identical(do.call(ts.intersect, l1), ref)
 })
-
 
 test_that("as.list for multivariate timeseries", {
     labels <- c("Var a", "Var b")
@@ -73,11 +70,9 @@ test_that("as.list for multivariate timeseries", {
     expect_identical(as.regts(l1, union = FALSE), regts1)
 })
 
-
 test_that("as.list for multivariate timeseries without colnames and labels", {
     regts1 <- regts(matrix(rnorm(10), ncol = 2), start = "2010M2")
     l1 <- as.list(regts1)
-
     expect_equal(l1[[1]], regts1[, 1])
     expect_equal(l1[[2]], regts1[, 2])
 
@@ -87,7 +82,6 @@ test_that("as.list for multivariate timeseries without colnames and labels", {
     expect_equal(do.call(cbind, l1), ref)
     expect_equal(as.regts(l1), ref)
 })
-
 
 test_that("usage of within", {
     regts1 <- regts(matrix(1:6, ncol = 2), start = "2015Q3",

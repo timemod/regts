@@ -5,9 +5,6 @@ set.seed(12345)
 aantal_variabelen <- 10000
 aantal_perioden <- 30
 
-aantal_variabelen <- 10
-aantal_perioden <- 30
-
 namen <- paste('ts', seq(aantal_variabelen), sep = "_")
 data <- matrix(rnorm(n  = aantal_variabelen * aantal_perioden),
                ncol = aantal_variabelen)
@@ -17,9 +14,6 @@ regts1 <- regts(data, start = "2010")
 tic("regts")
 lts <- as.list(regts1)
 toc()
-
-print(lts)
-stop("aap")
 
 ts1 <- as.ts(regts1)
 tic("ts")

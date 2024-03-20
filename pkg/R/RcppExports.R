@@ -35,8 +35,8 @@ get_period_range <- function(x) {
     .Call(`_regts_get_period_range`, x)
 }
 
-regts_to_list <- function(ts) {
-    .Call(`_regts_regts_to_list`, ts)
+regts_to_list_rcpp <- function(ts) {
+    .Call(`_regts_regts_to_list_rcpp`, ts)
 }
 
 rel2index_cpp <- function(grts, first_base_row) {

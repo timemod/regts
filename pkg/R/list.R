@@ -48,5 +48,5 @@ as.list.regts <- function(x, ...) {
     }
   }
 
-  return(regts_to_list(x))
+  return(regts_to_list_rcpp(x))
 }
