@@ -22,11 +22,15 @@ toc()
 
 mat1 <- as_matrix(regts1)
 tic("matrix (2)")
-lmat <- lapply(seq_len(ncol(mat1)), FUN = \(i) mat[, i])
+lmat <- lapply(seq_len(ncol(mat1)), FUN = \(i) mat1[, i])
 names(lmat) <- colnames(regts1)
 toc()
 
 tic("lmat omzetten naar regts")
 range <- get_period_range(regts1)
 lts4 <- sapply(lmat, FUN = \(x) regts(x, period = range), simplify = FALSE)
+toc()
+
+tic("regts_to_list")
+lst2_regts_to_list <- regts:::regts_to_list(regts1)
 toc()
