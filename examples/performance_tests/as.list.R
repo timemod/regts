@@ -1,5 +1,8 @@
+rm(list = ls())
 library(regts)
 library(tictoc)
+# use as.list from pakcage zoo for normal ts objects
+library(zoo)
 
 set.seed(12345)
 aantal_variabelen <- 10000
@@ -11,17 +14,16 @@ data <- matrix(rnorm(n  = aantal_variabelen * aantal_perioden),
 colnames(data) <- namen
 
 regts1 <- regts(data, start = "2010")
+ts1 <- as.ts(regts1)
+
 tic("regts")
-lts <- as.list(regts1)
+lregts <- as.list(regts1)
 toc()
 
-ts1 <- as.ts(regts1)
 tic("ts")
 lts <- as.list(ts1)
 toc()
 
-mat1 <- as_matrix(regts1)
-tic("matrix (2)")
-lmat <- lapply(seq_len(ncol(mat1)), FUN = \(i) mat1[, i])
-names(lmat) <- colnames(regts1)
+tic("as.regts.list")
+regts2 <- as.regts(lregts)
 toc()
