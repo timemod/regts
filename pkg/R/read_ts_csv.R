@@ -131,6 +131,9 @@
 #' Otherwise the timeseries are filled with \code{NA} for the missing periods.
 #' @param warn_dupl A logical. If \code{TRUE} (the default), a warning is
 #' issued if there are duplicate column names in the returned timeseries object.
+#' @param verbose A logical (default `FALSE`). If `TRUE`, the function
+#' prints the filename, the number of timeseries read, the period range, and
+#' the elapsed time.
 #' @return a \code{regts} object
 #'
 #' @examples
@@ -149,10 +152,9 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
                         sep = "auto", fill = FALSE,
                         dec = if (sep != ".") "." else ",",
                         na_string = "", name_fun, period_fun, strict = TRUE,
-                        warn_dupl = TRUE) {
+                        warn_dupl = TRUE, verbose = FALSE) {
 
   na_string <- union(na_string, "")
-
   labels <- match.arg(labels)
 
   if (!missing(name_fun) && !is.function(name_fun)) {
@@ -162,19 +164,14 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
     stop("argument period_fun is not a function")
   }
 
-  df <- fread(filename, skip = skiprow, header = FALSE, data.table = FALSE,
-              sep = sep, dec = dec, fill = fill, colClasses = "character",
-              na.strings = na_string)
-
-  if (!missing(skipcol) && skipcol > 0) {
-    df <- df[, -(1:skipcol), drop = FALSE]
+  if (verbose) {
+    cat(sprintf("\nReading timeseries from file %s ...\n", filename))
+    t_start <- Sys.time()
   }
 
-  if (nrow(df) == 0 && ncol(df) == 0) {
-    stop(sprintf("File %s is empty\n", filename))
-  }
-
-  tbl <- as_tibble(df)
+  tbl <- read_csv_file(filename, skiprow = skiprow, skipcol = skipcol,
+                       na_string = na_string, sep = sep, dec = dec,
+                       fill = fill)
 
   layout <- inspect_tibble(tbl, frequency, rowwise, labels, xlsx = FALSE,
                            period_fun = period_fun, name_fun = name_fun)
@@ -196,7 +193,33 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
   # check for duplicate names
   if (warn_dupl) test_duplicates(ret, filename)
 
+  if (verbose) {
+    t_end <- Sys.time()
+    secs <- t_end - t_start
+    cat(sprintf("%d timeseries read, period range %s, %.2f sec. elapsed.\n\n",
+                ncol(ret), get_period_range(ret), secs))
+  }
+
   return(ret)
+}
+
+read_csv_file <- function(filename, skiprow, skipcol, na_string, sep, dec,
+                          fill) {
+
+  df <- fread(filename, skip = skiprow, header = FALSE, data.table = FALSE,
+              sep = sep, dec = dec, fill = fill, colClasses = "character",
+              na.strings = na_string)
+
+  if (!missing(skipcol) && skipcol > 0) {
+    df <- df[, -(1:skipcol), drop = FALSE]
+  }
+
+  if (nrow(df) == 0 && ncol(df) == 0) {
+    stop(sprintf("File %s is empty\n", filename))
+  }
+
+  tbl <- as_tibble(df)
+  return(tbl)
 }
 
 # Internal function to read timeseries rowwise from a tibble, used by
@@ -210,7 +233,7 @@ read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, layout,
     # Therefore the error message cannot be as specific as for read_ts_xlsx.
     stop(sprintf(paste0("Periods with different frequencies found in the ",
                         "%d'th non-skipped row in file file %s."),
-         layout$period_row, filename))
+                 layout$period_row, filename))
   }
 
   # obtain the data part of the tibble: the data below the period row.

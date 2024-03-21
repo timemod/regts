@@ -4,15 +4,15 @@
 \alias{write_ts_xlsx/write_ts_sheet}
 \alias{write_ts_xlsx}
 \alias{write_ts_sheet}
-\title{Functions for writing timeseries to an xlsx file}
+\title{Functions for writing timeseries to an xlsx file.}
 \usage{
 write_ts_xlsx(x, file, sheet_name = "Sheet1", rowwise = TRUE,
   append = FALSE, labels = c("after", "before", "no"), comments,
-  number_format, period_as_date = FALSE)
+  number_format, period_as_date = FALSE, verbose = FALSE)
 
 write_ts_sheet(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
   labels = c("after", "before", "no"), comments, number_format,
-  period_as_date = FALSE)
+  period_as_date = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{x}{a \code{\link{ts}} or \code{\link{regts}} object}
@@ -47,6 +47,10 @@ in the \code{\link[openxlsx]{openxlsx}} package.}
 If \code{TRUE} the periods are written as date values to the Excel file.
 By default the periods are written as characters using the standard
 \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}).}
+
+\item{verbose}{A logical (default \code{FALSE}). If \code{TRUE}, the function
+prints the file and sheet name, the number of timeseries written, the period
+range, and the elapsed time.}
 
 \item{wb}{a \code{Workbook} object created with function
 \code{\link[openxlsx]{createWorkbook}} or

@@ -26,9 +26,16 @@ test_that("ts without labels written correctly",  {
   write_ts_xlsx(ts1, file, sheet_name = "ts1", labels = "after")
 
   comments <- c("This is a transposed timeseries", "")
-  write_ts_xlsx(ts1, file, sheet_name = "ts1_t",  rowwise = FALSE,
-                comments = comments, append = TRUE)
 
+  msg <- paste0(
+    "^\nWriting timeseries to sheet ts1_t of file xlsx/ts1\\.xlsx ...\n",
+    ".*", # this is necessary when running via RStudio
+    "2 timeseries written, period range 2010Q2/2011Q2, 0\\.\\d{2} sec\\. elapsed\\.\\n$"
+  )
+  expect_output({
+    write_ts_xlsx(ts1, file, sheet_name = "ts1_t",  rowwise = FALSE,
+                  comments = comments, append = TRUE, verbose = TRUE)
+  }, msg)
   wb <- openxlsx::loadWorkbook(file)
   # the next statement is redundant, but lets check it
   openxlsx::addWorksheet(wb, "ts1_times_2")

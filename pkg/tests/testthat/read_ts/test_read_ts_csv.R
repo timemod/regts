@@ -120,7 +120,16 @@ test_that("example1.csv is read correctly",  {
 
   csv_file <- "csv/example1.csv"
 
-  result <- read_ts_csv(csv_file, labels = "no", strict = FALSE)
+  msg <- paste0(
+    "^\nReading timeseries from file csv/example1\\.csv \\.\\.\\.\n",
+    ".*", # this is necessary when running via RStudio
+    "2 timeseries read, period range 2010Q2/2011Q2, 0\\.\\d{2} sec\\. elapsed\\.\\n$"
+  )
+  expect_output({
+    result <- read_ts_csv(csv_file, labels = "no", strict = FALSE,
+                          verbose = TRUE)
+  }, msg)
+
   expect_identical(result, correct_result * 1)
 
   result2 <- read_ts_csv(csv_file, skiprow = 1, strict = FALSE)

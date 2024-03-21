@@ -139,6 +139,9 @@
 #' assuming the decimal separator \code{"."}.
 #' @param warn_dupl A logical. If \code{TRUE} (the default), a warning is
 #' issued if there are duplicate column names in the returned timeseries object.
+#' @param verbose A logical (default `FALSE`). If `TRUE`, the function
+#' prints the name of the file and sheet, the number of timeseries read,
+#' the period range, and the elapsed time.
 #' @return a \code{regts} object
 #' @examples
 #' \dontrun{
@@ -159,25 +162,8 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
                          skiprow = 0, skipcol = 0, rowwise, frequency = NA,
                          labels = c("after", "before", "no"),
                          na_string = "", name_fun, period_fun, strict = TRUE,
-                         warn_num_text = TRUE, warn_dupl = TRUE) {
-
-  # n_inspect if the number of rows to read to determine the layout of the
-  # sheet.
-  n_inspect <- 25
-
-  if (missing(range)) {
-    range <- cell_limits()
-    range$ul[1] <- skiprow + 1
-    range$ul[2] <- skipcol + 1
-  } else {
-    range <- as.cell_limits(range)
-    # Function read_excel skips leading empty rows and columns if the first
-    # row or column in range is NA (i.e. not-specified). This is not desired
-    # here, because otherwise we do no longer know to which part of the sheet
-    # the readed data corresponds.
-    if (is.na(range$ul[1])) range$ul[1] <- 1
-    if (is.na(range$ul[2])) range$ul[2] <- 1
-  }
+                         warn_num_text = TRUE, warn_dupl = TRUE,
+                         verbose = FALSE) {
 
   na_string <- union(na_string, "")
 
@@ -190,17 +176,9 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     stop("argument period_fun is not a function")
   }
 
-  # the number of lines used to inspect the file
-  range_inspect <- range
-  range_inspect$lr[1] <- min(range_inspect$ul[1] + n_inspect - 1,
-                             range_inspect$lr[1], na.rm = TRUE)
+  range <- check_read_range(range, skiprow = skiprow, skipcol = skipcol)
 
-  tbl_inspect <- read_excel(filename, sheet, range = range_inspect,
-                            col_names = FALSE, col_types = "list",
-                            na = na_string, .name_repair = "minimal")
-
-
-  # create sheetname for error messages
+  # Create sheetname for (error) messages
   sheetname <- if (!is.na(range$sheet))  {
     range$sheet
   } else if (!is.null(sheet)) {
@@ -208,6 +186,74 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
   } else {
     "1"
   }
+
+  if (verbose) {
+    cat(sprintf("\nReading timeseries from sheet %s of file %s ...\n",
+                sheetname, filename))
+    t_start <- Sys.time()
+  }
+
+  layout <- get_sheet_layout(filename, sheet, sheetname = sheetname,
+                             range = range, frequency = frequency,
+                             rowwise = rowwise, labels = labels,
+                             na_string = na_string, period_fun = period_fun,
+                             name_fun = name_fun)
+
+  if (layout$rowwise) {
+    ret <- read_ts_rowwise_xlsx(filename, sheet, sheetname, range, na_string,
+                                frequency, labels, name_fun, layout, strict,
+                                warn_num_text)
+  } else {
+    ret <- read_ts_columnwise_xlsx(filename, sheet, sheetname, range, na_string,
+                                   frequency, period_fun, layout, strict,
+                                   warn_num_text)
+  }
+
+  # Check for duplicate names
+  if (warn_dupl) test_duplicates(ret, filename, sheetname)
+
+  if (verbose) {
+    t_end <- Sys.time()
+    secs <- t_end - t_start
+    cat(sprintf("%d timeseries read, period range %s, %.2f sec. elapsed.\n\n",
+                ncol(ret), get_period_range(ret), secs))
+  }
+
+  return(ret)
+}
+
+check_read_range <- function(range, skiprow, skipcol) {
+  if (is.null(range)) {
+    range <- cell_limits()
+    range$ul[1] <- skiprow + 1
+    range$ul[2] <- skipcol + 1
+  } else {
+    range <- as.cell_limits(range)
+    # Function read_excel skips leading empty rows and columns if the first
+    # row or column in range is NA (i.e. not-specified). This is not desired
+    # here, because otherwise we do no longer know to which part of the sheet
+    # the data read corresponds.
+    if (is.na(range$ul[1])) range$ul[1] <- 1
+    if (is.na(range$ul[2])) range$ul[2] <- 1
+  }
+  return(range)
+}
+
+get_sheet_layout <- function(filename, sheet, sheetname, range, frequency,
+                             rowwise, labels, na_string, period_fun,
+                             name_fun) {
+
+  # n_inspect is the number of rows to read to determine the layout of the
+  # sheet.
+  n_inspect <- 25
+
+  range_inspect <- range
+  range_inspect$lr[1] <- min(range_inspect$ul[1] + n_inspect - 1,
+                             range_inspect$lr[1], na.rm = TRUE)
+
+  tbl_inspect <- read_excel(filename, sheet, range = range_inspect,
+                            col_names = FALSE, col_types = "list",
+                            na = na_string, .name_repair = "minimal")
 
   if (nrow(tbl_inspect) == 0 || ncol(tbl_inspect) == 0) {
     stop(sprintf("Sheet %s of file %s is empty\n", sheetname, filename))
@@ -221,21 +267,7 @@ read_ts_xlsx <- function(filename, sheet = NULL, range = NULL,
     stop(sprintf("No periods found on sheet %s of file %s\n", sheetname,
                  filename))
   }
-
-  if (layout$rowwise) {
-    ret <- read_ts_rowwise_xlsx(filename, sheet, sheetname, range, na_string,
-                                frequency, labels, name_fun, layout, strict,
-                                warn_num_text)
-  } else {
-    ret <- read_ts_columnwise_xlsx(filename, sheet, sheetname, range, na_string,
-                                   frequency, period_fun, layout, strict,
-                                   warn_num_text)
-  }
-
-  # check for duplicate names
-  if (warn_dupl) test_duplicates(ret, filename, sheetname)
-
-  return(ret)
+  return(layout)
 }
 
 # Internal function to read timeseries rowwise from a tibble, used by

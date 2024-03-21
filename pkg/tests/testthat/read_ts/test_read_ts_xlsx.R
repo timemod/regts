@@ -240,7 +240,13 @@ test_that("example15.xlsx, multiple year frequencies",  {
 
   xlsx_file <- "xlsx/example15.xlsx"
 
-  result1 <- read_ts_xlsx(xlsx_file)
+  msg <- paste0(
+    "^\nReading timeseries from sheet 1 of file xlsx/example15\\.xlsx \\.\\.\\.\n",
+    ".*", # this is necessary when running via RStudio
+    "4 timeseries read, period range 2010/2011, 0\\.\\d{2} sec\\. elapsed\\.\\n$"
+  )
+  expect_output(result1 <- read_ts_xlsx(xlsx_file, verbose = TRUE),
+                msg)
 
   expected_result <- regts(matrix(c(1:4, sqrt(1:4)), nrow = 2, byrow = TRUE),
                            start = 2010, names = c("a", "b", "c", "d"))

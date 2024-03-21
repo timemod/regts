@@ -7,7 +7,7 @@
 read_ts_csv(filename, skiprow = 0, skipcol = 0, rowwise, frequency = NA,
   labels = c("after", "before", "no"), sep = "auto", fill = FALSE,
   dec = if (sep != ".") "." else ",", na_string = "", name_fun, period_fun,
-  strict = TRUE, warn_dupl = TRUE)
+  strict = TRUE, warn_dupl = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{filename}{a string with the filename.}
@@ -58,6 +58,10 @@ Otherwise the timeseries are filled with \code{NA} for the missing periods.}
 
 \item{warn_dupl}{A logical. If \code{TRUE} (the default), a warning is
 issued if there are duplicate column names in the returned timeseries object.}
+
+\item{verbose}{A logical (default \code{FALSE}). If \code{TRUE}, the function
+prints the filename, the number of timeseries read, the period range, and
+the elapsed time.}
 }
 \value{
 a \code{regts} object
