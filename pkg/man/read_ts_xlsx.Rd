@@ -7,7 +7,7 @@
 read_ts_xlsx(filename, sheet = NULL, range = NULL, skiprow = 0,
   skipcol = 0, rowwise, frequency = NA, labels = c("after", "before",
   "no"), na_string = "", name_fun, period_fun, strict = TRUE,
-  warn_num_text = TRUE, warn_dupl = TRUE)
+  warn_num_text = TRUE, warn_dupl = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{filename}{a string with the filename.}
@@ -63,6 +63,10 @@ assuming the decimal separator \code{"."}.}
 
 \item{warn_dupl}{A logical. If \code{TRUE} (the default), a warning is
 issued if there are duplicate column names in the returned timeseries object.}
+
+\item{verbose}{A logical (default \code{FALSE}). If \code{TRUE}, the function
+prints the name of the file and sheet, the number of timeseries read,
+the period range, and the elapsed time.}
 }
 \value{
 a \code{regts} object
