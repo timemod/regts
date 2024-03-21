@@ -1,3 +1,4 @@
+rm(list = ls())
 library(regts)
 library(zoo)
 source("examples/performance_tests/time_commands.R")
@@ -29,8 +30,8 @@ commands <- c("lts  <- as.list(ts1)",
               "do.call(ts.union, lts)",
               "do.call(ts.intersect, lts)",
               "do.call(cbind, lregts)",
-              "do.call(merge, lzoo)"
-)
+              "do.call(merge, lzoo)",
+              "as.regts(regts1)")
 
 print(time_commands(commands, times = 1, unit = "ms"))
 

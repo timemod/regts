@@ -31,29 +31,22 @@
 #' @export
 as.list.regts <- function(x, ...) {
 
-    if (!is.matrix(x)) {
-        retval <- list(x)
-        names(retval) <- deparse(substitute(x))
-        return(retval)
-    }
-
-    retval <- lapply(seq_len(ncol(x)), function(i) x[, i])
-
-    # the colnames of the original timeseries become the names of the list
-    cnames <- colnames(x)
-    if (!is.null(cnames)) {
-        names(retval) <- cnames
-    } else {
-        # The return value should always have names. Otherwise, a problem
-        # could occur when the list is converted to a regts again
-        # by using do.call(cbind, l)
-        xname <- deparse(substitute(x))
-        nc <- NCOL(x)
-        if (nc == 1) {
-            names(retval) <- xname
-        } else {
-            names(retval) <- paste(xname, 1:nc, sep = ".")
-        }
-    }
+  if (!is.matrix(x)) {
+    retval <- list(x)
+    names(retval) <- deparse(substitute(x))
     return(retval)
+  }
+
+  if (is.null(colnames(x))) {
+    # Create column names from the name of x
+    xname <- deparse(substitute(x))
+    nc <- NCOL(x)
+    if (nc == 1) {
+      colnames(x) <- xname
+    } else {
+      colnames(x) <- paste(xname, 1:nc, sep = ".")
+    }
+  }
+
+  return(regts_to_list_rcpp(x))
 }

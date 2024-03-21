@@ -99,6 +99,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// regts_to_list_rcpp
+List regts_to_list_rcpp(SEXP& ts);
+RcppExport SEXP _regts_regts_to_list_rcpp(SEXP tsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP& >::type ts(tsSEXP);
+    rcpp_result_gen = Rcpp::wrap(regts_to_list_rcpp(ts));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rel2index_cpp
 NumericMatrix rel2index_cpp(NumericMatrix& grts, int first_base_row);
 RcppExport SEXP _regts_rel2index_cpp(SEXP grtsSEXP, SEXP first_base_rowSEXP) {
@@ -120,6 +131,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_regts_parse_period_range", (DL_FUNC) &_regts_parse_period_range, 2},
     {"_regts_is_period_text", (DL_FUNC) &_regts_is_period_text, 2},
     {"_regts_get_period_range", (DL_FUNC) &_regts_get_period_range, 1},
+    {"_regts_regts_to_list_rcpp", (DL_FUNC) &_regts_regts_to_list_rcpp, 1},
     {"_regts_rel2index_cpp", (DL_FUNC) &_regts_rel2index_cpp, 2},
     {NULL, NULL, 0}
 };
