@@ -200,7 +200,6 @@ read_ts_csv <- function(filename, skiprow = 0, skipcol = 0,
                 ncol(ret), get_period_range(ret), secs))
   }
 
-
   return(ret)
 }
 

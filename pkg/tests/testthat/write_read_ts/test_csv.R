@@ -24,7 +24,16 @@ test_that("ts without labels written correctly",  {
   expect_identical(ts1, ts1_read)
 
   file <- "csv/ts1_t.csv"
-  write_ts_csv(ts1, file = file, rowwise = FALSE, sep = ";", dec = ",")
+  msg <- paste0(
+    "^\nWriting timeseries to file csv/ts1_t\\.csv ...\n",
+    ".*", # this is necessary when running via RStudio
+    "2 timeseries written, period range 2010Q2/2011Q2, 0\\.\\d{2} sec\\. elapsed\\.\\n$"
+  )
+  expect_output({
+    write_ts_csv(ts1, file = file, rowwise = FALSE, sep = ";", dec = ",",
+                 verbose = TRUE)
+  }, msg)
+
   ts1_t_read <- read_ts_csv(file, dec = ",")
   expect_identical(ts1, ts1_t_read)
 })

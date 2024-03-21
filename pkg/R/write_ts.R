@@ -14,6 +14,9 @@
 #' \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}) is used.
 #' Alternatively, it is possible to specify a format employed by base R function
 #' \code{\link[base]{strptime}}, e.g. \code{"\%Y-\%m-\%d"}.
+#' @param verbose A logical (default `FALSE`). If `TRUE`, the function
+#' prints the filename, the number of timeseries written, the period range, and
+#' the elapsed time.
 #' @importFrom data.table fwrite
 #' @examples
 #' # create a timeseries object
@@ -35,7 +38,12 @@
 #' @export
 write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
                          labels = c("after", "before", "no"),
-                         period_format = "regts") {
+                         period_format = "regts", verbose = FALSE) {
+
+  if (verbose) {
+    cat(sprintf("\nWriting timeseries to file %s ...\n", file))
+    t_start <- Sys.time()
+  }
 
   if (!is.matrix(x)) {
     x <- univec2unimat(x, deparse(substitute(x)))
@@ -49,11 +57,19 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
   fwrite(column_headers, file, sep = sep, dec  = dec, col.names = FALSE)
   fwrite(data, file, sep = sep, dec  = dec, append = TRUE, col.names = FALSE)
 
+  if (verbose) {
+    t_end <- Sys.time()
+    secs <- t_end - t_start
+    cat(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
+                      "elapsed.\n\n"),
+                ncol(x), get_period_range(x), secs))
+  }
+
   return(invisible(NULL))
 }
 
 
-#' Functions for writing timeseries to an xlsx file
+#' Functions for writing timeseries to an xlsx file.
 #'
 #' These functions can be used to write timeseries to a sheet of an
 #' xlsx file. \code{write_ts_xlsx} creates or opens an Excel workbook
@@ -108,7 +124,9 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @param comments a character vector or data frame. The comments
 #' are written to the beginning of the sheet, before the timeseries data is
 #' written.
-
+#' @param verbose A logical (default `FALSE`). If `TRUE`, the function
+#' prints the file and sheet name, the number of timeseries written, the period
+#' range, and the elapsed time.
 #' @name write_ts_xlsx/write_ts_sheet
 #' @examples
 #' # create a timeseries object
@@ -175,7 +193,14 @@ NULL
 write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           rowwise = TRUE, append = FALSE,
                           labels = c("after", "before", "no"), comments,
-                          number_format, period_as_date = FALSE) {
+                          number_format, period_as_date = FALSE,
+                          verbose = FALSE) {
+
+  if (verbose) {
+    cat(sprintf("\nWriting timeseries to sheet %s of file %s ...\n",
+                sheet_name, file))
+    t_start <- Sys.time()
+  }
 
   if (!is.matrix(x)) {
     x <- univec2unimat(x, deparse(substitute(x)))
@@ -219,15 +244,19 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   tryCatch({
     result <- saveWorkbook(wb, file, overwrite = TRUE, returnValue = TRUE)
     if (!isTRUE(result)) {
-      if (packageVersion("openxlsx") > "4.2.4") {
-        stop("Failed to save workbook to file '", file, "'. Check warnings.")
-      } else {
-        stop(result$message, call. = FALSE)
-      }
+      stop("Failed to save workbook to file '", file, "'. Check warnings.")
     }
   }, finally = {
     options("openxlsx.minWidth" = min_width_old)
   })
+
+  if (verbose) {
+    t_end <- Sys.time()
+    secs <- t_end - t_start
+    cat(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
+                      "elapsed.\n\n"),
+                ncol(x), get_period_range(x), secs))
+  }
 
   return(invisible(NULL))
 }
@@ -237,7 +266,8 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
 #' @export
 write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
                            labels = c("after", "before", "no"), comments,
-                           number_format, period_as_date = FALSE) {
+                           number_format, period_as_date = FALSE,
+                           verbose = FALSE) {
 
   sheet_exists <- sheet_name %in% names(wb)
 

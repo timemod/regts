@@ -5,7 +5,8 @@
 \title{Write timeseries to a csv file}
 \usage{
 write_ts_csv(x, file, rowwise = TRUE, sep = ",", dec = ".",
-  labels = c("after", "before", "no"), period_format = "regts")
+  labels = c("after", "before", "no"), period_format = "regts",
+  verbose = FALSE)
 }
 \arguments{
 \item{x}{a \code{\link{ts}} or \code{\link{regts}} object}
@@ -25,6 +26,10 @@ the names? By default, labels are written after the names if present.}
 \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}) is used.
 Alternatively, it is possible to specify a format employed by base R function
 \code{\link[base]{strptime}}, e.g. \code{"\%Y-\%m-\%d"}.}
+
+\item{verbose}{A logical (default \code{FALSE}). If \code{TRUE}, the function
+prints the filename, the number of timeseries written, the period range, and
+the elapsed time.}
 }
 \description{
 This function writes timeseries to a csv file.
