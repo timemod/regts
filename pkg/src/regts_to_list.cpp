@@ -7,10 +7,10 @@ List regts_to_list_templ (T &ts) {
    Rcpp::List dimnames = ts.attr("dimnames");
    CharacterVector colnames = dimnames[1];
    NumericVector tsp = ts.attr("tsp");
-   CharacterVector classes = CharacterVector::create("regts", "ts");
    bool has_labels = ts.hasAttribute("ts_labels");
    CharacterVector labels;
    if (has_labels) labels = ts.attr("ts_labels");
+   CharacterVector classes = CharacterVector::create("regts", "ts");
    int n = ts.ncol();
    Rcpp::List retval(n);
    for (int i = 0; i < n; i++) {
@@ -26,7 +26,6 @@ List regts_to_list_templ (T &ts) {
    return retval;
 }
 
-// TODO: maybe conversion to a general matrix type possible?
 List regts_to_list(SEXP ts) {
     switch (TYPEOF(ts)) {
         case INTSXP: 
@@ -39,17 +38,22 @@ List regts_to_list(SEXP ts) {
              Rcpp::NumericMatrix ts_num = Rcpp::as <Rcpp::NumericMatrix>(ts);
              return regts_to_list_templ(ts_num);
 	     }
+        case CPLXSXP: 
+	     {
+             Rcpp::ComplexMatrix ts_cplx = Rcpp::as <Rcpp::ComplexMatrix>(ts);
+             return regts_to_list_templ(ts_cplx);
+	     }
         case LGLSXP: 
 	     {
              Rcpp::LogicalMatrix ts_lgl = Rcpp::as <Rcpp::LogicalMatrix>(ts);
              return regts_to_list_templ(ts_lgl);
 	     }
-        case CHARSXP: 
+        case STRSXP: 
 	     {
              Rcpp::CharacterMatrix ts_char = Rcpp::as <Rcpp::CharacterMatrix>(ts);
              return regts_to_list_templ(ts_char);
 	     }
-        default: Rcpp::stop ("Illegal matrix type"); 
+        default: Rcpp::stop ("Unknown timeseries element type"); 
     }
 }
 
