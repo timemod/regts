@@ -4,7 +4,7 @@ using namespace Rcpp;
 
 template <class T>
 List regts_to_list_templ (T &ts) {
-   Rcpp::List dimnames = ts.attr("dimnames");
+   List dimnames = ts.attr("dimnames");
    CharacterVector colnames = dimnames[1];
    NumericVector tsp = ts.attr("tsp");
    bool has_labels = ts.hasAttribute("ts_labels");
@@ -12,7 +12,7 @@ List regts_to_list_templ (T &ts) {
    if (has_labels) labels = ts.attr("ts_labels");
    CharacterVector classes = CharacterVector::create("regts", "ts");
    int n = ts.ncol();
-   Rcpp::List retval(n);
+   List retval(n);
    for (int i = 0; i < n; i++) {
        Vector single_ts = ts(_, i);
        single_ts.attr("tsp") = tsp;
@@ -26,34 +26,34 @@ List regts_to_list_templ (T &ts) {
    return retval;
 }
 
-List regts_to_list(SEXP ts) {
+List regts_to_list(SEXP &ts) {
     switch (TYPEOF(ts)) {
         case INTSXP: 
              {
-             Rcpp::IntegerMatrix ts_int = Rcpp::as <Rcpp::IntegerMatrix>(ts);
+             IntegerMatrix ts_int = as <IntegerMatrix>(ts);
              return regts_to_list_templ(ts_int);
 	     }
         case REALSXP: 
 	     {
-             Rcpp::NumericMatrix ts_num = Rcpp::as <Rcpp::NumericMatrix>(ts);
+             NumericMatrix ts_num = as <NumericMatrix>(ts);
              return regts_to_list_templ(ts_num);
 	     }
         case CPLXSXP: 
 	     {
-             Rcpp::ComplexMatrix ts_cplx = Rcpp::as <Rcpp::ComplexMatrix>(ts);
+             ComplexMatrix ts_cplx = as <ComplexMatrix>(ts);
              return regts_to_list_templ(ts_cplx);
 	     }
         case LGLSXP: 
 	     {
-             Rcpp::LogicalMatrix ts_lgl = Rcpp::as <Rcpp::LogicalMatrix>(ts);
+             LogicalMatrix ts_lgl = as <LogicalMatrix>(ts);
              return regts_to_list_templ(ts_lgl);
 	     }
         case STRSXP: 
 	     {
-             Rcpp::CharacterMatrix ts_char = Rcpp::as <Rcpp::CharacterMatrix>(ts);
+             CharacterMatrix ts_char = as <CharacterMatrix>(ts);
              return regts_to_list_templ(ts_char);
 	     }
-        default: Rcpp::stop ("Unknown timeseries element type"); 
+        default: stop ("Unknown timeseries element type"); 
     }
 }
 

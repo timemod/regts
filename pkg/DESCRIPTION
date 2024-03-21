@@ -1,7 +1,7 @@
 Package: regts
 Type: Package
 Title: Regular Timeseries
-Version: 1.9.1
+Version: 2.0.0
 Authors@R: c(
  person("Rob", "van Harrevelt", email = "rvanharrevelt@gmail.com", role = c("aut", "cre")),
  person("Anita", "van der Roest", email = "J.C.van.der.Roest@cpb.nl",role = "aut")
@@ -43,3 +43,4 @@ Suggests:
     lubridate,
 LinkingTo: Rcpp
 VignetteBuilder: knitr
+Encoding: UTF-8
