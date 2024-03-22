@@ -3,6 +3,7 @@ build-job:
   script:
     - whoami
     - pwd
+    - echo $HOME
     - echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
     - R -e "print(.libPaths())"
     - make install
