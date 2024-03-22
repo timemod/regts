@@ -1,8 +1,7 @@
 #!/usr/bin/Rscript
-
 if (!require(devtools)) {
     stop('devtools not installed')
 }
-devtools::install_deps("pkg", dependencies = TRUE,
-                       upgrade = "never")
+devtools::install_deps("pkg", dependencies = TRUE, upgrade = "never",
+                       repos = "https://cloud.r-project.org")
 

@@ -5,6 +5,8 @@ build-job:
     - pwd
     - echo $HOME
     - echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
+    - R -e "lib_dir <- Sys.getenv('R_LIBS_USER'); \
+      if(!dir.exists(lib_dir)) dir.create(lib_dir, recursive = TRUE)"
     - R -e "print(.libPaths())"
     - make install
 
