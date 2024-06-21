@@ -58,7 +58,7 @@ test_that("univariate timeseries", {
 
   res <- movavb(b_lbls, order = 4)
   expect_equal(res, movav_back(b_lbls, order = 4))
-  expect_identical(ts_labels(res), "Timeseries bb")
+  expect_identical(ts_labels(res), "Timeseries b")
   expect_equal(movavc(c, order = 3),
                lag(movav_back(c, order = 3), 1)[p])
   expect_equal(movavb(c, order = 3, keep_range = FALSE),
