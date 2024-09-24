@@ -3,6 +3,7 @@
 #include "period_range.h"
 using Rcpp::NumericMatrix;
 using Rcpp::NumericVector;
+using Rcpp::stop;
 
 NumericVector PeriodRange::get_period_range() {
     NumericVector result(3);
@@ -41,7 +42,7 @@ PeriodRange get_prd_range(const NumericMatrix &ts) {
 // [[Rcpp::export]]
 NumericVector get_period_range(const SEXP &x) {
     if (!Rf_inherits(x, "ts")) {
-        Rf_error("Argument is not a timeseries");
+       stop("Argument is not a timeseries");
     }
     SEXP attr = Rf_getAttrib(x, Rf_install("tsp"));
     NumericVector tsp(attr);

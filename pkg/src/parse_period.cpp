@@ -5,6 +5,7 @@ using Rcpp::NumericVector;
 using Rcpp::CharacterVector;
 using Rcpp::LogicalVector;
 using Rcpp::List;
+using Rcpp::stop;
 using std::string;
 
 static string trim(const string& str);
@@ -28,7 +29,7 @@ SEXP parse_period(const CharacterVector period_text, double frequency) {
     for (int i = 0; i < n; i++) {
         if (CharacterVector::is_na(period_text(i))) {
             if (ISNA(frequency)) {
-                Rf_error("Frequency of NA period unknown."
+                stop("Frequency of NA period unknown."
                         " Specify argument frequency.");
                 return R_NilValue;
             }
@@ -93,7 +94,7 @@ NumericVector parse_period_range(const std::string &period_text,
         s2 = trim(s2);
         bool both = s1.size() > 0 && s2.size() >> 0;
         if (s1.size() == 0 && s2.size() == 0) {
-            Rf_error("Illegal period range %s.", period_text.c_str());
+            stop("Illegal period range %s.", period_text.c_str());
         }
         double f1 = 0.0, f2 = 0.0;
         if (s1.size() > 0) {
@@ -106,10 +107,10 @@ NumericVector parse_period_range(const std::string &period_text,
         }
         if (both) {
             if (f1 != f2) {
-               Rf_error("The two periods have different frequency");
+               stop("The two periods have different frequency");
             } else if (p1 > p2) {
-               Rf_error("The start period (%s) is after the end period (%s)",
-                s1.c_str(), s2.c_str());
+               stop("The start period (%s) is after the end period (%s)",
+                    s1.c_str(), s2.c_str());
             }
         }
     }
@@ -131,23 +132,23 @@ static void parse_single_period(const std::string &period_text,
     ParsedPeriod per = parse_period_text(period_text, given_freq);
 
     if (per.error) {
-        Rf_error("Illegal period %s.", period_text.c_str());
+        stop("Illegal period %s.", period_text.c_str());
     } else {
         freq = per.freq;
         if (ISNA(per.freq)) {
             if (ISNA(given_freq)) {
-                Rf_error("Frequency of period %s unknown."
-                         " Specify argument frequency.", period_text.c_str());
+                stop("Frequency of period %s unknown."
+                     " Specify argument frequency.", period_text.c_str());
                 return;
             }
 	        freq = given_freq;;
             if (per.subperiod > freq) {
-                Rf_error("Subperiod of period %s is larger than the"
-                         " specified frequency %d", period_text.c_str(),
-                         (int) given_freq);
+                stop("Subperiod of period %s is larger than the"
+                     " specified frequency %d", period_text.c_str(),
+                     (int) given_freq);
             }
 	    } else if (!ISNA(given_freq) && per.freq != given_freq) {
-	        Rf_error("Specified frequency %d does not agree with actual "
+	        stop("Specified frequency %d does not agree with actual "
                      "frequency in period %s.", (int) given_freq,
                      period_text.c_str());
             return;
