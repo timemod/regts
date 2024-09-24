@@ -29,10 +29,10 @@ static int get_frequency(const char *c);
 
 #define YY_NEVER_INTERACTIVE 1
 
-#define YY_FATAL_ERROR(msg) Rf_error(msg)
+#define YY_FATAL_ERROR(msg) Rcpp::stop(msg)
 
 // the following error cannot occur
-#define ECHO Rf_error("Internal error in period scanner ... uncatched input");
+#define ECHO Rcpp::stop("Internal error in period scanner ... uncatched input");
 
 
 %}

@@ -31,7 +31,7 @@ agg_reldiff_1 <- function(x, nfrequency = 1) {
   x_nfreq  <- aggregate(x, nfrequency)
   ret <- growth(x_nfreq, keep_range = FALSE)
   colnames(ret) <- colnames(x)
-  return (ret)
+  return(ret)
 }
 
 # Convert timeseries x to a relative difference timeseries with lower
@@ -86,7 +86,7 @@ test_that("difmean and rel, monthly to quarterly, two timeseries", {
                ref_rel)
 })
 
-test_that("difsum/difmean/rel, quarterly to year, single timeseries with NA values", {
+test_that("difsum/difmean/rel, qrtr to yr, single timeseries with NA values", {
   p         <- period_range("2009Q1", "2015Q4")
   ts_q      <- regts(abs(rnorm(nperiod(p))), start = start_period(p))
   ts_q["2009Q1"] <- NA
@@ -101,16 +101,23 @@ test_that("difsum/difmean/rel, quarterly to year, single timeseries with NA valu
 test_that("difmean/difsum/reldif, timeseries with Inf, -Inf or NaN values", {
   p  <- period_range("2009Q1", "2015Q4")
   ts_q <- regts(abs(rnorm(nperiod(p))), start = start_period(p))
-  ts_q["2009Q1"] <- 1/0
-  ts_q["2012Q2"] <- 0/0
-  ts_q["2015Q4"] <- -1/0
+  ts_q["2009Q1"] <- 1 / 0
+  ts_q["2012Q2"] <- 0 / 0
+  ts_q["2015Q4"] <- -1 / 0
   ref_abs <- agg_diff_1(ts_q) # the correct result
   expect_equal(agg_diff_2(ts_q, method = "difmean"), ref_abs)
   ref_rel <- agg_reldiff_1(ts_q) # the correct result
-  ref_rel['2015'] <- NaN  # the pct and dif1 methods  cannot distinguish
-  ts_q["2015Q4"] <- 1/0
+  ref_rel["2015"] <- NaN  # the pct and dif1 methods  cannot distinguish
+  ts_q["2015Q4"] <- 1 / 0
   #Inf, Inf and NaN
   expect_equal(agg_reldiff_2(ts_q, method = "rel"), ref_rel)
+})
+
+test_that("frequency 3", {
+  ts_f3 <- regts(1:6, start = 2010, frequency = 3)
+  ref <- agg_reldiff_1(ts_f3) # the correct result
+  result <- agg_reldiff_2(ts_f3, method = "rel")
+  expect_equal(result, ref, check.attributes = FALSE)
 })
 
 test_that("errors", {
@@ -126,6 +133,23 @@ test_that("errors", {
   ts_q <- regts(abs(rnorm(nperiod(p))), start = start_period(p))
   expect_warning(aggregate_gr(ts_q, method = "dif1s"), msg)
 
+  t1 <- regts(1:3, start = 2010, frequency = 3)
+  expect_error(
+    aggregate_gr(t1, nfrequency = 4),
+    "The new frequency 4 is higher than the old frequency 3.",
+    fixed = TRUE
+  )
+  expect_error(
+    aggregate_gr(t1, nfrequency = 2),
+    "The new frequency 2 is not a divisor of the old frequency 3.",
+    fixed = TRUE
+  )
+  expect_error(
+    aggregate_gr(t1, nfrequency = 1),
+    paste0("Cannot perform aggregation because the input timeseries\n",
+           "contains too few observations."),
+    fixed = TRUE
+  )
 })
 
 test_that("rel and pct for negative timeseries", {
@@ -174,4 +198,3 @@ test_that("rel and pct and NA values", {
   expect_equal(agg2$y["2014/2015"], regts(NA_real_, period = "2014/2015"))
   expect_equal(agg2$y["2016/"], aggregate_pct(r2$y["2015/"]))
 })
-

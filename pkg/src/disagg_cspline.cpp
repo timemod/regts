@@ -23,12 +23,12 @@ List disagg_spline(NumericMatrix ts_old, const int freq_new,
     per_new.freq = freq_new;
 
     if (freq_new <= (int) per_old.freq) {
-        Rf_error("nfrequency (%d) is not larger than the "
-                "input frequency (%d)", freq_new, (int) per_old.freq);
+        stop("nfrequency (%d) is not larger than the "
+              "input frequency (%d)", freq_new, (int) per_old.freq);
     }
     if (freq_new % (int) per_old.freq != 0) {
-        Rf_error("nfrequency (%d) is not an integer multiple "
-                "of the input frequency (%d)", freq_new, (int) per_old.freq);
+        stop("nfrequency (%d) is not an integer multiple "
+             "of the input frequency (%d)", freq_new, (int) per_old.freq);
     }
 
     bool do_cumul = constraint == "average" || constraint == "sum"; 
@@ -141,7 +141,7 @@ static void disagg_spline_single(NumericMatrix::Column column_old,
     }
 
     int ierr  = intpol_cspline(n, nnew, x, y, xnew, ynew, conds, work);
-    if (ierr != 0)  Rf_error("Internal error in disagg: intpol_cspline failed");
+    if (ierr != 0) stop("Internal error in disagg: intpol_cspline failed");
 
     if (do_cumul) {
         for (int i = 1; i < nnew; i++) {

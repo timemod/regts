@@ -15,20 +15,29 @@ List agg_gr(NumericMatrix ts_old, const int freq_new,
             const std::string &method) {
 
     PeriodRange per_old = get_prd_range(ts_old);
+
+    int freq_old = (int) per_old.freq;
+
+    if (freq_new > freq_old) {
+        stop("The new frequency %d is higher than the old frequency "
+             "%d.", freq_new, freq_old);
+    }
+
+    if (freq_old % (int) freq_new != 0) {
+        stop("The new frequency %d is not a divisor of the old frequency "
+             "%d.", freq_new, freq_old);
+    }
+
     PeriodRange per_new;
     per_new.freq = freq_new;
-    int rep = ((int) per_old.freq) / ((int) freq_new);
+    int rep = freq_old / freq_new;
     per_new.first = (((int) per_old.first) + 2 * (rep - 1)) / rep;
     per_new.last  = (((int) per_old.last) - (rep - 1)) / rep;
     int nper_new = per_new.len();
 
-    if ((int) per_old.freq % (int) freq_new != 0) {
-        Rf_error("The new frequency %d is not a divisor of the old frequency "
-                 "%d\n", freq_new, per_old.freq);
-    }
     if (nper_new <= 0) {
-        Rf_error("Cannot perform aggregation because the input timeseries "
-                "contains too few observations");
+        stop("Cannot perform aggregation because the input timeseries\n"
+             "contains too few observations.");
     }
 
     NumericMatrix data(nper_new, ts_old.ncol());
@@ -42,14 +51,14 @@ List agg_gr(NumericMatrix ts_old, const int freq_new,
             data = data / rep;
         }
     } else if (method == "rel" || method == "pct") {
-        double *work = new double[2*rep];
+        double *work = new double[2 * rep];
         int perc = method == "rel" ? 1 : 100;
         for (int col = 0; col < ts_old.ncol(); col++) {
             agg_gr_rel(ts_old(_, col), data(_, col), work, rep, shift, perc);
         }
         delete[] work;
     } else {
-        Rf_error((std::string("Illegal aggregation method ") + method).c_str());
+        stop((std::string("Illegal aggregation method ") + method).c_str());
     }
 
     List result(2);
