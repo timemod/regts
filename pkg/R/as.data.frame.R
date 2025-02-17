@@ -26,8 +26,9 @@
 #'
 #' If the \code{regts} has labels, then each column of the data frame gets an
 #' attribute named `label` with the label as value. These labels are shown when
-#' the data frame is opened in the Data Viewer of RStudio.
-#' TODO: are there other ways to view the label?
+#' the data frame is opened in the Data Viewer of RStudio. The labels can
+#' also be retrieved by using function \code{\link[labelled]{var_label}} from
+#' package `labelled`.
 #'
 #' **2. rowwise**
 #'
@@ -116,11 +117,8 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
   }
 
   if (!is.matrix(x)) {
-    xsub <- substitute(x)
-    # When as.data.frame.regts is called by View, xsub has class
-    # regts, in that case deparse does not give the desired result
-    name <- if (is.regts(xsub)) "Series" else deparse(xsub)
-    x <- univec2unimat(x, name)
+    x_name <- deparse(substitute(x))
+    x <- univec2unimat(x, x_name)
   }
 
   periods <- get_periods(x)
