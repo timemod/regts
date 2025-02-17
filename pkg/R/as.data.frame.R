@@ -171,8 +171,9 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
 
     if (period_as_date) {
       # Column 'period' now contains the periods as texts (because column names
-      # are always character variables. Restore the original periods, by using
-      # names Date vector.
+      # are always character variables). Replace then by the original data
+      # objects, by using a named vector with dates (the names are the dates
+      # as text).
       period_dict <- periods
       names(period_dict) <- as.character(periods)
       ret$period <- period_dict[ret$period]
