@@ -40,7 +40,7 @@ Suggests:
     timeSeries,
     tseries,
     tempdisagg,
-    Hmisc,
+    labelled,
     lubridate,
 LinkingTo: Rcpp
 VignetteBuilder: knitr

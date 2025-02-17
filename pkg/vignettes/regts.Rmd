@@ -22,7 +22,6 @@ linkcolor: blue
 
 ```{r echo = FALSE, message = FALSE}
 library(regts)
-library(Hmisc)
 library(readxl)
 data <- matrix(c(3,2,4,3,5,2,5,3), ncol = 2)
 data1 <- matrix(c(1,3,2,6,4,8,3,0,9), ncol = 3)
@@ -1331,8 +1330,8 @@ frame column names and the periods show up in the row names. Of course the
 ## Labels when converting `data frame` to `regts` and vice versa\label{dflabels}
 
 Base R does not have facilities for adding labels to a data frame. However the 
-`Hmisc` package has introduced a function `label` for adding label attributes 
-to data frames columns and to retrieve them. 
+`labelled` package has introduced a function `var_label` that can be used to
+add label attributes to data frames columns and to retrieve them. 
 Package `regts` preserves these labels when converting a 
 `regts` object with labels to a `data frame` or vice versa. 
 
@@ -1344,8 +1343,8 @@ rownames(df) <- c("2017", "2018", "2019")
 
 Now add labels to the columns of the data frame. First load the library:
 ```{r}
-library(Hmisc)
-label(df) <- list(a = "aap", b = "noot", c = "mies")
+library(labelled)
+var_label(df) <- list(a = "aap", b = "noot", c = "mies")
 ```
 
 If you want to see the labels in the result, retrieve them with the `label` 
@@ -1353,7 +1352,7 @@ function^[You can also view the whole data frame including labels with the
 `View` function in Rstudio.].
 
 ```{r}
-label(df)
+var_label(df, unlist = TRUE)
 ```
 
 When this data frame with labels is converted to a multivariate regts you can 
@@ -1371,7 +1370,7 @@ the timeseries labels are used to create the label attributes of the data frame.
 ts_data <- regts(matrix(1:8, ncol = 2), start = "2016q1", end = "2016q4",
                  names = c("a", "b"), labels = c("Series_a", "Series_b"))
 df1 <- as.data.frame(ts_data)
-label(df1)
+var_label(df1)
 ```
 
 ## Transposing a `data frame` 
@@ -1401,7 +1400,7 @@ create labels:
 ```{r collapse = TRUE}
 df2 <- transpose_df(dft, label_column = "label")
 df2
-label(df2)
+var_label(df2, unlist = TRUE)
 ```
 
 ## Example: reading timeseries from a deviant file \label{deviant}

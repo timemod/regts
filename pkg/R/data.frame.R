@@ -146,19 +146,17 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
       ret <- cbind(name = colnames(x), ret, stringsAsFactors = FALSE)
     }
 
-
-
   } else {
+
+    # columnwise
 
     ret <- as.data.frame.ts(x, ...)
 
-    # add labels
     if (!is.null(lbls)) {
-      # use as.character to convert a named character vector to a normal
-      # character vector.
-      # TODO: This code is very slow for large data frames, check if the
-      # performance of this code can be improved.
-      ret <- set_labels_df(ret, as.character(lbls))
+      # Add labels to the data frame, using Rcpp function
+      # add_labels_df, which adds labels in place. This function is very
+      # slow when implemented in R.
+      invisible(add_labels_df(ret, unname(lbls)))
     }
 
     if (row_names) {

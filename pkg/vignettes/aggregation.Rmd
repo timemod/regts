@@ -22,7 +22,6 @@ linkcolor: blue
 
 ```{r echo = FALSE, message = FALSE}
 library(regts)
-library(Hmisc)
 library(readxl)
 data <- matrix(c(3,2,4,3,5,2,5,3), ncol = 2)
 data1 <- matrix(c(1,3,2,6,4,8,3,0,9), ncol = 3)

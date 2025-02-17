@@ -86,7 +86,10 @@ transpose_df  <- function(x, colname_column, label_column) {
     colnames(ret) <- new_colnames
   }
   if (has_labels) {
-    ret <- set_labels_df(ret, labels)
+    # Add labels to the data frame, using Rcpp function
+    # add_labels_df, which adds labels in place. This function is very
+    # slow when implemented in R.
+    invisible(add_labels_df(ret, labels))
   }
 
   if (any(nchar(old_labels, type = "bytes") > 0)) {
