@@ -57,13 +57,14 @@ test_that("univariate timeseries with labels", {
 
   a_df_l <- a_df
   colnames(a_df_l) <- "a_ts_l"
-  a_df_l <- regts:::set_labels_df(a_df_l, "Var a")
+  labelled::var_label(a_df_l) <- "Var a"
 
   a_df_l_2 <- remove_row_names(a_df_l, FALSE)
   a_df_l_rowwise <- transpose_df(a_df_l)
   a_df_l_rowwise_2 <-  remove_row_names(a_df_l_rowwise, TRUE)
 
-  expect_identical(Hmisc::label(a_df_l), c(a_ts_l = "Var a"))
+  expect_identical(labelled::var_label(a_df_l, unlist = TRUE),
+                   c(a_ts_l = "Var a"))
 
   expect_identical(as.data.frame(a_ts_l), a_df_l)
   expect_identical(as.data.frame(a_ts_l, row_names = FALSE), a_df_l_2)
@@ -101,16 +102,17 @@ test_that("multivariate timeseries with labels", {
   a_df_l <- a_df
   a_df_l[, 1] <- as.numeric(a_df_l[, 1])
   colnames(a_df_l) <- "a_ts_l"
-  a_df_l <- regts:::set_labels_df(a_df_l, "Var a")
+  labelled::var_label(a_df_l) <- "Var a"
 
   b_df_l <- 2 * a_df
   colnames(b_df_l) <- "b_ts_l"
-  b_df_l <- regts:::set_labels_df(b_df_l, "Var b")
+  labelled::var_label(b_df_l) <- "Var b"
 
   multi_df <- cbind(a_df_l, b_df_l)
-
-  expect_identical(Hmisc::label(a_df_l), c(a_ts_l = "Var a"))
-  expect_identical(Hmisc::label(b_df_l), c(b_ts_l = "Var b"))
+  expect_identical(labelled::var_label(a_df_l, unlist = TRUE),
+                   c(a_ts_l = "Var a"))
+  expect_identical(labelled::var_label(b_df_l, unlist = TRUE),
+                   c(b_ts_l = "Var b"))
 
   multi_df_2 <- remove_row_names(multi_df, FALSE)
 

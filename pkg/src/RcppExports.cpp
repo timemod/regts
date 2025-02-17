@@ -10,6 +10,18 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// add_labels_df
+/* Add labels to the columns of a data frame.  * The data frame is modified in place. The function returns NULL */ SEXP add_labels_df(List& df, CharacterVector& labels);
+RcppExport SEXP _regts_add_labels_df(SEXP dfSEXP, SEXP labelsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List& >::type df(dfSEXP);
+    Rcpp::traits::input_parameter< CharacterVector& >::type labels(labelsSEXP);
+    rcpp_result_gen = Rcpp::wrap(add_labels_df(df, labels));
+    return rcpp_result_gen;
+END_RCPP
+}
 // agg_gr
 List agg_gr(NumericMatrix ts_old, const int freq_new, const std::string& method);
 RcppExport SEXP _regts_agg_gr(SEXP ts_oldSEXP, SEXP freq_newSEXP, SEXP methodSEXP) {
@@ -124,6 +136,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_regts_add_labels_df", (DL_FUNC) &_regts_add_labels_df, 2},
     {"_regts_agg_gr", (DL_FUNC) &_regts_agg_gr, 3},
     {"_regts_disagg_spline", (DL_FUNC) &_regts_disagg_spline, 4},
     {"_regts_moving_average", (DL_FUNC) &_regts_moving_average, 5},
