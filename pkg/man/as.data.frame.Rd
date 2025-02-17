@@ -6,7 +6,7 @@
 \title{Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}}
 \usage{
 \method{as.data.frame}{regts}(x, ..., rowwise = FALSE, row_names = TRUE,
-  period_as_date = FALSE)
+  period_as_date = FALSE, long = FALSE)
 }
 \arguments{
 \item{x}{a \code{\link{regts}}}
@@ -14,11 +14,14 @@
 \item{...}{additional arguments to be passed to methods.}
 
 \item{rowwise}{a logical value: should the timeseries be stored rowwise
-or columnwise in the data frame? Defaults to \code{FALSE}}
+or columnwise in the data frame? Defaults to \code{FALSE}.
+Ignored if \code{long = TRUE}.}
 
 \item{row_names}{Whether to create row names. If \code{FALSE},
 then an additional column with name \code{"period"} or \code{"name"} is
-created for columnwise or rowwise timeseries, respectively.}
+created for columnwise or rowwise timeseries, respectively.
+Ignored if \code{long = TRUE} (for the long format the result will have
+no row names).}
 
 \item{period_as_date}{A logical (default \code{FALSE}).
 If \code{TRUE} the periods are stored as \code{\link[base]{Date}} objects.
@@ -28,6 +31,12 @@ In that case the dates are coerced to character vectors,
 using the standard date format \code{"\%Y-\%m-\%d"}
 (see the documentation of function \code{\link[base]{strptime}}
 for more information about date formats).}
+
+\item{long}{Return the result is so called long format, i.e. a
+data frame with one row for each observation. The result is a data frame
+with columns \code{name}, \code{period} and \code{value} (if the timeseries has labels,
+there will be an additional column \code{label} after the column \code{name}).
+See Details.}
 }
 \value{
 A \code{\link[base]{data.frame}}
@@ -36,9 +45,68 @@ A \code{\link[base]{data.frame}}
 Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}
 }
 \details{
-If the \code{regts} has labels and argument \code{rowwise} is \code{FALSE},
-then the labels are added to columns of the data frame
-These labels are visible in the data viewer.
+Three different format for the data frame are possble.
+
+\strong{1. columnwise (default)}
+
+This is the default format. There is a column for each variable. Example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{       a   b
+2022   1  10
+2023   2  20
+}\if{html}{\out{</div>}}
+
+By default, the row names contain the periods of the timeseries, but if
+argument \code{row_names = FALSE}, the first column named \code{period} will contain
+the variable names, as shown below:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{period  a   b
+2022    1  10
+2023    2  20
+}\if{html}{\out{</div>}}
+
+If the \code{regts} has labels, then each column of the data frame gets an
+attribute named \code{label} with the label as value. These labels are shown when
+the data frame is opened in the Data Viewer of RStudio.
+TODO: are there other ways to view the label?
+
+\strong{2. rowwise}
+
+For a rowwise data frame, there is a column for each period. For example,
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{      label       2022  2023
+a     Variable a     1     2
+b     Variable b    10    20
+}\if{html}{\out{</div>}}
+
+Use argument \code{rowwise = TRUE} to create a rowwise data frame.
+By default, the row names contain the variable names, but if
+argument \code{row_names = FALSE}, the first column named \code{name} will contain
+the variable names. For example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{name   label       2022  2023
+a      Variable a     1     2
+b      Variable b    10    20
+}\if{html}{\out{</div>}}
+
+If the timeseries has no labels the \code{label}, column is missing.
+
+\strong{3. long format}
+
+For a data frame with long format, there is one row for each observation.
+For example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{ name  label        period value
+ a     Variable a     2022     1
+ a     Variable a     2023     2
+ b     Variable b     2022    10
+ b     Variable b     2023    20
+}\if{html}{\out{</div>}}
+
+Use argument \code{long = TRUE} to create such a data frame.
+Argument \code{row_names} is ignored when the long format option is used.
+
+If the timeseries has no labels, the \code{label} column is missing.
 }
 \examples{
 ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),
