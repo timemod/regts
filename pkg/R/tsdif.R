@@ -276,7 +276,7 @@ get_maxdif <- function(dif_table) {
   maxdif <- dif_table |>
     group_by(.data$name) |>
     slice(get_index_max(.data$dif)) |>
-    rename(maxdif = .data$dif) |>
+    rename(maxdif = "dif") |>
     # Sort differences: first NAs, then maximum differecences in decreasing
     # order.
     arrange(desc(is.na(.data$maxdif)), desc(abs(.data$maxdif))) |>
