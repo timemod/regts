@@ -40,7 +40,6 @@
 #'  `options(regts_max_difnames = 1000)`. Function \code{\link[base]{getOption}}
 #'  can be used to check the current values of these options
 #'  (e.g. `getOption("regts_max_maxdif")`).
-#' @export
 #' @param x1 the first timeseries (a  \code{\link{regts}} or
 #'            \code{\link[stats]{ts}} object).
 #' @param x2 the second timeseries (a \code{regts} or \code{ts} object).
@@ -85,6 +84,7 @@
 #'  \item{tol}{The tolerance parameter}
 #'  \item{fun}{a character string specifying the supplied function \code{fun},
 #'  or \code{NULL} if \code{fun} has not been specified}
+#'
 #' @examples
 #'# create two timeseries x1 and x2
 #'x1 <- regts(matrix(data = rep(1:27), nc = 3), start = "2008Q4",
@@ -123,7 +123,10 @@
 
 #' @seealso
 #'\code{\link{regts}}
-#'
+#' @importFrom dplyr right_join left_join arrange rename group_by summarise
+#' filter select mutate slice
+#' @importFrom rlang .data
+#' @export
 tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
 
   series_name1 <- deparse(substitute(x1))
@@ -134,7 +137,7 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
 
   if (frequency(x1) != frequency(x2)) {
     stop("Timeseries x1 and x2 (", series_name1, " and ", series_name2,
-                ") have different frequencies")
+         ") have different frequencies")
   }
 
   if (!is.matrix(x1)) x1 <- univec2unimat(x1, "ts_without_name")
@@ -188,40 +191,57 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
 
     difnames <- colnames(dif)
 
-    #
-    # Find the maximum differences
-    #
-    get_max_index <- function(x) {
-      # Returns the index of the first maximum of vector x,
-      # or the index of the first NA if x contains NA values.
-      idx <- Position(is.na, x)
-      if (is.na(idx)) idx <- which.max(x)
-      return(idx)
-    }
-    period_idx <- apply(abs(dif), FUN = get_max_index, MARGIN = 2)
-    maxdif_values <- dif[cbind(period_idx, seq_len(ncol(dif)))]
-    periods <- as.character(get_periods(dif)[period_idx])
-    maxdif <- data.frame(period = periods, maxdif = maxdif_values,
-                         row.names = difnames)
+    x1_long <- as.data.frame(x1[, difnames, drop = FALSE], long = TRUE)
+    x2_long <- as.data.frame(x2[, difnames, drop = FALSE], long = TRUE)
+    dif_long <- as.data.frame(dif, long  = TRUE)
 
-    # now order maxdif with decreasing order (but NA values come first)
-    ordr <- order(abs(maxdif_values), decreasing = TRUE, na.last = FALSE)
-    maxdif <- maxdif[ordr, , drop = FALSE]
+    dif_table <- right_join(x2_long, dif_long, by = c("name", "period"),
+                            suffix = c("", "_dif"))
+    dif_table <- right_join(x1_long, dif_table, by = c("name", "period"),
+                            suffix = c("1", "2")) |>
+      rename(dif = .data$value_dif) |>
+      filter(is.na(.data$dif) | abs(.data$dif) >= tol)
+
+    # Returns the index of largest absolute value in x. NA values come first.
+    get_index_max <- function(x) {
+      return(order(abs(x), decreasing = TRUE, na.last = FALSE)[1])
+    }
+
+    # Determine for each variable the period with the largest
+    # absolute difference (NA values come first).
+    maxdif <- dif_table |>
+      group_by(.data$name) |>
+      slice(get_index_max(.data$dif)) |>
+      rename(maxdif = dif) |>
+      # Sort differences: first NAs, the maximum differecences in descreasing
+      # order.
+      arrange(desc(is.na(.data$maxdif)), desc(abs(.data$maxdif))) |>
+      as.data.frame()
+
+    # tijdelijk voor het testen:
+    maxdif[, c("value1", "value2")] <- NULL
+
+    # Convert column name to row names. The result of printing  maxdif is then
+    # nicer.
+    rownames(maxdif) <- maxdif$name
+    maxdif$name <- NULL
 
   } else {
 
     difnames <- character(0)
     maxdif <- NULL
+    dif_table <- NULL
 
   }
 
   # check if results are equal
   equal <- ranges_equal && length(missing_names1) == 0 &&
-           length(missing_names2) == 0 && length(difnames) == 0
+    length(missing_names2) == 0 && length(difnames) == 0
 
   ret <- list(equal          = equal,
               difnames       = difnames,
               dif            = dif,
+              #dif_table      = dif_table,
               maxdif         = maxdif,
               common_names   = common_names,
               missing_names1 = missing_names1,
@@ -264,13 +284,13 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
   xx1[both_na] <- 0
   xx2[both_na] <- 0
 
-  both_Inf <- !is.na(xx1) & xx1 == Inf & !is.na(xx2) & xx2 == Inf
-  xx1[both_Inf] <- 0
-  xx2[both_Inf] <- 0
+  both_inf <- !is.na(xx1) & xx1 == Inf & !is.na(xx2) & xx2 == Inf
+  xx1[both_inf] <- 0
+  xx2[both_inf] <- 0
 
-  both_min_Inf <- !is.na(xx1) & xx1 == -Inf & !is.na(xx2) & xx2 == -Inf
-  xx1[both_min_Inf] <- 0
-  xx2[both_min_Inf] <- 0
+  both_min_inf <- !is.na(xx1) & xx1 == -Inf & !is.na(xx2) & xx2 == -Inf
+  xx1[both_min_inf] <- 0
+  xx2[both_min_inf] <- 0
 
   dif <- fun(xx1, xx2)
   colnames(dif) <- common_names
@@ -335,84 +355,96 @@ print.tsdif <- function(x, ...) {
   max_difnames <- getOption("regts_max_difnames",
                             default = regts_default_options$regts_max_difnames)
   max_maxdif <- getOption("regts_max_maxdif",
-                           default = regts_default_options$regts_max_maxdif)
+                          default = regts_default_options$regts_max_maxdif)
 
-  with(x, {
-    if (equal  && is.null(fun) && tol == 0) {
-      cat("The two timeseries objects", ts_names[1], "and", ts_names[2],
-                "are equal!\n")
-    } else {
-      cat("Compared timeseries:", ts_names[1], "and", paste0(ts_names[2], "\n"))
-      if (!is.null(fun)) {
-        cat("Difference function:", paste0(fun, "\n"))
-      }
-      if (tol != 0) {
-        cat("Difference tolerance:", paste0(tol, "\n"))
-      }
-      cat("\n")
-      if (!is.null(dif)) {
-        # print first max_difnames difnames with largest difference
-        cat("Names of timeseries with differences (alphabetical):\n")
-        if (length(difnames) > max_difnames) {
-          print(difnames[1:max_difnames])
-          cat("[ reached getOption(\"regts_max_difnames\") -- omitted ",
-              length(difnames) - max_difnames, "names ]\n")
-        } else {
-          print(difnames)
-        }
+  ts_names <- x$ts_names
+  ts_name1 <- ts_names[1]
+  ts_name2 <- ts_names[2]
+  dif <- x$dif
+  maxdif <- x$maxdif
+  fun <- x$fun
+  tol <- x$tol
+  difnames <- x$difnames
+  common_range <- x$common_range
+  missing_names1 <- x$missing_names1
+  missing_names2 <- x$missing_names2
 
-        max_maxdif <- min(ncol(dif), max_maxdif)
-        cat("\nMaximum differences timeseries in decreasing order:\n\n")
-        print(maxdif[1:max_maxdif, ])
-        if (ncol(dif) > max_maxdif) {
-          cat("[ reached getOption(\"regts_max_maxdif\") -- omitted ",
-              ncol(dif) - max_maxdif, "differences ]\n")
-        }
+  if (x$equal && is.null(x$fun) && x$tol == 0) {
+    cat("The two timeseries objects", ts_name1, "and", ts_name2,
+        "are equal!\n")
+  } else {
+    cat("Compared timeseries:", ts_name1, "and", paste0(ts_name2, "\n"))
+    if (!is.null(fun)) {
+      cat("Difference function:", paste0(fun, "\n"))
+    }
+    if (tol != 0) {
+      cat("Difference tolerance:", paste0(tol, "\n"))
+    }
+    cat("\n")
 
-        # print timeseries with largest difference
-        name <- rownames(maxdif)[1]
-        cat(sprintf("\nTimeseries with largest difference (%s):\n\n", name))
-        print(dif[, name])
+    if (!is.null(dif)) {
+      # print first max_difnames difnames with largest difference
+      cat("Names of timeseries with differences (alphabetical):\n")
+      if (length(difnames) > max_difnames) {
+        print(difnames[1:max_difnames])
+        cat("[ reached getOption(\"regts_max_difnames\") -- omitted ",
+            length(difnames) - max_difnames, "names ]\n")
       } else {
-        if (is.null(common_range)) {
-          cat(paste0("No differences computed because the two timeseries\n",
-                     "have no overlapping period ranges\n"))
-        } else if (length(common_names) == 0) {
-          cat("No differences computed because the two timeseries",
-                    "have no common columns\n")
-        } else if (tol == 0) {
-          cat("No differences found\n")
-        } else {
-          cat(paste("No differences larger than", tol, "found\n"))
-        }
+        print(difnames)
       }
-      if (length(missing_names1) > 0) {
-        cat("\nMissing timeseries in", paste0(ts_names[1], ":\n"))
-        nmissing <- length(missing_names1)
-        print(missing_names1[1:min(max_difnames, nmissing)])
-        if (nmissing > max_difnames) {
-          cat("[ reached getOption(\"regts_max_difnames\") -- omitted ",
-              nmissing - max_difnames, "names ]\n")
-        }
 
+      max_maxdif <- min(ncol(dif), max_maxdif)
+      cat("\nMaximum differences timeseries in decreasing order:\n\n")
+      print(maxdif[1:max_maxdif, ])
+      if (ncol(dif) > max_maxdif) {
+        cat("[ reached getOption(\"regts_max_maxdif\") -- omitted ",
+            ncol(dif) - max_maxdif, "differences ]\n")
       }
-      if (length(missing_names2) > 0) {
-        cat("\nMissing timeseries in", paste0(ts_names[2], ":\n"))
-        nmissing <- length(missing_names2)
-        print(missing_names2[1:min(max_difnames, nmissing)])
-        if (nmissing > max_difnames) {
-          cat("[ reached getOption(\"regts_max_difnames\") -- omitted ",
-              nmissing - max_difnames, "names ]\n")
-        }
-      }
-      if (!ranges_equal) {
-        cat("\nThe two timeseries have different period ranges:\n\n")
-        df <- data.frame(ranges = c(as.character(period_range1),
-                                    as.character(period_range2)))
-        rownames(df) <- ts_names
-        print(df)
+
+      # print timeseries with largest difference
+      name <- rownames(maxdif)[1]
+      cat(sprintf("\nTimeseries with largest difference (%s):\n\n", name))
+      print(dif[, name])
+    } else {
+      if (is.null(common_range)) {
+        cat(paste0("No differences computed because the two timeseries\n",
+                   "have no overlapping period ranges\n"))
+      } else if (length(x$common_names) == 0) {
+        cat("No differences computed because the two timeseries",
+            "have no common columns\n")
+      } else if (tol == 0) {
+        cat("No differences found\n")
+      } else {
+        cat(paste("No differences larger than", tol, "found\n"))
       }
     }
-  })
+    if (length(missing_names1) > 0) {
+      cat("\nMissing timeseries in", paste0(ts_name1, ":\n"))
+      nmissing <- length(missing_names1)
+      print(missing_names1[1:min(max_difnames, nmissing)])
+      if (nmissing > max_difnames) {
+        cat("[ reached getOption(\"regts_max_difnames\") -- omitted ",
+            nmissing - max_difnames, "names ]\n")
+      }
+
+    }
+    if (length(missing_names2) > 0) {
+      cat("\nMissing timeseries in", paste0(ts_name2, ":\n"))
+      nmissing <- length(missing_names2)
+      print(missing_names2[1:min(max_difnames, nmissing)])
+      if (nmissing > max_difnames) {
+        cat("[ reached getOption(\"regts_max_difnames\") -- omitted ",
+            nmissing - max_difnames, "names ]\n")
+      }
+    }
+    if (!x$ranges_equal) {
+      cat("\nThe two timeseries have different period ranges:\n\n")
+      df <- data.frame(ranges = c(as.character(x$period_range1),
+                                  as.character(x$period_range2)))
+      rownames(df) <- ts_names
+      print(df)
+    }
+  }
+
   return(invisible(x))
 }
