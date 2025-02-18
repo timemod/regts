@@ -61,12 +61,17 @@
 #'  Only timeseries with differences larger than \code{tol} are included.
 #'  Leading and trailing rows with differences less than \code{tol} have also
 #'  been removed.}
-#'   \item{maxdif}{A \code{data.frame} with the maximum differences. For each
-#'   timeseries the maximum difference is determined. Column `maxdif`
-#'   contains the maximum differences and
-#'   column `period` the periods at which these maximum difference occur.
-#'   The rows of the data frame are ordered with decreasing order of `maxdif`,
-#'   so the timeseries with the largest maximum differences come first.}
+#'  \item{dif_table}{A \code{data.frame} with all differences greater
+#'   than the tolerance. The data frame contains four columns: `name`, `period`,
+#'  `value1`, `value2` and `dif`.}
+#'  \item{maxdif}{A \code{data.frame} with the maximum differences. For each
+#'  timeseries the maximum difference is determined. Column `maxdif`
+#'  contains the maximum differences and
+#'  column `period` the periods at which these maximum difference occur.
+#'  Columns `value1` and `value2` are the values in timeseries `x1` and `x2.`
+#'  The rows of the data frame are ordered with decreasing order of `maxdif`,
+#'  so the timeseries with the largest maximum differences come first. `NA`
+#'  values come first.}
 #'  \item{common_names}{the names of the common columns}
 #'  \item{missing_names1}{The names of columns present in \code{x2} but missing
 #'                        in \code{x1}}
@@ -123,9 +128,6 @@
 
 #' @seealso
 #'\code{\link{regts}}
-#' @importFrom dplyr right_join left_join arrange rename group_by summarise
-#' filter select mutate slice
-#' @importFrom rlang .data
 #' @export
 tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
 
@@ -190,38 +192,8 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
   if (!is.null(dif)) {
 
     difnames <- colnames(dif)
-
-    x1_long <- as.data.frame(x1[, difnames, drop = FALSE], long = TRUE)
-    x2_long <- as.data.frame(x2[, difnames, drop = FALSE], long = TRUE)
-    dif_long <- as.data.frame(dif, long  = TRUE)
-
-    dif_table <- right_join(x2_long, dif_long, by = c("name", "period"),
-                            suffix = c("", "_dif"))
-    dif_table <- right_join(x1_long, dif_table, by = c("name", "period"),
-                            suffix = c("1", "2")) |>
-      rename(dif = .data$value_dif) |>
-      filter(is.na(.data$dif) | abs(.data$dif) >= tol)
-
-    # Returns the index of largest absolute value in x. NA values come first.
-    get_index_max <- function(x) {
-      return(order(abs(x), decreasing = TRUE, na.last = FALSE)[1])
-    }
-
-    # Determine for each variable the period with the largest
-    # absolute difference (NA values come first).
-    maxdif <- dif_table |>
-      group_by(.data$name) |>
-      slice(get_index_max(.data$dif)) |>
-      rename(maxdif = dif) |>
-      # Sort differences: first NAs, the maximum differecences in descreasing
-      # order.
-      arrange(desc(is.na(.data$maxdif)), desc(abs(.data$maxdif))) |>
-      as.data.frame()
-
-    # Convert column name to row names. The result of printing  maxdif is then
-    # nicer.
-    rownames(maxdif) <- maxdif$name
-    maxdif$name <- NULL
+    dif_table <- get_dif_table(x1, x2, dif, difnames, tol)
+    maxdif <- get_maxdif(dif_table)
 
   } else {
 
@@ -238,7 +210,7 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
   ret <- list(equal          = equal,
               difnames       = difnames,
               dif            = dif,
-              #dif_table      = dif_table,
+              dif_table      = dif_table,
               maxdif         = maxdif,
               common_names   = common_names,
               missing_names1 = missing_names1,
@@ -258,6 +230,52 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
   return(structure(ret, class = "tsdif"))
 }
 
+#' @importFrom dplyr right_join rename filter
+#' @importFrom rlang .data
+get_dif_table <- function(x1, x2, dif, difnames, tol) {
+
+  dif_prd <- get_period_range(dif)
+
+  x1_long <- as.data.frame(x1[dif_prd, difnames, drop = FALSE], long = TRUE) |>
+    rename(value1 = "value")
+  x2_long <- as.data.frame(x2[dif_prd, difnames, drop = FALSE], long = TRUE) |>
+    rename(value2 = "value")
+  dif_long <- as.data.frame(dif, long  = TRUE) |>
+    rename(dif = "value") |>
+    filter(is.na(.data$dif) | abs(.data$dif) > tol)
+
+  dif_table <- right_join(x2_long, dif_long, by = c("name", "period"))
+  dif_table <- right_join(x1_long, dif_table, by = c("name", "period"))
+
+  return(dif_table)
+}
+
+#' @importFrom dplyr arrange group_by slice desc
+get_maxdif <- function(dif_table) {
+
+  # Returns the index of largest absolute value in x. NA values come first.
+  get_index_max <- function(x) {
+    return(order(abs(x), decreasing = TRUE, na.last = FALSE)[1])
+  }
+
+  # Determine for each variable the period with the largest
+  # absolute difference (NA values come first).
+  maxdif <- dif_table |>
+    group_by(.data$name) |>
+    slice(get_index_max(.data$dif)) |>
+    rename(maxdif = .data$dif) |>
+    # Sort differences: first NAs, then maximum differecences in decreasing
+    # order.
+    arrange(desc(is.na(.data$maxdif)), desc(abs(.data$maxdif))) |>
+    as.data.frame()
+
+  # Convert column name to row names. The result of printing  maxdif is then
+  # nicer.
+  rownames(maxdif) <- maxdif$name
+  maxdif$name <- NULL
+
+  return(maxdif)
+}
 # Calculate the difference for the common columns in x1 and x2,
 # and return a regts with the difference. Return NULL if the differences
 # are smaller than tol, or if the two timeseries have no common columns
