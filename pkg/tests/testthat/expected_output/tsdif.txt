@@ -8,9 +8,9 @@ Names of timeseries with differences (alphabetical):
 
 Maximum differences timeseries in decreasing order:
 
-  period maxdif
-a 2008Q4  -0.01
-b 2008Q4  -0.01
+  period value1 value2 maxdif
+a 2008Q4      1   1.01  -0.01
+b 2008Q4      4   4.01  -0.01
 
 Timeseries with largest difference (a):
 

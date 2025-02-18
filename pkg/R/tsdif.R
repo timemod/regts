@@ -218,9 +218,6 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
       arrange(desc(is.na(.data$maxdif)), desc(abs(.data$maxdif))) |>
       as.data.frame()
 
-    # tijdelijk voor het testen:
-    maxdif[, c("value1", "value2")] <- NULL
-
     # Convert column name to row names. The result of printing  maxdif is then
     # nicer.
     rownames(maxdif) <- maxdif$name
