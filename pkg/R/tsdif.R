@@ -131,75 +131,62 @@
 #' @export
 tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
 
+  # Get name of the actual arguments -------------------------------------------
   series_name1 <- deparse(substitute(x1))
   series_name2 <- deparse(substitute(x2))
 
-  if (!is.ts(x1)) stop("Argument x1 (", series_name1, ") is not a timeseries")
-  if (!is.ts(x2)) stop("Argument x2 (", series_name2, ") is not a timeseries")
+  # Check input ----------------------------------------------------------------
+
+  x1 <- check_tsdif_arg(x1, "x1", series_name1)
+  x2 <- check_tsdif_arg(x2, "x2", series_name2)
 
   if (frequency(x1) != frequency(x2)) {
     stop("Timeseries x1 and x2 (", series_name1, " and ", series_name2,
          ") have different frequencies")
   }
 
-  if (!is.matrix(x1)) x1 <- univec2unimat(x1, "ts_without_name")
-  if (!is.matrix(x2)) x2 <- univec2unimat(x2, "ts_without_name")
-
-  x1 <- as.regts(x1)
-  x2 <- as.regts(x2)
-
   if (tol < 0) stop("Argument tol should be >= 0")
+
+  # Compare names --------------------------------------------------------------
 
   names1 <- colnames(x1)
   names2 <- colnames(x2)
-
-  # create colnames if x1 or x2 do not have colnames
-  if (is.null(names1) && ncol(x1) > 0) {
-    names1 <- paste("column", seq_len(ncol(x1)))
-    colnames(x1) <- names1
-  }
-  if (is.null(names2) && ncol(x2) > 0) {
-    names2 <- paste("column", seq_len(ncol(x2)))
-    colnames(x2) <- names2
-  }
-
   common_names   <- intersect(names1, names2)
   missing_names1 <- setdiff(names2, names1)
   missing_names2 <- setdiff(names1, names2)
+
+  if (length(common_names) == 0) {
+    warning(paste("Timeseries", series_name1, "and", series_name2,
+                  "have no common columns"))
+  }
+
+  # Compare period ranges ------------------------------------------------------
 
   period_range1  <- get_period_range(x1)
   period_range2  <- get_period_range(x2)
   common_range   <- range_intersect(period_range1, period_range2)
   ranges_equal   <- period_range1 == period_range2
 
-  if (length(common_names) == 0) {
-    warning(paste("Timeseries", series_name1, "and", series_name2,
-                  "have no common columns"))
-  }
   if (is.null(common_range)) {
     warning(paste("Timeseries", series_name1, "and", series_name2,
                   "have no common period range"))
   }
-  if (anyDuplicated(names1)) {
-    stop(paste("Duplicate column names in timeseries", series_name1))
-  }
-  if (anyDuplicated(names2)) {
-    stop(paste("Duplicate column names in timeseries", series_name2))
-  }
 
-  #tic("calc dif")
+  # Compute differences --------------------------------------------------------
+
+  # tic("calc dif")
   dif <- calculate_difference(common_names, common_range, x1, x2, tol, fun)
-  #toc()
+  # toc()
 
   if (!is.null(dif)) {
 
     difnames <- colnames(dif)
-    #tic("dif_table")
+    # tic("dif_table")
     dif_table <- get_dif_table(x1, x2, dif, difnames, tol)
-    #toc()
-    #tic("maxdif")
+    # toc()
+    # tic("maxdif")
     maxdif <- get_maxdif(dif_table)
-    #toc()
+    # toc()
   } else {
 
     difnames <- character(0)
@@ -208,9 +195,12 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
 
   }
 
-  # check if results are equal
+  # Check if results are equal -------------------------------------------------
+
   equal <- ranges_equal && length(missing_names1) == 0 &&
     length(missing_names2) == 0 && length(difnames) == 0
+
+  # Prepare result and return result -------------------------------------------
 
   ret <- list(equal          = equal,
               difnames       = difnames,
@@ -233,6 +223,26 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
               })
 
   return(structure(ret, class = "tsdif"))
+}
+
+check_tsdif_arg <- function(x, arg_name, series_name) {
+  if (!is.ts(x)) {
+    stop("Argument ", arg_name, " (", series_name, ") is not a timeseries")
+  }
+  cnames <- colnames(x)
+  has_cnames <- !is.null(cnames)
+  if (!is.matrix(x)) {
+    x <- univec2unimat(x, "ts_without_name")
+  } else if (!has_cnames && ncol(x) > 0) {
+    # If x has more than one column and no column names,
+    # then create dummy column names.
+    # TODO: what if x has one column and no column names?
+    colnames(x) <- paste("column", seq_len(ncol(x)))
+  } else if (has_cnames && anyDuplicated(cnames)) {
+    stop(paste("Duplicate column names in timeseries", series_name))
+  }
+
+  return(as.regts(x))
 }
 
 #' @importFrom dplyr right_join rename filter
