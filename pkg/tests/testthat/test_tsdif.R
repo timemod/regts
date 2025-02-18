@@ -3,7 +3,7 @@ library(testthat)
 
 rm(list = ls())
 
-update_expected <- FALSE
+update_expected <- TRUE
 
 # Functions --------------------------------------------------------------------
 

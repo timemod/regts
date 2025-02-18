@@ -19,7 +19,7 @@ h 2018Q4     96    289   -193
 g 2018Q4     84    253   -169
 e 2018Q4     60    181   -121
 d 2018Q4     48    145    -97
-[ reached getOption("regts_max_maxdif") -- omitted  2 differences ]
+[ reached getOption("regts_max_maxdif") -- omitted 2 differences ]
 
 Timeseries with largest difference (c):
 

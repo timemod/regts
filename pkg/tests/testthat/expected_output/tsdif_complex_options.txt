@@ -5,7 +5,7 @@ Compared timeseries: ts1 and ts2
 
 Names of timeseries with differences (alphabetical):
  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j"
-[ reached getOption("regts_max_difnames") -- omitted  2 names ]
+[ reached getOption("regts_max_difnames") -- omitted 2 names ]
 
 Maximum differences timeseries in decreasing order:
 
