@@ -36,7 +36,7 @@ Leading and trailing rows with differences less than \code{tol} have also
 been removed.}
 \item{dif_table}{A \code{data.frame} with all differences greater
 than the tolerance. The data frame contains four columns: \code{name}, \code{period},
-\code{value1}, \code{value2} and \code{dif}.}
+\code{dif}, \code{value1} and  \code{value2}.}
 \item{maxdif}{A \code{data.frame} with the maximum differences. For each
 timeseries the maximum difference is determined. Column \code{maxdif}
 contains the maximum differences and

@@ -3,7 +3,7 @@ library(testthat)
 
 rm(list = ls())
 
-update_expected <- TRUE
+update_expected <- FALSE
 
 # Functions --------------------------------------------------------------------
 
@@ -17,10 +17,10 @@ get_dif_table <- function(ts1, ts2, dif, tol = 0) {
   ts2_long <- as.data.frame(ts2[, names, drop = FALSE], long = TRUE)
   dif_long <- as.data.frame(dif, long = TRUE)
 
-  tot <- merge(ts1_long, ts2_long, by = c("name", "period")) |>
-    merge(dif_long, by = c("name", "period"))
+  tot <- merge(dif_long, ts1_long, by = c("name", "period")) |>
+    merge(ts2_long, by = c("name", "period"))
 
-  colnames(tot)[3:5] <- c("value1", "value2", "dif")
+  colnames(tot)[3:5] <- c("dif", "value1", "value2")
 
   tot <- tot[is.na(dif) | abs(dif) > tol, ]
 
@@ -47,9 +47,9 @@ difference <- regts(matrix(data = rep(-0.01, 6), nc = 2),
 
 maxdif <- data.frame(
   period = "2008Q4",
+  maxdif = rep(-0.01, 2),
   value1 = c(1, 4),
   value2 = c(1.01, 4.01),
-  maxdif = rep(-0.01, 2),
   row.names = c("a", "b")
 )
 
@@ -218,9 +218,9 @@ test_that("only one NA difference", {
 
   maxdif <- data.frame(
     period = as.character(get_periods(ts1)[2]),
+    maxdif = NA_real_,
     value1 = ts1[2, 2],
     value2 = ts1_na[2, 2],
-    maxdif = NA_real_,
     row.names = colnames(ts1)[2]
   )
 
@@ -252,9 +252,9 @@ test_that("two NA differences", {
 
   maxdif <- data.frame(
     period = as.character(get_periods(dif))[c(1, 3)],
+    maxdif = NA_real_,
     value1 = c(ts1[2, 2], ts1[4, 3]),
     value2 = c(ts1_na[2, 2], ts1_na[4, 3]),
-    maxdif = NA_real_,
     row.names = colnames(dif)
   )
 
@@ -365,9 +365,9 @@ test_that("single ts as result", {
   var_name <- "b"
   res_correct2$maxdif <- data.frame(
     period = prd,
+    maxdif = -0.11,
     value1 = as.numeric(ts1[prd, var_name]),
     value2 = as.numeric(x2[prd, var_name]),
-    maxdif = -0.11,
     row.names = var_name
   )
 
@@ -393,9 +393,9 @@ test_that("single common column", {
 
   maxdif <- data.frame(
     period = prd,
+    maxdif = -0.01,
     value1 = as.numeric(ts1[prd, var_name]),
     value2 = as.numeric(ts2[prd, var_name]),
-    maxdif = -0.01,
     row.names = var_name
   )
 
@@ -435,9 +435,9 @@ test_that("no column names simple", {
 
   maxdif3 <- data.frame(
     period = "2008Q4",
+    maxdif = rep(-0.01, 2),
     value1 = c(1, 4),
     value2 = c(1.01, 4.01),
-    maxdif = rep(-0.01, 2),
     row.names = colnames(difference3)
   )
 
@@ -575,9 +575,9 @@ test_that("test combinations of NA, NaN, Inf and proper values", {
   dif_prd <- get_periods(dif)[1]
   maxdif <- data.frame(
     period = as.character(dif_prd),
+    maxdif = dif[1, ],
     value1 = as.numeric(ts1[dif_prd, colnames(dif)]),
     value2 = as.numeric(ts2[dif_prd, colnames(dif)]),
-    maxdif = dif[1, ],
     row.names = colnames(dif)
   )
 

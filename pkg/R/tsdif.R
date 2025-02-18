@@ -63,7 +63,7 @@
 #'  been removed.}
 #'  \item{dif_table}{A \code{data.frame} with all differences greater
 #'   than the tolerance. The data frame contains four columns: `name`, `period`,
-#'  `value1`, `value2` and `dif`.}
+#'  `dif`, `value1` and  `value2`.}
 #'  \item{maxdif}{A \code{data.frame} with the maximum differences. For each
 #'  timeseries the maximum difference is determined. Column `maxdif`
 #'  contains the maximum differences and
@@ -242,7 +242,7 @@ check_tsdif_arg <- function(x, arg_name, series_name) {
 # Construct a table with differences. x1 and x2 are the input timeseries,
 # dif the difference timeseries, difnames the names of timeseries with
 # differences and tol the difference tolerance.
-#' @importFrom dplyr right_join rename filter
+#' @importFrom dplyr left_join rename filter
 #' @importFrom rlang .data
 get_dif_table <- function(x1, x2, dif, difnames, tol) {
 
@@ -256,8 +256,8 @@ get_dif_table <- function(x1, x2, dif, difnames, tol) {
     rename(dif = "value") |>
     filter(is.na(.data$dif) | abs(.data$dif) > tol)
 
-  dif_table <- right_join(x2_long, dif_long, by = c("name", "period"))
-  dif_table <- right_join(x1_long, dif_table, by = c("name", "period"))
+  dif_table <- left_join(dif_long, x1_long, by = c("name", "period")) |>
+    left_join(x2_long, by = c("name", "period"))
 
   return(dif_table)
 }

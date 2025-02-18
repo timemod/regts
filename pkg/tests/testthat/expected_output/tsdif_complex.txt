@@ -8,17 +8,17 @@ Names of timeseries with differences (alphabetical):
 
 Maximum differences timeseries in decreasing order:
 
-  period value1 value2 maxdif
-c 2016Q3     NA     82     NA
-f 2017Q4     68     NA     NA
-l 2018Q4    144    433   -289
-k 2018Q4    132    397   -265
-j 2018Q4    120    361   -241
-i 2018Q4    108    325   -217
-h 2018Q4     96    289   -193
-g 2018Q4     84    253   -169
-e 2018Q4     60    181   -121
-d 2018Q4     48    145    -97
+  period maxdif value1 value2
+c 2016Q3     NA     NA     82
+f 2017Q4     NA     68     NA
+l 2018Q4   -289    144    433
+k 2018Q4   -265    132    397
+j 2018Q4   -241    120    361
+i 2018Q4   -217    108    325
+h 2018Q4   -193     96    289
+g 2018Q4   -169     84    253
+e 2018Q4   -121     60    181
+d 2018Q4    -97     48    145
 [ reached getOption("regts_max_maxdif") -- omitted 2 differences ]
 
 Timeseries with largest difference (c):
