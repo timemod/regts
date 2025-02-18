@@ -174,27 +174,16 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
 
   # Compute differences --------------------------------------------------------
 
-  # tic("calc dif")
   dif <- calculate_difference(common_names, common_range, x1, x2, tol, fun)
-  # toc()
-
-  # TODO: check efficientie van onderstaande code.
 
   if (!is.null(dif)) {
-
     difnames <- colnames(dif)
-    # tic("dif_table")
     dif_table <- get_dif_table(x1, x2, dif, difnames, tol)
-    # toc()
-    # tic("maxdif")
     maxdif <- get_maxdif(dif_table)
-    # toc()
   } else {
-
     difnames <- character(0)
     maxdif <- NULL
     dif_table <- NULL
-
   }
 
   # Check if results are equal -------------------------------------------------
@@ -203,6 +192,9 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
     length(missing_names2) == 0 && length(difnames) == 0
 
   # Prepare result and return result -------------------------------------------
+
+  # Convert the actual argument for formal argument fun to a text
+  fun_txt <- if (missing(fun)) NULL else deparse(substitute(fun))
 
   ret <- list(equal          = equal,
               difnames       = difnames,
@@ -218,37 +210,38 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
               ranges_equal   = ranges_equal,
               ts_names       = c(series_name1, series_name2),
               tol            = tol,
-              # TODO: dit gaat mis voor lambda functies of anonieme
-              # functie gewoon opslaan als functie?
-              fun            = if (missing(fun)) {
-                NULL
-              } else {
-                deparse(substitute(fun))
-              })
+              fun            = fun_txt)
 
   return(structure(ret, class = "tsdif"))
 }
 
+# Check the timeseries arguments of function tsdif.
 check_tsdif_arg <- function(x, arg_name, series_name) {
+
   if (!is.ts(x)) {
     stop("Argument ", arg_name, " (", series_name, ") is not a timeseries")
   }
-  cnames <- colnames(x)
-  has_cnames <- !is.null(cnames)
+
+  # If x is a vector timeseries, convert it to a matrix timeseries with one
+  # column named 'ts_without_name'.
   if (!is.matrix(x)) {
-    x <- univec2unimat(x, "ts_without_name")
-  } else if (!has_cnames && ncol(x) > 0) {
-    # If x has more than one column and no column names,
-    # then create dummy column names.
-    # TODO: what if x has one column and no column names?
+    return(univec2unimat(x, "ts_without_name"))
+  }
+
+  # Check column names.
+  cnames <- colnames(x)
+  if (is.null(cnames)) {
     colnames(x) <- paste("column", seq_len(ncol(x)))
-  } else if (has_cnames && anyDuplicated(cnames)) {
-    stop(paste("Duplicate column names in timeseries", series_name))
+  } else if (anyDuplicated(cnames)) {
+    stop("Duplicate column names in timeseries ", series_name)
   }
 
   return(as.regts(x))
 }
 
+# Construct a table with differences. x1 and x2 are the input timeseries,
+# dif the difference timeseries, difnames the names of timeseries with
+# differences and tol the difference tolerance.
 #' @importFrom dplyr right_join rename filter
 #' @importFrom rlang .data
 get_dif_table <- function(x1, x2, dif, difnames, tol) {
@@ -269,6 +262,7 @@ get_dif_table <- function(x1, x2, dif, difnames, tol) {
   return(dif_table)
 }
 
+# Determine for each variable the maximum difference.
 #' @importFrom dplyr arrange group_by slice desc
 get_maxdif <- function(dif_table) {
 
@@ -295,6 +289,7 @@ get_maxdif <- function(dif_table) {
 
   return(maxdif)
 }
+
 # Calculate the difference for the common columns in x1 and x2,
 # and return a regts with the difference. Return NULL if the differences
 # are smaller than tol, or if the two timeseries have no common columns
