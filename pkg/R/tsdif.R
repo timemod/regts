@@ -178,6 +178,8 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
   dif <- calculate_difference(common_names, common_range, x1, x2, tol, fun)
   # toc()
 
+  # TODO: check efficientie van onderstaande code.
+
   if (!is.null(dif)) {
 
     difnames <- colnames(dif)
@@ -216,6 +218,8 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
               ranges_equal   = ranges_equal,
               ts_names       = c(series_name1, series_name2),
               tol            = tol,
+              # TODO: dit gaat mis voor lambda functies of anonieme
+              # functie gewoon opslaan als functie?
               fun            = if (missing(fun)) {
                 NULL
               } else {
@@ -309,6 +313,7 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
   both_nan <- is.nan(xx1) & is.nan(xx2)
   xx1[both_nan] <- 0
   xx2[both_nan] <- 0
+
   # is.na(x) is TRUE for NA  AND  NaN !!
   both_na <- is.na(xx1) & !is.nan(xx1) & is.na(xx2) & !is.nan(xx2)
   xx1[both_na] <- 0
@@ -325,26 +330,28 @@ calculate_difference <- function(common_names, common_range, x1, x2, tol, fun) {
   dif <- fun(xx1, xx2)
   colnames(dif) <- common_names
 
-  sel <- apply(abs(dif), FUN = max, MARGIN = 2) > tol
-  sel[is.na(sel)] <- TRUE
-  if (any(sel)) {
+  # Select columns with maximum difference > tol and columns with NA values:
+  col_sel <- matrixStats::colMaxs(abs(dif)) > tol
+  col_sel[is.na(col_sel)] <- TRUE
 
-    # remove columns with differences <= tol
-    dif <- dif[, sel, drop = FALSE]
+  if (!any(col_sel)) return(NULL)
 
-    # now remove leading/trailing rows with differences <= tol
-    row_sel <- apply(abs(dif), FUN = max, MARGIN = 1) > tol
-    row_sel[is.na(row_sel)] <- TRUE
-    row_sel <- which(row_sel)
-    row_sel <- min(row_sel) : max(row_sel)
-    pstart <- start_period(common_range) + row_sel[1] - 1
-    period <- period_range(pstart, pstart + length(row_sel) - 1)
-    dif <- dif[period, , drop = FALSE]
-    # sort columns of dif
-    dif <- dif[, sort(colnames(dif)), drop = FALSE]
-  } else {
-    dif <- NULL
-  }
+  # Keep columns with differences > tol and colums with NA values.
+  dif <- dif[, col_sel, drop = FALSE]
+
+  # Now remove leading/trailing rows with differences <= tol and no NA
+  # values.
+  row_sel <- matrixStats::rowMaxs(abs(dif)) > tol
+  row_sel[is.na(row_sel)] <- TRUE
+  row_sel <- which(row_sel)
+  row_sel <- min(row_sel) : max(row_sel)
+  pstart <- start_period(common_range) + row_sel[1] - 1
+  period <- period_range(pstart, pstart + length(row_sel) - 1)
+  dif <- dif[period, , drop = FALSE]
+
+  # Sort columns alphabetically:
+  dif <- dif[, order(colnames(dif)), drop = FALSE]
+
   return(dif)
 }
 

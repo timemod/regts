@@ -32,7 +32,8 @@ Imports:
     rlang,
     testthat,
     tidyr,
-    dplyr
+    dplyr,
+    matrixStats
 Suggests:
     knitr,
     rmarkdown,
