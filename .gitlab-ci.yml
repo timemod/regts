@@ -1,5 +1,6 @@
 variables:
   CRAN_REPO: https://cloud.r-project.org
+  BUILD_DIR: build
 
 build-job:
   stage: build
@@ -12,8 +13,9 @@ build-job:
     - R -e "print(.libPaths())"
     - R -e "if (!require(devtools)) install.packages('devtools', repos = '$CRAN_REPO')"
     - R -e "devtools::install_deps('pkg', dependencies = TRUE, repos = '$CRAN_REPO')"
-    - mkdir build
-    - R CMD build pkg -o build
+    - R CMD build pkg 
+    - mkdir $BUILD_DIR
+    - mv *.tar.gz $BUILD_DIR
   artifacts:
     paths:
       - build
@@ -23,5 +25,5 @@ test-job1:
   script:
     - echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
     - echo "R_LIBS_SITE=''" >> .Renviron
-    - ls -l build
-    - R CMD check build/*.tar.gz
+    - R -e "print(.libPaths())"
+    - R CMD check $BUILD_DIR/*.tar.gz
