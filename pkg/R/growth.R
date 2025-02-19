@@ -33,7 +33,7 @@
 growth <- function(x, n = 1, keep_range = TRUE) {
 
   if (!is.ts(x)) {
-     stop("Argument x is not a timeseries")
+    stop("Argument x is not a timeseries")
   }
 
   if (n >= NROW(x)) {
@@ -41,7 +41,7 @@ growth <- function(x, n = 1, keep_range = TRUE) {
   }
 
   ret <- diff_ts(x, n, keep_range = keep_range) /
-         lag_ts(x, n, keep_range = keep_range)
+    lag_ts(x, n, keep_range = keep_range)
 
   return(ret)
 }
