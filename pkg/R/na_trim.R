@@ -43,61 +43,61 @@ na_trim <- function(x, method = c("both", "first", "last"),
 
   # Use function inherits instead of is.ts to check if x1 is a timeseries.
   # is.ts returns FALSE if x1 is a timeseries with 0 columns
-    if (!inherits(x, "ts")) {
-        stop("Argument x is not a timeseries")
-    } else if (!is.regts(x)) {
-      x <- as.regts(x)
-    }
+  if (!inherits(x, "ts")) {
+    stop("Argument x is not a timeseries")
+  } else if (!is.regts(x)) {
+    x <- as.regts(x)
+  }
 
-    if (NCOL(x) == 0) return(x)
+  if (NCOL(x) == 0) return(x)
 
-    side <- match.arg(method)
-    isna <- match.arg(is_na)
+  side <- match.arg(method)
+  isna <- match.arg(is_na)
 
-    fst_not_na <- function(x) {
-      ret <- Position(function(x) x, !is.na(x))
-      if (is.na(ret)) ret <- length(x) + 1
-      return(ret)
-    }
-    lst_not_na <- function(x) {
-      ret <- Position(function(x) x, !is.na(x), right = TRUE)
-      if (is.na(ret)) ret <- 0
-      return(ret)
-    }
+  fst_not_na <- function(x) {
+    ret <- Position(function(x) x, !is.na(x))
+    if (is.na(ret)) ret <- length(x) + 1
+    return(ret)
+  }
+  lst_not_na <- function(x) {
+    ret <- Position(function(x) x, !is.na(x), right = TRUE)
+    if (is.na(ret)) ret <- 0
+    return(ret)
+  }
 
-    if (!is.matrix(x)) {
-      first <- fst_not_na(x)
-      last <- lst_not_na(x)
-      len <- length(x)
+  if (!is.matrix(x)) {
+    first <- fst_not_na(x)
+    last <- lst_not_na(x)
+    len <- length(x)
 
+  } else {
+    first <- apply(x, 2, fst_not_na)
+    last  <- apply(x, 2, lst_not_na)
+
+    if (isna == "any") {
+      first <- max(first)
+      last <- min(last)
     } else {
-      first <- apply(x, 2, fst_not_na)
-      last  <- apply(x, 2, lst_not_na)
-
-      if (isna == "any") {
-        first <- max(first)
-        last <- min(last)
-      } else {
-        first <- min(first)
-        last <- max(last)
-      }
-      len <- nrow(x)
+      first <- min(first)
+      last <- max(last)
     }
+    len <- nrow(x)
+  }
 
-    if (first > last) {
-        return(NULL)
-    }
+  if (first > last) {
+    return(NULL)
+  }
 
-    if (side == "both") {
-        sel <- first : last
-    } else if (side == "first") {
-        sel <- first : len
-    } else {
-        sel <- 1 : last
-    }
+  if (side == "both") {
+    sel <- first : last
+  } else if (side == "first") {
+    sel <- first : len
+  } else {
+    sel <- 1 : last
+  }
 
-    per <- start_period(get_period_range(x)) + sel[1] - 1
-    period <- period_range(per, per + length(sel) - 1)
+  per <- start_period(get_period_range(x)) + sel[1] - 1
+  period <- period_range(per, per + length(sel) - 1)
 
-    return(x[period, ])
+  return(x[period, ])
 }

@@ -31,7 +31,9 @@ Imports:
     tidyselect,
     rlang,
     testthat,
-    tidyr
+    tidyr,
+    dplyr,
+    matrixStats
 Suggests:
     knitr,
     rmarkdown,
@@ -41,7 +43,7 @@ Suggests:
     tseries,
     tempdisagg,
     labelled,
-    lubridate,
+    lubridate
 LinkingTo: Rcpp
 VignetteBuilder: knitr
 Encoding: UTF-8

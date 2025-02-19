@@ -8,7 +8,8 @@
 #' the values in periods between `from` and `to` (including period `to`) are
 #' equal to the values of `x` in period `from`.
 #' If `method == "diff_constant"`,
-#' the first differences in period between `from` and `to` (including period `to`)
+#' the first differences in period between `from` and `to` (including period
+#' `to`)
 #' are equal to first difference of `x` at period `from`.
 
 #' @param x a timeseries object (\code{\link{regts}} or \code{\link[stats]{ts}}

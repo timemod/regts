@@ -34,12 +34,17 @@ or \code{NULL} if there are no differences larger than \code{tol}.
 Only timeseries with differences larger than \code{tol} are included.
 Leading and trailing rows with differences less than \code{tol} have also
 been removed.}
+\item{dif_table}{A \code{data.frame} with all differences greater
+than the tolerance. The data frame contains four columns: \code{name}, \code{period},
+\code{dif}, \code{value1} and  \code{value2}.}
 \item{maxdif}{A \code{data.frame} with the maximum differences. For each
 timeseries the maximum difference is determined. Column \code{maxdif}
 contains the maximum differences and
 column \code{period} the periods at which these maximum difference occur.
+Columns \code{value1} and \code{value2} are the values in timeseries \code{x1} and \code{x2.}
 The rows of the data frame are ordered with decreasing order of \code{maxdif},
-so the timeseries with the largest maximum differences come first.}
+so the timeseries with the largest maximum differences come first. \code{NA}
+values come first.}
 \item{common_names}{the names of the common columns}
 \item{missing_names1}{The names of columns present in \code{x2} but missing
 in \code{x1}}

@@ -830,6 +830,7 @@ next example.
 difvar <- tsdif(rt1, rt2, tol = 1e-3)
 difvar$equal
 difvar$difnames
+difvar$dif_table
 ```
 
 In this example `equal` is `FALSE`, because there are differences larger than the 

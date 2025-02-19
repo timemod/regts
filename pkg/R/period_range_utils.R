@@ -63,7 +63,7 @@ range_check <- function(range1, range2) {
   p2_end   <- end_period(range2)
 
   if (is.null(p1_start) || is.null(p1_end) ||
-      is.null(p2_start) || is.null(p2_end)) {
+        is.null(p2_start) || is.null(p2_end)) {
     stop("Start and end periods of both ranges should not be NULL")
   }
 

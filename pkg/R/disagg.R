@@ -67,5 +67,5 @@ disagg <- function(x, nfrequency,
   }
 
   return(create_regts(data, range_new[1], range_new[2], range_new[3],
-                       ts_labels(x)))
+                      ts_labels(x)))
 }
