@@ -11,4 +11,10 @@ print(.libPaths())
 if (!require(devtools)) {
   install.packages("devtools", repos = cran_repo)
 }
+if (!require(lintr)) {
+  install.packages("lintr", repos = cran_repo)
+}
 devtools::install_deps("pkg", dependencies = TRUE, repos = cran_repo)
+
+# make sure all packages (including devtools and lintr) are up-to-date.
+update.packages()
