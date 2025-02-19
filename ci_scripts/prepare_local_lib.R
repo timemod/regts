@@ -17,4 +17,5 @@ if (!require(lintr, quietly = TRUE)) {
 devtools::install_deps("pkg", dependencies = TRUE, repos = cran_repo)
 
 # make sure all packages (including devtools and lintr) are up-to-date.
-update.packages(repos = cran_repo)
+update.packages(lib.loc = lib_dir, repos = cran_repo,
+                ask = FALSE)
