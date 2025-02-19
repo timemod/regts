@@ -248,6 +248,11 @@ get_dif_table <- function(x1, x2, dif, difnames, tol) {
 
   dif_prd <- get_period_range(dif)
 
+  # Ignore labels
+  ts_labels(x1) <- NULL
+  ts_labels(x2) <- NULL
+  ts_labels(dif) <- NULL
+
   x1_long <- as.data.frame(x1[dif_prd, difnames, drop = FALSE], long = TRUE) |>
     rename(value1 = "value")
   x2_long <- as.data.frame(x2[dif_prd, difnames, drop = FALSE], long = TRUE) |>

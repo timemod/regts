@@ -74,6 +74,21 @@ test_that("simple example", {
   expect_equal(res, res_correct)
 })
 
+test_that("labels", {
+  ts1_lbls <- ts1
+  ts2_lbls <- ts2
+  ts_labels(ts1_lbls) <- c("x", "y", "z")
+  ts_labels(ts2_lbls) <- c("p", "q", "r")
+
+  res <- tsdif(ts1_lbls, ts2_lbls)
+
+  # Only component dif contains labels. dif_table and maxdif do not have
+  # labels.
+  res_expected <- res
+  ts_labels(res_expected$dif) <- c("x", "y")
+  expect_equal(res, res_expected)
+})
+
 test_that("argument fun", {
   res2 <- tsdif(ts1, ts2, fun = function(x1, x2) (sin(x2 - x1)))
   res2_correct <- res_correct
