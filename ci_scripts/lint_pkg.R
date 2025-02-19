@@ -1,6 +1,5 @@
 # Exclude the following files from lintr. These files still contain many
-# style errors. The style of these function should be fixed once these function
-# are fixed.
+# style errors. The style of these function should be fixed later.
 exclusions <- list(
   "tests",
   "vignettes",
@@ -23,8 +22,10 @@ exclusions <- list(
 library(lintr)
 
 # The most recent version of lintr contains a return linter.
-if ("return_linter" %in% default_linters) {
+if ("return_linter" %in% names(default_linters)) {
   linters <- linters_with_defaults(return_linter = NULL)
+} else {
+  linters <- default_linters
 }
 
 lints <- lint_package("pkg", exclusions = exclusions, linters = linters)
