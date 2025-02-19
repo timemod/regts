@@ -133,7 +133,7 @@ tsdif <- function(x1, x2, tol = 0, fun = function(x1, x2) (x1 - x2)) {
 
   # Get name of the actual arguments -------------------------------------------
   series_name1 <- deparse(substitute(x1))
-  series_name2 <- deparse(substitute(x2))
+    series_name2 <- deparse(substitute(x2))
 
   # Check input ----------------------------------------------------------------
 
