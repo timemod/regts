@@ -8,13 +8,13 @@ if (!dir.exists(lib_dir)) {
 cat("\nLibrary paths:\n")
 print(.libPaths())
 
-if (!require(devtools)) {
+if (!require(devtools, quietly = TRUE)) {
   install.packages("devtools", repos = cran_repo)
 }
-if (!require(lintr)) {
+if (!require(lintr, quietly = TRUE)) {
   install.packages("lintr", repos = cran_repo)
 }
 devtools::install_deps("pkg", dependencies = TRUE, repos = cran_repo)
 
 # make sure all packages (including devtools and lintr) are up-to-date.
-update.packages()
+update.packages(repos = cran_repo)
