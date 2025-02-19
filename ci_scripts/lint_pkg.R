@@ -27,7 +27,7 @@ if ("return_linter" %in% default_linters) {
   linters <- linters_with_defaults(return_linter = NULL)
 }
 
-lints <- lint_package("pkg", exclusions = exclusions)
+lints <- lint_package("pkg", exclusions = exclusions, linters = linters)
 
 if (length(lints) > 0) {
   cat("\nLinter detected style issues:\n")
