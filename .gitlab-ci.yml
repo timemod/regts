@@ -1,21 +1,21 @@
 variables:
-  CRscriptAN_RscriptEPO: https://cloud.r-project.org
-  BUILD_DIRscript: build
+  CRAN_REPO: https://cloud.r-project.org
+  BUILD_DIR: build
 
 build-job:
   stage: build
   script:
     # The package is build and tested using a the local packages of gitlab-runner.
     # All packages are up-to-date before the package is build and the check is run.
-    - echo "Rscript_LIBS_USERscript=~/Rscript/cpb_r_packages/%v" > .Rscriptenviron
-    - echo "Rscript_LIBS_SITE=''" >> .Rscriptenviron
-    - Rscript -e "lib_dir <- Sys.getenv('Rscript_LIBS_USERscript'); if(!dir.exists(lib_dir)) dir.create(lib_dir, recursive = TRscriptUE)"
+    - echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
+    - echo "R_LIBS_SITE=''" >> .Renviron
+    - Rscript -e "lib_dir <- Sys.getenv('R_LIBS_USER'); if(!dir.exists(lib_dir)) dir.create(lib_dir, recursive = TRUE)"
     - Rscript -e "print(.libPaths())"
-    - Rscript -e "if (!require(devtools)) install.packages('devtools', repos = '$CRscriptAN_RscriptEPO')"
-    - Rscript -e "devtools::install_deps('pkg', dependencies = TRscriptUE, repos = '$CRscriptAN_RscriptEPO')"
-    - Rscript CMD build pkg 
-    - mkdir $BUILD_DIRscript
-    - mv *.tar.gz $BUILD_DIRscript
+    - Rscript -e "if (!require(devtools)) install.packages('devtools', repos = '$CRAN_REPO')"
+    - Rscript -e "devtools::install_deps('pkg', dependencies = TRUE, repos = '$CRAN_REPO')"
+    - R CMD build pkg 
+    - mkdir $BUILD_DIR
+    - mv *.tar.gz $BUILD_DIR
   artifacts:
     paths:
       - build
@@ -23,7 +23,7 @@ build-job:
 test-job1:
   stage: test
   script:
-    - echo "Rscript_LIBS_USERscript=~/Rscript/cpb_r_packages/%v" > .Rscriptenviron
-    - echo "Rscript_LIBS_SITE=''" >> .Rscriptenviron
+    - echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
+    - echo "R_LIBS_SITE=''" >> .Renviron
     - Rscript -e "print(.libPaths())"
-    - Rscript CMD check $BUILD_DIRscript/*.tar.gz
+    - R CMD check $BUILD_DIR/*.tar.gz
