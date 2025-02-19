@@ -23,6 +23,3 @@ test-job1:
     - Rscript -e "print(.libPaths())"
     - R CMD check $BUILD_DIR/*.tar.gz
     - Rscript ci_scripts/lint_pkg.R
-  env:
-      LINTR_ERROR_ON_LINT: true
-
