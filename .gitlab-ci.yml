@@ -26,4 +26,5 @@ test-job1:
     - echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
     - echo "R_LIBS_SITE=''" >> .Renviron
     - Rscript -e "print(.libPaths())"
+    - ls -l $BUILD_DIR
     - R CMD check $BUILD_DIR/*.tar.gz
