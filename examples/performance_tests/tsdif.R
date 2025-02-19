@@ -1,3 +1,4 @@
+#cpblib::use_cpblib()
 library(regts)
 library(tictoc)
 
