@@ -4,17 +4,23 @@ variables:
 build-job:
   stage: build
   script:
+    # The package is build and tested using a the local packages of gitlab-runner.
+    # All packages are up-to-date before the package is build and the check is run.
     - echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
     - echo "R_LIBS_SITE=''" >> .Renviron
     - R -e "lib_dir <- Sys.getenv('R_LIBS_USER'); if(!dir.exists(lib_dir)) dir.create(lib_dir, recursive = TRUE)"
     - R -e "print(.libPaths())"
     - R -e "if (!require(devtools)) install.packages('devtools', repos = '$CRAN_REPO')"
     - R -e "devtools::install_deps('pkg', dependencies = TRUE, repos = 'CRAN_REPO')"
-    - make install
+    - R CMD build pkg -o build
+  artifacts:
+    paths:
+      - build
 
 test-job1:
   stage: test
   script:
     - echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
-    - echo "R_LIBS_SITE="" >> .Renviron
-    - R CMD check pkg
+    - echo "R_LIBS_SITE=''" >> .Renviron
+    - ls -l build
+    - R CMD check build/*.tar.gz
