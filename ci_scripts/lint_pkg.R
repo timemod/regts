@@ -20,4 +20,11 @@ exclusions <- list(
   "R/write_ts.R"
 )
 
-lintr::lint_package("pkg", exclusions = exclusions)
+library(lintr)
+
+# The most recent version of lintr contains a return linter.
+if ("return_linter" %in% default_linters) {
+  linters <- linters_with_defaults(return_linter = NULL)
+}
+
+lint_package("pkg", exclusions = exclusions)
