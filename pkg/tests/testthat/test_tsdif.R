@@ -47,7 +47,7 @@ difference <- regts(matrix(data = rep(-0.01, 6), nc = 2),
 
 maxdif <- data.frame(
   period = "2008Q4",
-  maxdif = rep(-0.02, 2),
+  maxdif = rep(-0.01, 2),
   value1 = c(1, 4),
   value2 = c(1.01, 4.01),
   row.names = c("a", "b")
