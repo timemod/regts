@@ -1,6 +1,6 @@
 #!/usr/bin/Rscript
 
 if (!require(devtools)) {
-    stop('devtools not installed')
+  stop('devtools not installed')
 }
-devtools::test('pkg')
+devtools::test("pkg")
