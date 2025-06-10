@@ -44,5 +44,6 @@ growth(x, 4)
 
 }
 \seealso{
-\code{\link{rel2index}}, \code{\link{lag_ts}} and  \code{\link{diff_ts}}.
+\code{\link{rel2index}}, \code{\link{lag_ts}} and
+\code{\link{diff_ts}}.
 }

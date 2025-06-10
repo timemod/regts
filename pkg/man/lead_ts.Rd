@@ -52,5 +52,6 @@ lead_ts(x)
 lead_ts(x, k = 2, keep_range = FALSE)
 }
 \seealso{
-\code{\link{lag_ts}}, \code{\link{diff_ts}} and  \code{\link{growth}}.
+\code{\link{lag_ts}}, \code{\link{diff_ts}} and
+\code{\link{growth}}.
 }

@@ -49,5 +49,6 @@ diff_ts(x)
 diff_ts(x, lag = 2, keep_range = FALSE)
 }
 \seealso{
-\code{\link{lag_ts}}, \code{\link{lead_ts}} and  \code{\link{growth}}.
+\code{\link{lag_ts}}, \code{\link{lead_ts}} and
+\code{\link{growth}}.
 }

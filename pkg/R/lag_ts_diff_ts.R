@@ -86,7 +86,8 @@ lag_ts.default <- function(x, n = 1, keep_range = TRUE, ...) {
 #' x <- regts(1:10, start = "2018q3")
 #' lead_ts(x)
 #' lead_ts(x, k = 2, keep_range = FALSE)
-#' @seealso \code{\link{lag_ts}}, \code{\link{diff_ts}} and  \code{\link{growth}}.
+#' @seealso \code{\link{lag_ts}}, \code{\link{diff_ts}} and
+#' \code{\link{growth}}.
 #' @export
 lead_ts <- function(x, n = 1, keep_range = TRUE, ...) {
   UseMethod("lead_ts")
@@ -162,7 +163,8 @@ shift_ts <- function(x, k, keep_range) {
 #' x <- regts(1:10, start = "2018q3")
 #' diff_ts(x)
 #' diff_ts(x, lag = 2, keep_range = FALSE)
-#' @seealso \code{\link{lag_ts}}, \code{\link{lead_ts}} and  \code{\link{growth}}.
+#' @seealso \code{\link{lag_ts}}, \code{\link{lead_ts}} and
+#' \code{\link{growth}}.
 diff_ts <- function(x, lag = 1, differences = 1, keep_range = TRUE, ...) {
   UseMethod("diff_ts")
 }

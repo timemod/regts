@@ -26,7 +26,8 @@
 #' shorter than the input timeseries.
 #'
 #' @return a \code{regts} object with relative changes
-#' @seealso \code{\link{rel2index}}, \code{\link{lag_ts}} and  \code{\link{diff_ts}}.
+#' @seealso \code{\link{rel2index}}, \code{\link{lag_ts}} and
+#' \code{\link{diff_ts}}.
 #' @examples
 #' x <- regts(rnorm(10), start = "2018Q1")
 #' growth(x, keep_range = FALSE)
