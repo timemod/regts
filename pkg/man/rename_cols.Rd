@@ -11,7 +11,7 @@ rename_cols(.data, ...)
 or \code{data.frame})}
 
 \item{...}{Use \code{new_name = old_name} to rename selected
-variables. Alternatively, specify a named character vector (see Examples).S}
+variables. Alternatively, specify a named character vector (see Examples).}
 }
 \value{
 An object with the same type and contents as \code{.data}, except
