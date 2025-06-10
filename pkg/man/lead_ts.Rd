@@ -14,7 +14,7 @@ lead_ts(x, n = 1, keep_range = TRUE, ...)
 }
 \arguments{
 \item{x}{a univariate or multivariate timeseries.
-Can also be a vector, matrix or data frame (see details).}
+Can also be a vector, matrix or data frame (see Details).}
 
 \item{n}{the number of leads (in units of observations).
 Must be a positive number.}
@@ -52,5 +52,6 @@ lead_ts(x)
 lead_ts(x, k = 2, keep_range = FALSE)
 }
 \seealso{
-\code{\link{lag_ts}} and \code{\link{diff_ts}}
+\code{\link{lag_ts}}, \code{\link{diff_ts}} and
+\code{\link{growth}}.
 }

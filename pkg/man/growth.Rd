@@ -7,7 +7,8 @@
 growth(x, n = 1, keep_range = TRUE)
 }
 \arguments{
-\item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object}
+\item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} object.
+Can also be a vector, matrix or data frame (see Details).}
 
 \item{n}{an integer indicating the period of relative change}
 
@@ -31,12 +32,18 @@ Note that \code{growth} divides the change by \code{ x[t-n]} and not by the
 absolute value of \code{x[t-1]}.
 This implies that the growth rate is positive when a negative timeseries
 becomes more negative.
+
+Vector, matrix and data frame arguments are first converted to a \code{regts}
+with function \code{\link{regts}}. This conversion results in a timeseries
+with frequency 1 and starting at year 1.
 }
 \examples{
 x <- regts(rnorm(10), start = "2018Q1")
 growth(x, keep_range = FALSE)
 growth(x, 4)
+
 }
 \seealso{
-\code{\link{rel2index}}
+\code{\link{rel2index}}, \code{\link{lag_ts}} and
+\code{\link{diff_ts}}.
 }

@@ -34,7 +34,8 @@ If \code{method == "level_constant"} (the default),
 the values in periods between \code{from} and \code{to} (including period \code{to}) are
 equal to the values of \code{x} in period \code{from}.
 If \code{method == "diff_constant"},
-the first differences in period between \code{from} and \code{to} (including period \code{to})
+the first differences in period between \code{from} and \code{to} (including period
+\code{to})
 are equal to first difference of \code{x} at period \code{from}.
 }
 \examples{

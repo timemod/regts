@@ -15,7 +15,7 @@ diff_ts(x, lag = 1, differences = 1, keep_range = TRUE, ...)
 }
 \arguments{
 \item{x}{a univariate or multivariate timeseries.
-Can also be a vector, matrix or data frame (see details).}
+Can also be a vector, matrix or data frame (see Details).}
 
 \item{lag}{an integer indicating which lag to use}
 
@@ -49,5 +49,6 @@ diff_ts(x)
 diff_ts(x, lag = 2, keep_range = FALSE)
 }
 \seealso{
-\code{\link{lag_ts}} and \code{\link{lead_ts}}
+\code{\link{lag_ts}}, \code{\link{lead_ts}} and
+\code{\link{growth}}.
 }
