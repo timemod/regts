@@ -10,7 +10,8 @@ rename_cols(.data, ...)
 \item{.data}{An R object with column names (a \code{matrix}, \code{ts}, \code{regts}
 or \code{data.frame})}
 
-\item{...}{Use \code{new_name = old_name} to rename variables.}
+\item{...}{Use \code{new_name = old_name} to rename selected
+variables. Alternatively, specify a named character vector (see Examples).S}
 }
 \value{
 An object with the same type and contents as \code{.data}, except
@@ -26,8 +27,14 @@ on matrix objects (a \code{matrix} or \code{ts}) objects.
 \examples{
 data <- regts(matrix(1:20, ncol = 4), start = "2010Q2",
               names = c("a1", "a2", "b1", "b1"))
+
+# Use new_name = old_name syntax
 rename_cols(data, x = a1, y = b1)
 
+# Use named character vector
+rename_cols(data, c(x = "a1", y = "b1"))
+
+# Rename the first column (new column name is 'p'.)
 rename_cols(data, p = 1)
 }
 \seealso{

@@ -90,7 +90,8 @@ change_colnames <- function(x, fun, ...) {
 #' on matrix objects (a `matrix` or `ts`) objects.
 #' @param .data An R object with column names (a `matrix`, `ts`, `regts`
 #' or `data.frame`)
-#' @param ... Use `new_name = old_name` to rename variables.
+#' @param ... 	Use `new_name = old_name` to rename selected
+#' variables. Alternatively, specify a named character vector (see Examples).
 #' @return An object with the same type and contents as `.data`, except
 #' that the columns are renamed.
 #' @importFrom tidyselect eval_rename
@@ -99,8 +100,14 @@ change_colnames <- function(x, fun, ...) {
 #' @examples
 #' data <- regts(matrix(1:20, ncol = 4), start = "2010Q2",
 #'               names = c("a1", "a2", "b1", "b1"))
+#'
+#' # Use new_name = old_name syntax
 #' rename_cols(data, x = a1, y = b1)
 #'
+#' # Use named character vector
+#' rename_cols(data, c(x = "a1", y = "b1"))
+#'
+#' # Rename the first column (new column name is 'p'.)
 #' rename_cols(data, p = 1)
 #' @export
 rename_cols <- function(.data, ...) {
