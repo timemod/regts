@@ -2,7 +2,6 @@ library(regts)
 library(testthat)
 library(tibble)
 library(data.table)
-library(conflicted)
 
 mts <- regts(matrix(rnorm(30), ncol = 3), start = "2018Q1",
              names = c("b", "a", "c"))
@@ -30,8 +29,8 @@ test_that("data frame", {
 
 test_that("matrix", {
   m <- as_matrix(mts)
-  expect_equal(order_columns(df), df[, c("a", "b", "c")])
-  expect_equal(order_columns(df[, "c", drop = FALSE]), df[, "c", drop = FALSE])
+  expect_equal(order_columns(m), m[, c("a", "b", "c")])
+  expect_equal(order_columns(m[, "c", drop = FALSE]), m[, "c", drop = FALSE])
 })
 
 
