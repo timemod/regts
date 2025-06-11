@@ -11,7 +11,7 @@
 \arguments{
 \item{x}{a \code{\link{regts}}}
 
-\item{...}{additional arguments to be passed to methods.}
+\item{...}{additional arguments to be passed to methods (not used)}
 
 \item{rowwise}{a logical value: should the timeseries be stored rowwise
 or columnwise in the data frame? Defaults to \code{FALSE}.
@@ -46,7 +46,7 @@ This is an obsolete function that has been replaced by function
 \code{\link{as_data_frame}}.
 }
 \details{
-Three different format for the data frame are possble.
+Three different format for the data frame are possible.
 
 \strong{1. columnwise (default)}
 

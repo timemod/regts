@@ -10,11 +10,13 @@
   name_col = "name", label_col = "label", value_col = "value")
 }
 \arguments{
-\item{x}{a \code{\link{regts}}}
+\item{x}{a \code{\link{regts}} object.}
 
-\item{...}{additional arguments to be passed to methods.}
+\item{...}{additional arguments to be passed to methods (not used)}
 
-\item{format}{A character specifying the format (see Details): \verb{"rowwise"', }"columnwise"' or \code{"long"}.`}
+\item{format}{A character specifying the format (see Details): \code{"rowwise"},
+\code{"columnwise"} or \code{"long"}. For the long format, \code{x} should not have
+duplicate column names.}
 
 \item{period_as_date}{A logical (default \code{FALSE}).
 If \code{TRUE} the periods are stored as \code{\link[base]{Date}} objects.
@@ -37,12 +39,6 @@ does not have labels then this argument is ignored.}
 
 \item{value_col}{The name of the columns with values (default \code{"value"})
 for the long format.}
-
-\item{long}{Return the result is so called long format, i.e. a
-data frame with one row for each observation. The result is a data frame
-with columns \code{name}, \code{period} and \code{value} (if the timeseries has labels,
-there will be an additional column \code{label} after the column \code{name}).
-See Details.}
 }
 \value{
 A \code{\link[base]{data.frame}}

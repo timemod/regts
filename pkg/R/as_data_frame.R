@@ -53,9 +53,10 @@ as_data_frame <- function(x, ...) {
 #' Use argument `long = TRUE` to create such a data frame.
 #' If the timeseries has no labels, the `label` column is missing.
 #'
-#' @param x a \code{\link{regts}}
-#' @param format A character specifying the format (see Details): `"rowwise"',
-#' `"columnwise"' or `"long"`.`
+#' @param x a \code{\link{regts}} object.
+#' @param format A character specifying the format (see Details): `"rowwise"`,
+#' `"columnwise"` or `"long"`. For the long format, `x` should not have
+#' duplicate column names.
 #' @param period_as_date A logical (default \code{FALSE}).
 #' If \code{TRUE} the periods are stored as \code{\link[base]{Date}} objects.
 #' Depending on arguments \code{rowwise} and \code{row_names}
@@ -64,11 +65,6 @@ as_data_frame <- function(x, ...) {
 #' using the standard date format \code{"\%Y-\%m-\%d"}
 #' (see the documentation of function \code{\link[base]{strptime}}
 #' for more information about date formats).
-#' @param long Return the result is so called long format, i.e. a
-#' data frame with one row for each observation. The result is a data frame
-#' with columns `name`, `period` and `value` (if the timeseries has labels,
-#' there will be an additional column `label` after the column `name`).
-#' See Details.
 #' @param period_col The name of the column with periods (default `"period"`),
 #' used for the columnwise or long format.
 #' @param name_col   The name of the column with variable names
@@ -82,9 +78,7 @@ as_data_frame <- function(x, ...) {
 #' @return A \code{\link[base]{data.frame}}
 #' @name as_data_frame
 #' @importFrom tidyr pivot_longer
-#' @importFrom tidyselect where
-#' @importFrom dplyr mutate select
-#' @importFrom rlang `:=`
+#' @importFrom dplyr select
 #' @importFrom tidyselect all_of everything
 #' @importFrom stats setNames
 #' @export
@@ -133,41 +127,58 @@ as_data_frame.regts <- function(x, ...,
       invisible(add_labels_df(ret, unname(lbls)))
     }
 
-    ret <- mutate(ret, !!period_col := periods, .before = 1)
+    ret <- cbind(periods, ret)
+    colnames(ret)[1] <- period_col
 
 
   } else if (format == "rowwise") {
 
     ret <- as.data.frame(t(x)) |>
-      setNames(periods) |> # Add periods to the column names
-      # Add a column with variable names
-      mutate(!!name_col := colnames(x), .before = 1)
+      setNames(periods)  # Add periods to the column names
 
     # Add a column with labels
     if (!is.null(lbls)) {
-      ret <- mutate(ret, !!label_col := unname(lbls), .after = all_of(name_col))
+      ret <- cbind(unname(lbls), ret)
+      colnames(ret)[1] <- label_col
     }
 
-    # remove rownames
-    rownames(ret) <- NULL
+    # Add a column with variable names
+    ret <- cbind(colnames(x), ret)
+    colnames(ret)[1] <- name_col
 
   } else {  # long format
 
-    ret <- as.data.frame.ts(x)  |>
-      mutate(!!period_col := periods, .before = 1) |>
-      pivot_longer(cols = -all_of(period_col), names_to = name_col,
-                   values_to = value_col) |>
+    if (anyDuplicated(colnames(x))) {
+      stop("Long format not possible if there are duplicate column names")
+    }
+
+    ret <- as.data.frame.ts(x)
+
+    # Add period column
+    ret <- cbind(periods, ret)
+    colnames(ret)[1] <- period_col
+
+    # Convert to long format
+    ret <-  pivot_longer(ret, cols = -all_of(period_col), names_to = name_col,
+                         values_to = value_col) |>
       select(all_of(name_col), all_of(period_col), everything()) |>
-      arrange(.data[[name_col]])
+      arrange(.data[[name_col]]) |>
+      as.data.frame()
+
+    # Order on name_col alphabetically
+    ret <- ret[order(ret[[name_col]]), , drop = FALSE]
 
     if (!is.null(lbls)) {
-      ret <- mutate(ret, !!label_col := unname(lbls[.data[[name_col]]]),
-                    .after = all_of(name_col))
+      ret[[label_col]] <- unname(lbls[ret[[name_col]]])
+    } else {
+      label_col <- NULL
     }
+    cnames <- c(name_col, label_col, period_col, value_col)
+    ret <- ret[, cnames]
   }
 
-  # convert to a normale data.frame
-  ret <- as.data.frame(ret)
+  # remove row names
+  rownames(ret) <- NULL
 
   return(ret)
 }

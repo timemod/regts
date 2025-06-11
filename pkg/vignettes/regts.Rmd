@@ -1317,15 +1317,14 @@ Use the `fun` argument, if necessary with extra arguments
 ## `regts` to `data frame` 
 
 The reverse conversion from a `regts` to a `data frame` can be achieved with 
-function `as.data.frame`. The `as.data.frame` function has been extended for 
-`regts` types. Variable `ts` has been previously defined:
+function `as_data_frame`. Variable `ts` has been previously defined:
 
 ```{r}
-as.data.frame(ts)
+as_data_frame(ts)
 ```
 
 The results look similar to `ts`. The timeseries names have become the data 
-frame column names and the periods show up in the row names. Of course the 
+frame column names and the periods show up in column `"period"`. Of course the 
 `classes` are different.
 
 ## Labels when converting `data frame` to `regts` and vice versa\label{dflabels}

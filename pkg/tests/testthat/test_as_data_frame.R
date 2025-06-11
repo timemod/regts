@@ -219,3 +219,45 @@ test_that("single period", {
   )
 
 })
+
+test_that("duplicate column names", {
+  multi_ts_dupl <- multi_ts
+  ts_labels(multi_ts_dupl) <- c(a_label, b_label)
+  colnames(multi_ts_dupl) <- c("a", "a")
+
+  # columnwise ----
+
+  expected <- data.frame(period = periods, a_ts = a_data,
+                         b_ts = b_data)
+  colnames(expected) <- c("period", "a", "a")
+  attr(expected[[2]], "label") <- a_label
+  attr(expected[[3]], "label") <- b_label
+  expect_equal(
+    as_data_frame(multi_ts_dupl, format = "columnwise"),
+    expected
+  )
+
+  # rowwise ----
+
+  expected <- cbind(
+    data.frame(c("a", "a"), multi_labels),
+    multi_data_rowwise
+  ) |>
+    setNames(c("name", "label", periods))
+
+  expect_identical(
+    as_data_frame(multi_ts_dupl, format = "rowwise"),
+    expected
+  )
+
+  # long ----
+  expected <- data.frame(name = rep(c("a", "a"), each = 3),
+                         label = rep(multi_labels, each = 3),
+                         period = rep(periods, 2),
+                         value = c(a_data, b_data))
+  expect_error(
+    as_data_frame(multi_ts_dupl, format = "long"),
+    "Long format not possible if there are duplicate column names"
+  )
+})
+

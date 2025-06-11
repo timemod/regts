@@ -419,7 +419,7 @@ ts2df_ <- function(x, rowwise, labels = c("after", "before", "no"),
   ts_labels(x) <- NULL
 
   period_as_date <- period_format != "regts" || period_as_date
-  data <- as.data.frame(x, row_names = FALSE, period_as_date = period_as_date)
+  data <- as_data_frame(x, period_as_date = period_as_date)
   if (period_format != "regts") {
     data$period <- format(data$period, period_format)
   }
