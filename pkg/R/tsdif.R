@@ -253,11 +253,15 @@ get_dif_table <- function(x1, x2, dif, difnames, tol) {
   ts_labels(x2) <- NULL
   ts_labels(dif) <- NULL
 
-  x1_long <- as.data.frame(x1[dif_prd, difnames, drop = FALSE], long = TRUE) |>
+  x1_long <- as_data_frame(x1[dif_prd, difnames, drop = FALSE],
+                           format = "long") |>
     rename(value1 = "value")
-  x2_long <- as.data.frame(x2[dif_prd, difnames, drop = FALSE], long = TRUE) |>
+
+  x2_long <- as_data_frame(x2[dif_prd, difnames, drop = FALSE],
+                           format = "long") |>
     rename(value2 = "value")
-  dif_long <- as.data.frame(dif, long  = TRUE) |>
+
+  dif_long <- as_data_frame(dif, format = "long") |>
     rename(dif = "value") |>
     filter(is.na(.data$dif) | abs(.data$dif) > tol)
 
