@@ -161,7 +161,7 @@ as_data_frame.regts <- function(x, ...,
       arrange(.data[[name_col]])
 
     if (!is.null(lbls)) {
-      ret <- mutate(ret, !!label_col := unname(lbls[.data$name]),
+      ret <- mutate(ret, !!label_col := unname(lbls[.data[[name_col]]]),
                     .after = all_of(name_col))
     }
   }

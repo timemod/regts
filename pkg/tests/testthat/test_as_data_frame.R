@@ -102,6 +102,50 @@ test_that("multivariate timeseries with labels", {
   expect_equal(multi_df_long, expected)
 })
 
+test_that("specified column names", {
+  multi_ts_l <- multi_ts
+  ts_labels(multi_ts_l) <- c(a_label, b_label)
+
+  # columnwise ----
+  expected <- data.frame(qrtr = periods, a_ts = a_data,
+                         b_ts = b_data)
+  attr(expected[[2]], "label") <- a_label
+  attr(expected[[3]], "label") <- b_label
+
+  expect_identical(
+    as_data_frame(multi_ts_l, name_col = "var", label_col = "desc",
+                  period_col = "qrtr"),
+    expected
+  )
+
+  # rowwise ----
+  expected <- cbind(
+    data.frame(multi_names, multi_labels),
+    multi_data_rowwise
+  ) |>
+    setNames(c("var", "desc", periods))
+
+  expect_identical(
+    as_data_frame(multi_ts_l, format = "rowwise",
+                  name_col = "var", label_col = "desc",
+                  period_col = "???"),
+    expected
+  )
+
+  # Long format ----
+
+  multi_df_long <- as_data_frame(multi_ts_l, format = "long",
+                                 name_col = "var", label_col = "desc",
+                                 period_col = "qrtr",
+                                 value_col = "obs")
+  expected <- data.frame(var = rep(multi_names, each = 3),
+                         desc = rep(multi_labels, each = 3),
+                         qrtr = rep(periods, 2),
+                         obs = c(a_data, b_data))
+  expect_equal(multi_df_long, expected)
+
+})
+
 test_that("period_as_date", {
 
   date_periods <- c(as.Date("2018-01-01"), as.Date("2018-04-01"),
