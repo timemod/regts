@@ -1,6 +1,7 @@
 #' Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}
 #'
-#' This is an obsolete function; please use `as_data_frame` new applications.
+#' This is an obsolete function that has been replaced by function
+#' \code{\link{as_data_frame}}.
 #'
 #' @details
 
