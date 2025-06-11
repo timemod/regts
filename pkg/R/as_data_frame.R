@@ -119,7 +119,7 @@ as_data_frame.regts <- function(x, ...,
     periods <- as.character(periods)
   }
 
-  # Extra labels
+  # Extract labels
   lbls <- ts_labels(x)
 
   if (format == "columnwise") {
