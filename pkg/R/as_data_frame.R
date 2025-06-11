@@ -1,24 +1,13 @@
 #' Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}
 #'
-#' This is an obsolete function; please use `as_data_frame` new applications.
-#'
 #' @details
 
-#' Three different format for the data frame are possble.
+#' Three different format for the data frame are possbile.
 #'
 #' **1. columnwise (default)**
 #'
-#' This is the default format. There is a column for each variable. Example:
-#'
-#' ```
-#'        a   b
-#' 2022   1  10
-#' 2023   2  20
-#' ```
-#'
-#' By default, the row names contain the periods of the timeseries, but if
-#' argument `row_names = FALSE`, the first column named `period` will contain
-#' the periods (for example quarters for a quarterly series), as shown below:
+#' This is the default format. There is a column for each variable. The first
+#' column (by default named `period`) will contain the periods, as shown below:
 #'
 #' ```
 #' period  a   b
@@ -35,23 +24,14 @@
 #' **2. rowwise**
 #'
 #' For a rowwise data frame, there is a column for each period. For example,
-#' ```
-#'       label       2022  2023
-#' a     Variable a     1     2
-#' b     Variable b    10    20
-#' ```
-#' Use argument `rowwise = TRUE` to create a rowwise data frame.
-
-#' By default, the row names contain the variable names, but if
-#' argument `row_names = FALSE`, the first column named `name` will contain
-#' the variable names. For example:
-#'```
+#' #'```
 #' name   label       2022  2023
 #' a      Variable a     1     2
 #' b      Variable b    10    20
 #' ```
-
-#' If the timeseries has no labels the `label`, column is missing.
+# The first column, by default  named `name`, will contain
+# the variable names. If the timeseries has labels, the  second column,
+# by default named `label`, contains the labels.
 #'
 #' **3. long format**
 #'
@@ -66,19 +46,11 @@
 #'  b     Variable b     2023    20
 #' ````
 #' Use argument `long = TRUE` to create such a data frame.
-#' Argument `row_names` is ignored when the long format option is used.
-#'
 #' If the timeseries has no labels, the `label` column is missing.
 #'
 #' @param x a \code{\link{regts}}
-#' @param rowwise a logical value: should the timeseries be stored rowwise
-#' or columnwise in the data frame? Defaults to \code{FALSE}.
-#' Ignored if `long = TRUE`.
-#' @param row_names Whether to create row names. If \code{FALSE},
-#' then an additional column with name \code{"period"} or \code{"name"} is
-#' created for columnwise or rowwise timeseries, respectively.
-#' Ignored if `long = TRUE` (for the long format the result will have
-#' no row names).
+#' @param format A character specifying the format (see Details): `"rowwise"',
+#' `"columnwise"' or `"long"`.`
 #' @param period_as_date A logical (default \code{FALSE}).
 #' If \code{TRUE} the periods are stored as \code{\link[base]{Date}} objects.
 #' Depending on arguments \code{rowwise} and \code{row_names}
@@ -92,6 +64,15 @@
 #' with columns `name`, `period` and `value` (if the timeseries has labels,
 #' there will be an additional column `label` after the column `name`).
 #' See Details.
+#' @param period_col The name of the column with periods (default `"period"`),
+#' used for the columnwise or long format.
+#' @param name_col   The name of the column with variable names
+#' (default `"name"`), used for the rowwise or long format.
+#' @param label_col  The name of the column with labels of the variables
+#' (default `"label"`) used for the rowwise or long format. If the timeseries
+#' does not have labels then this argument is ignored.
+#' @param value_col  The name of the columns with values (default `"value"`)
+#' for the long format.
 #' @param ... additional arguments to be passed to methods.
 #' @return A \code{\link[base]{data.frame}}
 #' @name as.data.frame
@@ -101,22 +82,24 @@
 #' @examples
 #' ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),
 #'            labels = c("Timeseries a", "Timeseries b"))
-#' print(as.data.frame(ts))
-as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
-                                period_as_date = FALSE, long = FALSE) {
+#' print(as_data_frame(ts))
+#'
+#' #' print(as_data_frame(ts, format = "long))
+#' @export
+as_data_frame <- function(x, ...) {
+  UseMethod("as_data_frame")
+}
 
-  if (long) {
-    if (!missing(row_names)) {
-      warning("Argument 'row_names' is ignored if long is TRUE")
-    }
-    if (!missing(rowwise)) {
-      warning("Argument 'rowwise' is ignored if long is TRUE")
-    }
-    # For the conversion a timeseries to long format, the handling of labels
-    # is easier when the data is first converted to rowwise data frame.
-    rowwise <- TRUE
-    row_names <- FALSE
-  }
+#' @export
+as_data_frame.regts <- function(x, ...,
+                                format = c("columnwise", "rowwise", "long"),
+                                period_as_date = FALSE,
+                                period_col = "period",
+                                name_col   = "name",
+                                label_col  = "label",
+                                value_col  = "value") {
+
+  format <- match.arg(format)
 
   if (!is.matrix(x)) {
     x_name <- deparse(substitute(x))
@@ -132,19 +115,18 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
 
   lbls <- ts_labels(x)
 
-  if (rowwise) {
+  if (format %in% c("rowwise", "long")) {
 
     ret <- as.data.frame(t(x), ...)
     colnames(ret) <- periods
 
     if (!is.null(lbls)) {
       ret <- cbind(label = lbls, ret, stringsAsFactors = FALSE)
+      colnames(ret)[1] <- label_col
     }
 
-    if (!row_names) {
-      rownames(ret) <- NULL
-      ret <- cbind(name = colnames(x), ret, stringsAsFactors = FALSE)
-    }
+    ret <- cbind(name = colnames(x), ret, stringsAsFactors = FALSE)
+    colnames(ret)[1] <- name_col
 
   } else {
 
@@ -159,14 +141,11 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
       invisible(add_labels_df(ret, unname(lbls)))
     }
 
-    if (row_names) {
-      rownames(ret) <- periods
-    } else {
-      ret <- cbind(period = periods, ret, stringsAsFactors = FALSE)
-    }
+    ret <- cbind(period = periods, ret, stringsAsFactors = FALSE)
+    colnames(ret)[1] <- period_col
   }
 
-  if (long) {
+  if (format == "long") {
 
     ret <- pivot_longer(ret, cols = where(is.numeric), names_to = "period") |>
       as.data.frame()
@@ -181,6 +160,8 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
       ret$period <- period_dict[ret$period]
     }
   }
+
+  rownames(ret) <- NULL
 
   return(ret)
 }

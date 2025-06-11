@@ -3,136 +3,103 @@ library(testthat)
 
 rm(list = ls())
 
+a_data <- as.numeric(1:3)
+b_data <- 2 * a_data
+a_ts <- regts(a_data, start = "2018Q1")
+b_ts <- regts(b_data, start = "2018Q1")
+multi_ts <- cbind(a_ts, b_ts)
+multi_data <- cbind(a_data, b_data)
+colnames(multi_data) <- NULL
+multi_data_rowwise <- t(multi_data)
+periods <- as.character(get_periods(a_ts))
 
-a_ts <- regts(1:3, start = "2018Q1")
-a_df <- data.frame(a_ts = 1:3, row.names = c("2018Q1", "2018Q2", "2018Q3"))
+a_label <- "Var a"
+b_label <- "Var b"
 
-remove_row_names <- function(df, rowwise) {
-  rnames <- rownames(df)
-  rownames(df) <- NULL
-  if (rowwise) {
-    return(cbind(name = rnames, df, stringsAsFactors = FALSE))
-  } else {
-    return(cbind(period = rnames, df, stringsAsFactors = FALSE))
-  }
-}
-
+multi_labels <- c(a_label, b_label)
+multi_names <- c("a_ts", "b_ts")
 
 test_that("univariate timeseries without labels", {
 
-  a_df_2 <-  remove_row_names(a_df, FALSE)
-  a_df_rowwise <- as.data.frame(t(a_df))
-  a_df_rowwise_2 <-  remove_row_names(a_df_rowwise, TRUE)
+  # columnwise ----
+  expected <- data.frame(period = periods, a_ts = a_data)
+  expect_identical(as_data_frame(a_ts), expected)
 
-  expect_identical(as.data.frame(a_ts), a_df)
+  # columnwise with argument period_col ----
+  expected <- data.frame(quarter = periods, a_ts = a_data)
+  expect_identical(as_data_frame(a_ts, format = "columnwise",
+                                 period_col = "quarter"), expected)
 
-  expect_identical(as.data.frame(a_ts, row_names = TRUE, rowwise = FALSE), a_df)
 
+  # rowwise ----
+  expected <- data.frame("a_ts", t(a_data)) |>
+    setNames(c("name", periods))
+  expect_identical(as_data_frame(a_ts, format = "rowwise"),
+                   expected)
 
-  expect_identical(as.data.frame(a_ts, row_names = FALSE), a_df_2)
-
-  expect_identical(as.data.frame(a_ts, rowwise = TRUE), a_df_rowwise)
-
-  expect_identical(as.data.frame(a_ts, rowwise = TRUE, row_names = FALSE),
-                   a_df_rowwise_2)
-
-  # Now long format
-
-  expect_warning(
-    a_df_long <- as.data.frame(a_ts, rowwise = FALSE, long = TRUE),
-    "Argument 'rowwise' is ignored if long is TRUE",
-    fixed = TRUE
-  )
-
-  expect_equal(
-    as.data.frame(tidyr::pivot_wider(a_df_long, names_from = "name")),
-    a_df_2
-  )
+  # long format ----
+  a_df_long <- as_data_frame(a_ts, format = "long")
+  expected <- data.frame(name = "a_ts", period = periods, value = a_data)
+  expect_equal(a_df_long, expected)
 })
 
 test_that("univariate timeseries with labels", {
 
   a_ts_l <- a_ts
-  ts_labels(a_ts_l) <- "Var a"
+  ts_labels(a_ts_l) <- a_label
 
-  a_df_l <- a_df
-  colnames(a_df_l) <- "a_ts_l"
-  labelled::var_label(a_df_l) <- "Var a"
+  # Columnwise ----
+  expected <- data.frame(period = periods, a_ts_l = a_data)
+  attr(expected[[2]], "label") <- a_label
 
-  a_df_l_2 <- remove_row_names(a_df_l, FALSE)
-  a_df_l_rowwise <- transpose_df(a_df_l)
-  a_df_l_rowwise_2 <-  remove_row_names(a_df_l_rowwise, TRUE)
+  expect_identical(as_data_frame(a_ts_l), expected)
 
-  expect_identical(labelled::var_label(a_df_l, unlist = TRUE),
-                   c(a_ts_l = "Var a"))
+  # Rowwise ----
+  expected <- data.frame("a_ts_l", a_label, t(a_data)) |>
+    setNames(c("name", "label", periods))
+  expect_identical(as_data_frame(a_ts_l, format = "rowwise"),
+                   expected)
 
-  expect_identical(as.data.frame(a_ts_l), a_df_l)
-  expect_identical(as.data.frame(a_ts_l, row_names = FALSE), a_df_l_2)
-
-  expect_identical(as.data.frame(a_ts_l, rowwise = TRUE),
-                   a_df_l_rowwise)
-
-  expect_identical(as.data.frame(a_ts_l, rowwise = TRUE, row_names = FALSE),
-                   a_df_l_rowwise_2)
-
-  # Now long format
-
-  expect_warning(
-    a_df_l_long <- as.data.frame(a_ts_l, row_names = TRUE, long = TRUE),
-    "Argument 'row_names' is ignored if long is TRUE",
-    fixed = TRUE
-  )
+  # Long format
+  expected <- data.frame(name = "a_ts_l", label = a_label,
+                         period = periods, value = a_data)
 
   expect_equal(
-    as.data.frame(tidyr::pivot_wider(a_df_l_long, names_from = "period")),
-    a_df_l_rowwise_2
+    as_data_frame(a_ts_l, format = "long"),
+    expected
   )
 })
 
 test_that("multivariate timeseries with labels", {
 
-  a_ts_l <- a_ts
-  ts_labels(a_ts_l) <- "Var a"
+  multi_ts_l <- multi_ts
+  ts_labels(multi_ts_l) <- c(a_label, b_label)
 
-  b_ts_l <- 2 * a_ts
-  ts_labels(b_ts_l) <- "Var b"
+  # columnwise ----
+  expected <- data.frame(period = periods, a_ts = a_data,
+                         b_ts = b_data)
+  attr(expected[[2]], "label") <- a_label
+  attr(expected[[3]], "label") <- b_label
+  expect_identical(as_data_frame(multi_ts_l), expected)
 
-  multi_ts <- cbind(a_ts_l, b_ts_l)
+  # rowwise ----
+  expected <- cbind(
+    data.frame(multi_names, multi_labels),
+    multi_data_rowwise
+  ) |>
+    setNames(c("name", "label", periods))
 
-  a_df_l <- a_df
-  a_df_l[, 1] <- as.numeric(a_df_l[, 1])
-  colnames(a_df_l) <- "a_ts_l"
-  labelled::var_label(a_df_l) <- "Var a"
+  expect_identical(as_data_frame(multi_ts_l, format = "rowwise"),
+                   expected)
 
-  b_df_l <- 2 * a_df
-  colnames(b_df_l) <- "b_ts_l"
-  labelled::var_label(b_df_l) <- "Var b"
+  # Long format ----
 
-  multi_df <- cbind(a_df_l, b_df_l)
-  expect_identical(labelled::var_label(a_df_l, unlist = TRUE),
-                   c(a_ts_l = "Var a"))
-  expect_identical(labelled::var_label(b_df_l, unlist = TRUE),
-                   c(b_ts_l = "Var b"))
-
-  multi_df_2 <- remove_row_names(multi_df, FALSE)
-
-  expect_identical(as.data.frame(multi_ts), multi_df)
-  expect_identical(as.data.frame(multi_ts, row_names = FALSE),
-                   multi_df_2)
-
-  multi_df_rowwise <-  transpose_df(multi_df)
-  multi_df_rowwise_2 <- remove_row_names(multi_df_rowwise, TRUE)
-
-  expect_identical(as.data.frame(multi_ts, rowwise = TRUE), multi_df_rowwise)
-  expect_identical(as.data.frame(multi_ts, rowwise = TRUE, row_names = FALSE),
-                   multi_df_rowwise_2)
-
-  # Long format
-  multi_df_long <- as.data.frame(multi_ts, long = TRUE)
-  expect_equal(
-    as.data.frame(tidyr::pivot_wider(multi_df_long, names_from = "period")),
-    multi_df_rowwise_2
-  )
+  multi_df_long <- as_data_frame(multi_ts_l, format = "long")
+  expected <- data.frame(name = rep(multi_names, each = 3),
+                         label = rep(multi_labels, each = 3),
+                         period = rep(periods, 2),
+                         value = c(a_data, b_data))
+  expect_equal(multi_df_long, expected)
 })
 
 test_that("period_as_date", {
@@ -140,65 +107,71 @@ test_that("period_as_date", {
   date_periods <- c(as.Date("2018-01-01"), as.Date("2018-04-01"),
                     as.Date("2018-07-01"))
 
-  a_ts_df <- as.data.frame(a_ts, row_names = FALSE, period_as_date = TRUE)
+  # columnwise ----
 
-  expected_result <- data.frame(period = date_periods, a_ts = as.integer(a_ts))
-  expect_identical(a_ts_df, expected_result)
-
+  a_ts_df <- as_data_frame(a_ts, period_as_date = TRUE)
+  expected <- data.frame(period = date_periods, a_ts = a_data)
+  expect_identical(a_ts_df, expected)
   expect_identical(
     as.regts(a_ts_df, time_column = "period", frequency = 4)[, 1],
     a_ts
   )
 
-  a_ts_df2 <- as.data.frame(a_ts, row_names = TRUE, period_as_date = TRUE)
+  # rowwise ----
+  expected <- data.frame("a_ts", t(a_data)) |>
+    setNames(c("name", format(date_periods)))
+  expect_equal(
+    as_data_frame(a_ts, format = "rowwise", period_as_date = TRUE),
+    expected
+  )
 
-  expected_result <- data.frame(a_ts = as.integer(1:3))
-  rownames(expected_result) <- date_periods
-  expect_identical(a_ts_df2, expected_result)
 
-  conv_fun <- function(x) {
-    return(period(as.Date(x), frequency = 4))
-  }
-  expect_identical(as.regts(a_ts_df2, fun = conv_fun)[, 1],
-                   a_ts)
+  # Long format ----
 
-  # Long format
-  a_ts_df_l <- as.data.frame(a_ts, long = TRUE, period_as_date = TRUE)
-  expect_equal(a_ts_df_l,
-               data.frame(name = "a_ts",
-                          period = a_ts_df$period,
-                          value = 1:3))
+  expected <- data.frame(name = "a_ts", period = date_periods, value = a_data)
+  expect_equal(
+    as_data_frame(a_ts, format = "long", period_as_date = TRUE),
+    expected
+  )
+
 })
 
 test_that("single period", {
 
   a <- a_ts["2018Q1"]
-  expected_result <- a_df[1, , drop = FALSE]
-  colnames(expected_result) <- "a"
-  expect_identical(as.data.frame(a), expected_result)
 
+  # univariate columnwise ----
+  expected <- data.frame(period = periods[1], a = a_data[1])
+  expect_identical(as_data_frame(a), expected)
+
+  # multivariate columnwise
   ab_ts  <- cbind(a, b = 2 * a)
-  ts_labels(ab_ts) <- c("Var a", "Var b")
+  ts_labels(ab_ts) <- multi_labels
 
-  expected_result <- data.frame(period = "2018Q1", a = 1, b = 2,
-                                stringsAsFactors = FALSE)
-  attr(expected_result[[2]], "label") <- "Var a"
-  attr(expected_result[[3]], "label") <- "Var b"
+  expected <- data.frame(period = "2018Q1", a = 1, b = 2,
+                         stringsAsFactors = FALSE)
+  attr(expected[[2]], "label") <- a_label
+  attr(expected[[3]], "label") <- b_label
 
-  ab_df <- as.data.frame(ab_ts, row_names = FALSE)
-  expect_identical(ab_df, expected_result)
+  expect_identical(
+    as_data_frame(ab_ts),
+    expected
+  )
 
-  # Long format
+  # Long format ----
 
-  expect_equal(as.data.frame(a, long = TRUE),
+  expect_equal(as_data_frame(a, format = "long"),
                data.frame(name = "a",
                           period = "2018Q1",
                           value = 1))
 
-  ab_ts_df_l <- as.data.frame(ab_ts, long = TRUE)
-  expect_equal(ab_ts_df_l,
-               data.frame(name = c("a", "b"),
-                          label = c("Var a", "Var b"),
+  expected <-  data.frame(name = c("a", "b"),
+                          label = multi_labels,
                           period = "2018Q1",
-                          value = 1:2))
+                          value = 1:2)
+  expect_equal(
+    as_data_frame(ab_ts, format = "long"),
+    expected
+  )
+
 })
