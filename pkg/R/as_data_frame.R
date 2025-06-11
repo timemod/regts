@@ -78,7 +78,7 @@ as_data_frame <- function(x, ...) {
 #' does not have labels then this argument is ignored.
 #' @param value_col  The name of the columns with values (default `"value"`)
 #' for the long format.
-#' @param ... additional arguments to be passed to methods.
+#' @param ... additional arguments to be passed to methods (not used)
 #' @return A \code{\link[base]{data.frame}}
 #' @name as_data_frame
 #' @importFrom tidyr pivot_longer
@@ -106,7 +106,7 @@ as_data_frame.regts <- function(x, ...,
 
   format <- match.arg(format)
 
-  # convert scalar timeseries to a matrix timeseries
+  # Convert scalar timeseries to a matrix timeseries
   if (!is.matrix(x)) {
     x_name <- deparse(substitute(x))
     x <- univec2unimat(x, x_name)

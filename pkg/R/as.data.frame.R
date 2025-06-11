@@ -5,7 +5,7 @@
 #'
 #' @details
 
-#' Three different format for the data frame are possble.
+#' Three different format for the data frame are possible.
 #'
 #' **1. columnwise (default)**
 #'
@@ -93,7 +93,7 @@
 #' with columns `name`, `period` and `value` (if the timeseries has labels,
 #' there will be an additional column `label` after the column `name`).
 #' See Details.
-#' @param ... additional arguments to be passed to methods.
+#' @param ... additional arguments to be passed to methods (not used)
 #' @return A \code{\link[base]{data.frame}}
 #' @name as.data.frame
 #' @importFrom tidyr pivot_longer
@@ -106,6 +106,12 @@
 as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
                                 period_as_date = FALSE, long = FALSE) {
 
+  # Convert scalar timeseries to a matrix timeseries
+  if (!is.matrix(x)) {
+    x_name <- deparse(substitute(x))
+    x <- univec2unimat(x, x_name)
+  }
+
   if (long) {
     if (!missing(row_names)) {
       warning("Argument 'row_names' is ignored if long is TRUE")
@@ -113,74 +119,18 @@ as.data.frame.regts <- function(x, ..., rowwise = FALSE, row_names = TRUE,
     if (!missing(rowwise)) {
       warning("Argument 'rowwise' is ignored if long is TRUE")
     }
-    # For the conversion a timeseries to long format, the handling of labels
-    # is easier when the data is first converted to rowwise data frame.
-    rowwise <- TRUE
-    row_names <- FALSE
-  }
-
-  if (!is.matrix(x)) {
-    x_name <- deparse(substitute(x))
-    x <- univec2unimat(x, x_name)
-  }
-
-  periods <- get_periods(x)
-  if (period_as_date)  {
-    periods <- as.Date(periods)
+    format <- "long"
   } else {
-    periods <- as.character(periods)
+    format <- if (rowwise) "rowwise" else "columnwise"
   }
 
-  lbls <- ts_labels(x)
+  ret <- as_data_frame.regts(x, format = format,
+                             period_as_date = period_as_date)
 
-  if (rowwise) {
-
-    ret <- as.data.frame(t(x), ...)
-    colnames(ret) <- periods
-
-    if (!is.null(lbls)) {
-      ret <- cbind(label = lbls, ret, stringsAsFactors = FALSE)
-    }
-
-    if (!row_names) {
-      rownames(ret) <- NULL
-      ret <- cbind(name = colnames(x), ret, stringsAsFactors = FALSE)
-    }
-
-  } else {
-
-    # columnwise
-
-    ret <- as.data.frame.ts(x, ...)
-
-    if (!is.null(lbls)) {
-      # Add labels to the data frame, using Rcpp function
-      # add_labels_df, which adds labels in place. This function is very
-      # slow when implemented in R.
-      invisible(add_labels_df(ret, unname(lbls)))
-    }
-
-    if (row_names) {
-      rownames(ret) <- periods
-    } else {
-      ret <- cbind(period = periods, ret, stringsAsFactors = FALSE)
-    }
-  }
-
-  if (long) {
-
-    ret <- pivot_longer(ret, cols = where(is.numeric), names_to = "period") |>
-      as.data.frame()
-
-    if (period_as_date) {
-      # Column 'period' now contains the periods as texts (because column names
-      # are always character variables). Replace then by the original data
-      # objects, by using a named vector with dates (the names are the dates
-      # as text).
-      period_dict <- periods
-      names(period_dict) <- as.character(periods)
-      ret$period <- period_dict[ret$period]
-    }
+  # Move the first column to the row names
+  if (row_names && !long) {
+    rownames(ret) <- ret[[1]]
+    ret <- ret[-1]
   }
 
   return(ret)
