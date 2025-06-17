@@ -12,8 +12,6 @@ exclusions <- list(
   "R/period.R",
   "R/print.R",
   "R/RcppExports.R",
-  "R/read_utils.R",
-  "R/regts.R",
   "R/seq.R",
   "R/update_ts.R",
   "R/write_ts.R"
@@ -21,12 +19,27 @@ exclusions <- list(
 
 library(lintr)
 
-# The most recent version of lintr contains a return linter.
-if ("return_linter" %in% names(default_linters)) {
-  linters <- linters_with_defaults(return_linter = NULL)
-} else {
-  linters <- default_linters
-}
+# Create a list of linters that should be modified or removed ------------------
+linters_mut <- list(
+  object_name_linter = NULL,
+  cyclocomp_linter = NULL,
+  commented_code_linter = NULL,
+  return_linter = NULL
+)
+
+# Some linters may not be available for the specific version of lintr.
+sel <- names(linters_mut) %in% names(default_linters)
+linters_mut <- linters_mut[sel]
+
+#  Lint the files in the package -----------------------------------------------
+linters <- do.call(linters_with_defaults, linters_mut)
+
+# Some linters may not be available for the specific version of lintr.
+sel <- names(linters_mut) %in% names(default_linters)
+linters_mut <- linters_mut[sel]
+
+#  Lint the files in the package -----------------------------------------------
+linters <- do.call(linters_with_defaults, linters_mut)
 
 lints <- lint_package("pkg", exclusions = exclusions, linters = linters)
 

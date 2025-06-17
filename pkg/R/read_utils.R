@@ -269,7 +269,7 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
           rowwise <- is_rowwise(row_nr, col_nr, is_period_row, is_period_col,
                                 tbl, frequency, xlsx)
           if (!is.na(rowwise) && rowwise && col_nr == 1 &&
-              is_period_row_sum > 1) {
+                is_period_row_sum > 1) {
             # If the first rowwise period occurs in the first column, then
             # that period is ignored, because that column should contain
             # variable names (see code below). Therefore check again if the
@@ -315,7 +315,7 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
   if (!found) return(NULL)
 
   if (rowwise && col_nr == 1 &&
-      get_last_non_empty_row(tbl[, 1]) != 1) {
+        get_last_non_empty_row(tbl[, 1]) != 1) {
     # The period in first colum should be ignored, since this column probably
     # contains variable names.
     is_period_row[1] <- FALSE
@@ -324,7 +324,7 @@ inspect_tibble <- function(tbl, frequency, rowwise, labels, xlsx, period_fun,
   }
 
   if (!rowwise && row_nr == first_row_nr &&
-     get_last_non_empty_column(tbl[row_nr, ]) != 1) {
+        get_last_non_empty_column(tbl[row_nr, ]) != 1) {
     # The first period in the period column should be ignored, because the other
     # columns of this rows probably contain variable names.
     is_period_col[first_row_nr] <- FALSE
@@ -435,7 +435,7 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
   #
 
   if (!is.na(frequency) && frequency > 1 &&
-      (is_period_row_sum == 1 || is_period_col_sum == 1)) {
+        (is_period_row_sum == 1 || is_period_col_sum == 1)) {
     # If the frequency is larger than 1, there is no confusion between periods
     # and integer numerical data values. Therefore, if all periods are in a
     # single row then the timeseries are probably stored rowwise.
@@ -466,7 +466,7 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
   # be a period.
 
   # For csv files there is no distinction between numerical cells and text
-  # cells: are cells contain a text. However, even forfrequency 1 we
+  # cells: are cells contain a text. However, even for frequency 1 we
   # a text as "2010y" is definitively a text string.
 
   if (is.na(frequency) || frequency == 1) {
@@ -507,7 +507,7 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
         # a period, while the other "periods" are numerical data).
         return(FALSE)
       } else if (is_period_row_sum == 1 &&
-                 col_nr == get_last_non_empty_column(tbl)) {
+                   col_nr == get_last_non_empty_column(tbl)) {
         # see the comment above in the code block for is_period_row_sum > 1
         return(TRUE)
       }
@@ -532,10 +532,10 @@ is_rowwise <- function(row_nr, col_nr, is_period_row, is_period_col,
         num_is_year_row <- num_is_year(num_per_row, format)
         num_is_year_col <- num_is_year(num_per_col, format)
         if (all(num_is_year_row) &&
-            (is_period_col_sum == 1 || !all(num_is_year_col[-1]))) {
+              (is_period_col_sum == 1 || !all(num_is_year_col[-1]))) {
           return(TRUE)
         } else if (all(num_is_year_col) &&
-                   (is_period_row_sum == 1 || !all(num_is_year_row[-1]))) {
+                     (is_period_row_sum == 1 || !all(num_is_year_row[-1]))) {
           return(FALSE)
         } else {
           return(NA)
@@ -732,11 +732,10 @@ get_name_info_colwise <- function(first_data_row, first_row_nr, period_col, tbl,
 }
 
 get_labels_from_tbl <- function(label_tbl, rowwise) {
-  label_tbl[] <- lapply(label_tbl,
-                        FUN = function(x) {
-                                ifelse(is.na(x),  "", as.character(x))
-                              }
-                        )
+  label_tbl[] <- lapply(
+    label_tbl,
+    FUN = \(x) ifelse(is.na(x),  "", as.character(x))
+  )
   if (!rowwise) {
     label_tbl <- as_tibble(t(label_tbl), .name_repair = "minimal")
   }

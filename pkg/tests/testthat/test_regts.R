@@ -518,4 +518,20 @@ test_that("misc errors", {
     "Argument is not a timeseries",
     fixed = TRUE
   )
+
+  x <- regts(1:3, start = "2010q2")
+  expect_error(
+    x["2010M5"],
+    paste("frequency of timeseries (4) is lower than the frequency of the",
+          "selector (12)."),
+    fixed = TRUE
+  )
+
+  x <- as.regts(ts(1:3, start = 2010, frequency = 5))
+  expect_error(
+    x["2010Q1"],
+    paste("frequency of timeseries (5) not divisible by the frequency of the",
+          "selector (4)."),
+    fixed = TRUE
+  )
 })

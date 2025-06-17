@@ -493,7 +493,7 @@ numeric_matrix <- function(x) {
     if (nweird <= nweird_max) {
       warning("NAs introduced by coercion.\n",
               "The following texts could not be converted to numeric:\n",
-               paste0(weird_texts, collapse = "\n"))
+              paste0(weird_texts, collapse = "\n"))
     } else {
       warning("NAs introduced by coercion.\n",
               nweird, " texts could not be converted to numeric.\n",
@@ -518,8 +518,8 @@ convert_periods <- function(periods, fun = period, ...) {
   periods <- fun(periods, ...)
 
   if (length(periods) != n) {
-    stop(paste0("Function 'fun' should return an object with the same",
-                " length as\nthe number of rows in the data.frame or matrix."))
+    stop(paste("Function 'fun' should return an object with the same",
+               "length as\nthe number of rows in the data.frame or matrix."))
   }
 
   if (is.period(periods)) {
@@ -550,7 +550,7 @@ matrix2regts_ <- function(x, periods, numeric, strict) {
     dupl <- duplicated(periods)
     period_strings <- unique(as.character(periods[dupl]))
     stop(paste0("Duplicate periods found in data (",
-               paste(period_strings, collapse = ", "), ")."))
+                paste(period_strings, collapse = ", "), ")."))
   }
 
   sorted_periods <- sort(periods[1]:periods[nrow(x)])
@@ -599,11 +599,11 @@ as.regts.numeric <- function(x, fun = period, strict = TRUE, ...) {
       error <- FALSE
       tryCatch(
         periods <- convert_periods(periods, fun = fun, ...),
-      error = function(e) {
-        # use standard method (ignoring names)
-        error <<- TRUE
-
-      })
+        error = function(e) {
+          # use standard method (ignoring names)
+          error <<- TRUE
+        }
+      )
       if (error) return(as.regts(as.ts(x, ...)))
     } else {
       # fun an strict have been specified: now we can give an error
@@ -616,12 +616,12 @@ as.regts.numeric <- function(x, fun = period, strict = TRUE, ...) {
     }
 
     result <- matrix2regts_(as.matrix(x), periods, numeric = FALSE,
-                             strict = strict)
+                            strict = strict)
     return(result[, 1])
 
   } else {
 
-     # x is not a named vector: use standard ts method
+    # x is not a named vector: use standard ts method
     return(as.regts(as.ts(x, ...)))
   }
 }
@@ -699,7 +699,7 @@ add_columns <- function(x, new_colnames) {
   }
 
   if (!missing(i) && (is.character(i) || inherits(i, "period") ||
-                      inherits(i, "period_range"))) {
+                        inherits(i, "period_range"))) {
 
     # call C++ function get_period_range
     ts_range <- get_period_range(x)
@@ -721,6 +721,10 @@ add_columns <- function(x, new_colnames) {
   }
   return(NextMethod("[<-"))
 }
+
+# Use this command to prevent error from lintr about
+# No visible binding for global variable .Generic
+utils::globalVariables(".Generic")
 
 # Selection on the right-hand-side (e.g. x["2010Q2", ]).
 #' @importFrom stats is.ts
@@ -753,7 +757,7 @@ add_columns <- function(x, new_colnames) {
     } else {
       # row selection present
       if (is.character(i) || inherits(i, "period") ||
-          inherits(i, "period_range")) {
+            inherits(i, "period_range")) {
         # first select columns
         if (!missing(j)) {
           x <- x[, j, drop = drop]
@@ -770,10 +774,10 @@ add_columns <- function(x, new_colnames) {
     warning(w)
   }, error = function(err) {
     if (!j_missing && is.character(j) &&
-        err$message == "subscript out of bounds") {
+          err$message == "subscript out of bounds") {
       missing_cols <- setdiff(j, colnames(x))
       message <- paste0("Undefined columns: ",
-                       paste(missing_cols, collapse = ", "), ".")
+                        paste(missing_cols, collapse = ", "), ".")
       message_lines <- strwrap(message, width = 80)
       message <- paste(message_lines, collapse = "\n")
       stop(simpleError(message, call = func_call))
@@ -789,12 +793,19 @@ add_columns <- function(x, new_colnames) {
 # NA values are replaced by the values of ts_range.
 convert_selection_range <- function(sel_range, ts_range) {
 
-  # convert frequency
-  if (ts_range[3] %% sel_range[3] != 0) {
-    stop(paste0("frequency of timeseries (", ts_range[3],
-                ") not divisible by the frequency of",
-                "the selector (", sel_range[3], ")."))
+  if (sel_range[3] > ts_range[3]) {
+    stop("frequency of timeseries (", ts_range[3],
+         ") is lower than the frequency of the selector (",
+         sel_range[3], ").")
   }
+
+  if (ts_range[3] %% sel_range[3] != 0) {
+    stop("frequency of timeseries (", ts_range[3],
+         ") not divisible by the frequency of the selector (",
+         sel_range[3], ").")
+  }
+
+  # Convert frequency
   fac <- ts_range[3] %/% sel_range[3]
   new_sel_range <- numeric(3)
   new_sel_range[1] <- floor(sel_range[1] * fac)
@@ -813,8 +824,8 @@ convert_selection_range <- function(sel_range, ts_range) {
       pstart <- start_period(ts_range)
       pend <- end_period(ts_range)
     }
-    stop(paste0("The start period (", pstart, ") is after the end period (",
-               pend, ")."))
+    stop("The start period (", pstart, ") is after the end period (",
+         pend, ").")
   }
   return(new_sel_range)
 }
@@ -863,8 +874,8 @@ window_regts <- function(x, sel_range) {
 "$.regts" <- function(object, x) {
   if (!is.matrix(object)) stop("$ operator not possible for vector timeseries")
   cnames <- colnames(object)
-  if (is.null(cnames)) stop(paste("$ operator not possible for regts without",
-                            "column names"))
+  if (is.null(cnames)) stop("$ operator not possible for regts without ",
+                            "column names")
   i <- match(x, cnames)
   if (is.na(i)) {
     return(NULL)
