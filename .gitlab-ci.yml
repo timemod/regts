@@ -44,9 +44,9 @@ Test package in cpblib:
   before_script:
     - echo "cpblib::use_cpblib(cpb_only = TRUE)" > .Rprofile
     - cp .Rprofile pkg/tests/testthat
-    - Rscript -e "print(.libPaths())"
+    - Rscript_4.4.3 -e "print(.libPaths())"
   script:
-    - Rscript test.R
+    - Rscript_4.4.3 test.R
   rules:
     # Sometimes this check should be skipped (when Mimosigereedschap
     # needs versions of packages not in cpblib)

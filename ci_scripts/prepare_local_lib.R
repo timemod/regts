@@ -1,8 +1,11 @@
 cran_repo <- "https://cloud.r-project.org"
 
-lib_dir <- Sys.getenv("R_LIBS_USER")
-if (!dir.exists(lib_dir)) {
-  dir.create(lib_dir, recursive = TRUE)
+# If the user library does not exist, then create it
+# and add it to the library path.
+user_lib_dir <- Sys.getenv("R_LIBS_USER")
+if (!dir.exists(user_lib_dir)) {
+  dir.create(user_lib_dir, recursive = TRUE)
+  .libPaths(user_lib_dir_user)
 }
 
 cat("\nLibrary paths:\n")
@@ -17,5 +20,5 @@ if (!require(lintr, quietly = TRUE)) {
 devtools::install_deps("pkg", dependencies = TRUE, repos = cran_repo)
 
 # make sure all packages (including devtools and lintr) are up-to-date.
-update.packages(lib.loc = lib_dir, repos = cran_repo,
+update.packages(lib.loc = user_lib_dir, repos = cran_repo,
                 ask = FALSE)
