@@ -260,4 +260,3 @@ test_that("duplicate column names", {
     "Long format not possible if there are duplicate column names"
   )
 })
-
