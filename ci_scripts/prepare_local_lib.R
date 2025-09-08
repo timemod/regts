@@ -1,8 +1,11 @@
 cran_repo <- "https://cloud.r-project.org"
 
-lib_dir <- Sys.getenv("R_LIBS_USER")
-if (!dir.exists(lib_dir)) {
-  dir.create(lib_dir, recursive = TRUE)
+# If the user library does not exist, then create it
+# and add it to the library path.
+user_lib_dir <- Sys.getenv("R_LIBS_USER")
+if (!dir.exists(user_lib_dir)) {
+  dir.create(user_lib_dir, recursive = TRUE)
+  .libPaths(user_lib_dir_user)
 }
 
 cat("\nLibrary paths:\n")
