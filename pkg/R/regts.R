@@ -750,9 +750,7 @@ utils::globalVariables(".Generic")
         ret <- NextMethod(.Generic)
       }
       ret <- as.regts(ret)
-      if (!is.null(lbls)) {
-        ts_labels(ret) <- lbls
-      }
+      if (!is.null(lbls)) attr(ret, "ts_labels") <- unname(lbls)
       return(ret)
     } else {
       # row selection present
@@ -901,4 +899,16 @@ window_regts <- function(x, sel_range) {
   }
 
   return(object)
+}
+
+# Extract a part of a `regts` as a plain matrix or vector.
+#' @export
+"[[.regts" <- function(x, ...) {
+  attr(x, "ts_labels") <- NULL # remove labels
+  ret <- `[`(x, ...)
+  if (is.regts(ret)) {
+    ret <- unclass(ret)
+    attr(ret, "tsp") <- NULL
+  }
+  return(ret)
 }
