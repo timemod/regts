@@ -6,7 +6,7 @@
 \alias{[[}
 \alias{[<-}
 \alias{$}
-\alias{$<}
+\alias{$<-}
 \title{Extract of Replace Parts of a \code{regts} object.}
 \usage{
 # Select parts of a regts.
@@ -20,24 +20,23 @@ x[[i, j, drop = TRUE]]
 
 x[i] <- value
 x[i, j] <- value
-x[[j]] <- value
-x$name <- "piet"
-}
-\description{
-Operators acting on regts objects to extract or replace parts.
-}
-\section{Arguments}{
 
-\describe{
+x$name <- value
+}
+\arguments{
+\item{x}{A \code{regts} timeseries object.}
+
 \item{i}{Indices for the first dimension.
 A numeric vector or a \code{\link{period}},
 \code{\link{period_range}} or an character that be coerced to
 a \code{period} or \code{period_range} object. The frequency of the
 specified period or period range must be equal to or lower than
-the frequency of the timeseries}
+the frequency of the timeseries.}
+
 \item{j}{A numeric vector with column indices or a character vector with
 column names. Only used in the underlying data of the timeseries
 is a matrix.}
+
 \item{drop}{Relevant for extraction if the underlying data of the
 timeseries is a  matrix and if argument \code{j} has length 1. In
 that case, the timeseries is converted to a vector timeseries
@@ -45,15 +44,22 @@ that case, the timeseries is converted to a vector timeseries
 This argument is only used for extraction, not for
 replacement. Specify \code{drop = FALSE} if you want to retain
 the column names.}
-}
-}
 
+\item{value}{The replacement value(s), usually a vector, matrix or
+another timeseries object.}
+
+\item{name}{A rel}
+}
+\description{
+Operators acting on regts objects to extract or replace parts.
+}
 \section{Details}{
 
 
-The \code{[} operator can be used to extact part of a \code{regts} object. When
+The \code{[} operator can be used to extact par:qt of a \code{regts} object. When
 combined with the assignment operator \verb{<-}, it can also be used to
-replace part of a regts object, or to extend a regts (see the examples below).
+replace part of a regts object, or to extend a regts (see the examples
+below).
 For \code{regts} objects, the \code{[[} works similarly as the \code{[}
 operator, except that it always returns a normal vector or matrix and not a
 timeseries.

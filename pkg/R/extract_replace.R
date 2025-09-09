@@ -15,34 +15,36 @@
 #'
 #' x[i] <- value
 #' x[i, j] <- value
-#' x[[j]] <- value
-#' x$name <- "piet"
 #'
-#' @section Arguments:
-#' \describe{
-#'   \item{i}{Indices for the first dimension.
+#' x$name <- value
+#'
+#' @param x A `regts` timeseries object.
+#' @param i Indices for the first dimension.
 #'            A numeric vector or a \code{\link{period}},
 #'            \code{\link{period_range}} or an character that be coerced to
 #'            a `period` or `period_range` object. The frequency of the
 #'            specified period or period range must be equal to or lower than
-#'            the frequency of the timeseries}
-#'   \item{j}{A numeric vector with column indices or a character vector with
+#'            the frequency of the timeseries.
+#' @param j A numeric vector with column indices or a character vector with
 #'            column names. Only used in the underlying data of the timeseries
-#'            is a matrix.}
-#'   \item{drop}{Relevant for extraction if the underlying data of the
-#'               timeseries is a  matrix and if argument `j` has length 1. In
-#'               that case, the timeseries is converted to a vector timeseries
-#'               (dropping the column names) if `drop = TRUE`.
-#'               This argument is only used for extraction, not for
-#'               replacement. Specify `drop = FALSE` if you want to retain
-#'               the column names.}
-#' }
+#'            is a matrix.
+#' @param drop Relevant for extraction if the underlying data of the
+#'             timeseries is a  matrix and if argument `j` has length 1. In
+#'             that case, the timeseries is converted to a vector timeseries
+#'             (dropping the column names) if `drop = TRUE`.
+#'             This argument is only used for extraction, not for
+#'             replacement. Specify `drop = FALSE` if you want to retain
+#'            the column names.
+#' @param value The replacement value(s), usually a vector, matrix or
+#'              another timeseries object.
+#' @param name  A rel
 #'
 #' @section Details:
 #'
-#' The `[` operator can be used to extact part of a `regts` object. When
+#' The `[` operator can be used to extact par:qt of a `regts` object. When
 #' combined with the assignment operator `<-`, it can also be used to
-#' replace part of a regts object, or to extend a regts (see the examples below).
+#' replace part of a regts object, or to extend a regts (see the examples
+#' below).
 #' For `regts` objects, the `[[` works similarly as the `[`
 #' operator, except that it always returns a normal vector or matrix and not a
 #' timeseries.
@@ -127,9 +129,7 @@
 #' x$d <- 2  # Add a new column d, with value 2
 #' x
 #' @name extract
-#' @aliases [ [[ [<- $ $<
-
-
+#' @aliases [ [[ [<- $ $<-
 NULL
 
 # Use this command to prevent error from lintr about
