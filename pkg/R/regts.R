@@ -650,139 +650,44 @@ add_columns <- function(x, new_colnames) {
   return(ret)
 }
 
-# Selection on the left-hand side: replace a part of a regts
-# (e.g. x["2010Q2", ] <- 2).
-#' @importFrom stats is.mts
-#' @export
-"[<-.regts" <- function(x, i, j, value) {
+window_regts <- function(x, sel_range) {
+  ts_range <- get_period_range(x)
+  sel_range <- convert_selection_range(sel_range, ts_range)
+  nper_new <- nperiod__(sel_range)
+  if (nper_new < 0) {
+    stop("Illegal selection")
+  }
+  shift <- sel_range[1] - ts_range[1]
+  rmin <- max(1, 1 - shift)
+  rmax <- min(nper_new, nperiod__(ts_range) - shift)
 
-  if (is.null(value) && is.matrix(x)) {
-    # remove columns
-    if (!missing(i)) {
-      stop("Row selection not allowed when the replacement is NULL")
-    }
-    if (missing(j)) {
-      # x[] <- NULL: remove all columns
-      return(x[, numeric(0)])
-    } else {
-      if (length(j) == 0) {
-        return(x)
-      }
-      if (is.numeric(j)) {
-        return(x[, -j, drop = FALSE])
-      } else if (is.logical(j)) {
-        return(x[, !j, drop = FALSE])
-      } else {
-        colsel <- match(as.character(j), colnames(x))
-        colsel <- colsel[!is.na(colsel)]
-        if (length(colsel) > 0) {
-          return(x[, -colsel, drop = FALSE])
-        } else {
-          # no matching columns, do nothing
-          return(x)
-        }
-      }
-    }
+  # Create NA with the correct type, this is necessary when the period
+  # selection lies completely outside the period range of the timeseries.
+  if (is.integer(x)) {
+    na_val <- NA_integer_
+  } else if (is.numeric(x)) {
+    na_val <- NA_real_
+  } else if (is.character(x)) {
+    na_val <- NA_character_
+  } else {
+    na_val <- NA
   }
 
-  if (!missing(j) && is.character(j)) {
-    # Check if j contains names of columns not present in x.
-    # Add missing columns if necessary
-    cnames <- colnames(x)
-    if (is.null(cnames)) {
-      stop("object has no column names")
+  if (is.matrix(x)) {
+    data <- matrix(na_val, nrow = nper_new, ncol = ncol(x))
+    if (rmax >= rmin) {
+      data[rmin:rmax, ] <- x[(rmin + shift):(rmax + shift), ]
     }
-    new_colnames <- setdiff(j, cnames)
-    if (length(new_colnames) > 0) {
-      x <- add_columns(x, new_colnames)
-    }
-  }
-
-  if (!missing(i) && (is.character(i) || inherits(i, "period") ||
-                        inherits(i, "period_range"))) {
-
-    # call C++ function get_period_range
-    ts_range <- get_period_range(x)
-
-    sel_range <- convert_selection_range(as.period_range(i), ts_range)
-    if (sel_range[1] < ts_range[1] || sel_range[2] > ts_range[2]) {
-      ts_range <- c(min(sel_range[1], ts_range[1]),
-                    max(sel_range[2], ts_range[2]), ts_range[3])
-      x <- window_regts(x, ts_range)
-    }
-    i <- seq(sel_range[1] - ts_range[1] + 1,
-             length.out = nperiod__(sel_range))
-    # if argument j is missing, then we have to add an empty
-    # column selection. x[i] does not return the same as x[i, ].
-    if (missing(j) && is.mts(x)) {
-      x[i, ] <- value
-      return(x)
+    colnames(data) <- colnames(x)
+  } else {
+    data <- logical(nper_new)
+    data[] <- na_val
+    if (rmax >= rmin) {
+      data[rmin:rmax] <- x[(rmin + shift):(rmax + shift)]
     }
   }
-  return(NextMethod("[<-"))
-}
-
-# Use this command to prevent error from lintr about
-# No visible binding for global variable .Generic
-utils::globalVariables(".Generic")
-
-# Selection on the right-hand-side (e.g. x["2010Q2", ]).
-#' @importFrom stats is.ts
-#' @export
-"[.regts" <- function(x, i, j, drop = TRUE) {
-
-  j_missing <- missing(j)
-
-  # save function call for error handling
-  func_call <- sys.call()
-
-  tryCatch({
-    if (missing(i)) {
-      lbls <- ts_labels(x)
-      if (!is.null(lbls) && !missing(j)) {
-        lbls <- lbls[j]
-      }
-      if (is.matrix(x) && nrow(x) == 1 && (missing(j) || length(j) > 1)) {
-        # the result is very weird is the timeseries has a single row
-        # and if drop = TRUE is used
-        ret <- NextMethod(.Generic, drop = FALSE)
-      } else {
-        ret <- NextMethod(.Generic)
-      }
-      ret <- as.regts(ret)
-      if (!is.null(lbls)) attr(ret, "ts_labels") <- unname(lbls)
-      return(ret)
-    } else {
-      # row selection present
-      if (is.character(i) || inherits(i, "period") ||
-            inherits(i, "period_range")) {
-        # first select columns
-        if (!missing(j)) {
-          x <- x[, j, drop = drop]
-        }
-        # the row selector is a period_range. Use window_regts
-        return(window_regts(x, as.period_range(i)))
-      } else  {
-        # numeric / logical row selection: the result is a  matrix or vector
-        # (no longer a ts)
-        return(NextMethod(.Generic))
-      }
-    }
-  }, warning = function(w) {
-    warning(w)
-  }, error = function(err) {
-    if (!j_missing && is.character(j) &&
-          err$message == "subscript out of bounds") {
-      missing_cols <- setdiff(j, colnames(x))
-      message <- paste0("Undefined columns: ",
-                        paste(missing_cols, collapse = ", "), ".")
-      message_lines <- strwrap(message, width = 80)
-      message <- paste(message_lines, collapse = "\n")
-      stop(simpleError(message, call = func_call))
-    } else {
-      stop(err)
-    }
-  })
+  return(create_regts(data, sel_range[1], sel_range[2], sel_range[3],
+                      ts_labels(x)))
 }
 
 # This function converts period_range object sel_range so that it is a valid
@@ -826,89 +731,4 @@ convert_selection_range <- function(sel_range, ts_range) {
          pend, ").")
   }
   return(new_sel_range)
-}
-
-window_regts <- function(x, sel_range) {
-  ts_range <- get_period_range(x)
-  sel_range <- convert_selection_range(sel_range, ts_range)
-  nper_new <- nperiod__(sel_range)
-  if (nper_new < 0) {
-    stop("Illegal selection")
-  }
-  shift <- sel_range[1] - ts_range[1]
-  rmin <- max(1, 1 - shift)
-  rmax <- min(nper_new, nperiod__(ts_range) - shift)
-
-  # Create NA with the correct type, this is necessary when the period
-  # selection lies completely outside the period range of the timeseries.
-  if (is.integer(x)) {
-    na_val <- NA_integer_
-  } else if (is.numeric(x)) {
-    na_val <- NA_real_
-  } else if (is.character(x)) {
-    na_val <- NA_character_
-  } else {
-    na_val <- NA
-  }
-
-  if (is.matrix(x)) {
-    data <- matrix(na_val, nrow = nper_new, ncol = ncol(x))
-    if (rmax >= rmin) {
-      data[rmin:rmax, ] <- x[(rmin + shift):(rmax + shift), ]
-    }
-    colnames(data) <- colnames(x)
-  } else {
-    data <- logical(nper_new)
-    data[] <- na_val
-    if (rmax >= rmin) {
-      data[rmin:rmax] <- x[(rmin + shift):(rmax + shift)]
-    }
-  }
-  return(create_regts(data, sel_range[1], sel_range[2], sel_range[3],
-                      ts_labels(x)))
-}
-
-#' @export
-"$.regts" <- function(object, x) {
-  if (!is.matrix(object)) stop("$ operator not possible for vector timeseries")
-  cnames <- colnames(object)
-  if (is.null(cnames)) stop("$ operator not possible for regts without ",
-                            "column names")
-  i <- match(x, cnames)
-  if (is.na(i)) {
-    return(NULL)
-  } else {
-    return(object[, i])
-  }
-}
-
-#' @export
-"$<-.regts" <- function(object, x, value) {
-  if (!is.matrix(object)) stop("$ operator not possible for vector timeseries")
-  cnames <- colnames(object)
-  if (is.null(cnames)) stop(paste("$ operator not possible for regts without",
-                                  "column names"))
-
-  if (is.null(value)) {
-    i <- pmatch(x, cnames)
-    if (!is.na(i)) {
-      object <- object[, -i, drop = FALSE]
-    }
-  } else {
-    object[, x] <- value
-  }
-
-  return(object)
-}
-
-# Extract a part of a `regts` as a plain matrix or vector.
-#' @export
-"[[.regts" <- function(x, ...) {
-  attr(x, "ts_labels") <- NULL # remove labels
-  ret <- `[`(x, ...)
-  if (is.regts(ret)) {
-    ret <- unclass(ret)
-    attr(ret, "tsp") <- NULL
-  }
-  return(ret)
 }
