@@ -326,6 +326,14 @@ rts1
 ```
 The missing quarters (`2009q3` and `2009q4`) are filled in with `NA` values.
 
+The result of period selection with the `[` operator 
+is a `regts` object. If the `[[` operator is used instead, the 
+result is a plain vector, which is sometimes useful, as discussed in
+Section \ref{operators}.
+```{r}
+rts1[["2011Q1/2011Q2"]]
+```
+
 ##  Period selection for multivariate regts
 
 Selecting a period for a multivariate regts is quite similar. You can select 
@@ -357,7 +365,11 @@ rts["2011", "x"] <- 1         # update all quarters in 2011 in column "x"
 rts
 ```
 
-
+For multivariate timseries, the `[[` operator returns a plain matrix without
+regts attributes. Example:
+```{r}
+rts[["2011Q2/2011Q4", c("a", "b")]]
+```
 
 # Reading and writing timeseries 
 
@@ -592,8 +604,10 @@ After some processing (e.g. selecting and/or deleting (parts of) rows and column
 
 # Manipulating timeseries
 
-## Operators and functions for `regts`
-Since the `regts` class is a subclass of the `ts` class it inherits all functionality from this class.
+## Operators for `regts` \label{operators}
+
+Since the `regts` class is a subclass of the `ts` class it inherits all
+functionality from this class.
 All arithmetic (`+`, `-`, `*`, `/`, `^`, `%%`, `%/%`), logical (`&`, `|`, `!`), 
 relational (`==`, `!=`, `<`, `<=`, `>`, `>=`) and subsetting (`[]`) operators 
 applicable for a `ts` variable, can be used for a `regts` timeseries. 
@@ -618,6 +632,25 @@ tx <- regts(1:6, start = "2016q1")
 ty <- regts(1:6, start = "2017q1")
 tx + ty
 ```
+ 
+This behaviour of arithmetic operators may sometimes lead to unexpected results.
+Suppose we want to compute an index series from `tx` using the following 
+statement:
+ 
+```{r}
+tx_i <- 100 * tx / tx["2017q1"] 
+tx_i
+```
+
+The result is a timeseries with a single period. In this case, use the `[[`
+operator (see Section \ref{periodselection} 
+to extract the value of `tx` at 2017Q1 as a plain numerical value:
+```{r}
+tx_i <- 100 * tx / tx[["2017q1"]] 
+tx_i
+```
+
+## Functions for `regts` \label{regts_functions}
 
 You can use all functions applicable to a `ts` class timeseries. Some examples:
 ```{r, eval = FALSE}

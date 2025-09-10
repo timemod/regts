@@ -1,22 +1,26 @@
-#' Extract of Replace Parts of a `regts` object.
+#' Select or Replace Parts of a `regts` object.
 #'
-#' Operators acting on regts objects to extract or replace parts.
+#' Operators acting on `regts` objects to select or replace parts. This
+#' documentation gives a brief overview of these operators. A more extensive
+#' description is provided in the vignette
+#' \href{../doc/regts.pdf}{\emph{"Introduction to regts"}}.
 #'
 #' @usage
 #'
-#' # Select parts of a regts.
-#' x[i]
-#' x[i, j, drop = TRUE]
-#' x$name
+#' # Select a part of a regts.
+#' \method{[}{regts}(x, i, j, drop = TRUE)
 #'
 #' # Select parts of a regts as a plain vector or matrix:
-#' x[[i]]
-#' x[[i, j, drop = TRUE]]
+#' \method{[[}{regts}(x, ...)
 #'
-#' x[i] <- value
-#' x[i, j] <- value
+#' # Select a column of a regts
+#' \method{$}{regts}(x, name)
 #'
-#' x$name <- value
+#' # Replace a part of a regts
+#' \method{[}{regts}(x, i, j) <- value
+#'
+#' # Replace or add a column
+#' \method{$}{regts}(x, name) <- value
 #'
 #' @param x A `regts` timeseries object.
 #' @param i Indices for the first dimension.
@@ -34,37 +38,47 @@
 #'             (dropping the column names) if `drop = TRUE`.
 #'             This argument is only used for extraction, not for
 #'             replacement. Specify `drop = FALSE` if you want to retain
-#'            the column names.
-#' @param value The replacement value(s), usually a vector, matrix or
+#'             the column names.
+#' @param ...  Arguments passed to the `[` method by method `[[`:
+#'             `i`, `j`, and `drop`.
+#' @param value Replacement value(s), usually a vector, matrix or
 #'              another timeseries object.
-#' @param name  A rel
+#' @param name  A literal character string with the name of the column.
 #'
 #' @section Details:
 #'
-#' The `[` operator can be used to extact par:qt of a `regts` object. When
+#' The `[` operator can be used to select a part of a `regts` object. When
 #' combined with the assignment operator `<-`, it can also be used to
-#' replace part of a regts object, or to extend a regts (see the examples
+#' replace a part of a regts object, or to extend a regts (see the examples
 #' below).
-#' For `regts` objects, the `[[` works similarly as the `[`
-#' operator, except that it always returns a normal vector or matrix and not a
-#' timeseries.
+#'
+#' When the first selector (argument `i`) of the `[` method is an numerical or
+#' integer vector, the result is a plain vector or matrix without timeseries
+#' attributes. However, if `i` is a period or period range (or a character
+#' that represents a period or period range), the result is a timeseries object
+#' with the requested period or period range.
+#'
+#' The `[[` operator works similarly as `[`. The only difference is that the
+#' result is *always* a plain vector or  matrix. Actually, `[[` first
+#' calls the `[` method and subsequenty converts the result to a plain
+#' vector or matrix, with regts attributes removed.
+#'
+#' The precise behaviour of the extraction functions depends on whether it
+#' operates on a vector or matrix timeseries. Below more details are given.
 #'
 #' **Vector timeseries**
 #'
 #' A vector timeseries is  a univariate timeseries for which the underlying
-#' data is a vector (and not a matrix). A vector timeseries only has one
+#' data is a vector and not a matrix. A vector timeseries only has one
 #' dimension and only argument `i` is relevant.
 #'
-#' If `i` is a numeric vector, the result is a vector (not a timeseries)
+#' If `i` is a numeric vector, the result is a vector
 #' with the observations at the specified indices.
 #' If `i` is a `period`, `period_range`, or a character that can
 #' be coerced to a `period` or `period_range`,  the result is a timeseries
-#' with a period equal to the specified period (range). The result is padded
+#' with a period equal to the specified period range. The result is padded
 #' with NA values if the specified period or period range lies outside the
 #' period range of the input timeseries.
-#'
-#' The result of the `[[` operator is always a vector.
-#'
 #'
 #' **Matrix timeseries**
 #'
@@ -77,11 +91,9 @@
 #' timeseries.
 #'
 #' For matrix timeseries, argument `j` can be used to select columns.
-#' When used in combination with the `<-` operator I can be used to add
-#' columns. If `j` has length 1, the result is a vector timeseries
+#' When used in combination with the `<-` operator it can be used to replace or
+#' add columns. If `j` has length 1, the result is a vector timeseries
 #' unless `drop = FALSE`.
-
-#' The result of the `[[` operator is always a plain matrix (not a timeseries).
 #'
 #' @examples
 #'
@@ -105,9 +117,10 @@
 #'
 #' x <- regts(matrix(1:10, ncol = 2), names = c("a", "b"), start = "2018q1")
 #'
-#' x[c(1, 3)]
-#' x["2018q2"] # select period 2018q2
-#' x[["2018q2"]] # get value in 2018q2 as numeric,"
+#' x[c(1, 3)] # Select the first and third element
+#' x["2018q2"] # Select period 2018q2
+#' x[["2018q2"]] # Select period 2018q2 as a plain matrix
+#' x[["2018q2/2018q4"]] # Select period 2018q2/2018Q4 as a plain matrix
 #'
 #' x["2018", "b"]   # select all quarters of column b in the year 2018
 #' x[["2018", "b"]] # get values for the year 2018 as numeric vector
@@ -128,8 +141,8 @@
 #'
 #' x$d <- 2  # Add a new column d, with value 2
 #' x
-#' @name extract
-#' @aliases [ [[ [<- $ $<-
+#' @name select
+#' @aliases [.regts  [[.regts  [<-.regts  $.regts  $<-.regts
 NULL
 
 # Use this command to prevent error from lintr about
@@ -268,39 +281,39 @@ utils::globalVariables(".Generic")
 }
 
 #' @export
-"$.regts" <- function(object, x) {
-  if (!is.matrix(object)) stop("$ operator not possible for vector timeseries")
-  cnames <- colnames(object)
+"$.regts" <- function(x, name) {
+  if (!is.matrix(x)) stop("$ operator not possible for vector timeseries")
+  cnames <- colnames(x)
   if (is.null(cnames)) stop("$ operator not possible for regts without ",
                             "column names")
-  i <- match(x, cnames)
+  i <- match(name, cnames)
   if (is.na(i)) {
     return(NULL)
   } else {
-    return(object[, i])
+    return(x[, i])
   }
 }
 
 #' @export
-"$<-.regts" <- function(object, x, value) {
-  if (!is.matrix(object)) stop("$ operator not possible for vector timeseries")
-  cnames <- colnames(object)
+"$<-.regts" <- function(x, name, value) {
+  if (!is.matrix(x)) stop("$ operator not possible for vector timeseries")
+  cnames <- colnames(x)
   if (is.null(cnames)) stop(paste("$ operator not possible for regts without",
                                   "column names"))
 
   if (is.null(value)) {
-    i <- pmatch(x, cnames)
+    i <- pmatch(name, cnames)
     if (!is.na(i)) {
-      object <- object[, -i, drop = FALSE]
+      x <- x[, -i, drop = FALSE]
     }
   } else {
-    object[, x] <- value
+    x[, name] <- value
   }
 
-  return(object)
+  return(x)
 }
 
-# Extract a part of a `regts` as a plain matrix or vector.
+#  Extract a part of a `regts` as a plain matrix or vector.
 #' @export
 "[[.regts" <- function(x, ...) {
   attr(x, "ts_labels") <- NULL # remove labels
