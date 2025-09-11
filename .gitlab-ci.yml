@@ -42,6 +42,8 @@ Lint package:
 Test package in cpblib:
   stage: test_with_cpblib
   before_script:
+    # install the package, to ensure that the C code is compiled.
+    - R CMD INSTALL pkg
     - echo "cpblib::use_cpblib(cpb_only = TRUE)" > .Rprofile
     - cp .Rprofile pkg/tests/testthat
     - Rscript_4.4.3 -e "print(.libPaths())"
