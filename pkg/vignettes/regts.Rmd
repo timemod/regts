@@ -642,8 +642,10 @@ tx_i <- 100 * tx / tx["2017q1"]
 tx_i
 ```
 
-The result is a timeseries with a single period. In this case, use the `[[`
-operator (see Section \ref{periodselection} 
+The result is a timeseries with a single period, 2017Q1, because this is the
+intersection of the periods of the two operands of the division operator (`/`).
+In this case, use the `[[`
+operator (see Section \ref{periodselection}) 
 to extract the value of `tx` at 2017Q1 as a plain numerical value:
 ```{r}
 tx_i <- 100 * tx / tx[["2017q1"]] 
