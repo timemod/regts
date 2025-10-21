@@ -42,6 +42,8 @@ Lint package:
 Test package in cpblib:
   stage: test_with_cpblib
   before_script:
+    # regts should be installed in ~/R/cpb_r_packages
+    - echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
     # install the package, to ensure that the C code is compiled.
     - R CMD INSTALL pkg
     - echo "cpblib::use_cpblib(cpb_only = TRUE)" > .Rprofile
