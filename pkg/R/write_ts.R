@@ -238,6 +238,7 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
     worksheetOrder(wb) <- order
   }
 
+  # Set the minimum column width.
   min_width_old <- options("openxlsx.minWidth")[[1]]
   options("openxlsx.minWidth" = 8.43)
   on.exit(options("openxlsx.minWidth" = min_width_old))
