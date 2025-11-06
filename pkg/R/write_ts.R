@@ -238,17 +238,15 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
     worksheetOrder(wb) <- order
   }
 
+  # Set the minimum column width.
   min_width_old <- options("openxlsx.minWidth")[[1]]
   options("openxlsx.minWidth" = 8.43)
+  on.exit(options("openxlsx.minWidth" = min_width_old))
 
-  tryCatch({
-    result <- saveWorkbook(wb, file, overwrite = TRUE, returnValue = TRUE)
-    if (!isTRUE(result)) {
-      stop("Failed to save workbook to file '", file, "'. Check warnings.")
-    }
-  }, finally = {
-    options("openxlsx.minWidth" = min_width_old)
-  })
+  result <- saveWorkbook(wb, file, overwrite = TRUE, returnValue = TRUE)
+  if (!isTRUE(result)) {
+    stop("Failed to save workbook to file '", file, "'. Check warnings.")
+  }
 
   if (verbose) {
     t_end <- Sys.time()

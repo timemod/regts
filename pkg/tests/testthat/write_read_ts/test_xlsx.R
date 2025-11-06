@@ -21,7 +21,7 @@ test_that("ts without labels written correctly",  {
   file <- "xlsx/ts1.xlsx"
 
   # make sure that the file is simply overwritten
-  writeLines(c("Hello","World"), con = file)
+  writeLines(c("Hello", "World"), con = file)
 
   write_ts_xlsx(ts1, file, sheet_name = "ts1", labels = "after")
 
@@ -30,7 +30,8 @@ test_that("ts without labels written correctly",  {
   msg <- paste0(
     "^\nWriting timeseries to sheet ts1_t of file xlsx/ts1\\.xlsx ...\n",
     ".*", # this is necessary when running via RStudio
-    "2 timeseries written, period range 2010Q2/2011Q2, 0\\.\\d{2} sec\\. elapsed\\.\\n$"
+    "2 timeseries written, period range 2010Q2/2011Q2, 0\\.\\d{2} sec\\. ",
+    "elapsed\\.\\n$"
   )
   expect_output({
     write_ts_xlsx(ts1, file, sheet_name = "ts1_t",  rowwise = FALSE,
@@ -87,7 +88,8 @@ test_that("ts with labels written correctly (1)",  {
   expect_identical(ts1_lbls, ts1_read)
 
   expect_error(
-    dum <- read_ts_xlsx(file, sheet = "ts1", labels = "rig"))
+    dum <- read_ts_xlsx(file, sheet = "ts1", labels = "rig")
+  )
 
   ts1_t_read <- read_ts_xlsx(file, sheet = "ts1_t", labels = "after")
 
@@ -250,10 +252,11 @@ test_that("period_as_date", {
 
   # check if the file really contains date objects
   first_row <- readxl::read_xlsx(file, n_max = 1, col_types = "list",
-                                  col_names = FALSE,
-                                 .name_repair = function(x) {x})
-  periods <- first_row[-c(1,2)]
-  is_posixt <- sapply(periods, FUN = function(x) {inherits(x[[1]], "POSIXt")},
+                                 col_names = FALSE,
+                                 .name_repair = identity)
+  periods <- first_row[-c(1, 2)]
+  is_posixt <- sapply(periods,
+                      FUN = function(x) inherits(x[[1]], "POSIXt"),
                       USE.NAMES = FALSE)
   names(is_posixt) <- NULL
   expect_identical(is_posixt, rep(TRUE, 5))
@@ -279,27 +282,18 @@ test_that("period_as_date", {
 test_that("errors", {
   file <- "xxlsx/ts1_date.xlsx"
 
-  msg1 <- "cannot create file 'xxlsx/ts1_date.xlsx', reason 'No such file or directory'"
-  msg2 <-  "Failed to save workbook to file 'xxlsx/ts1_date.xlsx'\\. Check warnings\\."
+  wmsg <- "cannot create file 'xxlsx/ts1_date.xlsx', reason 'No such file or directory'"
+  emsg <-  "Failed to save workbook to file 'xxlsx/ts1_date.xlsx'\\. Check warnings\\."
 
-  minWidth_old <- options("openxlsx.minWidth")[[1]]
-  options("openxlsx.minWidth" = 111)
+  withr::local_options(`openxlsx.minWidth` = 111)
 
-  if (packageVersion("openxlsx") > "4.2.4") {
-    # different error handling since openxslx 4.2.5
-    expect_error(
-      expect_warning(
-        write_ts_xlsx(ts1_lbls, file, labels = "after", period_as_date = TRUE),
-        msg1),
-      msg2
-     )
-  } else {
-    expect_error(
+  expect_error(
+    expect_warning(
       write_ts_xlsx(ts1_lbls, file, labels = "after", period_as_date = TRUE),
-      msg1)
-  }
+      wmsg
+    ),
+    emsg
+  )
 
   expect_equal(options("openxlsx.minWidth")[[1]], 111)
-
-  options("openxlsx.minWidth" = minWidth_old)
 })
