@@ -635,17 +635,12 @@ test_that("check more complex case with combinations of NA and proper values", {
   expect_known_output(tsdif(ts1, ts2), "expected_output/tsdif_complex.txt",
     print = TRUE, update = update_expected
   )
-  max_difnames_old <- getOption("regts_max_difnames")
-  max_maxdif_old <- getOption("regts_max_maxdif")
-  on.exit({
-    options(list(
-      regts_max_difnames = max_difnames_old,
-      regts_max_maxdif = max_maxdif_old
-    ))
-  })
-  expect_equal(max_difnames_old, 50)
-  expect_equal(max_maxdif_old, 10)
-  options(list(regts_max_difnames = 10, regts_max_maxdif = 12))
+
+  expect_equal(getOption("regts_max_difnames"), 50)
+  expect_equal(getOption("regts_max_maxdif"), 10)
+
+  withr::local_options(c(regts_max_difnames = 10, regts_max_maxdif = 12))
+
   expect_equal(getOption("regts_max_difnames"), 10)
   expect_equal(getOption("regts_max_maxdif"), 12)
 
