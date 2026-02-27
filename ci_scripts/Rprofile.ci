@@ -1,0 +1,3 @@
+use_cpblib <- tolower(Sys.getenv("USE_CPBLIB", "")) %in% c("1", "true", "t", "yes", "y")
+
+if (use_cpblib) cpblib::use_cpblib()

@@ -11,6 +11,7 @@ workflow:
 
 variables:
   BUILD_DIR: build
+  R_PROFILE_USER: "$CI_PROJECT_DIR/ci_scripts/Rprofile.ci"
 
 stages:
     - build
@@ -18,16 +19,12 @@ stages:
     - test_with_cpblib
 
 before_script:
-    - echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
-    - echo "R_LIBS_SITE=''" >> .Renviron
-    # Copy the .Renviron file to the testthat directory,
-    # this makes it possible to manually run the test job as gitlab
-    # runner in case of problems:
-    - cp .Renviron pkg/tests/testthat
     - Rscript -e "print(.libPaths())"
 
 build-job:
   stage: build
+  variables:
+    USE_CPB_LIB: "false"
   script:
     # The package is build and tested using a the local packages of gitlab-runner.
     - Rscript ci_scripts/prepare_local_lib.R
@@ -40,11 +37,15 @@ build-job:
 
 Check package:
   stage: test
+  variables:
+    USE_CPB_LIB: "false"
   script:
     - R CMD check $BUILD_DIR/*.tar.gz
 
 Lint package:
   stage: test
+  variables:
+    USE_CPB_LIB: "false"
   script:
     # Install the package in the local library
     - R CMD INSTALL $BUILD_DIR/*.tar.gz
@@ -52,16 +53,10 @@ Lint package:
 
 Test package in cpblib:
   stage: test_with_cpblib
-  before_script:
-    # regts should be installed in ~/R/cpb_r_packages
-    - echo "R_LIBS_USER=~/R/cpb_r_packages/%v" > .Renviron
-    # install the package, to ensure that the C code is compiled.
-    - R CMD INSTALL pkg
-    - echo "cpblib::use_cpblib(cpb_only = TRUE)" > .Rprofile
-    - cp .Rprofile pkg/tests/testthat
-    - Rscript_4.4.3 -e "print(.libPaths())"
+  variables:
+    USE_CPB_LIB: "true"
   script:
-    - Rscript_4.4.3 test.R
+    - Rscript test.R
   rules:
     # Sometimes this check should be skipped (when Mimosigereedschap
     # needs versions of packages not in cpblib)
