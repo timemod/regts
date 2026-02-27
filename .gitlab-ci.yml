@@ -24,7 +24,7 @@ before_script:
 build-job:
   stage: build
   variables:
-    USE_CPB_LIB: "false"
+    USE_CPBLIB: "false"
   script:
     # The package is build and tested using a the local packages of gitlab-runner.
     - Rscript ci_scripts/prepare_local_lib.R
@@ -38,14 +38,14 @@ build-job:
 Check package:
   stage: test
   variables:
-    USE_CPB_LIB: "false"
+    USE_CPBLIB: "false"
   script:
     - R CMD check $BUILD_DIR/*.tar.gz
 
 Lint package:
   stage: test
   variables:
-    USE_CPB_LIB: "false"
+    USE_CPBLIB: "false"
   script:
     # Install the package in the local library
     - R CMD INSTALL $BUILD_DIR/*.tar.gz
@@ -54,7 +54,7 @@ Lint package:
 Test package in cpblib:
   stage: test_with_cpblib
   variables:
-    USE_CPB_LIB: "true"
+    USE_CPBLIB: "true"
   script:
     - Rscript test.R
   rules:
