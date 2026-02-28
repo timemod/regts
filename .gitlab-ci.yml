@@ -71,7 +71,7 @@ Test package in cpblib:
     - ls -l $R_LIBS_USER
     - Rscript_$R_PROD -e '
     pkgs <- dir(Sys.getenv("R_LIBS_USER"));
-    if (!identical(pkgs, "regts")) stop("Expected only regts, found: ", paste(pkgs, collapse=", "))
+    if (!identical(pkgs, "regts")) stop("Expected only regts")
   '
 
     # Now use cpblib to test regts
