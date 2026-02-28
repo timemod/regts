@@ -57,14 +57,15 @@ Lint package:
 Test package in cpblib:
   stage: test_with_cpblib
   variables:
-    USE_CPBLIB: "true"
     R_LIBS_USER: "$CI_PROJECT_DIR/regtslib"
+  before_script:
   script:
     - mkdir -p $R_LIBS_USER
-    - R_$R_PROD CMD INSTALL --preclean --clean -l "$R_LIBS_USER" $BUILD_DIR/*.tar.gz
-    - Rscript_$R_PROD -e "cat('library-paths:\n');print(.libPaths())"
+    # first install regts in regtslib with standard packages.
+    - USE_CPBLIB=false R_$R_PROD CMD INSTALL --preclean --clean -l "$R_LIBS_USER" $BUILD_DIR/*.tar.gz
+    - USE_CPBLIB=true Rscript_$R_PROD -e "cat('library-paths:\n');print(.libPaths())"
     - ls -l $R_LIBS_USER
-    - Rscript_$R_PROD -e "testthat::test_package('regts', stop_on_failure = TRUE)"
+    - USE_CPBLIB=true Rscript_$R_PROD -e "testthat::test_package('regts', stop_on_failure = TRUE)"
   rules:
     # Sometimes this check should be skipped (when Mimosigereedschap
     # needs versions of packages not in cpblib)
