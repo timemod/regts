@@ -65,7 +65,7 @@ Test package in cpblib:
 
     # First make sure that all required packages are need for this R-version,
     # this is required if R_PROD != R_DEV.
-    - Rscript_$R_PROD ci_scripts/prepare_local_lib.R
+    - USE_CPBLIB=false Rscript_$R_PROD ci_scripts/prepare_local_lib.R
     - mkdir -p $R_LIBS_USER
     - USE_CPBLIB=false R_$R_PROD CMD INSTALL --preclean --clean -l "$R_LIBS_USER" $BUILD_DIR/*.tar.gz
     - ls -l $R_LIBS_USER
