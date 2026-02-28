@@ -45,8 +45,8 @@ Suggests:
     tempdisagg,
     labelled,
     lubridate,
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
+    testthat
+Config/testthat/edition: 2
 LinkingTo: Rcpp
 VignetteBuilder: knitr
 Encoding: UTF-8
