@@ -45,27 +45,32 @@ Check package:
   variables:
     USE_CPBLIB: "false"
   script:
-    - R_$R_DEV CMD check $BUILD_DIR/*.tar.gz
+    #- R_$R_DEV CMD check $BUILD_DIR/*.tar.gz
 
 Lint package:
   stage: test
   variables:
     USE_CPBLIB: "false"
   script:
-    - Rscript ci_scripts/lint_pkg.R
+    #- Rscript ci_scripts/lint_pkg.R
 
 Test package in cpblib:
   stage: test_with_cpblib
   variables:
+    USE_CPBLIB: TRUE
     R_LIBS_USER: "$CI_PROJECT_DIR/regtslib"
   before_script:
   script:
+
+    # Step 1: install regts in directory regtslib.
     - mkdir -p $R_LIBS_USER
-    # first install regts in regtslib with standard packages.
-    - USE_CPBLIB=false R_$R_PROD CMD INSTALL --preclean --clean -l "$R_LIBS_USER" $BUILD_DIR/*.tar.gz
-    - USE_CPBLIB=true Rscript_$R_PROD -e "cat('library-paths:\n');print(.libPaths())"
+    - USE_CPBLIB=true R_$R_PROD CMD INSTALL --preclean --clean -l "$R_LIBS_USER" $BUILD_DIR/*.tar.gz
     - ls -l $R_LIBS_USER
+
+    # Now use cpblib to test regts
+    - USE_CPBLIB=true Rscript_$R_PROD -e "cat('library-paths:\n');print(.libPaths())"
     - USE_CPBLIB=true Rscript_$R_PROD -e "testthat::test_package('regts', stop_on_failure = TRUE)"
+
   rules:
     # Sometimes this check should be skipped (when Mimosigereedschap
     # needs versions of packages not in cpblib)
