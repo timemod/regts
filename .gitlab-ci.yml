@@ -76,7 +76,7 @@ Test package in cpblib:
     - export USE_CPBLIB=true
     - Rscript_$R_PROD -e 'pkgs <- dir(Sys.getenv("R_LIBS_USER")); print(pkgs); if (!identical(pkgs, "regts")) stop("Expected only regts")'
     - Rscript_$R_PROD -e "cat('library-paths:\n');print(.libPaths())"
-    - Rscript_$R_PROD -e "testthat::test_package('regts', stop_on_failure = TRUE)"
+    - Rscript_$R_PROD -e "testthat::test_package('regts', report = 'check', stop_on_failure = TRUE)"
 
   rules:
     # Sometimes this check should be skipped (when regts
