@@ -57,7 +57,7 @@ Lint package:
 Test package in cpblib:
   stage: test_with_cpblib
   variables:
-    R_LIBS_USER: "$CI_PROJECT_DIR/regtslib"
+    REGTS_LIB: "$CI_PROJECT_DIR/regtslib"
   before_script:
   script:
 
@@ -65,15 +65,18 @@ Test package in cpblib:
 
     # First make sure that all required packages are need for this R-version,
     # this is required if R_PROD != R_DEV.
-    - USE_CPBLIB=false Rscript_$R_PROD ci_scripts/prepare_local_lib.R
+    - export USE_CPBLIB=false
+    - Rscript_$R_PROD ci_scripts/prepare_local_lib.R
     - mkdir -p $R_LIBS_USER
-    - USE_CPBLIB=false R_$R_PROD CMD INSTALL --preclean --clean -l "$R_LIBS_USER" $BUILD_DIR/*.tar.gz
-    - ls -l $R_LIBS_USER
-    - Rscript_$R_PROD -e 'pkgs <- dir(Sys.getenv("R_LIBS_USER")); if (!identical(pkgs, "regts")) stop("Expected only regts")'
+    - R_$R_PROD CMD INSTALL --preclean --clean -l $REGTS_LIB $BUILD_DIR/*.tar.gz
+    - ls -l $REGTS_LIB
 
     # Now use cpblib to test regts
-    - USE_CPBLIB=true Rscript_$R_PROD -e "cat('library-paths:\n');print(.libPaths())"
-    - USE_CPBLIB=true Rscript_$R_PROD -e "testthat::test_package('regts', stop_on_failure = TRUE)"
+    - export R_LIBS_USER=$REGTS_LIB
+    - export USE_CPBLIB=true
+    - Rscript_$R_PROD -e 'pkgs <- dir(Sys.getenv("R_LIBS_USER")); print(pkgs); if (!identical(pkgs, "regts")) stop("Expected only regts")'
+    - Rscript_$R_PROD -e "cat('library-paths:\n');print(.libPaths())"
+    - Rscript_$R_PROD -e "testthat::test_package('regts', stop_on_failure = TRUE)"
 
   rules:
     # Sometimes this check should be skipped (when regts
