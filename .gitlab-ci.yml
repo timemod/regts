@@ -68,7 +68,7 @@ Test package in cpblib:
     - export USE_CPBLIB=false
     - Rscript_$R_PROD ci_scripts/prepare_local_lib.R
     - mkdir -p $REGTS_LIB
-    - R_$R_PROD CMD INSTALL --preclean --clean -l $REGTS_LIB $BUILD_DIR/*.tar.gz
+    - R_$R_PROD CMD INSTALL --preclean --clean --install-tests -l $REGTS_LIB $BUILD_DIR/*.tar.gz
     - ls -l $REGTS_LIB
 
     # Now use cpblib to test regts
