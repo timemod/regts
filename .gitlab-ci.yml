@@ -67,7 +67,7 @@ Test package in cpblib:
     # this is required if R_PROD != R_DEV.
     - export USE_CPBLIB=false
     - Rscript_$R_PROD ci_scripts/prepare_local_lib.R
-    - mkdir -p $R_LIBS_USER
+    - mkdir -p $REGTS_LIB
     - R_$R_PROD CMD INSTALL --preclean --clean -l $REGTS_LIB $BUILD_DIR/*.tar.gz
     - ls -l $REGTS_LIB
 
