@@ -46,13 +46,14 @@ Check package:
     USE_CPBLIB: "false"
   script:
     #- R_$R_DEV CMD check $BUILD_DIR/*.tar.gz
-
+    - echo "aap"
 Lint package:
   stage: test
   variables:
     USE_CPBLIB: "false"
   script:
     #- Rscript ci_scripts/lint_pkg.R
+    - echo "aap"
 
 Test package in cpblib:
   stage: test_with_cpblib
