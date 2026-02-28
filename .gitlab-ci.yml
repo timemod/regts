@@ -69,13 +69,15 @@ Test package in cpblib:
     - mkdir -p $R_LIBS_USER
     - USE_CPBLIB=false R_$R_PROD CMD INSTALL --preclean --clean -l "$R_LIBS_USER" $BUILD_DIR/*.tar.gz
     - ls -l $R_LIBS_USER
+    - test "$(ls -1 "$R_LIBS_USER")" = "regts" \
+        || { echo "ERROR: unexpected packages in R_LIBS_USER:"; ls -1 "$R_LIBS_USER"; exit 1; }
 
     # Now use cpblib to test regts
     - USE_CPBLIB=true Rscript_$R_PROD -e "cat('library-paths:\n');print(.libPaths())"
     - USE_CPBLIB=true Rscript_$R_PROD -e "testthat::test_package('regts', stop_on_failure = TRUE)"
 
   rules:
-    # Sometimes this check should be skipped (when Mimosigereedschap
+    # Sometimes this check should be skipped (when regts
     # needs versions of packages not in cpblib)
     - if: '$test_within_cpblib == "skip"'
       when: never
