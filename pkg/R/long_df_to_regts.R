@@ -51,11 +51,6 @@ long_df_to_regts <- function(df, name_col = "name",
 
   cnames <- colnames(df)
 
-  df <- df |>
-    rename(name = name_col,
-           period = period_col,
-           value = value_col)
-
   if (missing(label_col)) {
     # if label_col not specified and the default label column name does not
     # exist, then set label_col to NULL
