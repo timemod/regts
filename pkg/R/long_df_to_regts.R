@@ -15,13 +15,15 @@
 #'
 #' @param df A long data frame at least three columns with names specified
 #' with argument `name_col`, `period_col` and `value_col`.
-#' @param name_col The name of the column with variable names (by default `"name"`).
+#' @param name_col The name of the column with variable names (by default
+#' `"name"`).
 #' @param period_col The name of the column with periods. This columns
 #' should contain data of a type that can be converted to `period` objects
 #' by function \code{\link{period}}. The default is `"period"`.
 #' @param value_col The name of the column with values (default `"value"`).
 #' @param label_col The name of the column with labels (default `"label`").
-#' If not specified and a column named `"label"` exists, the texts in this column
+#' If not specified and a column named `"label"` exists, the texts in this
+#' column
 #' are used to create timeseries labels. Specify `NULL` if you do not want
 #' to use the labels in column `labels`.
 #' @param numeric If `TRUE`, the data in the column with values are converted
@@ -97,8 +99,9 @@ get_labels_from_long_df <- function(df, name_col, label_col) {
                                     collapse = ", "),
                      .groups = "drop")
   if (nrow(duplicates) > 0) {
-    warning_msg <- paste(
-      "Duplicate labels found for the following names (the first label is used):\n",
+    warning_msg <- paste0(
+      "Duplicate labels found for the following names (the first label is ",
+      "used):\n",
       paste0("  - ", duplicates$name, ": ",
              paste(duplicates$labels, collapse = "\n"))
     )

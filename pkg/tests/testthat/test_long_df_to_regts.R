@@ -4,7 +4,6 @@ library(dplyr)
 
 rm(list = ls())
 
-
 df <- tibble::tribble(
   ~name,  ~period,  ~value,  ~description,
   "a",    "2015Q3", 1.2,     "Var a",
@@ -23,7 +22,7 @@ ts_expected_lbls <- update_ts_labels(ts_expected,
 
 wmsg_dupl_labels <- paste(
   "Duplicate labels found for the following names (the first label is used):\n",
-  "  - b: 'Var b', 'Var b (2)'"
+  " - b: 'Var b', 'Var b (2)'"
 )
 
 test_that("basic example", {
