@@ -69,3 +69,65 @@ test_that("no observations", {
     fixed = TRUE
   )
 })
+
+test_that("column name errors", {
+
+  df_tmp <- df[, 2]
+  expect_error(
+    long_df_to_regts(df_tmp),
+    "The following columns do not exist: name, value",
+    fixed = TRUE
+  )
+
+  msg <- paste0(
+    "name_col, period_col, value_col and label_col should be distinct.\n",
+    "Duplicate column names: name"
+  )
+  expect_error(
+    long_df_to_regts(df, label_col = "name"),
+    msg,
+    fixed = TRUE
+  )
+
+  msg <- paste0(
+    "name_col, period_col, value_col and label_col should be distinct.\n",
+    "Duplicate column names: xxx"
+  )
+  expect_error(
+    long_df_to_regts(df, label_col = NULL, name_col = "xxx",
+                     period_col = "xxx", value_col = "xxx"),
+    msg,
+    fixed = TRUE
+  )
+
+  expect_error(
+    long_df_to_regts(df, label_col = NULL, name_col = "xxx",
+                     period_col = "yyy"),
+    "The following columns do not exist: xxx, yyy"
+  )
+})
+
+
+test_that("duplicate rows", {
+  df_tmp <- df
+  df_tmp$period <- "2015q1"
+  msg <- paste0("Duplicate rows found:\n",
+                "  - name: a, period: 2015q1\n",
+                "  - name: b, period: 2015q1\n",
+                "  - name: b, period: 2015q1")
+  expect_error(
+    long_df_to_regts(df_tmp),
+    msg,
+    fixed = TRUE
+  )
+})
+
+test_that("illegal period", {
+  df_tmp <- df
+  df_tmp$period <- paste0("X", df_tmp$period)
+  expect_error(
+    long_df_to_regts(df_tmp),
+    "Illegal period X2015Q3.",
+    fixed = TRUE
+  )
+})

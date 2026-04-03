@@ -53,6 +53,24 @@ long_df_to_regts <- function(df, name_col = "name",
 
   cnames <- colnames(df)
 
+  # Check if the specified column names are distinct
+  data_cols <- c(name_col, period_col, value_col)
+  all_cols <- data_cols
+  if (!is.null(label_col)) all_cols <- c(all_cols, label_col)
+  if (anyDuplicated(all_cols)) {
+    cols_dupl <- unique(all_cols[duplicated(all_cols)])
+    stop("name_col, period_col, value_col and label_col should be distinct.\n",
+         "Duplicate column names: ", paste(cols_dupl, collapse = ", "))
+  }
+
+  # Check if data columns exist
+  missing_cols <- setdiff(data_cols, cnames)
+  if (length(missing_cols) > 0) {
+    stop("The following columns do not exist: ",
+         paste(missing_cols, collapse = ", "))
+  }
+
+  # Now check the label column
   if (missing(label_col)) {
     # if label_col not specified and the default label column name does not
     # exist, then set label_col to NULL
@@ -62,7 +80,19 @@ long_df_to_regts <- function(df, name_col = "name",
   }
 
   df_data <- select(df, all_of(name_col), all_of(period_col),
-                    all_of(value_col)) |>
+                    all_of(value_col))
+
+  # Check that each name-period combination is unique.
+  df_names_periods <- select(df_data, all_of(name_col), all_of(period_col))
+  dupl <- df_names_periods[duplicated(df_names_periods), , drop = FALSE]
+  if (nrow(dupl) > 0) {
+    stop("Duplicate rows found:\n",
+         paste0("  - name: ", dupl[[name_col]], ", period: ",
+                dupl[[period_col]], collapse = "\n"))
+  }
+
+  # now convert to wide format
+  df_data <- df_data |>
     pivot_wider(names_from = all_of(name_col), values_from = all_of(value_col))
 
   ts_data <- as.regts.data.frame(df_data, time_column = period_col,
