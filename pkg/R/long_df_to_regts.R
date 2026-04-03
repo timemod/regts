@@ -1,4 +1,4 @@
-#' Converts a long data frame (or tibble) to a regts object.
+#' Converts a long data frame to a regts object.
 #'
 #' The data frame should have at least three columns: one column with
 #' the names of the timeseries, one column with periods and a third
@@ -13,8 +13,9 @@
 #' is ignored. If the data frame does contain a column `"label"` but you do not
 #' want to create labels specify `label_col = NULL`.
 #'
-#' @param df A long data frame at least three columns with names specified
-#' with argument `name_col`, `period_col` and `value_col`.
+#' @param df A long data frame (or \code{\link[tibble]{tibble}}) with at least
+#' three columns with names specified with arguments `name_col`, `period_col`
+#' and `value_col`.
 #' @param name_col The name of the column with variable names (by default
 #' `"name"`).
 #' @param period_col The name of the column with periods. This columns
@@ -23,11 +24,10 @@
 #' @param value_col The name of the column with values (default `"value"`).
 #' @param label_col The name of the column with labels (default `"label`").
 #' If not specified and a column named `"label"` exists, the texts in this
-#' column
-#' are used to create timeseries labels. Specify `NULL` if you do not want
-#' to use the labels in column `labels`.
-#' @param numeric If `TRUE`, the data in the column with values are converted
-#' to numeric data.
+#' column are used to create timeseries labels. Specify `NULL` if you do not
+#  want to use the labels in column `labels`.
+#' @param numeric A logical. If `TRUE` (the default), the data in the column
+#' with values are converted to numeric data.
 #'
 #' @returns A \code{regts} object
 #' @importFrom tidyr pivot_wider
@@ -39,10 +39,9 @@
 #' "a",    "2015Q3", 1.2 ,     "Var a",
 #' "a",    "2016Q1", 1.5 ,     "Var a",
 #' "b",    "2015Q3", 15 ,      "Var b",
-#' "b",    "2015Q4", 20,       "Var b",
-#' "b",    "2016Q1", NA_real_, "Var b (2)"
+#' "b",    "2015Q4", 20,       "Var b"
 #'  )
-#' ts <- long_df_to_regts(df, label_col = "description")
+#' long_df_to_regts(df, label_col = "description")
 long_df_to_regts <- function(df, name_col = "name",
                              period_col = "period",
                              value_col = "value",
@@ -91,7 +90,7 @@ long_df_to_regts <- function(df, name_col = "name",
                 dupl[[period_col]], collapse = "\n"))
   }
 
-  # now convert to wide format
+  # Now convert to wide format
   df_data <- df_data |>
     pivot_wider(names_from = all_of(name_col), values_from = all_of(value_col))
 
@@ -106,7 +105,7 @@ long_df_to_regts <- function(df, name_col = "name",
   return(ts_data)
 }
 
-#' Created a named character vector with labels from a long data frame.
+#' Create a named character vector with labels from a long data frame.
 #'
 #' If there are duplicate labels for a name, the first label is used.
 #' A warning is given for all duplicate labels.

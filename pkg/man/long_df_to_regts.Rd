@@ -2,16 +2,18 @@
 % Please edit documentation in R/long_df_to_regts.R
 \name{long_df_to_regts}
 \alias{long_df_to_regts}
-\title{Converts a long data frame (or tibble) to a regts object.}
+\title{Converts a long data frame to a regts object.}
 \usage{
 long_df_to_regts(df, name_col = "name", period_col = "period",
   value_col = "value", label_col = "label", numeric = TRUE)
 }
 \arguments{
-\item{df}{A long data frame at least three columns with names specified
-with argument \code{name_col}, \code{period_col} and \code{value_col}.}
+\item{df}{A long data frame (or \code{\link[tibble]{tibble}}) with at least
+three columns with names specified with arguments \code{name_col}, \code{period_col}
+and \code{value_col}.}
 
-\item{name_col}{The name of the column with variable names (by default \code{"name"}).}
+\item{name_col}{The name of the column with variable names (by default
+\code{"name"}).}
 
 \item{period_col}{The name of the column with periods. This columns
 should contain data of a type that can be converted to \code{period} objects
@@ -20,12 +22,11 @@ by function \code{\link{period}}. The default is \code{"period"}.}
 \item{value_col}{The name of the column with values (default \code{"value"}).}
 
 \item{label_col}{The name of the column with labels (default \verb{"label}").
-If not specified and a column named \code{"label"} exists, the texts in this column
-are used to create timeseries labels. Specify \code{NULL} if you do not want
-to use the labels in column \code{labels}.}
+If not specified and a column named \code{"label"} exists, the texts in this
+column are used to create timeseries labels. Specify \code{NULL} if you do not}
 
-\item{numeric}{If \code{TRUE}, the data in the column with values are converted
-to numeric data.}
+\item{numeric}{A logical. If \code{TRUE} (the default), the data in the column
+with values are converted to numeric data.}
 }
 \value{
 A \code{regts} object
@@ -50,8 +51,7 @@ df <- tibble::tribble(
 "a",    "2015Q3", 1.2 ,     "Var a",
 "a",    "2016Q1", 1.5 ,     "Var a",
 "b",    "2015Q3", 15 ,      "Var b",
-"b",    "2015Q4", 20,       "Var b",
-"b",    "2016Q1", NA_real_, "Var b (2)"
+"b",    "2015Q4", 20,       "Var b"
  )
-ts <- long_df_to_regts(df, label_col = "description")
+long_df_to_regts(df, label_col = "description")
 }

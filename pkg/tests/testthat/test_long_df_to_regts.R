@@ -131,3 +131,61 @@ test_that("illegal period", {
     fixed = TRUE
   )
 })
+
+test_that("character values", {
+
+  df_tmp <- df
+  df_tmp$value <- as.character(df$value)
+  expect_equal(
+    long_df_to_regts(df_tmp),
+    ts_expected
+  )
+
+  ts_expected_txt <- ts_expected
+  ts_expected_txt[] <- as.character(ts_expected_txt)
+  expect_equal(
+    long_df_to_regts(df_tmp, numeric = FALSE),
+    ts_expected_txt
+  )
+
+
+  df_tmp$value[5] <- "hello"
+  wmsg <- paste0(
+    "The following texts could not be converted to numeric:\n",
+    "\"hello\""
+  )
+  expect_warning(
+    expect_equal(
+      long_df_to_regts(df_tmp),
+      ts_expected
+    ),
+    wmsg,
+    fixed = TRUE
+  )
+
+  ts_expected_txt2 <- ts_expected_txt
+  ts_expected_txt2["2016Q1", "b"] <- "hello"
+  expect_warning(
+    expect_equal(
+      long_df_to_regts(df_tmp, numeric = FALSE),
+      ts_expected_txt2
+    ),
+    NA
+  )
+
+})
+
+test_that("NA values at beginning and end periods", {
+  df_tmp <- tibble::tribble(
+    ~name,  ~period,  ~value,   ~description,
+    "a",    "2015Q3", NA_real_,     "Var a",
+    "a",    "2016Q1", 1.5,           "Var a",
+    "b",    "2015Q4", 20,            "Var b",
+    "b",    "2016Q2", NA_real_,      "Var b"
+  )
+
+  expect_equal(
+    get_period_range(long_df_to_regts(df_tmp)),
+    period_range("2015Q3/2016Q2")
+  )
+})
