@@ -62,7 +62,7 @@ test_that("column 'label' in df", {
 })
 
 test_that("no observations", {
-  df_tmp <- filter(df, .data$name == "xxx")
+  df_tmp <- dplyr::filter(df, .data$name == "xxx")
   expect_error(
     long_df_to_regts(df_tmp),
     "'regts' object must have one or more observations",

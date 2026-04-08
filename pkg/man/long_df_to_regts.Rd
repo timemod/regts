@@ -15,35 +15,37 @@ and \code{value_col}.}
 \item{name_col}{The name of the column with variable names (by default
 \code{"name"}).}
 
-\item{period_col}{The name of the column with periods. This columns
+\item{period_col}{The name of the column with periods. This column
 should contain data of a type that can be converted to \code{period} objects
 by function \code{\link{period}}. The default is \code{"period"}.}
 
 \item{value_col}{The name of the column with values (default \code{"value"}).}
 
-\item{label_col}{The name of the column with labels (default \verb{"label}").
-If not specified and a column named \code{"label"} exists, the texts in this
-column are used to create timeseries labels. Specify \code{NULL} if you do not}
+\item{label_col}{The name of the column with labels (default \code{"label"}).
+If the column exists, labels are extracted from it. If the column does not
+exist and \code{label_col} was explicitly set, an error is thrown. If the column
+does not exist and the default was used, the result is
+returned without labels.
+Specify \code{NULL} if a column \code{"label"} exists but
+you want to ignore the labels.}
 
 \item{numeric}{A logical. If \code{TRUE} (the default), the data in the column
 with values are converted to numeric data.}
 }
 \value{
-A \code{regts} object
+A \code{\link{regts}} object.
 }
 \description{
-The data frame should have at least three columns: one column with
-the names of the timeseries, one column with periods and a third
+The data frame should have at least three columns: a column with
+the names of the timeseries, a column with periods and another
 column with the values. The names of these columns can be specified with
-argument \code{name_col}, \code{period_col} and \code{value_col}, respectively
+arguments \code{name_col}, \code{period_col} and \code{value_col}, respectively
 (the default column names are \code{"name"}, \code{"period"} and \code{"value"}).
-\cr
-Argument \code{label_col} can be used to specify the name of a column with
-labels (default \code{"label"}). If not specified, we function checks whether
-a column \code{"label"} exists. If this column exists, the labels are based on
-the data in this column. If the column does not exist, the label column
-is ignored. If the data frame does contain a column \code{"label"} but you do not
-want to create labels specify \code{label_col = NULL}.
+\cr \cr
+The data frame can optionally contain an additional column with labels. The name
+of this column can be specified with argument \code{label_col}. If this column
+exists, the resulting \code{regts} object is equipped with the labels from this
+column.
 }
 \examples{
 df <- tibble::tribble(
@@ -54,4 +56,7 @@ df <- tibble::tribble(
 "b",    "2015Q4", 20,       "Var b"
  )
 long_df_to_regts(df, label_col = "description")
+}
+\seealso{
+\code{\link{as_data_frame}}.
 }

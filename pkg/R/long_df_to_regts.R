@@ -1,37 +1,39 @@
 #' Converts a long data frame to a regts object.
 #'
-#' The data frame should have at least three columns: one column with
-#' the names of the timeseries, one column with periods and a third
+#' The data frame should have at least three columns: a column with
+#' the names of the timeseries, a column with periods and another
 #' column with the values. The names of these columns can be specified with
-#' argument `name_col`, `period_col` and `value_col`, respectively
+#' arguments `name_col`, `period_col` and `value_col`, respectively
 #' (the default column names are `"name"`, `"period"` and `"value"`).
-#' \cr
-#' Argument `label_col` can be used to specify the name of a column with
-#' labels (default `"label"`). If not specified, we function checks whether
-#' a column `"label"` exists. If this column exists, the labels are based on
-#' the data in this column. If the column does not exist, the label column
-#' is ignored. If the data frame does contain a column `"label"` but you do not
-#' want to create labels specify `label_col = NULL`.
+#' \cr \cr
+#' The data frame can optionally contain an additional column with labels. The name
+#' of this column can be specified with argument `label_col`. If this column
+#' exists, the resulting `regts` object is equipped with the labels from this
+#' column.
 #'
 #' @param df A long data frame (or \code{\link[tibble]{tibble}}) with at least
 #' three columns with names specified with arguments `name_col`, `period_col`
 #' and `value_col`.
 #' @param name_col The name of the column with variable names (by default
 #' `"name"`).
-#' @param period_col The name of the column with periods. This columns
+#' @param period_col The name of the column with periods. This column
 #' should contain data of a type that can be converted to `period` objects
 #' by function \code{\link{period}}. The default is `"period"`.
 #' @param value_col The name of the column with values (default `"value"`).
-#' @param label_col The name of the column with labels (default `"label`").
-#' If not specified and a column named `"label"` exists, the texts in this
-#' column are used to create timeseries labels. Specify `NULL` if you do not
-#  want to use the labels in column `labels`.
+#' @param label_col The name of the column with labels (default `"label"`).
+#' If the column exists, labels are extracted from it. If the column does not
+#' exist and `label_col` was explicitly set, an error is thrown. If the column
+#' does not exist and the default was used, the result is
+#' returned without labels.
+#' Specify `NULL` if a column `"label"` exists but
+#' you want to ignore the labels.
 #' @param numeric A logical. If `TRUE` (the default), the data in the column
 #' with values are converted to numeric data.
 #'
-#' @returns A \code{regts} object
+#' @returns A \code{\link{regts}} object.
 #' @importFrom tidyr pivot_wider
 #' @export
+#' @seealso \code{\link{as_data_frame}}.
 #'
 #' @examples
 #' df <- tibble::tribble(
