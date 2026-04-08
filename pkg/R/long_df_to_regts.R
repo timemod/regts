@@ -85,6 +85,7 @@ long_df_to_regts <- function(df, name_col = "name",
   df_names_periods <- select(df_data, all_of(name_col), all_of(period_col))
   dupl <- df_names_periods[duplicated(df_names_periods), , drop = FALSE]
   if (nrow(dupl) > 0) {
+    dupl <- dplyr::distinct(dupl)
     stop("Duplicate rows found:\n",
          paste0("  - name: ", dupl[[name_col]], ", period: ",
                 dupl[[period_col]], collapse = "\n"))

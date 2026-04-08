@@ -97,3 +97,6 @@ print(as_data_frame(ts))
 
 print(as_data_frame(ts, format = "long"))
 }
+\seealso{
+\code{\link{long_df_to_regts}}.
+}

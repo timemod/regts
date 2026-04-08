@@ -82,6 +82,7 @@ as_data_frame <- function(x, ...) {
 #' @importFrom tidyselect all_of everything
 #' @importFrom stats setNames
 #' @export
+#' @seealso \code{\link{long_df_to_regts}}.
 #' @examples
 #' library(regts)
 #' ts <- regts(matrix(1:4, ncol = 2) , start = "2015Q3", names = c("a", "b"),

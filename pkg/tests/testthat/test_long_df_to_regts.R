@@ -113,7 +113,6 @@ test_that("duplicate rows", {
   df_tmp$period <- "2015q1"
   msg <- paste0("Duplicate rows found:\n",
                 "  - name: a, period: 2015q1\n",
-                "  - name: b, period: 2015q1\n",
                 "  - name: b, period: 2015q1")
   expect_error(
     long_df_to_regts(df_tmp),
