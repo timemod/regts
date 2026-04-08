@@ -42,10 +42,10 @@ column with the values. The names of these columns can be specified with
 arguments \code{name_col}, \code{period_col} and \code{value_col}, respectively
 (the default column names are \code{"name"}, \code{"period"} and \code{"value"}).
 \cr \cr
-The data frame can optionally contain an additional column with labels. The name
-of this column can be specified with argument \code{label_col}. If this column
-exists, the resulting \code{regts} object is equipped with the labels from this
-column.
+The data frame can optionally contain an additional column with labels. The
+name of this column can be specified with argument \code{label_col}. If this
+column exists, the resulting \code{regts} object is equipped with the labels from
+this column.
 }
 \examples{
 df <- tibble::tribble(

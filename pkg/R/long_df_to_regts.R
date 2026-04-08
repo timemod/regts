@@ -6,10 +6,10 @@
 #' arguments `name_col`, `period_col` and `value_col`, respectively
 #' (the default column names are `"name"`, `"period"` and `"value"`).
 #' \cr \cr
-#' The data frame can optionally contain an additional column with labels. The name
-#' of this column can be specified with argument `label_col`. If this column
-#' exists, the resulting `regts` object is equipped with the labels from this
-#' column.
+#' The data frame can optionally contain an additional column with labels. The
+#' name of this column can be specified with argument `label_col`. If this
+#' column exists, the resulting `regts` object is equipped with the labels from
+#' this column.
 #'
 #' @param df A long data frame (or \code{\link[tibble]{tibble}}) with at least
 #' three columns with names specified with arguments `name_col`, `period_col`
