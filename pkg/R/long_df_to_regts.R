@@ -11,24 +11,22 @@
 #' column exists, the resulting `regts` object is equipped with the labels from
 #' this column.
 #'
-#' @param df A long data frame (or \code{\link[tibble]{tibble}}) with at least
-#' three columns with names specified for arguments `name_col`, `period_col`
+#' @param df A long data frame (or \code{\link[tibble]{tibble}}) with at
+#' least three columns containing names, periods and values. The names
+#' of these column can be specified with arguments `name_col`, `period_col`
 #' and `value_col`.
-#' @param name_col The name of the column with variable names.
-#' The default name for this column is (by default
-#' `"name"`).
+#' @param name_col The name of the column with variable names
+#' (by default `"name"`).
 #' @param period_col The name of the column with periods
 #' (by default `"period"`). This column
 #' should contain data of a type that can be converted to `period`
-#' objects by the function \code{\link{period}} .
+#' objects by the function \code{\link{period}}.
 #' @param value_col The name of the column with values (default `"value"`).
 #' @param label_col The name of the column with labels (default `"label"`).
 #' If the column exists, labels are extracted from it. If the column does not
 #' exist and `label_col` was explicitly set, an error is thrown. If the column
-#' does not exist and the default was used, the result is
-#' returned without labels.
-#' Specify `NULL` if a column `"label"` exists but
-#' you want to ignore the labels.
+#' does not exist and the default was used, the result is returned without labels.
+#' Specify `NULL` if a column `"label"` exists but you want to ignore the labels.
 #' @param numeric A logical. If `TRUE` (the default), the data in the column
 #' with values are converted to numeric data.
 #'
