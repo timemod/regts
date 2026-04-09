@@ -1,7 +1,6 @@
 #!/usr/bin/Rscript
 repo <- "https://cloud.r-project.org"
-if (!require(devtools)) {
-  install.packages("devtools", repos = repo)
+if (!require(pak)) {
+  install.packages("pak", repos = repo)
 }
-devtools::install_deps("pkg", dependencies = TRUE, upgrade = "never",
-                       repos = repo)
+pak::local_install_deps("pkg", upgrade = FALSE)

@@ -1,5 +1,3 @@
-# compiler flags for C++
-PKG_CXXFLAGS = `"$(R_HOME)/bin/Rscript" -e "Rcpp:::CxxFlags()"`
 
 # options for lex and yacc
 LEX_CMD = flex
