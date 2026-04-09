@@ -9,15 +9,17 @@ long_df_to_regts(df, name_col = "name", period_col = "period",
 }
 \arguments{
 \item{df}{A long data frame (or \code{\link[tibble]{tibble}}) with at least
-three columns with names specified with arguments \code{name_col}, \code{period_col}
+three columns with names specified for arguments \code{name_col}, \code{period_col}
 and \code{value_col}.}
 
-\item{name_col}{The name of the column with variable names (by default
+\item{name_col}{The name of the column with variable names.
+The default name for this column is (by default
 \code{"name"}).}
 
-\item{period_col}{The name of the column with periods. This column
-should contain data of a type that can be converted to \code{period} objects
-by function \code{\link{period}}. The default is \code{"period"}.}
+\item{period_col}{The name of the column with periods
+(by default \code{"period"}). This column
+should contain data of a type that can be converted to \code{period}
+objects by the function \code{\link{period}} .}
 
 \item{value_col}{The name of the column with values (default \code{"value"}).}
 

@@ -12,13 +12,15 @@
 #' this column.
 #'
 #' @param df A long data frame (or \code{\link[tibble]{tibble}}) with at least
-#' three columns with names specified with arguments `name_col`, `period_col`
+#' three columns with names specified for arguments `name_col`, `period_col`
 #' and `value_col`.
-#' @param name_col The name of the column with variable names (by default
+#' @param name_col The name of the column with variable names.
+#' The default name for this column is (by default
 #' `"name"`).
-#' @param period_col The name of the column with periods. This column
-#' should contain data of a type that can be converted to `period` objects
-#' by function \code{\link{period}}. The default is `"period"`.
+#' @param period_col The name of the column with periods
+#' (by default `"period"`). This column
+#' should contain data of a type that can be converted to `period`
+#' objects by the function \code{\link{period}} .
 #' @param value_col The name of the column with values (default `"value"`).
 #' @param label_col The name of the column with labels (default `"label"`).
 #' If the column exists, labels are extracted from it. If the column does not
