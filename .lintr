@@ -2,6 +2,5 @@ linters: linters_with_defaults(
     object_name_linter = NULL,
     commented_code_linter = NULL,
     trailing_whitespace_linter = NULL,
-    return_linter = NULL,
-    line_length_linter = line_length_linter(100)
+    return_linter = NULL
   )
