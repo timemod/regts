@@ -44,8 +44,7 @@ Suggests:
     tseries,
     tempdisagg,
     labelled,
-    lubridate,
-    devtools
+    lubridate
 Config/testthat/edition: 2
 LinkingTo: Rcpp
 VignetteBuilder: knitr

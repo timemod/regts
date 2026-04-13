@@ -11,7 +11,12 @@ if (!dir.exists(user_lib_dir)) {
   .libPaths(user_lib_dir)
 }
 
-if (!require(pak)) {
-  install.packages("pak")
+# install extra packages needed to install isismdl with the install script.
+extra_packages <- c("pak", "devtools", "lintr")
+for (extra_package in extra_packages) {
+  if (!require(extra_package, character.only = TRUE, quietly = TRUE)) {
+    install.packages(extra_package, repos = repo)
+  }
 }
+
 pak::local_install_dev_deps("pkg", upgrade = FALSE)
