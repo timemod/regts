@@ -1,4 +1,3 @@
-
 # options for lex and yacc
 LEX_CMD = flex
 YACC_CMD = bison
