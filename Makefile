@@ -21,7 +21,7 @@ PKGTAR=$(PKG)_$(shell grep Version $(PKGDIR)/DESCRIPTION  | cut -d " " -f 2).tar
 ifneq ($(OSTYPE), windows)
 CPP=$(shell R CMD config CXX)
 CPP_FLAGS=$(shell R CMD config --cppflags)
-PKG_CXXFLAGS = $(shell Rscript -e "Rcpp:::CxxFlags()")
+RCPP_INC = $(shell Rscript -e 'cat(system.file("include", package="Rcpp"))')
 endif
 
 help:
@@ -50,7 +50,7 @@ flags:
 ifneq ($(OSTYPE), windows)
 	@echo CPP=$(CPP)
 	@echo CPP_FLAGS=$(CPP_FLAGS)
-	@echo PKG_CXXFLAGS=$(PKG_CXXFLAGS)
+	@echo RCPP_INC=$(RCPP_INC)
 endif
 	@echo libPaths:
 	@R --no-save --quiet --slave -e '.libPaths()'
@@ -69,7 +69,7 @@ check: cleanx install_deps syntax
 
 syntax:
 ifneq ($(OSTYPE), windows)
-	$(CPP) $(CPP_FLAGS) $(PKG_CXXFLAGS) -c -fsyntax-only -Wall \
+	$(CPP) $(CPP_FLAGS) -I$(RCPP_INC) -c -fsyntax-only -Wall \
 		         -pedantic $(PKGDIR)/src/*.c*
 else
 	@echo Syntax checking not possible on Windows
