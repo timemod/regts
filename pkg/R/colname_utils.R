@@ -18,6 +18,7 @@
 #'   vector when only one column is selected. If no columns match, the result
 #'   always has `drop = FALSE`.
 #' @param names A character vector of exact column names to select or drop.
+#'   Duplicate names are silently removed.
 #' @param strict A logical: if `TRUE` (default), an error is raised when any
 #'   element of `names` is not present as a column name in `x`.
 #' @param ... Additional arguments passed to [base::grep].
@@ -82,6 +83,7 @@ select_cols_by_name <- function(x, names, strict = TRUE) {
   if (is.null(cnames)) {
     stop("No column names available. No selection possible")
   }
+  names <- unique(names)
   if (strict) {
     missing <- setdiff(names, cnames)
     if (length(missing) > 0) {
@@ -102,6 +104,7 @@ drop_cols_by_name <- function(x, names, strict = TRUE) {
   if (is.null(cnames)) {
     stop("No column names available. No selection possible")
   }
+  names <- unique(names)
   if (strict) {
     missing <- setdiff(names, cnames)
     if (length(missing) > 0) {

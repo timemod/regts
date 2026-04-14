@@ -27,7 +27,8 @@ always has \code{drop = FALSE}.}
 
 \item{...}{Additional arguments passed to \link[base:grep]{base::grep}.}
 
-\item{names}{A character vector of exact column names to select or drop.}
+\item{names}{A character vector of exact column names to select or drop.
+Duplicate names are silently removed.}
 
 \item{strict}{A logical: if \code{TRUE} (default), an error is raised when any
 element of \code{names} is not present as a column name in \code{x}.}
