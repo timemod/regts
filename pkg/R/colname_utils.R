@@ -1,17 +1,19 @@
 #' Select columns using a regular expression
 #'
-#' This function selects columns of an R object with column names
-#' (for example a \code{\link[base]{data.frame}}, \code{\link[base]{matrix}},
-#' \code{\link[stats]{ts}} or \code{\link{regts}}).
+#' This function selects columns of a  \code{\link{regts}} object,
+#' or any other R object with column names  (for example a
+#' \code{\link[base]{data.frame}}, \code{\link[base]{matrix}}).
 #' The columns with names matching a given regular expression are selected.
 #' This function employs base R function \code{\link{grep}}
-#' @param x an R object with column names (e.g. a \code{data.frame},
-#' \code{matrix}, \code{ts} or \code{regts})
-#' @param regex a regular expression used to select a column
-#' @param drop if \code{TRUE}, the result is coerced to a vector if possible
-#' @param ... arguments passed to function \code{\link{grep}}
-#' @return the column selection of object \code{x}
+#' @param x an R object with column names (e.g. a `regts`, `matrix` or
+#' `data.frame`.
+#' @param regex A regular expression used to select columns.
+#' @param drop A logical: if \code{TRUE}, the result is coerced to a vector if
+#' the result has a single column.
+#' @param ... arguments passed to function \code{\link{grep}}.
+#' @return The column selection of object \code{x}.
 #' @examples
+#'
 #' data <- regts(matrix(1:20, ncol = 4), start = "2010Q2",
 #'               names = c("nlc", "ukc", "nly", "uky"))
 #'
