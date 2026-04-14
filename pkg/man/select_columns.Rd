@@ -5,7 +5,7 @@
 \alias{drop_columns}
 \alias{select_cols_by_name}
 \alias{drop_cols_by_name}
-\title{Select or drop columns using a regular expression or exact names}
+\title{Select or drop columns by regex or name}
 \usage{
 select_columns(x, regex, drop = TRUE, ...)
 
@@ -16,63 +16,70 @@ select_cols_by_name(x, names, strict = TRUE)
 drop_cols_by_name(x, names, strict = TRUE)
 }
 \arguments{
-\item{x}{an R object with column names (e.g. a \code{regts}, \code{matrix} or
+\item{x}{An R object with column names (e.g. a \code{regts}, \code{matrix} or
 \code{data.frame}).}
 
-\item{regex}{A regular expression used to select or drop columns.}
+\item{regex}{A regular expression used to match column names.}
 
-\item{drop}{A logical: if \code{TRUE}, the result is coerced to a vector if
-the result has a single column. (Only relevant for \code{select_columns}.)}
+\item{drop}{A logical: if \code{TRUE} (default), the result is coerced to a
+vector when only one column is selected. If no columns match, the result
+always has \code{drop = FALSE}.}
 
-\item{...}{arguments passed to function \code{\link{grep}}.}
+\item{...}{Additional arguments passed to \link[base:grep]{base::grep}.}
 
 \item{names}{A character vector of exact column names to select or drop.}
 
-\item{strict}{A logical: if \code{TRUE} (the default), an error is raised
-when any element of \code{names} is not a column name of \code{x}.}
+\item{strict}{A logical: if \code{TRUE} (default), an error is raised when any
+element of \code{names} is not present as a column name in \code{x}.}
 }
 \value{
-The column selection (\code{select_columns}, \code{select_cols_by_name}) or
-the object with the specified columns removed
-(\code{drop_columns}, \code{drop_cols_by_name}).
+An object of the same type as \code{x} containing the selected columns
+(\code{select_columns}, \code{select_cols_by_name}), or \code{x} with the matched
+columns removed (\code{drop_columns}, \code{drop_cols_by_name}).
 }
 \description{
-\code{select_columns} selects the columns of a \code{\link{regts}} object,
-or any other R object with column names (for example a
-\code{\link[base]{data.frame}}, \code{\link[base]{matrix}}),
-whose names match a given regular expression.
+These functions select or remove columns from an R object with column names
+(such as a \link{regts}, \link[base:matrix]{base::matrix} or \link[base:data.frame]{base::data.frame}).
+Two approaches are supported: matching by regular expression
+(\code{select_columns}, \code{drop_columns}) and matching by exact name
+(\code{select_cols_by_name}, \code{drop_cols_by_name}).
 }
 \details{
-\code{drop_columns} does the opposite: it removes the columns whose names match
-the regular expression, keeping all non-matching columns.
-
-Both \code{select_columns} and \code{drop_columns} employ base R function
-\code{\link{grep}}.
-
-\code{select_cols_by_name} selects columns by exact name.
-
-\code{drop_cols_by_name} removes columns by exact name.
+The regex-based functions use \link[base:grep]{base::grep} internally, so any argument
+accepted by \link[base:grep]{base::grep} (e.g. \code{ignore.case}, \code{invert}) can be passed
+via \code{...}.
+The name-based functions return columns in the original column order of
+\code{x}, regardless of the order of the \code{names} argument.
 }
-\examples{
+\section{Functions}{
+\itemize{
+\item \code{select_columns()}: Select columns whose names match a regular
+expression.
 
+\item \code{drop_columns()}: Drop columns whose names match a regular
+expression.
+
+\item \code{select_cols_by_name()}: Select columns by exact name.
+
+\item \code{drop_cols_by_name()}: Drop columns by exact name.
+
+}}
+\examples{
 data <- regts(matrix(1:20, ncol = 4), start = "2010Q2",
               names = c("nlc", "ukc", "nly", "uky"))
 
-# select all columns with names starting with "nl"
-nl_data <- select_columns(data, "^nl")
+# Select all columns whose names start with "nl"
+select_columns(data, "^nl")
 
-# select all columns except column "nlc" (using invert)
-no_nlc <- select_columns(data, "^nlc$", invert = TRUE)
+# Select all columns except "nlc" (using grep's invert argument)
+select_columns(data, "^nlc$", invert = TRUE)
 
-# drop all columns with names starting with "nl"
-no_nl <- drop_columns(data, "^nl")
+# Drop all columns whose names start with "nl"
+drop_columns(data, "^nl")
 
-# drop only column "nlc"
-no_nlc2 <- drop_columns(data, "^nlc$")
+# Select columns "nlc" and "ukc" by exact name
+select_cols_by_name(data, c("nlc", "ukc"))
 
-# select columns "nlc" and "ukc" by exact name
-sel <- select_cols_by_name(data, c("nlc", "ukc"))
-
-# drop columns "nlc" and "ukc" by exact name
-dropped <- drop_cols_by_name(data, c("nlc", "ukc"))
+# Drop columns "nlc" and "ukc" by exact name
+drop_cols_by_name(data, c("nlc", "ukc"))
 }
