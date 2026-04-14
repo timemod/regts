@@ -9,15 +9,17 @@
 #' The regex-based functions use [base::grep] internally, so any argument
 #' accepted by [base::grep] (e.g. `ignore.case`, `invert`) can be passed
 #' via `...`.
-#' The name-based functions return columns in the original column order of
-#' `x`, regardless of the order of the `names` argument.
+#' The name-based functions return columns in the  order of
+#' the `names` argument.
 #' @param x An R object with column names (e.g. a `regts`, `matrix` or
 #'   `data.frame`).
 #' @param regex A regular expression used to match column names.
 #' @param drop A logical: if `TRUE` (default), the result is coerced to a
 #'   vector when only one column is selected. If no columns match, the result
-#'   always has `drop = FALSE`.
-#' @param names A character vector of exact column names to select or drop.
+#'   always has `drop = FALSE`. This argument is only available
+#'   for `select_columns`, for other functions the result is never coerced
+#'   to a vector.
+#' @param names A character vector of exact columns names to select or drop.
 #'   Duplicate names are silently removed.
 #' @param strict A logical: if `TRUE` (default), an error is raised when any
 #'   element of `names` is not present as a column name in `x`.
@@ -83,6 +85,12 @@ select_cols_by_name <- function(x, names, strict = TRUE) {
   if (is.null(cnames)) {
     stop("No column names available. No selection possible")
   }
+  if (anyDuplicated(cnames)) {
+    dupl <- cnames[duplicated(cnames)]
+    warning("Duplicate column names (",
+            paste(dupl, collapse = ", "),
+            "). The first column(s) will be selected.")
+  }
   names <- unique(names)
   if (strict) {
     missing <- setdiff(names, cnames)
@@ -93,7 +101,7 @@ select_cols_by_name <- function(x, names, strict = TRUE) {
       ))
     }
   }
-  sel <- intersect(cnames, names)
+  sel <- intersect(names, cnames)
   return(x[, sel, drop = FALSE])
 }
 

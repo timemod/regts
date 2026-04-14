@@ -97,24 +97,6 @@ test_that("select_columns, multivariate timseries", {
   )
 })
 
-test_that("select_columns, multivariate timseries with labels", {
-  df <- data.frame(
-    period = c("2015Q3", "2015Q4", "2016Q1"),
-    a = 1:3,
-    b = 10:12,
-    stringsAsFactors = FALSE
-  )
-  ts1 <- as.regts(df, time_column = 1)
-  ts_labels(ts1) <- paste("Var", c("a", "b"))
-
-  ts1_a <- select_columns(ts1, "a", drop = FALSE)
-  expect_identical(ts1_a, ts1[, "a", drop = FALSE])
-  expect_equal(ts_labels(ts1_a), c(a = "Var a"))
-
-  ts1_a <- select_columns(ts1, "a", drop = TRUE)
-  expect_identical(ts1_a, ts1$a)
-  expect_equal(ts_labels(ts1_a), "Var a")
-})
 
 test_that("drop_columns, multivariate timeseries", {
   df <- data.frame(
@@ -168,8 +150,8 @@ test_that("select_cols_by_name, basic selection", {
 
   # multiple columns: result follows column order in x, not names argument order
   expect_identical(
-    select_cols_by_name(ts1, c("b", "a")),
-    ts1[, c("a", "b"), drop = FALSE]
+    select_cols_by_name(ts1, c("b", "a", "a")),
+    ts1[, c("b", "a"), drop = FALSE]
   )
 
   # empty selection
@@ -212,7 +194,7 @@ test_that("drop_cols_by_name, basic dropping", {
 
   # drop multiple columns
   expect_identical(
-    drop_cols_by_name(ts1, c("a", "b")),
+    drop_cols_by_name(ts1, c("a", "b", "a")),
     ts1[, character(0), drop = FALSE]
   )
 
@@ -237,4 +219,64 @@ test_that("drop_cols_by_name, basic dropping", {
     drop_cols_by_name(ts2, "a"),
     "No column names available. No selection possible"
   )
+})
+
+test_that("timeseries wih duplicate column names", {
+
+  df <- data.frame(
+    period = c("2015Q3", "2015Q4", "2016Q1"),
+    a = 1:3,
+    b = 10:12,
+    stringsAsFactors = FALSE
+  )
+  ts1 <- as.regts(df, time_column = 1)
+  colnames(ts1) <- c("a", "a")
+
+  expect_equal(
+    select_columns(ts1, "a"),
+    ts1
+  )
+
+  expect_warning(
+    expect_equal(
+      select_cols_by_name(ts1, "a"),
+      ts1[, "a", drop = FALSE],
+    ),
+    "Duplicate column names (a). The first column(s) will be selected.",
+    fixed = TRUE
+  )
+
+  expect_equal(
+    drop_columns(ts1, "a"),
+    ts1[, character(0)]
+  )
+
+  expect_equal(
+    drop_cols_by_name(ts1, "a"),
+    ts1[, character(0)]
+  )
+})
+
+test_that("multivariate timseries with labels", {
+  df <- data.frame(
+    period = c("2015Q3", "2015Q4", "2016Q1"),
+    a = 1:3,
+    b = 10:12,
+    stringsAsFactors = FALSE
+  )
+  ts1 <- as.regts(df, time_column = 1)
+  ts_labels(ts1) <- paste("Var", c("a", "b"))
+
+  # Select columns ----
+
+  ts1_a <- select_columns(ts1, "a", drop = FALSE)
+  expect_identical(ts1_a, ts1[, "a", drop = FALSE])
+  expect_equal(ts_labels(ts1_a), c(a = "Var a"))
+  expect_equal(drop_columns(ts1, "b"), ts1_a)
+  expect_equal(select_cols_by_name(ts1, "a"), ts1_a)
+  expect_equal(drop_cols_by_name(ts1, "b"), ts1_a)
+
+  ts1_a <- select_columns(ts1, "a", drop = TRUE)
+  expect_identical(ts1_a, ts1$a)
+  expect_equal(ts_labels(ts1_a), "Var a")
 })

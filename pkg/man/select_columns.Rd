@@ -23,11 +23,13 @@ drop_cols_by_name(x, names, strict = TRUE)
 
 \item{drop}{A logical: if \code{TRUE} (default), the result is coerced to a
 vector when only one column is selected. If no columns match, the result
-always has \code{drop = FALSE}.}
+always has \code{drop = FALSE}. This argument is only available
+for \code{select_columns}, for other functions the result is never coerced
+to a vector.}
 
 \item{...}{Additional arguments passed to \link[base:grep]{base::grep}.}
 
-\item{names}{A character vector of exact column names to select or drop.
+\item{names}{A character vector of exact columns names to select or drop.
 Duplicate names are silently removed.}
 
 \item{strict}{A logical: if \code{TRUE} (default), an error is raised when any
@@ -49,8 +51,8 @@ Two approaches are supported: matching by regular expression
 The regex-based functions use \link[base:grep]{base::grep} internally, so any argument
 accepted by \link[base:grep]{base::grep} (e.g. \code{ignore.case}, \code{invert}) can be passed
 via \code{...}.
-The name-based functions return columns in the original column order of
-\code{x}, regardless of the order of the \code{names} argument.
+The name-based functions return columns in the  order of
+the \code{names} argument.
 }
 \section{Functions}{
 \itemize{
