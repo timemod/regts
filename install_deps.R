@@ -11,12 +11,16 @@ if (!dir.exists(user_lib_dir)) {
   .libPaths(user_lib_dir)
 }
 
-# install extra packages needed to install isismdl with the install script.
-extra_packages <- c("pak", "devtools", "lintr")
+if (!require("remotes", character.only = TRUE, quietly = TRUE)) {
+  install.packages("remotes", dependencies = FALSE)
+}
+
+# Install extra packages needed to install isismdl with the install script.
+extra_packages <- c("devtools", "tictoc")
 for (extra_package in extra_packages) {
   if (!require(extra_package, character.only = TRUE, quietly = TRUE)) {
-    install.packages(extra_package, repos = repo)
+    remotes::install_cran(extra_package, upgrade = "never")
   }
 }
 
-pak::local_install_dev_deps("pkg", upgrade = FALSE)
+remotes::install_deps("pkg", dependencies = TRUE, upgrade = "never")
