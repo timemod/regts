@@ -191,9 +191,26 @@ ats <- rts$a
 rts$d <- rts$c + 1
 ```
 
+### Functions `select_cols_by_name` and `drop_cols_by_name`
 
+The function `select_cols_by_name` provides an alternative method to select
+columns by name:
+```{r, results = 'hide'}
+select_cols_by_name(rts, c("a", "c"))  # equivalent to rts[, c("a", "b)]
+```
 
-### Selecting columns with a regular expression
+The advantage of using function is that you use it in a pipe:
+```{r, results = 'hide'}
+rts |>
+  select_cols_by_name(c("a", "c"))  
+```
+
+To remove specific columns use function `drop_col_by_name`:
+```{r}
+drop_cols_by_name(rts, c("c", "x"))  # remove columns c and x
+```
+
+### Selecting or dropping columns with a regular expression
 The `regts` package contains a function `select_columns` to select columns of 
 an R object with column names. Besides `regts` this can be a `matrix` or a 
 `data frame`. The columns with names matching a given regular expression are 
@@ -201,12 +218,17 @@ selected. A few examples:
 
 ```{r}
 rts <- regts(matrix(1:8, ncol = 4), start = "2016Q1", names = c("a1", "b1", "a2", "b2"))
-select_columns(rts, regex = "a.*")  # all columns with names starting with "a"
-select_columns(rts, regex = ".+1")  # all columns with names ending with 1
+select_columns(rts, regex = "^a.*")  # all columns with names starting with "a"
+select_columns(rts, regex = "1$")  # all columns with names ending with 1
 ```
 
-The syntax of `regular expression` patterns is described in the R Documentation.
+The syntax of regular expression patterns is described in the R Documentation.
 
+Function `drop_columns` can be used to remove columns based on a regular 
+expressions. Example:
+```{r}
+drop_columns(rts, "1$") # drop all columns with names ending with '1'.
+```
 
 ## Matrices with one column
 If a `regts` is created from a matrix with only one column, the timeseries is 
