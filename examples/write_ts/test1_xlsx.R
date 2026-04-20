@@ -10,4 +10,4 @@ ts_labels(x) <- c(
 )
 
 write_ts_xlsx(x, file = "test1.xlsx", sheet_name = "testje",
-              number_format = "#.00", max_col_width = 60)
+              number_format = "#.00", max_col_width = 60, verbose = TRUE)

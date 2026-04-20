@@ -41,7 +41,7 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
                          period_format = "regts", verbose = FALSE) {
 
   if (verbose) {
-    cat(sprintf("\nWriting timeseries to file %s ...\n", file))
+    message(sprintf("\nWriting timeseries to file %s ...", file))
     t_start <- Sys.time()
   }
 
@@ -60,9 +60,9 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
   if (verbose) {
     t_end <- Sys.time()
     secs <- t_end - t_start
-    cat(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
-                      "elapsed.\n\n"),
-                ncol(x), get_period_range(x), secs))
+    message(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
+                          "elapsed.\n"),
+                    ncol(x), get_period_range(x), secs))
   }
 
   return(invisible(NULL))
@@ -200,8 +200,8 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           verbose = FALSE) {
 
   if (verbose) {
-    cat(sprintf("\nWriting timeseries to sheet %s of file %s ...\n",
-                sheet_name, file))
+    message(sprintf("\nWriting timeseries to sheet %s of file %s ...",
+                    sheet_name, file))
     t_start <- Sys.time()
   }
 
@@ -265,9 +265,9 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   if (verbose) {
     t_end <- Sys.time()
     secs <- t_end - t_start
-    cat(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
-                      "elapsed.\n\n"),
-                ncol(x), get_period_range(x), secs))
+    message(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
+                          "elapsed.\n"),
+                    ncol(x), get_period_range(x), secs))
   }
 
   return(invisible(NULL))
@@ -282,7 +282,7 @@ write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
                            verbose = FALSE) {
 
   if (verbose) {
-    cat(sprintf(
+    message(sprintf(
       "\nWriting timeseries to sheet %s ...\n",
       sheet_name
     ))
@@ -322,9 +322,9 @@ write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
   if (verbose) {
     t_end <- Sys.time()
     secs <- t_end - t_start
-    cat(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
-                      "elapsed.\n\n"),
-                ncol(x), get_period_range(x), secs))
+    message(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
+                          "elapsed.\n"),
+                    ncol(x), get_period_range(x), secs))
   }
 
   invisible()
