@@ -8,7 +8,8 @@
 \usage{
 write_ts_xlsx(x, file, sheet_name = "Sheet1", rowwise = TRUE,
   append = FALSE, labels = c("after", "before", "no"), comments,
-  number_format, period_as_date = FALSE, verbose = FALSE)
+  number_format, period_as_date = FALSE, max_col_width = 60,
+  verbose = FALSE)
 
 write_ts_sheet(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
   labels = c("after", "before", "no"), comments, number_format,
@@ -47,6 +48,9 @@ in the \code{\link[openxlsx]{openxlsx}} package.}
 If \code{TRUE} the periods are written as date values to the Excel file.
 By default the periods are written as characters using the standard
 \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}).}
+
+\item{max_col_width}{integer (default 50). The column widths are
+adjusted automatically, but are never larger than the specified value.}
 
 \item{verbose}{A logical (default \code{FALSE}). If \code{TRUE}, the function
 prints the file and sheet name, the number of timeseries written, the period

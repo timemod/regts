@@ -169,8 +169,18 @@ test_that("ts with labels written correctly (3)",  {
 
   openxlsx::addWorksheet(wb, "dummy")
 
-  write_ts_sheet(ts1_lbls, wb, sheet_name = "ts1_t",  rowwise = FALSE,
-                 number_format = "#.000")
+  msg <- paste0(
+    "^\nWriting timeseries to sheet ts1_t ...\n",
+    ".*", # this is necessary when running via RStudio
+    "2 timeseries written, period range 2010Q2/2011Q2, 0\\.\\d{2} sec\\. ",
+    "elapsed\\.\\n$"
+  )
+  expect_output(
+    write_ts_sheet(ts1_lbls, wb, sheet_name = "ts1_t",  rowwise = FALSE,
+                   number_format = "#.000", verbose = TRUE),
+    msg
+  )
+
 
   openxlsx::saveWorkbook(wb, file, overwrite  = TRUE)
 
@@ -285,7 +295,8 @@ test_that("errors", {
   wmsg <- "cannot create file 'xxlsx/ts1_date.xlsx', reason 'No such file or directory'"
   emsg <-  "Failed to save workbook to file 'xxlsx/ts1_date.xlsx'\\. Check warnings\\."
 
-  withr::local_options(`openxlsx.minWidth` = 111)
+  withr::local_options(`openxlsx.minWidth` = 111,
+                       `openxlsx.maxWidth` = 120)
 
   expect_error(
     expect_warning(
@@ -296,4 +307,5 @@ test_that("errors", {
   )
 
   expect_equal(options("openxlsx.minWidth")[[1]], 111)
+  expect_equal(options("openxlsx.maxWidth")[[1]], 120)
 })

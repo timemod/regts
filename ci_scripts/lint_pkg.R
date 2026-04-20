@@ -24,7 +24,8 @@ linters_mut <- list(
   object_name_linter = NULL,
   cyclocomp_linter = NULL,
   commented_code_linter = NULL,
-  return_linter = NULL
+  return_linter = NULL,
+  line_length_linter = line_length_linter(100)
 )
 
 # Some linters may not be available for the specific version of lintr.

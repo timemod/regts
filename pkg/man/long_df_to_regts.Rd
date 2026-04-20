@@ -24,10 +24,11 @@ objects by the function \code{\link{period}}.}
 \item{value_col}{The name of the column with values (default \code{"value"}).}
 
 \item{label_col}{The name of the column with labels (default \code{"label"}).
-If the column exists, labels are extracted from it. If the column does not
-exist and \code{label_col} was explicitly set, an error is thrown. If the column
-does not exist and the default was used, the result is returned without labels.
-Specify \code{NULL} if a column \code{"label"} exists but you want to ignore the labels.}
+If the column exists, labels are extracted from it. If the column does
+not exist and \code{label_col} was explicitly set, an error is thrown.
+If the column does not exist and the default was used, the result
+is returned without labels. Specify \code{NULL} if a column \code{"label"}
+exists but you want to ignore the labels.}
 
 \item{numeric}{A logical. If \code{TRUE} (the default), the data in the column
 with values are converted to numeric data.}

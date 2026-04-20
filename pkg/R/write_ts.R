@@ -124,6 +124,8 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' @param comments a character vector or data frame. The comments
 #' are written to the beginning of the sheet, before the timeseries data is
 #' written.
+#' @param max_col_width integer (default 50). The column widths are
+#' adjusted automatically, but are never larger than the specified value.
 #' @param verbose A logical (default `FALSE`). If `TRUE`, the function
 #' prints the file and sheet name, the number of timeseries written, the period
 #' range, and the elapsed time.
@@ -194,6 +196,7 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           rowwise = TRUE, append = FALSE,
                           labels = c("after", "before", "no"), comments,
                           number_format, period_as_date = FALSE,
+                          max_col_width = 60,
                           verbose = FALSE) {
 
   if (verbose) {
@@ -229,8 +232,17 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   }
   addWorksheet(wb, sheetName = sheet_name, gridLines = TRUE)
 
-  write_ts_sheet_(x, wb, sheet_name, rowwise, labels, missing(labels),
-                  comments, number_format, period_as_date)
+  write_ts_sheet_(
+    x,
+    wb,
+    sheet = sheet_name,
+    rowwise = rowwise,
+    labels = labels,
+    labels_missing = missing(labels),
+    comments = comments,
+    number_format = number_format,
+    period_as_date = period_as_date
+  )
 
   if (append && sheet_exists) {
     # if the sheet already existed, then keep the original ordering
@@ -238,10 +250,12 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
     worksheetOrder(wb) <- order
   }
 
-  # Set the minimum column width.
-  min_width_old <- options("openxlsx.minWidth")[[1]]
-  options("openxlsx.minWidth" = 8.43)
-  on.exit(options("openxlsx.minWidth" = min_width_old))
+  # Set the minimum and maximum column width and restore them on exit.
+  # Use a fixed minimum column width of 8.43.
+  original_opts <- options("openxlsx.minWidth", "openxlsx.maxWidth")
+  on.exit(options(original_opts), add = TRUE)
+  options(openxlsx.minWidth = 8.43)
+  if (!is.na(max_col_width)) options(openxlsx.maxWidth = max_col_width)
 
   result <- saveWorkbook(wb, file, overwrite = TRUE, returnValue = TRUE)
   if (!isTRUE(result)) {
@@ -267,6 +281,14 @@ write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
                            number_format, period_as_date = FALSE,
                            verbose = FALSE) {
 
+  if (verbose) {
+    cat(sprintf(
+      "\nWriting timeseries to sheet %s ...\n",
+      sheet_name
+    ))
+    t_start <- Sys.time()
+  }
+
   sheet_exists <- sheet_name %in% names(wb)
 
   if (sheet_exists) {
@@ -279,20 +301,38 @@ write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
     x <- univec2unimat(x, deparse(substitute(x)))
   }
 
-  write_ts_sheet_(x, wb, sheet_name, rowwise, labels, missing(labels),
-                  comments, number_format, period_as_date)
+  write_ts_sheet_(
+    x,
+    wb,
+    sheet = sheet_name,
+    rowwise = rowwise,
+    labels = labels,
+    labels_missing = missing(labels),
+    comments = comments,
+    number_format = number_format,
+    period_as_date = period_as_date
+  )
 
   if (sheet_exists) {
     # if the sheet already existed, then keep the original ordering
     order <- match(sheetnames_old, names(wb))
     worksheetOrder(wb) <- order
   }
+
+  if (verbose) {
+    t_end <- Sys.time()
+    secs <- t_end - t_start
+    cat(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
+                      "elapsed.\n\n"),
+                ncol(x), get_period_range(x), secs))
+  }
+
+  invisible()
 }
 
 # internal function to write a timeseries object to a sheet of an Excel workbook
 write_ts_sheet_ <- function(x, wb, sheet, rowwise, labels, labels_missing,
                             comments, number_format, period_as_date) {
-
 
   # check for comments. The comments are actually written before the
   # autoSizeColumns() command has been executed.
