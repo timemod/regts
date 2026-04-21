@@ -97,6 +97,14 @@ workbook
 \code{Workbook} object
 
 }}
+\section{Warning}{
+
+When using \code{write_ts_xlsx} with \code{append = TRUE},
+formulas on existing sheets are \strong{not} reevaluated. The same applies when
+\code{write_ts_sheet} is used to add a sheet to an existing workbook.
+Open the file in Excel and press \code{F9} to recalculate all formulas manually.
+}
+
 \examples{
 # create a timeseries object
 ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
@@ -111,11 +119,11 @@ wb <- createWorkbook()
 write_ts_sheet(ts1, wb, "ts1", labels = "after")
 write_ts_sheet(ts1 * 100, wb, "ts1_times_100", labels = "after")
 
-# Set the minimum column width. saveWorkbook will adjust
+# Set the minimum and maximum column width. saveWorkbook will adjust
 # the column widths for the sheets written by write_ts_xlsx,
-# Setting a minimum column width prevents that some columns are very
-# narrow.
-options("openxlsx.minWidth" = 8.43)
+# Setting a minimum and maximum column width prevents that some columns are
+# very narrow or wide.
+options(openxlsx.minWidth = 8.43, openxlsx.maxWidth = 60)
 
 # Save the workbook with openxlsx::saveWorkbook. Function saveWorkbook
 # sometimes only gives a warning, and not an error, when something goes
