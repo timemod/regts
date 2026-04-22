@@ -2,13 +2,14 @@
 #'
 #' Write timeseries to a csv file, using [data.table::fwrite].
 #'
-#' @param x a [ts] or [regts] object.
-#' @param file a \code{regts} object
-#' @param rowwise a logical value: should the timeseries be written rowwise?
+#' @param x A [ts] or [regts] object.
+#' @param file A \code{regts} object
+#' @param rowwise A logical value: should the timeseries be written rowwise?
 #' @param sep The separator between columns. Default is ",".
 #' @param dec The decimal separator, by default ".". Cannot be the same as sep.
-#' @param labels should labels we written, and if so before the names or after
-#' the names? By default, labels are written after the names if present.
+#' @param labels Should labels be written? If so, should it be
+#' done before the names or after the names? By default,
+#' labels are written after the names if present.
 #' @param period_format The period format. By default the
 #' \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}) is used.
 #' Alternatively, it is possible to specify a format employed by base R function
@@ -74,7 +75,7 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' (depending on argument `append`) and writes the timeseries to
 #' a sheet with a specified name.
 #' `write_ts_sheet` writes timeseries to a sheet of a workbook
-#' object created with function [openxlsx::createWorkbook]
+#' object returned by function [openxlsx::createWorkbook]
 #' or [openxlsx::loadWorkbook] of package [openxlsx].
 #'
 #' The functions employ package [openxlsx] package for writing the Excel file.
@@ -97,21 +98,21 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' `write_ts_sheet` is used to add a sheet to an existing workbook.
 #' Open the file in Excel and press `F9` to recalculate all formulas manually.
 #'
-#' @param x a \code{\link{ts}} or \code{\link{regts}} object
-#' @param file the filename of the output file
-#' @param wb a \code{Workbook} object created with function
+#' @param x A \code{\link{ts}} or \code{\link{regts}} object
+#' @param file The filename of the output file
+#' @param wb A \code{Workbook} object created with function
 #' [openxlsx::createWorkbook] or [openxlsx::loadWorkbook].
-#' @param sheet_name the sheet name
+#' @param sheet_name The sheet name
 #' @param append If \code{FALSE} (the default), then the original file,
 #' if it exists, is replaced with the new file. All original data is lost.
 #' If \code{TRUE}, then only data on the sheet with
 #' the specified sheet name is erased and replaced with new data.  If the sheet
 #' does not yet exist, then a new sheet is created and appended to the
 #' original file.
-#' @param rowwise a logical value: should the timeseries be written rowwise?
-#' @param labels should labels be written, and if so before or after
+#' @param rowwise A logical value: should the timeseries be written rowwise?
+#' @param labels Should labels be written, and if so before or after
 #' the names? By default, labels are written after the names if present
-#' @param number_format a character value specifying the number format.
+#' @param number_format A character value specifying the number format.
 #' For example, \code{"#.00"} corresponds to two decimal spaces.
 #' For details see the description of the function
 #' [openxlsx::createStyle].
@@ -119,10 +120,10 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #' If \code{TRUE} the periods are written as date values to the Excel file.
 #' By default the periods are written as characters using the standard
 #' \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}).
-#' @param comments a character vector or data frame. The comments
+#' @param comments A character vector or data frame. The comments
 #' are written to the beginning of the sheet, before the timeseries data is
 #' written.
-#' @param max_col_width integer (default 50). The column widths are
+#' @param max_col_width Integer (default 50). The column widths are
 #' adjusted automatically, but are never larger than the specified value.
 #' @param verbose A logical (default `FALSE`). If `TRUE`, the function
 #' prints the file and sheet name, the number of timeseries written, the period
@@ -266,8 +267,8 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   return(invisible(NULL))
 }
 
-#' @describeIn write_ts_xlsx writes a timeseries to a workbook object created
-#' with [openxlsx::createWorkbook] or [openxlsx::loadWorkbook].
+#' @describeIn write_ts_xlsx writes a timeseries to a workbook object
+#' returned by [openxlsx::createWorkbook] or [openxlsx::loadWorkbook].
 #' @export
 write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
                            labels = c("after", "before", "no"), comments,

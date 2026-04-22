@@ -15,13 +15,13 @@ write_ts_sheet(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
   period_as_date = FALSE, verbose = FALSE)
 }
 \arguments{
-\item{x}{a \code{\link{ts}} or \code{\link{regts}} object}
+\item{x}{A \code{\link{ts}} or \code{\link{regts}} object}
 
-\item{file}{the filename of the output file}
+\item{file}{The filename of the output file}
 
-\item{sheet_name}{the sheet name}
+\item{sheet_name}{The sheet name}
 
-\item{rowwise}{a logical value: should the timeseries be written rowwise?}
+\item{rowwise}{A logical value: should the timeseries be written rowwise?}
 
 \item{append}{If \code{FALSE} (the default), then the original file,
 if it exists, is replaced with the new file. All original data is lost.
@@ -30,14 +30,14 @@ the specified sheet name is erased and replaced with new data.  If the sheet
 does not yet exist, then a new sheet is created and appended to the
 original file.}
 
-\item{labels}{should labels be written, and if so before or after
+\item{labels}{Should labels be written, and if so before or after
 the names? By default, labels are written after the names if present}
 
-\item{comments}{a character vector or data frame. The comments
+\item{comments}{A character vector or data frame. The comments
 are written to the beginning of the sheet, before the timeseries data is
 written.}
 
-\item{number_format}{a character value specifying the number format.
+\item{number_format}{A character value specifying the number format.
 For example, \code{"#.00"} corresponds to two decimal spaces.
 For details see the description of the function
 \link[openxlsx:createStyle]{openxlsx::createStyle}.}
@@ -47,14 +47,14 @@ If \code{TRUE} the periods are written as date values to the Excel file.
 By default the periods are written as characters using the standard
 \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}).}
 
-\item{max_col_width}{integer (default 50). The column widths are
+\item{max_col_width}{Integer (default 50). The column widths are
 adjusted automatically, but are never larger than the specified value.}
 
 \item{verbose}{A logical (default \code{FALSE}). If \code{TRUE}, the function
 prints the file and sheet name, the number of timeseries written, the period
 range, and the elapsed time.}
 
-\item{wb}{a \code{Workbook} object created with function
+\item{wb}{A \code{Workbook} object created with function
 \link[openxlsx:createWorkbook]{openxlsx::createWorkbook} or \link[openxlsx:loadWorkbook]{openxlsx::loadWorkbook}.}
 }
 \description{
@@ -62,7 +62,7 @@ range, and the elapsed time.}
 (depending on argument \code{append}) and writes the timeseries to
 a sheet with a specified name.
 \code{write_ts_sheet} writes timeseries to a sheet of a workbook
-object created with function \link[openxlsx:createWorkbook]{openxlsx::createWorkbook}
+object returned by function \link[openxlsx:createWorkbook]{openxlsx::createWorkbook}
 or \link[openxlsx:loadWorkbook]{openxlsx::loadWorkbook} of package \link[openxlsx:openxlsx]{openxlsx::openxlsx}.
 }
 \details{
@@ -84,8 +84,8 @@ as shown in the example below.
 \itemize{
 \item \code{write_ts_xlsx()}: writes timeseries to an Excel workbook file.
 
-\item \code{write_ts_sheet()}: writes a timeseries to a workbook object created
-with \link[openxlsx:createWorkbook]{openxlsx::createWorkbook} or \link[openxlsx:loadWorkbook]{openxlsx::loadWorkbook}.
+\item \code{write_ts_sheet()}: writes a timeseries to a workbook object
+returned by \link[openxlsx:createWorkbook]{openxlsx::createWorkbook} or \link[openxlsx:loadWorkbook]{openxlsx::loadWorkbook}.
 
 }}
 \section{Warning}{
