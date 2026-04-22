@@ -21,15 +21,15 @@ drop_cols_by_name(x, names, strict = TRUE)
 
 \item{regex}{A regular expression used to match column names.}
 
-\item{drop}{A logical: if \code{TRUE} (default), the result is coerced to a
-vector when only one column is selected. If no columns match, the result
-is never coerced to a vector, but to an object with zero columns.
-for \code{select_columns}, for other functions the result is never coerced
-to a vector.}
+\item{drop}{A logical. If \code{TRUE} (default), the result is simplified to a
+vector if only one column is selected. If \code{FALSE}, the original structure
+(e.g., matrix or data frame) is always preserved. If no columns match,
+the result is always an object with zero columns, regardless of the \code{drop}
+setting. This argument only applies to \code{select_columns}.}
 
 \item{...}{Additional arguments passed to \link[base:grep]{base::grep}.}
 
-\item{names}{A character vector of exact columns names to select or drop.
+\item{names}{A character vector of exact column names to select or drop.
 Duplicate names are silently removed.}
 
 \item{strict}{A logical: if \code{TRUE} (default), an error is raised when any
@@ -39,9 +39,8 @@ element of \code{names} is not present as a column name in \code{x}.}
 An object of the same type as \code{x} containing the selected columns
 (\code{select_columns}, \code{select_cols_by_name}), or \code{x} with the matched
 columns removed (\code{drop_columns}, \code{drop_cols_by_name}).
-If \code{select_columns} was used with \code{drop = TRUE} and a single columns
-was selected, the result may be a different class than \code{x}, for
-example a \code{numeric} when \code{x}.
+If \code{select_columns} is used with \code{drop = TRUE} and a single column
+is selected, the result is simplified to a vector.
 }
 \description{
 These functions select or remove columns from an R object with column names

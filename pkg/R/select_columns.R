@@ -14,13 +14,12 @@
 #' @param x An R object with column names (e.g. a `regts`, `matrix` or
 #'   `data.frame`).
 #' @param regex A regular expression used to match column names.
-#' @param drop A logical: if `TRUE` (default), the result is coerced to a
-#'   vector when only one column is selected. If no columns match, the result
-#'   is never coerced to a vector, but to an object with zero columns.
-#    This argument is only available
-#'   for `select_columns`, for other functions the result is never coerced
-#'   to a vector.
-#' @param names A character vector of exact columns names to select or drop.
+#' @param drop A logical. If `TRUE` (default), the result is simplified to a
+#'   vector if only one column is selected. If `FALSE`, the original structure
+#'   (e.g., matrix or data frame) is always preserved. If no columns match,
+#'   the result is always an object with zero columns, regardless of the `drop`
+#'   setting. This argument only applies to `select_columns`.
+#' @param names A character vector of exact column names to select or drop.
 #'   Duplicate names are silently removed.
 #' @param strict A logical: if `TRUE` (default), an error is raised when any
 #'   element of `names` is not present as a column name in `x`.
@@ -28,9 +27,8 @@
 #' @return An object of the same type as `x` containing the selected columns
 #'   (`select_columns`, `select_cols_by_name`), or `x` with the matched
 #'   columns removed (`drop_columns`, `drop_cols_by_name`).
-#'   If `select_columns` was used with `drop = TRUE` and a single columns
-#'   was selected, the result may be a different class than `x`, for
-#'   example a `numeric` when `x`.
+#'   If `select_columns` is used with `drop = TRUE` and a single column
+#'   is selected, the result is simplified to a vector.
 #' @examples
 #' data <- regts(matrix(1:20, ncol = 4), start = "2010Q2",
 #'               names = c("nlc", "ukc", "nly", "uky"))
