@@ -1,15 +1,15 @@
 #' Write timeseries to a csv file
 #'
-#' This function writes timeseries to a csv file.
-#' The csv file is actually written by function
-#' \code{\link[data.table]{fwrite}} of package \code{data.table}.
-#' @param x a \code{\link{ts}} or \code{\link{regts}} object
-#' @param file a \code{regts} object
-#' @param rowwise a logical value: should the timeseries be written rowwise?
+#' Write timeseries to a csv file, using [data.table::fwrite].
+#'
+#' @param x A [ts] or [regts] object.
+#' @param file A \code{regts} object
+#' @param rowwise A logical value: should the timeseries be written rowwise?
 #' @param sep The separator between columns. Default is ",".
 #' @param dec The decimal separator, by default ".". Cannot be the same as sep.
-#' @param labels should labels we written, and if so before the names or after
-#' the names? By default, labels are written after the names if present.
+#' @param labels Should labels be written? If so, should it be
+#' done before the names or after the names? By default,
+#' labels are written after the names if present.
 #' @param period_format The period format. By default the
 #' \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}) is used.
 #' Alternatively, it is possible to specify a format employed by base R function
@@ -34,14 +34,14 @@
 #'    unlink("ts1.csv")
 #'    unlink("ts1_2.csv")
 #' }
-#' @seealso \code{\link{read_ts_csv}} and \code{\link{write_ts_xlsx}}
+#' @seealso [read_ts_csv] and [write_ts_xlsx].
 #' @export
 write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
                          labels = c("after", "before", "no"),
                          period_format = "regts", verbose = FALSE) {
 
   if (verbose) {
-    cat(sprintf("\nWriting timeseries to file %s ...\n", file))
+    message(sprintf("\nWriting timeseries to file %s ...", file))
     t_start <- Sys.time()
   }
 
@@ -60,102 +60,99 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
   if (verbose) {
     t_end <- Sys.time()
     secs <- t_end - t_start
-    cat(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
-                      "elapsed.\n\n"),
-                ncol(x), get_period_range(x), secs))
+    message(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
+                          "elapsed.\n"),
+                    ncol(x), get_period_range(x), secs))
   }
 
   return(invisible(NULL))
 }
 
 
-#' Functions for writing timeseries to an xlsx file.
+#' Write timeseries to an xlsx file.
 #'
-#' These functions can be used to write timeseries to a sheet of an
-#' xlsx file. \code{write_ts_xlsx} creates or opens an Excel workbook
-#' (depending on argument \code{append}) and writes the timeseries to
+#' `write_ts_xlsx` creates or opens an Excel workbook
+#' (depending on argument `append`) and writes the timeseries to
 #' a sheet with a specified name.
-#' \code{write_ts_sheet} writes timeseries to a sheet of a \code{Workbook}
-#' object created with function \code{\link[openxlsx]{createWorkbook}}
-#' or \code{\link[openxlsx]{loadWorkbook}}
-#' of package \code{\link[openxlsx]{openxlsx}}.
+#' `write_ts_sheet` writes timeseries to a sheet of a workbook
+#' object returned by function [openxlsx::createWorkbook]
+#' or [openxlsx::loadWorkbook] of package [openxlsx].
 #'
-#' The functions employ package
-#' \code{\link[openxlsx]{openxlsx}}
-#' package for writing the Excel file.
+#' The functions employ package [openxlsx] package for writing the Excel file.
 #'
 #' If you want to write multiple timeseries objects to different
 #' sheets, you can use \code{write_ts_xlsx} with argument
 #' \code{append = TRUE}. Alternatively,
-#' you can create a \code{Workbook} object with
-#' function \code{\link[openxlsx]{createWorkbook}} of package
-#' \code{openxlsx} and then add a sheet with \code{write_ts_sheet}.
+#' you can create a workbook object with
+#' function [openxlsx::createWorkbook] of package
+#' [openxlsx] and then add a sheet with \code{write_ts_sheet}.
 #' The latter approach is more efficient.
 #' When the workbook is written to a file with function
-#'  \code{\link[openxlsx]{saveWorkbook}}, it is often useful to
-#' set the minimum column width option for package \code{openxlsx},
+#' [openxlsx::saveWorkbook], it is often useful to
+#' set the minimum and maximum scolumn width option for package [openxlsx],
 #' as shown in the example below.
 #'
-#' @param x a \code{\link{ts}} or \code{\link{regts}} object
-#' @param file the filename of the output file
-#' @param wb a \code{Workbook} object created with function
-#' \code{\link[openxlsx]{createWorkbook}} or
-#' \code{\link[openxlsx]{loadWorkbook}}
-#' of package \code{\link[openxlsx]{openxlsx}}
-#' @param sheet_name the sheet name
+#' @section Warning:
+#' When using `write_ts_xlsx` with `append = TRUE`,
+#' formulas on existing sheets are **not** reevaluated. The same applies when
+#' `write_ts_sheet` is used to add a sheet to an existing workbook.
+#' Open the file in Excel and press `F9` to recalculate all formulas manually.
+#'
+#' @param x A \code{\link{ts}} or \code{\link{regts}} object
+#' @param file The filename of the output file
+#' @param wb A \code{Workbook} object created with function
+#' [openxlsx::createWorkbook] or [openxlsx::loadWorkbook].
+#' @param sheet_name The sheet name
 #' @param append If \code{FALSE} (the default), then the original file,
 #' if it exists, is replaced with the new file. All original data is lost.
 #' If \code{TRUE}, then only data on the sheet with
 #' the specified sheet name is erased and replaced with new data.  If the sheet
 #' does not yet exist, then a new sheet is created and appended to the
 #' original file.
-#' @param rowwise a logical value: should the timeseries be written rowwise?
-#' @param labels should labels be written, and if so before or after
+#' @param rowwise A logical value: should the timeseries be written rowwise?
+#' @param labels Should labels be written, and if so before or after
 #' the names? By default, labels are written after the names if present
-#' @param number_format a character value specifying the number format.
+#' @param number_format A character value specifying the number format.
 #' For example, \code{"#.00"} corresponds to two decimal spaces.
 #' For details see the description of the function
-#' \code{\link[openxlsx]{createStyle}}
-#' in the \code{\link[openxlsx]{openxlsx}} package.
+#' [openxlsx::createStyle].
 #' @param period_as_date A logical (default \code{FALSE}).
 #' If \code{TRUE} the periods are written as date values to the Excel file.
 #' By default the periods are written as characters using the standard
 #' \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}).
-#' @param comments a character vector or data frame. The comments
+#' @param comments A character vector or data frame. The comments
 #' are written to the beginning of the sheet, before the timeseries data is
 #' written.
+#' @param max_col_width Integer (default 50). The column widths are
+#' adjusted automatically, but are never larger than the specified value.
 #' @param verbose A logical (default `FALSE`). If `TRUE`, the function
 #' prints the file and sheet name, the number of timeseries written, the period
 #' range, and the elapsed time.
-#' @name write_ts_xlsx/write_ts_sheet
+#' @name write_ts_xlsx
 #' @examples
 #' # create a timeseries object
 #' ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
 #'              labels = c("Timeseries a", "Timeseries b"), start = "2017Q2")
 #'
 #' # write timeseries ts1 to an Excel file
-#' write_ts_xlsx(ts1, file = "ts1.xlsx", sheet_name = "ts1", labels = "after")
+#' write_ts_xlsx(ts1, file = "ts1.xlsx", sheet_name = "ts1", labels = "after",
+#'               verbose = TRUE)
 #'
 #' # write two sheets using write_ts_sheet
 #' library(openxlsx)
 #' wb <- createWorkbook()
 #' write_ts_sheet(ts1, wb, "ts1", labels = "after")
-#' write_ts_sheet(ts1 * 100, wb, "ts1_times_100", labels = "after")
+#' write_ts_sheet(ts1 * 100, wb, "ts1_times_100", labels = "after",
+#'                verbose = TRUE)
 #'
-#' # Set the minimum column width. saveWorkbook will adjust
-#' # the column widths for the sheets written by write_ts_xlsx,
-#' # Setting a minimum column width prevents that some columns are very
-#' # narrow.
-#' options("openxlsx.minWidth" = 8.43)
+#' # Set the minimum and maximum column width, to prevent very narrow or wide
+#' # columns. saveWorkbook will adjust the widths of the columns written by
+#' # write_ts_sheet.
+#' options(openxlsx.minWidth = 8.43, openxlsx.maxWidth = 60)
 #'
-#' # Save the workbook with openxlsx::saveWorkbook. Function saveWorkbook
-#' # sometimes only gives a warning, and not an error, when something goes
-#' # wrong, for example if the file is not writable.
-#' # However, if argument returnValue = TRUE, saveWorkbook returns TRUE in case
-#' # of success and else FALSE. The recommended way to save the workbook is
-#' # therefore something like the following code:
-#' output_file <- "timeseries.xlsx"
-#' ok <- saveWorkbook(wb, output_file, overwrite = TRUE, returnValue = TRUE)
+#' # Save the workbook with openxlsx::saveWorkbook.
+#' ok <- saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE,
+#'                    returnValue = TRUE)
 #' if (!ok) {
 #'   stop("Failed to save workbook to file '", output_file,
 #'        "'. Check warnings.")
@@ -171,11 +168,10 @@ write_ts_csv <- function(x, file, rowwise = TRUE, sep = ",", dec = ".",
 #'    unlink("timeseries.xlsx")
 #'    unlink("ts_comments.xlsx")
 #' }
-#' @seealso \code{\link{read_ts_xlsx}} and \code{\link{write_ts_csv}}
+#' @seealso [read_ts_xlsx] and [write_ts_csv].
 NULL
 
-#' @describeIn write_ts_xlsx-slash-write_ts_sheet writes timeseries to an Excel
-#' workbook
+#' @describeIn write_ts_xlsx writes timeseries to an Excel workbook file.
 #' @importFrom openxlsx createWorkbook
 #' @importFrom openxlsx loadWorkbook
 #' @importFrom openxlsx saveWorkbook
@@ -194,11 +190,12 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
                           rowwise = TRUE, append = FALSE,
                           labels = c("after", "before", "no"), comments,
                           number_format, period_as_date = FALSE,
+                          max_col_width = 60,
                           verbose = FALSE) {
 
   if (verbose) {
-    cat(sprintf("\nWriting timeseries to sheet %s of file %s ...\n",
-                sheet_name, file))
+    message(sprintf("\nWriting timeseries to sheet %s of file %s ...",
+                    sheet_name, file))
     t_start <- Sys.time()
   }
 
@@ -229,8 +226,17 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   }
   addWorksheet(wb, sheetName = sheet_name, gridLines = TRUE)
 
-  write_ts_sheet_(x, wb, sheet_name, rowwise, labels, missing(labels),
-                  comments, number_format, period_as_date)
+  write_ts_sheet_(
+    x,
+    wb,
+    sheet = sheet_name,
+    rowwise = rowwise,
+    labels = labels,
+    labels_missing = missing(labels),
+    comments = comments,
+    number_format = number_format,
+    period_as_date = period_as_date
+  )
 
   if (append && sheet_exists) {
     # if the sheet already existed, then keep the original ordering
@@ -238,10 +244,12 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
     worksheetOrder(wb) <- order
   }
 
-  # Set the minimum column width.
-  min_width_old <- options("openxlsx.minWidth")[[1]]
-  options("openxlsx.minWidth" = 8.43)
-  on.exit(options("openxlsx.minWidth" = min_width_old))
+  # Set the minimum and maximum column width and restore them on exit.
+  # Use a fixed minimum column width of 8.43.
+  original_opts <- options("openxlsx.minWidth", "openxlsx.maxWidth")
+  on.exit(options(original_opts), add = TRUE)
+  options(openxlsx.minWidth = 8.43)
+  if (!is.na(max_col_width)) options(openxlsx.maxWidth = max_col_width)
 
   result <- saveWorkbook(wb, file, overwrite = TRUE, returnValue = TRUE)
   if (!isTRUE(result)) {
@@ -251,21 +259,29 @@ write_ts_xlsx <- function(x, file, sheet_name = "Sheet1",
   if (verbose) {
     t_end <- Sys.time()
     secs <- t_end - t_start
-    cat(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
-                      "elapsed.\n\n"),
-                ncol(x), get_period_range(x), secs))
+    message(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
+                          "elapsed.\n"),
+                    ncol(x), get_period_range(x), secs))
   }
 
   return(invisible(NULL))
 }
 
-#' @describeIn write_ts_xlsx-slash-write_ts_sheet writes a timeseries to a
-#' \code{Workbook} object
+#' @describeIn write_ts_xlsx writes a timeseries to a workbook object
+#' returned by [openxlsx::createWorkbook] or [openxlsx::loadWorkbook].
 #' @export
 write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
                            labels = c("after", "before", "no"), comments,
                            number_format, period_as_date = FALSE,
                            verbose = FALSE) {
+
+  if (verbose) {
+    message(sprintf(
+      "\nWriting timeseries to sheet %s ...\n",
+      sheet_name
+    ))
+    t_start <- Sys.time()
+  }
 
   sheet_exists <- sheet_name %in% names(wb)
 
@@ -279,20 +295,38 @@ write_ts_sheet <- function(x, wb, sheet_name = "Sheet1", rowwise = TRUE,
     x <- univec2unimat(x, deparse(substitute(x)))
   }
 
-  write_ts_sheet_(x, wb, sheet_name, rowwise, labels, missing(labels),
-                  comments, number_format, period_as_date)
+  write_ts_sheet_(
+    x,
+    wb,
+    sheet = sheet_name,
+    rowwise = rowwise,
+    labels = labels,
+    labels_missing = missing(labels),
+    comments = comments,
+    number_format = number_format,
+    period_as_date = period_as_date
+  )
 
   if (sheet_exists) {
     # if the sheet already existed, then keep the original ordering
     order <- match(sheetnames_old, names(wb))
     worksheetOrder(wb) <- order
   }
+
+  if (verbose) {
+    t_end <- Sys.time()
+    secs <- t_end - t_start
+    message(sprintf(paste("%d timeseries written, period range %s, %.2f sec.",
+                          "elapsed.\n"),
+                    ncol(x), get_period_range(x), secs))
+  }
+
+  invisible()
 }
 
 # internal function to write a timeseries object to a sheet of an Excel workbook
 write_ts_sheet_ <- function(x, wb, sheet, rowwise, labels, labels_missing,
                             comments, number_format, period_as_date) {
-
 
   # check for comments. The comments are actually written before the
   # autoSizeColumns() command has been executed.

@@ -9,18 +9,19 @@ write_ts_csv(x, file, rowwise = TRUE, sep = ",", dec = ".",
   verbose = FALSE)
 }
 \arguments{
-\item{x}{a \code{\link{ts}} or \code{\link{regts}} object}
+\item{x}{A \link{ts} or \link{regts} object.}
 
-\item{file}{a \code{regts} object}
+\item{file}{A \code{regts} object}
 
-\item{rowwise}{a logical value: should the timeseries be written rowwise?}
+\item{rowwise}{A logical value: should the timeseries be written rowwise?}
 
 \item{sep}{The separator between columns. Default is ",".}
 
 \item{dec}{The decimal separator, by default ".". Cannot be the same as sep.}
 
-\item{labels}{should labels we written, and if so before the names or after
-the names? By default, labels are written after the names if present.}
+\item{labels}{Should labels be written? If so, should it be
+done before the names or after the names? By default,
+labels are written after the names if present.}
 
 \item{period_format}{The period format. By default the
 \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}) is used.
@@ -32,9 +33,7 @@ prints the filename, the number of timeseries written, the period range, and
 the elapsed time.}
 }
 \description{
-This function writes timeseries to a csv file.
-The csv file is actually written by function
-\code{\link[data.table]{fwrite}} of package \code{data.table}.
+Write timeseries to a csv file, using \link[data.table:fwrite]{data.table::fwrite}.
 }
 \examples{
 # create a timeseries object
@@ -53,5 +52,5 @@ write_ts_csv(ts1, file = "ts1_2.csv", rowwise = FALSE,
 }
 }
 \seealso{
-\code{\link{read_ts_csv}} and \code{\link{write_ts_xlsx}}
+\link{read_ts_csv} and \link{write_ts_xlsx}.
 }

@@ -1,7 +1,6 @@
 library(regts)
 library(testthat)
 
-
 if (!dir.exists("xlsx")) {
   # this could is needed if we run the test with Travis CI,
   # even though xlsx/.gitignore is part of the repo.
@@ -27,16 +26,20 @@ test_that("ts without labels written correctly",  {
 
   comments <- c("This is a transposed timeseries", "")
 
-  msg <- paste0(
-    "^\nWriting timeseries to sheet ts1_t of file xlsx/ts1\\.xlsx ...\n",
-    ".*", # this is necessary when running via RStudio
-    "2 timeseries written, period range 2010Q2/2011Q2, 0\\.\\d{2} sec\\. ",
-    "elapsed\\.\\n$"
-  )
-  expect_output({
+  msgs <- capture_messages(
     write_ts_xlsx(ts1, file, sheet_name = "ts1_t",  rowwise = FALSE,
                   comments = comments, append = TRUE, verbose = TRUE)
-  }, msg)
+  )
+  expect_match(
+    msgs[1],
+    "^\nWriting timeseries to sheet ts1_t of file xlsx/ts1\\.xlsx ...\n"
+  )
+  expect_match(
+    msgs[2],
+    paste("2 timeseries written, period range 2010Q2/2011Q2, 0\\.\\d{2} sec\\.",
+          "elapsed\\.\\n\n$")
+  )
+
   wb <- openxlsx::loadWorkbook(file)
   # the next statement is redundant, but lets check it
   openxlsx::addWorksheet(wb, "ts1_times_2")
@@ -164,13 +167,24 @@ test_that("ts with labels written correctly (3)",  {
 
   wb <- openxlsx::loadWorkbook("xlsx_org/ts1_lbls.xlsx")
 
-  write_ts_sheet(ts1_lbls, wb, sheet_name = "ts1",
-                 number_format = "00.00")
+  write_ts_sheet(ts1_lbls, wb, sheet_name = "ts1", number_format = "00.00")
 
   openxlsx::addWorksheet(wb, "dummy")
 
-  write_ts_sheet(ts1_lbls, wb, sheet_name = "ts1_t",  rowwise = FALSE,
-                 number_format = "#.000")
+  msgs <- capture_messages(
+    write_ts_sheet(ts1_lbls, wb, sheet_name = "ts1_t",  rowwise = FALSE,
+                   number_format = "#.000", verbose = TRUE)
+  )
+  expect_match(
+    msgs[1],
+    "^\nWriting timeseries to sheet ts1_t ...\n"
+  )
+  expect_match(
+    msgs[2],
+    paste("2 timeseries written, period range 2010Q2/2011Q2, 0\\.\\d{2} sec\\.",
+          "elapsed\\.\\n\n$")
+  )
+
 
   openxlsx::saveWorkbook(wb, file, overwrite  = TRUE)
 
@@ -285,7 +299,8 @@ test_that("errors", {
   wmsg <- "cannot create file 'xxlsx/ts1_date.xlsx', reason 'No such file or directory'"
   emsg <-  "Failed to save workbook to file 'xxlsx/ts1_date.xlsx'\\. Check warnings\\."
 
-  withr::local_options(`openxlsx.minWidth` = 111)
+  withr::local_options(`openxlsx.minWidth` = 111,
+                       `openxlsx.maxWidth` = 120)
 
   expect_error(
     expect_warning(
@@ -296,4 +311,5 @@ test_that("errors", {
   )
 
   expect_equal(options("openxlsx.minWidth")[[1]], 111)
+  expect_equal(options("openxlsx.maxWidth")[[1]], 120)
 })

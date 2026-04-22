@@ -13,6 +13,9 @@ if (!dir.exists(user_lib_dir)) {
 
 if (!require("remotes", character.only = TRUE, quietly = TRUE)) {
   install.packages("remotes", dependencies = FALSE)
+} else {
+  unloadNamespace("remotes")
+
 }
 
 # Install extra packages needed to install isismdl with the install script.
@@ -20,6 +23,8 @@ extra_packages <- c("devtools", "tictoc")
 for (extra_package in extra_packages) {
   if (!require(extra_package, character.only = TRUE, quietly = TRUE)) {
     remotes::install_cran(extra_package, upgrade = "never")
+  } else {
+    unloadNamespace(extra_package)
   }
 }
 
