@@ -159,3 +159,6 @@ x$b   # Select columb b
 x$d <- 2  # Add a new column d, with value 2
 x
 }
+\seealso{
+\link{select_columns}.
+}

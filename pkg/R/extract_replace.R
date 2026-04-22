@@ -95,6 +95,8 @@
 #' add columns. If `j` has length 1, the result is a vector timeseries
 #' unless `drop = FALSE`.
 #'
+#' @seealso [select_columns].
+#'
 #' @examples
 #'
 #' # univariate timeseries
