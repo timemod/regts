@@ -7,6 +7,7 @@
 #' @param x A timeseries object (a \code{regts} or a \code{ts}).
 #' @param range The period range to select, as a \code{\link{period_range}}
 #' object or a character string that can be converted to a \code{period_range}.
+#' Partial ranges like `"2011/"` (from 2011 onwards) are supported.
 #' @return A \code{regts} object containing the selected period range.
 #' @examples
 #' data <- regts(1:10, start = "2010Q1")
