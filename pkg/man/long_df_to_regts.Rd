@@ -10,7 +10,7 @@ long_df_to_regts(df, name_col = "name", period_col = "period",
 \arguments{
 \item{df}{A long data frame (or \code{\link[tibble]{tibble}}) with at
 least three columns containing names, periods and values. The names
-of these column can be specified with arguments \code{name_col}, \code{period_col}
+of these columns can be specified with arguments \code{name_col}, \code{period_col}
 and \code{value_col}.}
 
 \item{name_col}{The name of the column with variable names

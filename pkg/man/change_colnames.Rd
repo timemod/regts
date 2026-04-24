@@ -23,7 +23,7 @@ Change the column names of a matrix or data frame by applying a function.
 \examples{
 data <- regts(matrix(1:8, ncol = 2), start = "2010Q2", names = c("a", "b"))
 
-# convert to column names tp upper case
+# convert column names to uppercase
 change_colnames(data, toupper)
 }
 \seealso{

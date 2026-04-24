@@ -62,7 +62,7 @@ select_columns <- function(x, regex, drop = TRUE, ...) {
   sel <- grep(regex, cnames, ...)
   if (length(sel) == 0) {
     # the result with drop = TRUE is weird, therefore use drop = FALSE
-    # if the selection was not succesfull
+    # if the selection was not successful
     return(x[, sel, drop = FALSE])
   } else {
     return(x[, sel, drop = drop])
@@ -90,9 +90,11 @@ select_cols_by_name <- function(x, names, strict = TRUE) {
   }
   if (anyDuplicated(cnames)) {
     dupl <- cnames[duplicated(cnames)]
-    warning("Duplicate column names (",
-            paste(dupl, collapse = ", "),
-            "). The first column(s) will be selected.")
+    warning(
+      "Duplicate column names (",
+      paste(dupl, collapse = ", "),
+      "). The first column(s) will be selected."
+    )
   }
   names <- unique(names)
   if (strict) {

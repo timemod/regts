@@ -3,7 +3,7 @@
 \name{write_ts_xlsx}
 \alias{write_ts_xlsx}
 \alias{write_ts_sheet}
-\title{Write timeseries to an xlsx file.}
+\title{Write timeseries to an xlsx file}
 \usage{
 write_ts_xlsx(x, file, sheet_name = "Sheet1", rowwise = TRUE,
   append = FALSE, labels = c("after", "before", "no"), comments,
@@ -63,10 +63,10 @@ range, and the elapsed time.}
 a sheet with a specified name.
 \code{write_ts_sheet} writes timeseries to a sheet of a workbook
 object returned by function \link[openxlsx:createWorkbook]{openxlsx::createWorkbook}
-or \link[openxlsx:loadWorkbook]{openxlsx::loadWorkbook} of package \link[openxlsx:openxlsx]{openxlsx::openxlsx}.
+or \link[openxlsx:loadWorkbook]{openxlsx::loadWorkbook}.
 }
 \details{
-The functions employ package \link[openxlsx:openxlsx]{openxlsx::openxlsx} package for writing the Excel file.
+The functions employ package \link[openxlsx:openxlsx]{openxlsx::openxlsx} for writing the Excel file.
 
 If you want to write multiple timeseries objects to different
 sheets, you can use \code{write_ts_xlsx} with argument
@@ -121,8 +121,7 @@ options(openxlsx.minWidth = 8.43, openxlsx.maxWidth = 60)
 ok <- saveWorkbook(wb, "timeseries.xlsx", overwrite = TRUE,
                    returnValue = TRUE)
 if (!ok) {
-  stop("Failed to save workbook to file '", output_file,
-       "'. Check warnings.")
+  stop("Failed to save workbook to file 'timeseries.xlsx'. Check warnings.")
 }
 
 # write a timeseries with comments

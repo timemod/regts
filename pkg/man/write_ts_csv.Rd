@@ -11,7 +11,7 @@ write_ts_csv(x, file, rowwise = TRUE, sep = ",", dec = ".",
 \arguments{
 \item{x}{A \link{ts} or \link{regts} object.}
 
-\item{file}{A \code{regts} object}
+\item{file}{The filename of the output file.}
 
 \item{rowwise}{A logical value: should the timeseries be written rowwise?}
 
@@ -25,8 +25,8 @@ labels are written after the names if present.}
 
 \item{period_format}{The period format. By default the
 \code{regts} format (e.g. \code{"2010Q2"}, see \code{\link{period}}) is used.
-Alternatively, it is possible to specify a format employed by base R function
-\code{\link[base]{strptime}}, e.g. \code{"\%Y-\%m-\%d"}.}
+Alternatively, it is possible to specify a format employed by the base R
+function \code{\link[base]{strptime}}, e.g. \code{"\%Y-\%m-\%d"}.}
 
 \item{verbose}{A logical (default \code{FALSE}). If \code{TRUE}, the function
 prints the filename, the number of timeseries written, the period range, and
@@ -37,7 +37,7 @@ Write timeseries to a csv file, using \link[data.table:fwrite]{data.table::fwrit
 }
 \examples{
 # create a timeseries object
-ts1 <- regts(matrix(rnorm(50), ncol =  2), names = c("a", "b"),
+ts1 <- regts(matrix(rnorm(50), ncol = 2), names = c("a", "b"),
              labels = c("Timeseries a", "Timeseries b"), start = "2017Q2")
 
 # write timeseries to csv

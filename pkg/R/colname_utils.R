@@ -31,7 +31,7 @@ tag_colnames <- function(x, tag) {
 #' @examples
 #' data <- regts(matrix(1:8, ncol = 2), start = "2010Q2", names = c("a", "b"))
 #'
-#' # convert to column names tp upper case
+#' # convert column names to uppercase
 #' change_colnames(data, toupper)
 #' @seealso \code{\link{tag_colnames}}
 #' @export
@@ -84,7 +84,7 @@ rename_cols <- function(.data, ...) {
 
   # The following code is based on dplyr::rename. Because
   # tidyselect::eval_rename uses the 'names' attribute of the data and not the
-  # colnames, we create an named vector with names equal to the column names,
+  # colnames, we create a named vector with names equal to the column names,
   # eval_rename does not look at the contents of argument data, we simply
   # create a vector of NAs
   colname_data <- rep(NA, length(cnames))

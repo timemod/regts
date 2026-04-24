@@ -13,7 +13,7 @@
 #'
 #' @param df A long data frame (or \code{\link[tibble]{tibble}}) with at
 #' least three columns containing names, periods and values. The names
-#' of these column can be specified with arguments `name_col`, `period_col`
+#' of these columns can be specified with arguments `name_col`, `period_col`
 #' and `value_col`.
 #' @param name_col The name of the column with variable names
 #' (by default `"name"`).
