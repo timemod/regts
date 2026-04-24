@@ -89,5 +89,5 @@ select_cols_by_name(data, c("nlc", "ukc"))
 drop_cols_by_name(data, c("nlc", "ukc"))
 }
 \seealso{
-\link{select}.
+\link{select} and \link{select_range}.
 }

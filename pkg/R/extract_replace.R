@@ -145,6 +145,7 @@
 #' x
 #' @name select
 #' @aliases [.regts  [[.regts  [<-.regts  $.regts  $<-.regts
+#' @seealso [select_range] and [select_columns].
 NULL
 
 # Use this command to prevent error from lintr about
