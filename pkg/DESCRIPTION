@@ -4,6 +4,7 @@ Title: Regular Timeseries
 Version: 2.3.0
 Authors@R: c(
  person("Rob", "van Harrevelt", email = "rvanharrevelt@gmail.com", role = c("aut", "cre")),
+ person("Elanur", "Akbas", email = "E.Akbas@cpb.nl", role = "aut"),
  person("Anita", "van der Roest", email = "J.C.van.der.Roest@cpb.nl",role = "aut")
  )
 Author: Rob van Harrevelt [aut, cre],
