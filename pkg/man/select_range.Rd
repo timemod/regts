@@ -10,7 +10,8 @@ select_range(x, range)
 \item{x}{A timeseries object (a \code{regts} or a \code{ts}).}
 
 \item{range}{The period range to select, as a \code{\link{period_range}}
-object or a character string that can be converted to a \code{period_range}.}
+object or a character string that can be converted to a \code{period_range}.
+Partial ranges like \code{"2011/"} (from 2011 onwards) are supported.}
 }
 \value{
 A \code{regts} object containing the selected period range.
