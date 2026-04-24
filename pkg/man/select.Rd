@@ -161,4 +161,6 @@ x
 }
 \seealso{
 \link{select_columns}.
+
+\link{select_range} and \link{select_columns}.
 }

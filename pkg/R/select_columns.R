@@ -48,7 +48,7 @@
 #' # Drop columns "nlc" and "ukc" by exact name
 #' drop_cols_by_name(data, c("nlc", "ukc"))
 #' @name select_columns
-#' @seealso [select].
+#' @seealso [select] and [select_range].
 NULL
 
 #' @describeIn select_columns Select columns whose names match a regular
