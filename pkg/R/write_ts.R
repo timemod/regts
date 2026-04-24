@@ -479,7 +479,7 @@ write_ts_sheet_ <- function(
   return(invisible(NULL))
 }
 
-# Internal function that converts a timeseries to a data frames that can be
+# Internal function that converts a timeseries to a data frame that can be
 # written to a csv or excel file. The function returns a list with
 # three elements:
 #   data          : The data part of the timeseries (excluding column headers).
