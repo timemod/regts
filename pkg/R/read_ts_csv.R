@@ -228,7 +228,7 @@ read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, layout,
                             strict, filename) {
 
   if (is.list(layout$periods)) {
-    # There are periods with differnet frequencies.
+    # There are periods with different frequencies.
     # The exact row number is unknown, because of the automatic row skipping.
     # Therefore the error message cannot be as specific as for read_ts_xlsx.
     stop(sprintf(paste0("Periods with different frequencies found in the ",
@@ -270,7 +270,7 @@ read_ts_columnwise <- function(tbl, frequency, dec, period_fun, layout, strict,
   periods <- get_periods_data(tbl[[layout$period_col]], frequency,
                               xlsx = FALSE, period_fun = period_fun)
   if (is.list(periods)) {
-    # There are periods with differnet frequencies.
+    # There are periods with different frequencies.
     # The exact row number is unknown, because of the automatic row skipping.
     # Therefore the error message cannot be as specific as for read_ts_xlsx.
     col <- num_to_letter(layout$period_col + skipcol)

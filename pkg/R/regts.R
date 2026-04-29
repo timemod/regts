@@ -590,7 +590,7 @@ as.regts.numeric <- function(x, fun = period, strict = TRUE, ...) {
 
   if (length(x) > 0 && !is.null(periods <- names(x))) {
 
-    # x is a named vector. The names possiby contain period texts
+    # x is a named vector. The names possibly contain period texts
 
     if (missing(fun) && missing(strict)) {
 
