@@ -32,7 +32,7 @@ using the standard date format \code{"\%Y-\%m-\%d"}
 (see the documentation of function \code{\link[base]{strptime}}
 for more information about date formats).}
 
-\item{long}{Return the result is so called long format, i.e. a
+\item{long}{Return the result in so called long format, i.e. a
 data frame with one row for each observation. The result is a data frame
 with columns \code{name}, \code{period} and \code{value} (if the timeseries has labels,
 there will be an additional column \code{label} after the column \code{name}).

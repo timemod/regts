@@ -13,7 +13,7 @@ pct2index(x, base = NULL, scale = 100, keep_range = TRUE)
 }
 \arguments{
 \item{x}{a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a
-multivariate timeseries) with the relative of percentage changes.}
+multivariate timeseries) with the relative or percentage changes.}
 
 \item{base}{a \code{\link{period}} or a
 \code{\link{period_range}} specifying the base period, or an object that can

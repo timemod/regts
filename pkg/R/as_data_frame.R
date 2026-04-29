@@ -7,7 +7,7 @@ as_data_frame <- function(x, ...) {
 #'
 #' @details
 
-#' Three different format for the data frame are possbile.
+#' Three different formats for the data frame are possible.
 #'
 #' **1. columnwise (default)**
 #'

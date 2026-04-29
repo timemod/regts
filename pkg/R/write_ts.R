@@ -103,7 +103,7 @@ write_ts_csv <- function(
 #' The latter approach is more efficient.
 #' When the workbook is written to a file with function
 #' [openxlsx::saveWorkbook], it is often useful to
-#' set the minimum and maximum scolumn width option for package [openxlsx],
+#' set the minimum and maximum column width option for package [openxlsx],
 #' as shown in the example below.
 #'
 #' @section Warning:

@@ -55,7 +55,7 @@ disagg <- function(x, nfrequency,
     is_mat <- TRUE
   }
 
-  # call C++ function disagg_sline (see src/disagg_spline.cpp)
+  # call C++ function disagg_spline (see src/disagg_spline.cpp)
   res <- disagg_spline(x, nfrequency, constraint, conds)
   data  <- res[[1]]
   range_new <- res[[2]]

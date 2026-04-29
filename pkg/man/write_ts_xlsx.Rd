@@ -77,7 +77,7 @@ function \link[openxlsx:createWorkbook]{openxlsx::createWorkbook} of package
 The latter approach is more efficient.
 When the workbook is written to a file with function
 \link[openxlsx:saveWorkbook]{openxlsx::saveWorkbook}, it is often useful to
-set the minimum and maximum scolumn width option for package \link[openxlsx:openxlsx]{openxlsx::openxlsx},
+set the minimum and maximum column width option for package \link[openxlsx:openxlsx]{openxlsx::openxlsx},
 as shown in the example below.
 }
 \section{Functions}{

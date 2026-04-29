@@ -47,7 +47,7 @@ A \code{\link[base]{data.frame}}
 Convert a \code{\link{regts}} to a \code{\link[base]{data.frame}}
 }
 \details{
-Three different format for the data frame are possbile.
+Three different formats for the data frame are possible.
 
 \strong{1. columnwise (default)}
 
