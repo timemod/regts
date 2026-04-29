@@ -232,7 +232,7 @@ read_ts_rowwise <- function(tbl, frequency, labels, dec, name_fun, layout,
     # The exact row number is unknown, because of the automatic row skipping.
     # Therefore the error message cannot be as specific as for read_ts_xlsx.
     stop(sprintf(paste0("Periods with different frequencies found in the ",
-                        "%d'th non-skipped row in file file %s."),
+                        "%d'th non-skipped row in file %s."),
                  layout$period_row, filename))
   }
 

@@ -272,7 +272,7 @@ test_that("example6.csv read correctly", {
 
   expect_error(read_ts_csv(csv_file, rowwise = TRUE),
                paste("Periods with different frequencies found in the 2'th",
-                     "non-skipped row in file file csv/example6.csv."))
+                     "non-skipped row in file csv/example6.csv."))
 })
 
 test_that("double_row.csv is read correctly and gives warning",  {

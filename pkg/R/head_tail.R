@@ -43,15 +43,21 @@ tail.regts <- function(x, n = 6L, ...) {
 #' @export
 topleft <- function(x, n = 6L, ncol = 10L) {
 
-  if (!is.ts(x)) {
+  if (!inherits(x, "ts")) {
     stop("Argument x is not a timeseries")
   }
+  if (!is.matrix(x)) {
+    stop("Argument x is not a matrix timeseries")
+  }
 
-  first <- start_period(get_period_range(x))
-  last  <- end_period(get_period_range(x))
+  x <- as.regts(x)
+
+  r <- get_period_range(x)
+  first <- start_period(r)
+  last  <- end_period(r)
   period <- period_range(first, min(first + n - 1, last))
 
   ncol <- min(ncol, ncol(x))
 
-  return(x[period, 1:ncol, drop = FALSE])
+  return(x[period, seq_len(ncol), drop = FALSE])
 }
