@@ -76,7 +76,7 @@ lag_ts.default <- function(x, n = 1, keep_range = TRUE, ...) {
 #' @param keep_range if \code{TRUE} (the default), then the output
 #' timeseries has the same period range as the input timeseries.
 #' The result timeseries will have \code{n} \code{NA} values at the
-#' beginning end.
+#' beginning and end.
 #' If \code{FALSE} the period range of the result timeseries is shifted
 #' by \code{n} periods. The result timeseries
 #' starts and ends \code{n} periods earlier.

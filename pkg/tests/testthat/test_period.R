@@ -83,7 +83,7 @@ test_that("errors", {
                "Frequency of period 2001-4 unknown. Specify argument frequency.")
   expect_error(period("2001Q4", frequency = 12),
                paste("Specified frequency 12 does not agree with actual frequency",
-                    "in period 2001Q4."))
+                     "in period 2001Q4."))
   expect_error(period("xxx"), "Illegal period xxx")
   expect_error(period("2010M2a"), "Illegal period 2010M2a")
   expect_error(period("20103"), "Illegal period 20103")
@@ -120,6 +120,13 @@ test_that("errors", {
   expect_error(period(2018, "xxx"), msg)
   expect_error(period(2018, 2:4), msg)
   expect_error(period(2018, 2.5), msg)
+
+  d <- as.Date("2010-05-01")
+  expect_error(
+    period(as.POSIXlt(d), frequency = 5),
+    "12 is not divisible by the specified frequency (5)",
+    fixed = TRUE
+  )
 })
 
 test_that("frequency", {
@@ -191,8 +198,8 @@ test_that("as.period", {
 })
 
 test_that("print period", {
-  expect_output(print(period("2010q2")),"2010Q2")
-  expect_output(print(period("2010-1", freq = 12) - 3),"2009M10")
+  expect_output(print(period("2010q2")), "2010Q2")
+  expect_output(print(period("2010-1", freq = 12) - 3), "2009M10")
 })
 
 test_that("get_year / get_subperiod", {
@@ -237,7 +244,7 @@ test_that("regts:::is_period_text", {
   expect_false(regts:::is_period_text("2010.25", frequency = NA))
   expect_false(regts:::is_period_text("2010.25", frequency = 1))
   expect_false(regts:::is_period_text(as.character(period(NA_character_, 4)),
-                                                   frequency = 1))
+                                      frequency = 1))
 })
 
 test_that("c", {
@@ -263,15 +270,19 @@ test_that("seq.period", {
                "is not divisible by\nlength.out - 1 = 3.")
   expect_error(seq(p, p + 8, length.out = 4), msg)
 
-  expect_error(seq(p, 8), paste("Argument 'to' has a different frequency",
-        "\\(1\\) than argument 'from' \\(4\\)"))
+  expect_error(
+    seq(p, 8),
+    paste("Argument 'to' has a different frequency",
+          "\\(1\\) than argument 'from' \\(4\\)")
+  )
 
   expect_error(seq(p, p + 2, by = 0.5), "Argument 'by' is not an integer")
 
   expect_error(seq(p, p + 8, by = 3, length.out = 3), "too many arguments")
 
-  expect_error(seq(p, "2012m2"), paste("Argument 'to' has a different frequency",
-               "\\(12\\) than argument 'from' \\(4\\)"))
+  expect_error(seq(p, "2012m2"),
+               paste("Argument 'to' has a different frequency",
+                     "\\(12\\) than argument 'from' \\(4\\)"))
 })
 
 
@@ -294,18 +305,18 @@ test_that("seq.character", {
   expect_error(seq(ptxt, p + 8, length.out = 4), msg)
 
   expect_error(seq(ptxt, 8), paste("Argument 'to' has a different frequency",
-                                "\\(1\\) than argument 'from' \\(4\\)"))
+                                   "\\(1\\) than argument 'from' \\(4\\)"))
 
   expect_error(seq(ptxt, as.character(p + 2), by = 0.5), "Argument 'by' is not an integer")
 
   expect_error(seq(ptxt, p + 8, by = 3, length.out = 3), "too many arguments")
 
   expect_error(seq(ptxt, "2012m2"), paste("Argument 'to' has a different frequency",
-                                       "\\(12\\) than argument 'from' \\(4\\)"))
+                                          "\\(12\\) than argument 'from' \\(4\\)"))
 
   expect_identical(seq("2010", 2011), period(c("2010", "2011")))
   expect_identical(seq(2010, "2011"), 2010:2011)
-  expect_identical(seq(to =" 2010", length.out = 2), period(c("2009", "2010")))
+  expect_identical(seq(to = " 2010", length.out = 2), period(c("2009", "2010")))
 })
 
 test_that("as.character and print", {
@@ -356,14 +367,15 @@ test_that("multiple periods", {
                    c(pq1, pq2, pq3))
 
   expect_error(period(c(2010, 2010.5), frequency = 1),
-              "If frequency == 1, then x should be an integer.")
+               "If frequency == 1, then x should be an integer.")
 
   expect_error(period(c(2010, NA, 2011)),
                "Argument frequency should be specified.")
 
   expect_identical(
     period(c(as.Date("2010-04-01"), as.Date("2010-07-01")), frequency = 4),
-          c(pq1, pq2))
+    c(pq1, pq2)
+  )
 
   # multiple texts
   expect_identical(period(c("2010q2", "2011", "2018m3")), list(pq1, py2, pm1))

@@ -29,7 +29,7 @@
 
 \item{i}{Indices for the first dimension.
 A numeric vector or a \code{\link{period}},
-\code{\link{period_range}} or an character that be coerced to
+\code{\link{period_range}} or a character that can be coerced to
 a \code{period} or \code{period_range} object. The frequency of the
 specified period or period range must be equal to or lower than
 the frequency of the timeseries.}

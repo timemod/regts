@@ -21,7 +21,7 @@
 #' to extrapolate the timeseries. The period should be smaller than
 #' `to`. See Details.
 #' @param method the extrapolation method. See details.
-#' @return a code `regts` object
+#' @return a `regts` object
 #' @examples
 #' # univariate ts
 #' x <- regts(rnorm(3), start = "2019q1")

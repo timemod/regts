@@ -37,10 +37,16 @@ as.list.regts <- function(x, ...) {
     return(retval)
   }
 
+  nc <- NCOL(x)
+
+  # if x has zero columns, return an empty list.
+  if (nc == 0) {
+    return(list())
+  }
+
   if (is.null(colnames(x))) {
     # Create column names from the name of x
     xname <- deparse(substitute(x))
-    nc <- NCOL(x)
     if (nc == 1) {
       colnames(x) <- xname
     } else {

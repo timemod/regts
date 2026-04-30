@@ -181,7 +181,8 @@ as.period.POSIXlt <- function(x, frequency = NA, ...) {
 
   if (frequency != 12) {
     if (12 %% frequency != 0) {
-      stop(sprintf("12 is not divisibly by te specified frequency (%d)"))
+      stop(sprintf("12 is not divisible by the specified frequency (%d)",
+                   frequency))
     } else {
       subperiod <- floor((month - 1) * frequency / 12 + 1)
     }

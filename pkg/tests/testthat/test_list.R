@@ -177,3 +177,9 @@ test_that("exotic timeseries types", {
              start = "2010", labels = c("Var x", "Var y"))
   expect_error(as.list(x), "Unknown timeseries element type")
 })
+
+test_that("regts with zero columns", {
+  data <- regts(matrix(1:3, ncol = 1, nrow = 3), names = "a", start = "2010")
+  data <- data[, character(0), drop = FALSE]
+  expect_equal(as.list(data), list())
+})

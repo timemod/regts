@@ -22,7 +22,7 @@ to extrapolate the timeseries. The period should be smaller than
 \item{method}{the extrapolation method. See details.}
 }
 \value{
-a code \code{regts} object
+a \code{regts} object
 }
 \description{
 Extrapolate a timeseries forwards by assuming a constant level or first

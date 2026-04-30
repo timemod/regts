@@ -34,7 +34,7 @@
 #' therefore it can be arbitrarily set to 1.
 #'
 #' @param x  a \code{\link[stats]{ts}} or \code{\link{regts}} (can also be a
-#' multivariate timeseries) with the relative of percentage changes.
+#' multivariate timeseries) with the relative or percentage changes.
 #' @param base a \code{\link{period}} or a
 #' \code{\link{period_range}} specifying the base period, or an object that can
 #' be coerced to a \code{period} or \code{period_range}. The (average) value

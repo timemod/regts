@@ -41,7 +41,7 @@ cbind.regts <- function(..., union = TRUE, suffixes) {
 # Returns the names of the ... arguments.
 # For example, if cbind was called as cbind(a, b), then this
 # function returns c("a", "b"). However, if cbind was called as
-# cbind(x = a, y= b), then the returned value if c("x", "y").
+# cbind(x = a, y= b), then the returned value is c("x", "y").
 # This code is based on the function stats:::.makeNamesTs.
 .get_ts_names <- function(...) {
 
