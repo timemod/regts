@@ -13,3 +13,4 @@ archive
 *.Rd2*
 pkg.Rcheck
 .DS_Store
+.positai
